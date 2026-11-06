@@ -714,7 +714,7 @@ Public API support, considering teams from the initial model and avoiding explic
 | D-05 | Withdrawal/disqualification | Keep effective previous results; resolve future matches under §7/§9; member and team sanctions separate | H1 |
 | D-06 | Waiting-list promotion | Direct automatic promotion while open; director promotion after closure | H1 |
 | D-07 | Corrections with dependencies | Initially apply only without published dependencies; detect/block others | H1 |
-| D-08 | Tournament lifecycle ownership | Explicit owner of configuration/lifecycle; do not assume tournament creation belongs entirely to Registration | H1 design |
+| D-08 | Tournament lifecycle ownership | **Settled:** the Tournaments module owns configuration, publication, visibility and lifecycle; Registration owns admission (ADR 0004) | H1 design |
 | D-09 | Public identity/history | Public alias without email; tournament visibility inherited; actual lineup participation distinct from roster registration | H2 public launch |
 | D-10 | Competitor confirmation | No silence-based confirmation; operator escalation; team representation required | H2 |
 | D-11 | External profile compatibility | Shared formulas, bye treatment, drawn games and participation rules | H4 |

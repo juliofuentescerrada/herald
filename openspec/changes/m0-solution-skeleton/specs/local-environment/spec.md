@@ -8,7 +8,7 @@ Running the AppHost SHALL start a PostgreSQL container and the host, with the ho
 - **THEN** the Aspire dashboard shows PostgreSQL and the host running, and the host's health check is healthy
 
 ### Requirement: The host composes every module
-The host SHALL register each of the three modules through the module's own registration entry point, so that a module is added to the host in one place.
+The host SHALL register each module through the module's own registration entry point, so that a module is added to the host in one place.
 
 #### Scenario: The host starts with all modules registered
 - **WHEN** the host starts

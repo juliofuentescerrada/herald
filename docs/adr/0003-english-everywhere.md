@@ -9,7 +9,9 @@ Herald is meant to be read by people who don't share the maintainer's first lang
 
 ## Decision
 
-Everything in the repository is in English: code, comments, docs, specs, commit messages and UI text.
+Everything in the repository is in English: code, comments, docs, specs, commit messages and UI text. British spelling, the same in code and docs (`Organisation`, `organiser`, `licence`); framework and library names keep their own.
+
+Herald's domain calls the organising entity an **organisation**, never a tenant; "tenant" is kept for Entra ID's own term.
 
 ## Alternatives considered
 

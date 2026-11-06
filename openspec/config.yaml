@@ -21,8 +21,11 @@ context: |
     Design notes and measurements go in the change's design.md. ADRs are superseded, never edited.
     Design inputs already in docs/: herald-functional-discovery.md, herald-visual-direction.md,
     assets/mockups/, herald-domain-overview.pptx.
-  - Modular monolith: one hexagonal module per bounded context (Registration, Competition,
-    Standings); modules talk only through integration events in Herald.Contracts (ADR 0004).
+  - Modular monolith: one hexagonal module per bounded context; the set evolves with the design
+    (today Organisations, Tournaments, Registration, Competition, Standings) and a change that
+    moves a boundary explains it in its design.md; modules talk only through integration events
+    in Herald.Contracts (ADR 0004).
+  - Organisation, never "tenant", for the organising entity; British spelling (ADR 0003).
   - CQRS: commands through aggregates, queries as no-tracking projections (ADR 0005).
   - DDD: aggregates own the rules and raise domain events; integration events leave through
     the transactional outbox; consumers are idempotent; contract changes are backwards

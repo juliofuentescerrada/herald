@@ -6,16 +6,16 @@ Nothing is built yet, and every later milestone needs a solution to put code in,
 
 - A .NET 10 solution `Herald.slnx` with central package management, shared build properties and a pinned SDK running tests on Microsoft.Testing.Platform.
 - `Herald.BuildingBlocks` and `Herald.Contracts`, created empty: their content arrives with the first code that needs it.
-- Three modules, `Herald.Registration`, `Herald.Competition` and `Herald.Standings`, one project each with `Domain`, `Application` (`Commands`, `Queries`, `Ports`) and `Adapters`, each exposing one registration entry point the host calls.
+- The initial modules (ADR 0004), `Herald.Organisations`, `Herald.Tournaments`, `Herald.Registration`, `Herald.Competition` and `Herald.Standings`, one project each with `Domain`, `Application` (`Commands`, `Queries`, `Ports`) and `Adapters`, each exposing one registration entry point the host calls.
 - `Herald.Host` (ASP.NET Core), which composes the modules and reports its health, including the database's.
 - `Herald.ServiceDefaults` (OpenTelemetry, health endpoints, resilience) and `Herald.AppHost` (.NET Aspire), which starts PostgreSQL and the host.
-- Architecture tests that enforce ADR 0004: modules don't reference each other, `Domain` depends on nothing but the building blocks, `Application` doesn't depend on `Adapters`.
+- Architecture tests that enforce ADR 0004 over a single module list that later changes extend: modules don't reference each other, `Domain` depends on nothing but the building blocks, `Application` doesn't depend on `Adapters`.
 - An API test of the host's health against real PostgreSQL (Testcontainers), the first test of the ADR 0010 kind.
 - xUnit v3 with Shouldly as the assertion library, which answers the ADR 0010 follow-up.
 - A GitHub Actions workflow: format, build and test on every pull request and on `main`.
 - `CLAUDE.md` gets its Commands section; the roadmap marks this change.
 
-Out of scope: Wolverine, EF Core, the outbox and the broker (`m0-messaging`); the Angular workspace and app shell (`m0-web-shell`). No screens: mockups are not applicable.
+Out of scope: Wolverine, EF Core, the outbox and the broker (`m0-messaging`); the Angular workspace, both app shells and the OpenAPI document (`m0-web-shell`). No screens: mockups are not applicable.
 
 ## Capabilities
 

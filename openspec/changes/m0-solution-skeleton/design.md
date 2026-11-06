@@ -6,10 +6,10 @@ The repository holds only documentation: ADRs 0001–0012 (Proposed), the roadma
             m0-solution-skeleton  (this change)
                │                │
        m0-messaging        m0-web-shell
-  Wolverine, EF Core,     Angular 22, TanStack Query,
-  outbox/inbox, RabbitMQ  Tailwind 4, admin (CSR) and
-  locally, probe message  public (hybrid), API client
-  in tests only
+  Wolverine, EF Core,     Angular workspace: admin
+  outbox/inbox, RabbitMQ  (CSR) and public (hybrid)
+  locally, probe message  shells, ui library, OpenAPI
+  in tests only           document and API client
 ```
 
 Decisions taken in that exploration that belong to the later changes are recorded there: RabbitMQ as the local broker through Aspire (a revision of ADR 0009's follow-up), and an outbox proven by a message that exists only in tests.
@@ -30,19 +30,15 @@ None. This change has no user interface, so mockups are not applicable.
 **Non-Goals:**
 
 - Wolverine, EF Core, migrations, the outbox, the broker: `m0-messaging`.
-- Angular and the generated API client: `m0-web-shell`.
+- Angular and the generated API client: `m0-web-shell`, which also makes the host build write the OpenAPI document (ADR 0011) because it is the first consumer. Whether Wolverine's endpoints appear in it stays with `m0-messaging` (ADR 0005).
 - Domain base types (aggregate root, domain event) in `Herald.BuildingBlocks`: they arrive with the first aggregate in M1, shaped by its use.
 - Deployment and Azure (M4).
 
 ## Decisions
 
-### Frontend boundary (carried to `m0-web-shell`)
+### Frontend
 
-Frontend decisions carried to `m0-web-shell` (ADR 0011): one Angular workspace with admin (CSR) and public/participant (hybrid) apps; shared UI, tokens and generated API client. Corporate pages use SSG under their own layout; public tournament pages and the initial discovery view use SSR; personal workflows and live updates run in the browser. There is no separate corporate framework.
-
-`m0-web-shell` establishes both shells, hybrid route configuration and a representative prerender/hydration check. API-backed SSR, metadata and visibility/request-cache isolation are verified with the first public tournament page. The complete corporate site and discovery flows are outside M0. M4 resolves SSR runtime hosting (ADR 0012). None of this adds frontend work to this solution-skeleton change.
-
-The later frontend change creates an internal `ui` library consumed by both shells, separate from `api-client`. Share tokens and common controls; keep feature components and app-local shared components within their app. `ui` has no dependency on apps, API clients, sessions, permissions or app routes and must support SSR. M0 adds only the pieces used by the shells. A component/state catalogue follows with the first controls as development tooling, not a third product application; the tool and external component foundation remain follow-ups (ADR 0011).
+ADR 0011 and `m0-web-shell`; this change adds no frontend work.
 
 ### Layout
 
@@ -57,7 +53,9 @@ src/
   Herald.Host/              ASP.NET Core; calls each module's AddXxxModule()
   Herald.BuildingBlocks/    empty
   Herald.Contracts/         empty; references BuildingBlocks
-  Herald.Registration/      Domain/ Application/{Commands,Queries,Ports}/ Adapters/
+  Herald.Organisations/     Domain/ Application/{Commands,Queries,Ports}/ Adapters/
+  Herald.Tournaments/       same
+  Herald.Registration/      same
   Herald.Competition/       same
   Herald.Standings/         same
 tests/
@@ -71,9 +69,11 @@ Module test projects (domain and use-case tests) are not created until the modul
 
 ### Module entry point
 
-Each module exposes one `IServiceCollection` extension (`AddRegistrationModule()` and so on) in `Adapters`, and the host calls the three. It is the single place a module plugs into the host, and it gives the architecture tests a real type in each assembly to load the assembly from. It registers nothing yet; `m0-messaging` adds the module's `DbContext` and Wolverine discovery there.
+Each module exposes one `IServiceCollection` extension (`AddRegistrationModule()` and so on) in `Adapters`, and the host calls each one. It is the single place a module plugs into the host, and it gives the architecture tests a real type in each assembly to load the assembly from. It registers nothing yet; `m0-messaging` adds the module's `DbContext` and Wolverine discovery there.
 
-Alternative: reflection-based module discovery in the host. Rejected: three explicit calls are clearer than a scan.
+Alternative: reflection-based module discovery in the host. Rejected: one explicit call per module is clearer than a scan.
+
+The modules are ADR 0004's initial set, created empty. They are expected to move: a later change that adds, merges, splits or renames one updates the host's calls and the architecture tests' module list, and explains why in its `design.md`.
 
 ### Architecture tests: NetArchTest.eNhancedEdition
 
@@ -81,7 +81,7 @@ Rules are written per module over namespaces (`Herald.<Module>.Domain` must not 
 
 Alternatives: ArchUnitNET (Apache-2.0), richer but heavier and with its own rule language; reading `.csproj` files, which catches project references but not types. NetArchTest (MIT) works with any test framework and its failures list the offending types.
 
-The test of "every module is checked" asserts that the three expected assemblies are loaded, so renaming a module can't silently skip its rules.
+The module list is one array in the test project. The test of "every module is checked" asserts that every assembly in it is loaded, so renaming a module can't silently skip its rules.
 
 ### Database health without EF Core yet
 
@@ -105,6 +105,10 @@ One job on `ubuntu-latest` (Docker available): restore, `dotnet format --verify-
 - [Pinned SDK falls behind] → `rollForward: latestFeature`; bump the pin when CI's `setup-dotnet` or format results diverge.
 - [`Aspire.Npgsql` is temporary] → recorded here; `m0-messaging` removes it.
 - [The AppHost isn't exercised in CI] → its wiring is small; an Aspire integration test (`Aspire.Hosting.Testing`) is added if it starts to grow or break.
+
+## Sequencing
+
+This change is archived before `m0-messaging` and `m0-web-shell` are proposed, so both build on its specs in `openspec/specs/`: `m0-web-shell` modifies `local-environment` (the AppHost starts both apps) and `continuous-integration` (the web job).
 
 ## Migration Plan
 
