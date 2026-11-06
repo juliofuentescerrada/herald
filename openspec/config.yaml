@@ -9,6 +9,14 @@ context: |
   Apps, Key Vault, Entra ID, OpenTofu, GitHub Actions.
 
   Conventions:
+  - UI sharing (ADR 0011): an internal ui library from M0, consumed by both shells,
+    separate from api-client; feature and app-local shared components remain in their app.
+    ui supports SSR and has no app/API/session/permission/routing dependencies. Add a
+    component/state catalogue as development tooling with the first controls, not a third product app.
+  - Frontend (ADR 0011): one Angular workspace, admin (CSR) and public/participant (hybrid)
+    apps; SSG for corporate pages, SSR for dynamic public entry pages, CSR for personal
+    workflows and live updates. Shared UI/tokens/API client, isolated SSR request state
+    and public-only shared caches. Hosting includes an SSR runtime (ADR 0012).
   - Everything in English. Docs are minimal: README.md, CLAUDE.md, docs/roadmap.md, docs/adr/.
     Design notes and measurements go in the change's design.md. ADRs are superseded, never edited.
     Design inputs already in docs/: herald-functional-discovery.md, herald-visual-direction.md,

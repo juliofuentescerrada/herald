@@ -17,6 +17,8 @@ Herald runs tournaments (league, knockout, single match) and is game-agnostic: g
 ## Rules
 
 - Everything in English (ADR 0003).
+- UI sharing (ADR 0011): an internal `ui` library from M0, consumed by both shells, separate from `api-client`; feature and app-local shared components remain in their app. `ui` supports SSR and has no app/API/session/permission/routing dependencies. Add a component/state catalogue as development tooling with the first controls, not a third product app.
+- Frontend (ADR 0011): one Angular workspace, admin (CSR) and public/participant (hybrid) apps; SSG for corporate pages, SSR for dynamic public entry pages, CSR for personal workflows and live updates. Shared UI/tokens/API client, isolated SSR request state and public-only shared caches. Hosting includes an SSR runtime (ADR 0012).
 - Original work only: no code, names, structure or text taken from other codebases, the maintainer's employers' included. Concepts are public knowledge; their implementation here is Herald's own.
 - The core is game-agnostic (ADR 0002): no game names or rules in `Domain`; a game's rules enter as a policy, its data through an adapter. No Wizards of the Coast content in the repository.
 - Modules (ADR 0004): one per bounded context (Registration, Competition, Standings as read models), each with `Domain`, `Application` (`Commands`, `Queries`, `Ports`) and `Adapters`. `Domain` references no other project and no package but the building blocks; modules never reference each other, only `Herald.Contracts`; one PostgreSQL schema per module, no cross-schema joins.

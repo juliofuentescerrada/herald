@@ -11,7 +11,7 @@ Herald shares an Azure subscription with the maintainer's other projects, Arcana
 
 ## Decision
 
-- **Compute:** Azure Container Apps for the host, scaling to zero when idle; the Angular app as static files (Static Web Apps, or served by the host; decided in the cloud milestone).
+- **Compute:** Azure Container Apps for the .NET API host, scaling to zero when idle. The Angular admin app and prerendered corporate pages are static assets; the public/participant app also needs a server runtime for SSR routes (ADR 0011). Static-only hosting is insufficient for those routes. M4 decides runtime placement (including a Node.js container on Container Apps as an option), static/dynamic route serving and cache configuration, and measures SSR/API cold starts and their effect on initial public responses.
 - **Data and messaging:** Azure Database for PostgreSQL Flexible Server and Azure Service Bus (ADRs 0007, 0009).
 - **Identity and secrets:** a managed identity per app reaching PostgreSQL, Service Bus and Key Vault without passwords; users sign in with Entra ID (the tenant type decided with the sign-in change).
 - **Telemetry:** OpenTelemetry from the start (through Aspire's service defaults locally), exported to Application Insights in Azure.
@@ -39,4 +39,5 @@ Herald shares an Azure subscription with the maintainer's other projects, Arcana
 - Positive: a deployment that reads like a production one and costs little idle.
 - Negative: Service Bus and PostgreSQL have a fixed monthly cost even idle; cold starts after scale to zero.
 - Negative: Herald's cloud milestone depends on work in another repository.
+- Negative: SSR adds a frontend server runtime to deploy and observe alongside the API; shared caches exclude private and personalised responses and request-specific state stays isolated (ADR 0011).
 - Follow-ups: the platform repository and its ADR (the split above, how projects find the platform: `data` sources by name or a versioned lookup module rather than reading its state, the least privilege each project's pipeline needs on shared resources, and whether Arcana's server and environment are imported or recreated with platform names); then region (North Europe, as Arcana), naming and a cost estimate for Herald, in M4.

@@ -103,6 +103,8 @@ Use sentence case for actions and headings. Icons share one consistent outline f
 
 ## 5. Shared component contracts
 
+Implementation boundary (ADR 0011): an internal Angular `ui` library supplies shared tokens and common controls to both applications. Portal compositions, feature components and app-local shared components stay within their app. Shared controls support SSR and expose presentation contracts without API, session, permission or app-routing dependencies. A component/state catalogue is development tooling introduced with the first controls, not a third product application. The choice of external component foundation versus our own controls remains open.
+
 | Component | Common contract | Admin emphasis | Public emphasis |
 | --- | --- | --- | --- |
 | Button | Primary, secondary, quiet and destructive variants; hover, focus, loading, disabled | One primary action per operation area | One clear next action per tournament or participation state |

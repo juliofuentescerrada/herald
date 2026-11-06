@@ -7,8 +7,8 @@ The repository holds only documentation: ADRs 0001–0012 (Proposed), the roadma
                │                │
        m0-messaging        m0-web-shell
   Wolverine, EF Core,     Angular 22, TanStack Query,
-  outbox/inbox, RabbitMQ  Tailwind 4, admin and public
-  locally, probe message  shells, generated API client
+  outbox/inbox, RabbitMQ  Tailwind 4, admin (CSR) and
+  locally, probe message  public (hybrid), API client
   in tests only
 ```
 
@@ -35,6 +35,14 @@ None. This change has no user interface, so mockups are not applicable.
 - Deployment and Azure (M4).
 
 ## Decisions
+
+### Frontend boundary (carried to `m0-web-shell`)
+
+Frontend decisions carried to `m0-web-shell` (ADR 0011): one Angular workspace with admin (CSR) and public/participant (hybrid) apps; shared UI, tokens and generated API client. Corporate pages use SSG under their own layout; public tournament pages and the initial discovery view use SSR; personal workflows and live updates run in the browser. There is no separate corporate framework.
+
+`m0-web-shell` establishes both shells, hybrid route configuration and a representative prerender/hydration check. API-backed SSR, metadata and visibility/request-cache isolation are verified with the first public tournament page. The complete corporate site and discovery flows are outside M0. M4 resolves SSR runtime hosting (ADR 0012). None of this adds frontend work to this solution-skeleton change.
+
+The later frontend change creates an internal `ui` library consumed by both shells, separate from `api-client`. Share tokens and common controls; keep feature components and app-local shared components within their app. `ui` has no dependency on apps, API clients, sessions, permissions or app routes and must support SSR. M0 adds only the pieces used by the shells. A component/state catalogue follows with the first controls as development tooling, not a third product application; the tool and external component foundation remain follow-ups (ADR 0011).
 
 ### Layout
 
