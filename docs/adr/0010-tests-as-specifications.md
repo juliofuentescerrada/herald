@@ -16,16 +16,17 @@ Herald's tests are part of what it shows: a reviewer should be able to read the 
 - **Architecture tests:** the dependency rules of ADR 0004.
 - **Front end:** Vitest and Testing Library, testing what the user sees and does; Playwright for a few end-to-end journeys.
 
-xUnit v3 on Microsoft.Testing.Platform, as in the maintainer's other projects. Mocks only at ports to things outside Herald (a clock, a result source).
+xUnit v3 on Microsoft.Testing.Platform, as in the maintainer's other projects, with **Shouldly** for assertions: its failure messages quote the expression that failed, which reads well next to sentence-style names. Mocks only at ports to things outside Herald (a clock, a result source).
 
 ## Alternatives considered
 
 - **EF Core's in-memory provider for use cases:** fast, but it ignores transactions, constraints and SQL, which is exactly where Herald's concurrency rules live.
 - **SQLite:** closer, still not PostgreSQL.
 - **Mocking repositories:** tests the wiring of mocks more than the system.
+- **FluentAssertions:** from version 8 it requires a commercial licence, the case ADR 0009 describes for MediatR and MassTransit. **AwesomeAssertions** (an Apache-2.0 fork of version 7) is free, but Shouldly's messages read better here.
 
 ## Consequences
 
 - Positive: tests document the domain and catch what the database would catch in production.
 - Negative: Docker is required to run the suite, and container tests are slower; they share containers per collection to stay fast.
-- Follow-ups: the assertion library, chosen in M0.
+- Follow-ups: none.

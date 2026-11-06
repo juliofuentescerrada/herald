@@ -9,12 +9,31 @@ context: |
   Apps, Key Vault, Entra ID, OpenTofu, GitHub Actions.
 
   Conventions:
+  - UI sharing (ADR 0011): an internal ui library from M0, consumed by both shells,
+    separate from api-client; feature and app-local shared components remain in their app.
+    ui supports SSR and has no app/API/session/permission/routing dependencies. Add a
+    component/state catalogue as development tooling with the first controls, not a third product app.
+  - Frontend (ADR 0011): one Angular workspace, admin (CSR) and public/participant (hybrid)
+    apps; SSG for corporate pages, SSR for dynamic public entry pages, CSR for personal
+    workflows and live updates. Shared UI/tokens/API client, isolated SSR request state
+    and public-only shared caches. Hosting includes an SSR runtime (ADR 0012).
   - Everything in English. Docs are minimal: README.md, CLAUDE.md, docs/roadmap.md, docs/adr/.
     Design notes and measurements go in the change's design.md. ADRs are superseded, never edited.
-  - Modular monolith: one hexagonal module per bounded context (Registration, Competition,
-    Standings); modules talk only through integration events in Herald.Contracts (ADR 0004).
+    Design inputs already in docs/: herald-functional-discovery.md, herald-visual-direction.md,
+    assets/mockups/, herald-domain-overview.pptx.
+  - Modular monolith: one hexagonal module per bounded context; the set evolves with the design
+    (today Organisations, Tournaments, Registration, Competition, Standings) and a change that
+    moves a boundary explains it in its design.md; modules talk only through integration events
+    in Herald.Contracts (ADR 0004).
+  - Organisation, never "tenant", for the organising entity; British spelling (ADR 0003).
   - CQRS: commands through aggregates, queries as no-tracking projections (ADR 0005).
   - DDD: aggregates own the rules and raise domain events; integration events leave through
-    the transactional outbox; consumers are idempotent (ADRs 0006, 0008).
+    the transactional outbox; consumers are idempotent; contract changes are backwards
+    compatible or versioned (ADRs 0006, 0008).
   - Tests read as sentences; use-case and API tests run against real PostgreSQL (ADR 0010).
   - Original work only: nothing taken from other codebases.
+  - On every /opsx:propose, identify screens to create or modify and explicitly ask the user
+    for mockups of each affected screen and its relevant states. Reuse supplied mockups
+    when they cover the change and reference them in the change's design.md. Missing
+    mockups keep the proposal pending visual input, not ready for implementation.
+    For changes without screen impact, state that mockups are not applicable.

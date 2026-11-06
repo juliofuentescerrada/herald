@@ -32,6 +32,8 @@ When ready to implement, run /opsx:apply
 
    **IMPORTANT**: Do NOT proceed without understanding what the user wants to build.
 
+   **Required screen mockups:** Identify every screen the change will create or modify and explicitly ask the user for mockups of each affected screen, including relevant states. Reuse mockups already supplied when they cover the change. Record the screen inventory and mockup references in `design.md`. If any mockups are missing, you may draft the remaining artifacts, but keep the proposal pending visual input and do not declare it ready for implementation or prompt `/opsx:apply` until they are supplied. If no screens are affected, state that mockups are not applicable.
+
 2. **Create the change directory**
    ```bash
    openspec new change "<name>"

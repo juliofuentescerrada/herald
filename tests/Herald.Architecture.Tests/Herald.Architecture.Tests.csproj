@@ -1,0 +1,16 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <PackageReference Include="NetArchTest.eNhancedEdition" />
+    <PackageReference Include="Shouldly" />
+    <PackageReference Include="xunit.v3" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Herald.BuildingBlocks\Herald.BuildingBlocks.csproj" />
+    <ProjectReference Include="..\..\src\Herald.Contracts\Herald.Contracts.csproj" />
+    <ProjectReference Include="..\..\src\Herald.Organisations\Herald.Organisations.csproj" />
+    <ProjectReference Include="..\..\src\Herald.Tournaments\Herald.Tournaments.csproj" />
+    <ProjectReference Include="..\..\src\Herald.Registration\Herald.Registration.csproj" />
+    <ProjectReference Include="..\..\src\Herald.Competition\Herald.Competition.csproj" />
+    <ProjectReference Include="..\..\src\Herald.Standings\Herald.Standings.csproj" />
+  </ItemGroup>
+</Project>

@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <ItemGroup>
+    <PackageReference Include="Aspire.Npgsql" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Herald.ServiceDefaults\Herald.ServiceDefaults.csproj" />
+    <ProjectReference Include="..\Herald.Organisations\Herald.Organisations.csproj" />
+    <ProjectReference Include="..\Herald.Tournaments\Herald.Tournaments.csproj" />
+    <ProjectReference Include="..\Herald.Registration\Herald.Registration.csproj" />
+    <ProjectReference Include="..\Herald.Competition\Herald.Competition.csproj" />
+    <ProjectReference Include="..\Herald.Standings\Herald.Standings.csproj" />
+  </ItemGroup>
+</Project>
