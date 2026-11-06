@@ -18,3 +18,8 @@ context: |
     the transactional outbox; consumers are idempotent (ADRs 0006, 0008).
   - Tests read as sentences; use-case and API tests run against real PostgreSQL (ADR 0010).
   - Original work only: nothing taken from other codebases.
+  - On every /opsx:propose, identify screens to create or modify and explicitly ask the user
+    for mockups of each affected screen and its relevant states. Reuse supplied mockups
+    when they cover the change and reference them in the change's design.md. Missing
+    mockups keep the proposal pending visual input, not ready for implementation.
+    For changes without screen impact, state that mockups are not applicable.

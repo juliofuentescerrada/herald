@@ -7,6 +7,7 @@ Herald runs tournaments (league, knockout, single match) and is game-agnostic: g
 ## Working with OpenSpec
 
 - Specs live in `openspec/specs/`; proposed changes in `openspec/changes/`. No production code without an approved change: propose (`/opsx:propose`), human review, implement (`/opsx:apply`), archive (`/opsx:archive`). Run `openspec validate <change>` before asking for review.
+- On every `/opsx:propose`, identify all screens to create or modify and explicitly ask the user for mockups of each affected screen, including relevant states. Reuse supplied mockups when they cover the proposed change; record their references in the change's `design.md`. If mockups are missing, keep the proposal pending visual input instead of declaring it ready for implementation. For changes without screen impact, state that mockups are not applicable.
 - A hard-to-reverse or debatable decision gets an ADR in `docs/adr/` (template `0000-template.md`); a changed decision gets a new ADR that supersedes the old one, never an edit.
 - Docs stay minimal (ADR 0001): `README.md`, this file, `docs/roadmap.md`, `docs/adr/`. Measurements and design notes go in the change's `design.md`. Keep the roadmap current.
 
