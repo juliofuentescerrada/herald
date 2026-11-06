@@ -27,4 +27,4 @@ None yet: the solution is created by M0 (`docs/roadmap.md`).
 
 ## Status
 
-Design: ADRs 0001–0012 are proposed. Next: M0 (solution skeleton, AppHost, CI).
+Design: ADRs 0001–0012 are proposed. Next: M0 (solution skeleton, AppHost, CI). M4 (Azure) waits for a shared platform repository, not designed yet (ADR 0012): never add Herald resources to Arcana's state.

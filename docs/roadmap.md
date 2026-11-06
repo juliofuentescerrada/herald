@@ -8,8 +8,8 @@ Each milestone ends with something that works end to end. From M0 on, every mile
 | **M1 League** | Registration (create a tournament, register, waiting list, close) and a league in Competition (round-robin schedule, report and confirm a result, finish), the league table in Standings, and the screens for each | A league of 4–8 players runs end to end in the browser; the table updates from integration events through the outbox; every rule has a test that reads as a sentence |
 | **M2 Knockout and single match** | Bracket with byes and advancing winners; single match; the bracket view | Both formats run end to end; the format is a strategy, not a branch in handlers |
 | **M3 Live and sign-in** | Live standings pushed to the browser; sign-in with Entra ID, organiser and player roles | Two browsers see a result appear without reloading; only the organiser can close registration |
-| **M4 Cloud** | Azure Container Apps, PostgreSQL, Service Bus, Key Vault, managed identities, Application Insights, OpenTofu and deployment on merge | A merge to `main` deploys with no manual step; no secrets in the repository or the OpenTofu state; idle cost measured |
+| **M4 Cloud** | On the shared platform (planned infrastructure repository, ADR 0012): Herald's container apps, database, Service Bus topics, Key Vault, managed identities, Application Insights, OpenTofu and deployment on merge | A merge to `main` deploys with no manual step; no secrets in the repository or the OpenTofu state; idle cost measured |
 | **M5 Game policies** | Points, draws, best-of-three and tiebreakers as policies; a first game profile; Swiss pairing | Two different profiles give the expected tables on the same results |
 | **M6 Simulated results (optional)** | A result-source adapter fed by a match simulator, behind its own port and an anti-corruption layer | A whole tournament runs from simulated results without changes to `Domain` |
 
-Next: accept or revise ADRs 0001–0012, then propose M0.
+Next: accept or revise ADRs 0001–0012, then propose M0. M4 waits for the shared platform repository, which will take the costly shared resources out of Arcana's state; it is not designed yet.
