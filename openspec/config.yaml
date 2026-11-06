@@ -1,0 +1,20 @@
+schema: spec-driven
+
+context: |
+  Herald: runs tournaments (league, knockout, single match), game-agnostic; game-specific
+  rules are policies. The maintainer's reference project for .NET and Azure.
+
+  Stack: .NET 10, ASP.NET Core, Wolverine (in-process bus, outbox and inbox, Azure Service Bus
+  transport), EF Core on PostgreSQL, .NET Aspire, Angular with TanStack Query, Azure Container
+  Apps, Key Vault, Entra ID, OpenTofu, GitHub Actions.
+
+  Conventions:
+  - Everything in English. Docs are minimal: README.md, CLAUDE.md, docs/roadmap.md, docs/adr/.
+    Design notes and measurements go in the change's design.md. ADRs are superseded, never edited.
+  - Modular monolith: one hexagonal module per bounded context (Registration, Competition,
+    Standings); modules talk only through integration events in Herald.Contracts (ADR 0004).
+  - CQRS: commands through aggregates, queries as no-tracking projections (ADR 0005).
+  - DDD: aggregates own the rules and raise domain events; integration events leave through
+    the transactional outbox; consumers are idempotent (ADRs 0006, 0008).
+  - Tests read as sentences; use-case and API tests run against real PostgreSQL (ADR 0010).
+  - Original work only: nothing taken from other codebases.
