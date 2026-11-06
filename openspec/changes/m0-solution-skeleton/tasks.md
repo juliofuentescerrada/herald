@@ -27,7 +27,7 @@
 ## 5. CI
 
 - [x] 5.1 Add `.github/workflows/ci.yml`: `pull_request` and push to `main`, `contents: read`, concurrency per ref; restore, format check, Release build, tests
-- [ ] 5.2 Confirm the workflow passes on the pull request, and fails on an unformatted file
+- [x] 5.2 Confirm the workflow passes on the pull request, and fails on an unformatted file
 
 ## 6. Docs
 
