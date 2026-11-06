@@ -44,7 +44,7 @@ ADR 0011 and `m0-web-shell`; this change adds no frontend work.
 
 ```
 Herald.slnx
-global.json                 SDK 10.0.403 (rollForward latestFeature), test runner MTP
+global.json                 SDK 10.0.100 (rollForward latestPatch), test runner MTP
 Directory.Build.props       net10.0, nullable, warnings as errors, code style in build
 Directory.Packages.props    central package management, exact versions
 src/
@@ -63,7 +63,7 @@ tests/
   Herald.Host.Tests/        API tests: WebApplicationFactory + Testcontainers PostgreSQL
 ```
 
-The SDK is pinned so that `dotnet format` gives the same result locally and in CI; `latestFeature` lets patch releases in.
+The SDK is pinned to the 10.0.1xx feature band so that `dotnet format` gives the same result locally and in CI; `latestPatch` lets patch releases in, and `setup-dotnet` reads `global.json` and installs the latest patch of that band. The band is 1xx, not the newest 4xx, because Linux distribution packages (the maintainer's machine) ship only 1xx; moving to a newer band means installing it outside the package manager.
 
 Module test projects (domain and use-case tests) are not created until the modules have code (M1).
 

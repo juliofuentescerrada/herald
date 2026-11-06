@@ -30,8 +30,14 @@ Herald runs tournaments (league, knockout, single match) and is game-agnostic: g
 
 ## Commands
 
-None yet: the solution is created by M0 (`docs/roadmap.md`).
+Docker is required for the tests and the AppHost.
+
+- Build: `dotnet build Herald.slnx`
+- Format check (as CI): `dotnet format Herald.slnx --verify-no-changes`
+- All tests: `dotnet test --solution Herald.slnx`
+- One test: `dotnet test --project tests/Herald.Host.Tests --filter-method "*Name*"` (filter per project: a project where no test matches fails the run)
+- Run locally (PostgreSQL + host, Aspire dashboard): `dotnet run --project src/Herald.AppHost`
 
 ## Status
 
-Design: ADRs 0001–0012 are proposed. Next: M0 (solution skeleton, AppHost, CI). M4 (Azure) waits for a shared platform repository, not designed yet (ADR 0012): never add Herald resources to Arcana's state.
+Design: ADRs 0001–0012 are proposed. M0 is three changes: `m0-solution-skeleton` (done), then `m0-messaging` and `m0-web-shell`. M4 (Azure) waits for a shared platform repository, not designed yet (ADR 0012): never add Herald resources to Arcana's state.

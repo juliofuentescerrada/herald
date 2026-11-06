@@ -18,4 +18,6 @@ Frontend scope (ADR 0011): `m0-web-shell` creates one workspace with two app she
 
 Component scope (ADR 0011): M0 creates an internal `ui` library consumed by both shells, separate from `api-client`, with only the shared pieces those shells require. Features retain their own components and app-local shared pieces. Add a component/state catalogue as development tooling with the first controls; no third product app, independently versioned UI package or complete component system is required in M0.
 
-Next: accept or revise ADRs 0001–0012, then propose M0. M4 waits for the shared platform repository, which will take the costly shared resources out of Arcana's state; it is not designed yet.
+M0 is three changes: `m0-solution-skeleton` (solution, modules, host, AppHost, architecture tests, CI) first, archived before `m0-messaging` (Wolverine, EF Core, outbox, broker) and `m0-web-shell` (Angular workspace, both shells, OpenAPI document and API client) are proposed; those two then run in parallel.
+
+Next: `m0-messaging` and `m0-web-shell`; accept ADRs 0001–0012 as M0 answers their follow-ups. M4 waits for the shared platform repository, which will take the costly shared resources out of Arcana's state; it is not designed yet.

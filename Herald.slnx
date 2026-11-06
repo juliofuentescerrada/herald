@@ -1,0 +1,18 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Herald.AppHost/Herald.AppHost.csproj" />
+    <Project Path="src/Herald.BuildingBlocks/Herald.BuildingBlocks.csproj" />
+    <Project Path="src/Herald.Competition/Herald.Competition.csproj" />
+    <Project Path="src/Herald.Contracts/Herald.Contracts.csproj" />
+    <Project Path="src/Herald.Host/Herald.Host.csproj" />
+    <Project Path="src/Herald.Organisations/Herald.Organisations.csproj" />
+    <Project Path="src/Herald.Registration/Herald.Registration.csproj" />
+    <Project Path="src/Herald.ServiceDefaults/Herald.ServiceDefaults.csproj" />
+    <Project Path="src/Herald.Standings/Herald.Standings.csproj" />
+    <Project Path="src/Herald.Tournaments/Herald.Tournaments.csproj" />
+  </Folder>
+  <Folder Name="/tests/">
+    <Project Path="tests/Herald.Architecture.Tests/Herald.Architecture.Tests.csproj" />
+    <Project Path="tests/Herald.Host.Tests/Herald.Host.Tests.csproj" />
+  </Folder>
+</Solution>
