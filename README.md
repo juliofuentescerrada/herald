@@ -14,6 +14,14 @@ It is also a reference: a small project that shows, end to end, how its maintain
 
 Design. The first ADRs are proposed and nothing is built yet. See [the roadmap](docs/roadmap.md).
 
+## Visual direction
+
+The [visual direction and design system](docs/herald-visual-direction.md) describes the shared foundations and the admin and public experiences. Initial concept mockups:
+
+- [Tournament round management](docs/assets/mockups/herald-round-management.png)
+- [Match outcomes and standings](docs/assets/mockups/herald-match-outcomes-and-standings.png)
+- [Public tournament discovery](docs/assets/mockups/herald-tournament-discovery.png)
+
 ## Architecture in four lines
 
 - A **modular monolith**: one module per bounded context (Registration, Competition, Standings), each one **hexagonal**: the domain at the centre, ports around it, adapters at the edge ([ADR 0004](docs/adr/0004-modular-monolith-of-hexagonal-modules.md)).
