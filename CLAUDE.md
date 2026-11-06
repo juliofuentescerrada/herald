@@ -2,7 +2,7 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-Herald runs tournaments (league, knockout, single match) and is game-agnostic: game-specific rules are policies. It is the maintainer's reference project for .NET and Azure: hexagonal modules, CQRS, DDD with events, Angular, Azure. Sibling projects: Arcana (`../arcana`), Archivist (`../archivist`), PauperPilot (`../pauper-pilot`). Start with `README.md`, `docs/roadmap.md` and `docs/adr/`.
+Herald runs tournaments (league, knockout, single match) and is game-agnostic: game-specific rules are policies. It is the maintainer's reference project for .NET and Azure: modular monolith with vertical slices, CQRS, DDD with events, Angular, Azure. Sibling projects: Arcana (`../arcana`), Archivist (`../archivist`), PauperPilot (`../pauper-pilot`). Start with `README.md`, `docs/roadmap.md` and `docs/adr/`.
 
 ## Working with OpenSpec
 
@@ -22,7 +22,7 @@ Herald runs tournaments (league, knockout, single match) and is game-agnostic: g
 - Original work only: no code, names, structure or text taken from other codebases, the maintainer's employers' included. Concepts are public knowledge; their implementation here is Herald's own.
 - The core is game-agnostic (ADR 0002): no game names or rules in `Domain`; a game's rules enter as a policy, its data through an adapter. No Wizards of the Coast content in the repository.
 - Organisation, never "tenant", for the organising entity; British spelling in code and docs (ADR 0003).
-- Modules (ADR 0004): one per bounded context; the set evolves with the design (today Organisations, Tournaments, Registration, Competition, Standings as read models) and a change that moves a boundary explains it in its `design.md`. Each has `Domain`, `Application` (`Commands`, `Queries`, `Ports`) and `Adapters`. `Domain` references no other project and no package but the building blocks; modules never reference each other, only `Herald.Contracts`; one PostgreSQL schema per module, no cross-schema joins.
+- Modules (ADR 0004): one per bounded context; the set evolves with the design (today Organisations, Tournaments, Registration, Competition, Standings as read models) and a change that moves a boundary explains it in its `design.md`. Each has `Domain`, `Features` (one file per use case: command or query plus its Wolverine endpoint or handler; features don't depend on each other) and `Persistence`, with its entry point at the root. `Domain` references no other project and no package but the building blocks; modules never reference each other, only `Herald.Contracts`; one PostgreSQL schema per module, no cross-schema joins.
 - CQRS (ADR 0005): commands go through an aggregate and return at most an id; queries never load aggregates, they project to read models with no tracking. Handlers run through Wolverine; Wolverine types stay out of `Domain`.
 - Events (ADRs 0006, 0008): aggregates raise domain events; a module publishes integration events (`Herald.Contracts`) only through the Wolverine outbox, in the same transaction as the state change. Consumers are idempotent. A contract change is backwards compatible or versioned.
 - Licences: a dependency must be free for an open-source personal project; check the licence of the exact version before adding it (ADR 0009 records why MediatR and MassTransit were left out).

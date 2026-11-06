@@ -18,7 +18,7 @@ Separate commands from queries in every module:
 
 Commands, queries and the handlers of domain and integration events run through **Wolverine** (`WolverineFx`, MIT, 6.62.0 when this was written): its in-process bus invokes the handlers, and its middleware gives the pipeline (validation with `WolverineFx.FluentValidation`, transactions with `WolverineFx.EntityFrameworkCore`). HTTP endpoints use `WolverineFx.Http`, so an endpoint is a handler too.
 
-Wolverine is an adapter concern. `Domain` doesn't reference it; handlers in `Application` may use its attributes and return values, and everything else Wolverine-specific stays in the module's composition and the host.
+Wolverine is an adapter concern. `Domain` doesn't reference it; a module's `Features` (its endpoints and handlers, ADR 0004) may use its attributes and return values, and everything else Wolverine-specific stays in the module's composition and the host.
 
 ## Alternatives considered
 

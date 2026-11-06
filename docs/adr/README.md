@@ -11,7 +11,7 @@ One significant decision per record: context, decision, alternatives and consequ
 | [0001](0001-record-architecture-decisions.md) | Record architecture decisions, and plan changes with OpenSpec | Proposed |
 | [0002](0002-product-scope-v1.md) | Product scope of v1: game-agnostic tournaments in three formats | Proposed |
 | [0003](0003-english-everywhere.md) | English everywhere | Proposed |
-| [0004](0004-modular-monolith-of-hexagonal-modules.md) | A modular monolith of hexagonal modules, one per bounded context | Proposed |
+| [0004](0004-modular-monolith-of-hexagonal-modules.md) | A modular monolith of modules with the domain at the centre and vertical slices around it | Proposed |
 | [0005](0005-cqrs-with-wolverine.md) | CQRS inside each module, with Wolverine as the in-process bus | Proposed |
 | [0006](0006-tactical-ddd-with-domain-events.md) | Aggregates own the rules and raise domain events, on small building blocks of our own | Proposed |
 | [0007](0007-postgresql-ef-core-state-stored.md) | State stored in PostgreSQL with EF Core, one schema per module; no event sourcing for now | Proposed |

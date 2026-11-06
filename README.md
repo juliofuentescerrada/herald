@@ -24,7 +24,7 @@ The [visual direction and design system](docs/herald-visual-direction.md) descri
 
 ## Architecture in four lines
 
-- A **modular monolith**: one module per bounded context (Organisations, Tournaments, Registration, Competition, Standings to begin with; the set evolves), each one **hexagonal**: the domain at the centre, ports around it, adapters at the edge ([ADR 0004](docs/adr/0004-modular-monolith-of-hexagonal-modules.md)).
+- A **modular monolith**: one module per bounded context (Organisations, Tournaments, Registration, Competition, Standings to begin with; the set evolves), each with **the domain at the centre and vertical slices around it**: one file per use case, persistence at the edge ([ADR 0004](docs/adr/0004-modular-monolith-of-hexagonal-modules.md)).
 - **CQRS** inside each module, with commands and queries handled through **Wolverine** ([ADR 0005](docs/adr/0005-cqrs-with-wolverine.md)).
 - **DDD with events**: aggregates guard the rules and raise domain events; modules talk only through integration events, stored in a **transactional outbox** and carried by **Azure Service Bus** ([ADRs 0006](docs/adr/0006-tactical-ddd-with-domain-events.md), [0008](docs/adr/0008-transactional-outbox-and-inbox.md), [0009](docs/adr/0009-azure-service-bus-through-wolverine.md)).
 - Two **Angular** apps over an API contract generated from OpenAPI: admin (CSR) and public/participant (SSG for corporate pages, SSR for dynamic public entry pages, CSR for personal workflows), hosted on Azure with OpenTofu ([ADRs 0011](docs/adr/0011-angular-front-end-and-generated-api-contract.md), [0012](docs/adr/0012-azure-hosting.md)).

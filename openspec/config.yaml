@@ -21,7 +21,8 @@ context: |
     Design notes and measurements go in the change's design.md. ADRs are superseded, never edited.
     Design inputs already in docs/: herald-functional-discovery.md, herald-visual-direction.md,
     assets/mockups/, herald-domain-overview.pptx.
-  - Modular monolith: one hexagonal module per bounded context; the set evolves with the design
+  - Modular monolith: one module per bounded context, with Domain at the centre and vertical slices
+    (Features: one file per use case; Persistence at the edge); the set evolves with the design
     (today Organisations, Tournaments, Registration, Competition, Standings) and a change that
     moves a boundary explains it in its design.md; modules talk only through integration events
     in Herald.Contracts (ADR 0004).
