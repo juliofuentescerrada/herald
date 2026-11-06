@@ -87,7 +87,7 @@ ADR 0004 is revised (still Proposed): with Wolverine's endpoints the HTTP entry 
 Herald.Registration/
   RegistrationModule.cs      entry point, at the root (namespace Herald.Registration)
   Domain/                    aggregates, value objects, events, policies; no infrastructure
-  Features/                  one file per use case: command or query + its Wolverine endpoint or handler
+  Features/                  one namespace (usually one file) per use case: command or query + its Wolverine endpoint or handler
   Persistence/               DbContext, mappings, migrations, envelope tables (the module's schema)
 ```
 
