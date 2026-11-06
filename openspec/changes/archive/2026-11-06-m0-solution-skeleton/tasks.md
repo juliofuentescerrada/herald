@@ -14,7 +14,7 @@
 - [x] 3.1 Create `Herald.ServiceDefaults` (OpenTelemetry, health endpoints `/health` and `/alive`, resilience, service discovery)
 - [x] 3.2 Create `Herald.Host`: service defaults, each module's entry point, `AddNpgsqlDataSource("herald")` with its health check
 - [x] 3.3 Create `Herald.AppHost`: PostgreSQL with a data volume and database `herald`, the host referencing it and waiting for it
-- [x] 3.4 Run the AppHost locally and confirm the dashboard shows both resources and `/health` is Healthy
+- [x] 3.4 Run the AppHost locally and confirm the dashboard shows both resources and `/health` is Healthy (checked through the dashboard's resource service with `aspire describe`: postgres, herald and host Running and Healthy)
 
 ## 4. Tests
 
