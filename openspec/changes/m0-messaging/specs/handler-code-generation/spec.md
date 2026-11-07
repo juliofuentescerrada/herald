@@ -1,11 +1,11 @@
 ## ADDED Requirements
 
 ### Requirement: Production runs pre-generated handler code
-Outside Development and tests, the host SHALL load Wolverine's pre-generated handler code from its own assembly and SHALL refuse to start if any expected generated type is missing; in Development and tests the code SHALL be generated at start-up.
+Outside Development and tests, the host SHALL run Wolverine's pre-generated handler code from its own assembly and SHALL NOT compile handler code at run time; in Development and tests the code SHALL be generated at run time. Stale generated code is caught by CI (next requirement), not at start-up.
 
-#### Scenario: Pre-generated code is missing
-- **WHEN** the host starts in Production and a handler has no pre-generated type
-- **THEN** the host fails to start and names what is missing
+#### Scenario: Production
+- **WHEN** the host starts in Production and handles a message
+- **THEN** it uses the committed generated type and no code is compiled
 
 #### Scenario: Development
 - **WHEN** the host starts in Development after a handler changed

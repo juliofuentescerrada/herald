@@ -11,7 +11,7 @@ Every module will change state and tell other modules about it, and ADR 0008 pro
 - **EF Core per module**: one `DbContext` per module in its schema, whose migrations create the module's own tables; Wolverine creates its envelope tables through Weasel (at start-up in Development and tests, `db-apply` as a deployment step elsewhere); the host moves from `Aspire.Npgsql` to Aspire's EF Core integration, keeping one database health check.
 - **The Azure Service Bus emulator** in the AppHost as the local broker, with topics and subscriptions declared there. No broker in CI yet.
 - **Probe modules in a test project** (a sender and a receiver) prove, against PostgreSQL: state and message commit or roll back together, each module uses its own store, a redelivery is handled once, a failing message reaches dead letters, and a Wolverine endpoint appears in the OpenAPI document.
-- **Pre-generated Wolverine code** for production, committed in the host, with a start-up assertion and a CI check that fails when it is stale; dynamic generation in development and tests.
+- **Pre-generated Wolverine code** for production, committed in the host, with a CI check that fails when it is stale (Wolverine has no start-up check, see the spike); dynamic generation in development and tests.
 - Docs: ADRs 0005, 0008 and 0009 answer their M0 follow-ups; `CLAUDE.md` commands (migrations, code generation); the roadmap.
 
 Out of scope: domain base types and the first aggregate (H1); a broker test in CI (H1, with the first integration event); the build-time OpenAPI document and the TypeScript client (`m0-web-shell`); broker health and Azure resources (M4). No screens: mockups are not applicable.
@@ -21,7 +21,7 @@ Out of scope: domain base types and the first aggregate (H1); a broker test in C
 ### New Capabilities
 
 - `transactional-messaging`: a module's state change and its outgoing messages commit together in the module's own store; messages between modules are received through the receiver's inbox once, and failures are kept as dead letters.
-- `handler-code-generation`: production runs Wolverine's pre-generated code and refuses to start without it; CI fails when the committed code is stale.
+- `handler-code-generation`: production runs Wolverine's pre-generated code without compiling at run time; CI fails when the committed code is stale.
 - `api-description`: the host describes its HTTP endpoints, Wolverine's included, in an OpenAPI document.
 
 ### Modified Capabilities

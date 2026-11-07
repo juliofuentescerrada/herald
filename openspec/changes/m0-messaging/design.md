@@ -74,8 +74,8 @@ Alternatives: a copy in each `AddXxxModule()` (the tests would prove a sixth cop
 
 Answers ADR 0005's follow-up. Wolverine generates the code that runs each handler. By environment:
 
-- **Development and tests:** dynamic: generated and compiled with Roslyn at start-up, so a changed handler needs no extra step.
-- **Production:** static: the host loads pre-generated types from its own assembly (`Herald.Host/Internal/Generated`, written by `dotnet run -- codegen write`) and asserts at start-up that every expected type exists, so a missing regeneration stops the host instead of failing later. Roslyn is not loaded, which shortens cold starts after scale to zero (ADR 0012) and keeps the AOT option open.
+- **Development and tests:** dynamic: generated and compiled with Roslyn on each handler's first use (spike point 7), so a changed handler needs no extra step.
+- **Production:** static: the host loads pre-generated types from its own assembly (`Herald.Host/Internal/Generated`, written by `dotnet run -- codegen write`) without compiling anything. There is no start-up check (decided 2026-11-07): in static mode Wolverine knows only the handlers listed in its generated registry, so a handler added without regenerating would fail on first use, and a Herald check would have to repeat Wolverine's handler discovery; the CI check below catches that case before merge. Roslyn is not loaded, which shortens cold starts after scale to zero (ADR 0012) and keeps the AOT option open.
 - **The generated code is committed, and CI regenerates it and fails on a difference**: the same pattern as the generated API client (ADR 0011). A reader can see what Wolverine does under the hood.
 
 Alternatives: dynamic everywhere (no generated files, slower cold starts and Roslyn in memory); static code generated when the image is built in M4 (no files in pull requests, but production code nobody reviewed, and a second pattern for generated code); Wolverine's `Auto` mode (convenient, but it writes missing files at run time and can hide them).
@@ -121,7 +121,15 @@ Spike in the scratchpad (2026-11-06): two module assemblies, each with a `DbCont
 - **Point 5 (module-level configuration): works, differently than planned.** `services.ConfigureWolverine(...)` cannot register a store (Wolverine applies it once the service collection is read-only). A module registers instead on `WolverineOptions` (`opts.AddRegistrationModule()`, with `opts.Services` for its `DbContext`), called inside the host's `UseWolverine`: still one call per module.
 - **Code generation:** core Wolverine no longer ships Roslyn; dynamic generation needs `WolverineFx.RuntimeCompilation` (MIT). Static production code can leave it out.
 - **Point 4 (migrations): Wolverine's tables do not come from EF Core migrations; Weasel's commands create them.** `MapWolverineEnvelopeStorage` marks the incoming and outgoing tables `ExcludeFromMigrations` and maps no dead-letter tables: it exists so a handler's envelopes join its `SaveChanges`. A module's initial migration therefore holds only its own tables. Each ancillary store needs four tables (`wolverine_incoming_envelopes`, `_outgoing_envelopes`, `_dead_letters`, `_dead_letter_history`); the main store has nine (the four plus nodes, node assignments, node records, agent restrictions and the control queue). Checked sequence: EF migrations create `a."Items"` and `b."Received"`; with `AutoBuildMessageStorageOnStartup = AutoCreate.None` and the host exposing `RunJasperFxCommands`, `db-assert` fails, `db-apply` creates the tables of all three stores, `db-assert` passes, and the host then starts and delivers (point 3 sequence) without creating anything. `db-dump`/`db-patch` cannot select one store: all three share a `DatabaseUri` and the ancillary stores have an empty `SubjectUri`, so there is no per-module SQL export; `db-list` also lists each store three times (cosmetic). Wolverine 6.62.0 with Weasel 9.49.0 and JasperFx 2.100.1.
-- Not yet run: points 6 (emulator), 7 (start-up times).
+- **Point 7 (start-up): start-up is the same; pre-generated code saves about 1.8 s on the first message.** Release build, one fresh process per run, local PostgreSQL already prepared, six runs each, times from building the host:
+
+  | Mode | Host started (ms) | First message handled, `CreateItem` → `ItemCreated` (ms) | Roslyn loaded |
+  | --- | --- | --- | --- |
+  | Dynamic, `WolverineFx.RuntimeCompilation` | 1,225–1,428 | 3,352–3,652 | yes |
+  | Static, pre-generated, without `RuntimeCompilation` | 1,253–1,374 | 1,657–1,833 | no |
+
+  Dynamic generation is lazy: it costs nothing at start-up and is paid on the first message of each handler, so with H1's handlers the cold-start penalty after scale to zero grows with the handlers a request touches. The difference is not negligible, so the decision above stands. Other observations: `codegen write` writes to the current directory's `Internal/Generated` unless the output path is set, so the host's must be fixed; deleting a generated file breaks compilation (the generated registry references it); in static mode a handler added without regenerating does **not** stop start-up, it fails on first use with `IndeterminateRoutesException`; `codegen test` compiles in memory and does not compare with the committed files, so the CI check is `codegen write` followed by a diff; `WolverineFx.EntityFrameworkCore` depends on `Microsoft.EntityFrameworkCore.Design`, which copies about 15 MB of Roslyn assemblies into the output even when they are never loaded.
+- Not yet run: point 6 (emulator).
 
 ## Risks / Trade-offs
 
@@ -132,4 +140,4 @@ Spike in the scratchpad (2026-11-06): two module assemblies, each with a `DbCont
 
 ## Open Questions
 
-Why the 6 November run failed (not reproduced, see findings), emulator integration and start-up measurements remain open in this messaging investigation. Reconcile the candidate design, specifications and unchecked tasks with the spike evidence before implementation. The documentation consolidation does not choose a resolution or declare these details accepted.
+Why the 6 November run failed (not reproduced, see findings) and emulator integration remain open in this messaging investigation. Reconcile the candidate design, specifications and unchecked tasks with the spike evidence before implementation. The documentation consolidation does not choose a resolution or declare these details accepted.

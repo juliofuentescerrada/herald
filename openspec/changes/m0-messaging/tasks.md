@@ -6,7 +6,7 @@
 - [x] 1.4 Check the envelope tables through each module's EF Core migrations (`MapWolverineEnvelopeStorage`) and how the main store's tables are created (point 4)
 - [x] 1.5 Check that each module configures its store and routing from its own registration (a Wolverine extension through DI), with the host calling one method per module (point 5)
 - [ ] 1.6 Start the Azure Service Bus emulator with Aspire (`AddAzureServiceBus().RunAsEmulator()`, topics and subscriptions declared in the AppHost) and send and receive through Wolverine's transport; record whether Wolverine's provisioning must be turned off (point 6)
-- [ ] 1.7 Measure host start-up with dynamic and with pre-generated code (point 7)
+- [x] 1.7 Measure host start-up with dynamic and with pre-generated code (point 7)
 - [ ] 1.8 Record the findings and the pinned versions in `design.md`; if points 1–2 or 6 fail, stop and revise the design with the maintainer before going on
 
 ## 2. Modules as vertical slices and Herald.ModuleHosting
@@ -36,8 +36,8 @@
 
 ## 5. Generated code
 
-- [ ] 5.1 Configure dynamic code generation in Development and tests, static with the start-up assertion elsewhere
-- [ ] 5.2 Generate and commit the code in `Herald.Host/Internal/Generated`, exclude it from `dotnet format`, and confirm the host starts in Production with it and fails naming the missing type without it
+- [ ] 5.1 Configure dynamic code generation in Development and tests, static elsewhere, and fix the generated code's output path to `Herald.Host/Internal/Generated`
+- [ ] 5.2 Generate and commit the code in `Herald.Host/Internal/Generated`, exclude it from `dotnet format`, and confirm the host handles a message in Production with it, without compiling code
 - [ ] 5.3 Add the CI step that regenerates the code and fails on a difference; confirm it fails on a pull request that changes a handler without regenerating
 
 ## 6. Docs
