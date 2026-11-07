@@ -51,7 +51,7 @@ The OpenSpec change that needs to add, merge, split or rename a module does so a
 
 Organisation scope and the responsible actor enter through the application boundary and are validated for each operation, including direct API access. Each owning module preserves the required business revisions and authorship (ADR 0007). These responsibilities apply from H1, independently of later participant collaboration.
 
-**Implementation status:** `m0-messaging` implements this layout: entry points at module roots, no `Application`/`Adapters`, `Herald.ModuleHosting`, a `DbContext` per module in `Persistence`, and architecture tests with fixtures; its specifications become current when it is archived. Module state is per schema; Wolverine's messages share one `wolverine` schema (ADR 0008). The vertical-slice direction is confirmed; detailed implementation and remaining Proposed decisions still follow their change's review gates.
+**Implementation status:** `m0-messaging` implements this layout: entry points at module roots, no `Application`/`Adapters`, `Herald.ModuleHosting`, a `DbContext` per module in `Persistence`, and architecture tests with fixtures; its specifications are current. Module state is per schema; Wolverine's messages share one `wolverine` schema (ADR 0008). The vertical-slice direction is confirmed; detailed implementation and remaining Proposed decisions still follow their change's review gates.
 
 ## Alternatives considered
 

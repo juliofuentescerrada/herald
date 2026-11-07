@@ -31,9 +31,9 @@ context: |
     confirmed/proposed/implemented distinctions. PPT, mockups and prototypes are explanatory
     supports, not production or independent rules. Apply Refactoring UI with square corners and
     the documented scale. The earlier round-management PNG is superseded for semantics.
-  - openspec/specs describes the implemented skeleton. Active deltas describe target changes;
-    archived changes and dated reviews remain historical. Only m0-solution-skeleton is done;
-    m0-messaging is implemented in its branch, pending review and archive; m0-web-shell is draft. H1 functionality has not started.
+  - openspec/specs describes what is implemented. Active deltas describe target changes;
+    archived changes and dated reviews remain historical. m0-solution-skeleton and m0-messaging
+    are done; m0-web-shell is draft. H1 functionality has not started.
   - Modular monolith: one module per bounded context, with Domain at the centre and vertical slices
     (Features: one namespace per use case, one file or cohesive folder; Persistence at the edge);
     features never depend on other features. Shared business rules belong in Domain; technical

@@ -8,7 +8,7 @@ Each milestone ends with something that works end to end. From M0 on, every mile
 | --- | --- | --- |
 | Functional/technical/visual baseline | Consolidated as v0.7; confirmed scope and proposed defaults are distinguished | Resolve the functional decision ledger before each affected H1 slice; review the new wireframes |
 | `m0-solution-skeleton` | Implemented and archived; empty backend modules, local PostgreSQL/host and CI | Preserve its accepted specifications as the description of current code |
-| `m0-messaging` | Implemented in its branch: vertical-slice modules, one shared Wolverine store, the Service Bus emulator, messaging tests and pre-generated code; ADR 0005, 0008 and 0009 follow-ups answered | Maintainer review, merge and archive |
+| `m0-messaging` | Implemented and archived: vertical-slice modules, one shared Wolverine store, the Service Bus emulator, messaging tests and pre-generated code; ADR 0005, 0008 and 0009 follow-ups answered | Its specifications describe current code; H1 confirms the pending items in its ADR follow-ups |
 | `m0-web-shell` | Draft proposal; no production Angular workspace | Choose the pending frontend tools and review shell/state references before implementation |
 | H1 functionality | Not started | Bounded OpenSpec slices for identity, configuration, entry/readiness, operations, history and public reads |
 
@@ -36,7 +36,7 @@ Component scope (ADR 0011): M0 creates an internal `ui` library consumed by both
 
 M0 is three changes: `m0-solution-skeleton` (solution, modules, host, AppHost, architecture tests, CI) first, archived before `m0-messaging` (Wolverine, EF Core, outbox, broker) and `m0-web-shell` (Angular workspace, both shells, OpenAPI document and API client) are proposed; those two then run in parallel.
 
-Next: review, merge and archive `m0-messaging`, and refine the [draft `m0-web-shell`](../openspec/changes/m0-web-shell/proposal.md). Accept each remaining Proposed ADR when its relevant decisions are settled; do not make a blanket status change because documentation is consolidated. M4 waits for the shared platform repository, which will take the costly shared resources out of Arcana's state; it is not designed yet.
+Next: refine the [draft `m0-web-shell`](../openspec/changes/m0-web-shell/proposal.md). Accept each remaining Proposed ADR when its relevant decisions are settled; do not make a blanket status change because documentation is consolidated. M4 waits for the shared platform repository, which will take the costly shared resources out of Arcana's state; it is not designed yet.
 
 H0 remains the product decision gate described in the functional baseline. It does not require solving H2–H7 or every M0 implementation detail. No H1 screen proposal is ready solely because a concept image or wireframe now exists: confirm the rule/interaction decisions and relevant states for that slice.
 

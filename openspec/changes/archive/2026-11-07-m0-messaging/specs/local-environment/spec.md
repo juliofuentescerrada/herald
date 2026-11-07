@@ -18,6 +18,6 @@ The host SHALL expose a liveness endpoint (`/alive`) that does not depend on the
 - **WHEN** the host runs against a reachable PostgreSQL and `/health` is requested
 - **THEN** the response is 200 with status Healthy
 
-#### Scenario: Health when the database stops answering
+#### Scenario: Health with the database unavailable
 - **WHEN** the host has started against a reachable PostgreSQL, the database then stops answering, and `/health` is requested
 - **THEN** the response is 503, while `/alive` still returns 200
