@@ -31,18 +31,20 @@ context: |
     confirmed/proposed/implemented distinctions. PPT, mockups and prototypes are explanatory
     supports, not production or independent rules. Apply Refactoring UI with square corners and
     the documented scale. The earlier round-management PNG is superseded for semantics.
-  - openspec/specs describes the implemented skeleton. Active deltas describe target changes;
-    archived changes and dated reviews remain historical. Only m0-solution-skeleton is done;
-    m0-messaging is in progress and m0-web-shell is draft. H1 functionality has not started.
+  - openspec/specs describes what is implemented. Active deltas describe target changes;
+    archived changes and dated reviews remain historical. m0-solution-skeleton and m0-messaging
+    are done; m0-web-shell is draft. H1 functionality has not started.
   - Modular monolith: one module per bounded context, with Domain at the centre and vertical slices
     (Features: one namespace per use case, one file or cohesive folder; Persistence at the edge);
     features never depend on other features. Shared business rules belong in Domain; technical
     reuse belongs with its responsibility, not automatically in Domain. The set evolves with the design
     (today Organisations, Tournaments, Registration, Competition, Standings) and a change that
     moves a boundary explains it in its design.md; modules talk only through integration events
-    in Herald.Contracts (ADR 0004). ModuleHosting is technical composition only. Cross-module
+    in Herald.Contracts (ADR 0004). ModuleHosting is technical composition only; modules
+    register through it inside the host's UseWolverine. Cross-module
     transitions identify an owner, authoritative conditions and reviewed revisions. Domain is
-    independent of infrastructure; one schema per module and no cross-schema joins.
+    independent of infrastructure; one schema per module for its state and no cross-schema joins;
+    Wolverine's messages share one wolverine schema (Wolverine 6.62.0 cannot keep them per module).
   - Organisation, never "tenant", for the organising entity; British spelling (ADR 0003).
   - CQRS: commands through aggregates, returning identities/receipts/outcome or revision metadata
     and typed errors; queries as no-tracking projections (ADR 0005). An acknowledgement is not

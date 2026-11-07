@@ -1,6 +1,12 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
+  <PropertyGroup>
+    <!-- `dotnet run` from anywhere uses this folder as content root, so `codegen write` lands in Internal/Generated here. -->
+    <RunWorkingDirectory>$(MSBuildProjectDirectory)</RunWorkingDirectory>
+  </PropertyGroup>
   <ItemGroup>
     <PackageReference Include="Aspire.Npgsql" />
+    <PackageReference Include="WolverineFx.AzureServiceBus" />
+    <PackageReference Include="WolverineFx.RuntimeCompilation" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Herald.ServiceDefaults\Herald.ServiceDefaults.csproj" />

@@ -1,4 +1,3 @@
-using System.Reflection;
 using Shouldly;
 
 namespace Herald.Architecture.Tests;
@@ -7,14 +6,15 @@ public class SharedProjectTests
 {
     [Fact]
     public void The_building_blocks_reference_no_other_Herald_project() =>
-        HeraldReferencesOf("Herald.BuildingBlocks").ShouldBeEmpty();
+        ProjectReferences.Of("Herald.BuildingBlocks").ShouldBeEmpty();
 
     [Fact]
     public void The_contracts_reference_no_Herald_project_but_the_building_blocks() =>
-        HeraldReferencesOf("Herald.Contracts").ShouldBeSubsetOf(["Herald.BuildingBlocks"]);
+        ProjectReferences.Of("Herald.Contracts").ShouldBeSubsetOf(["Herald.BuildingBlocks"]);
 
-    private static string[] HeraldReferencesOf(string assembly) =>
-        [.. Assembly.Load(assembly).GetReferencedAssemblies()
-            .Select(reference => reference.Name!)
-            .Where(name => name.StartsWith("Herald.", StringComparison.Ordinal))];
+    [Fact]
+    public void Module_hosting_references_no_module_and_not_the_host() =>
+        ProjectReferences.Of("Herald.ModuleHosting")
+            .Intersect([.. Modules.Names.Select(module => $"Herald.{module}"), "Herald.Host"])
+            .ShouldBeEmpty();
 }

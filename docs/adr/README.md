@@ -5,7 +5,7 @@ One significant decision per record: context, decision, alternatives and consequ
 - Numbered in order, never renumbered.
 - Status: `Proposed`, `Accepted`, `Superseded by NNNN`, `Deprecated`.
 - Proposed records can be refined. Accepted decisions normally change through a superseding ADR. The maintainer authorised an in-place pre-development consolidation on 7 November 2026 (ADR 0001); revised records identify it. This does not accept every proposed detail.
-- Decision status and implementation status are separate. `openspec/specs/` describes the implemented skeleton; active changes describe migrations and new capabilities. ADR 0004's vertical-slice target is not yet implemented, and no production Angular workspace exists.
+- Decision status and implementation status are separate. `openspec/specs/` describes what is implemented; active changes describe migrations and new capabilities. ADR 0004's vertical slices and the messaging decisions of ADRs 0005, 0008 and 0009 are implemented (`m0-messaging`, archived); no production Angular workspace exists.
 
 | # | Decision | Status |
 |---|---|---|

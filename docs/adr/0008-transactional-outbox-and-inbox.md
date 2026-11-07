@@ -3,6 +3,7 @@
 - Status: Proposed
 - Date: 2026-11-06
 - Consolidated: 2026-11-07 (terminology and scope only)
+- Revised: 2026-11-08 (store topology and table creation answered by `m0-messaging`)
 
 ## Context
 
@@ -17,7 +18,11 @@ Use Wolverine's durable messaging with `WolverineFx.EntityFrameworkCore` and `Wo
 
 Every consumer is also idempotent by design (a result already applied is ignored), so correctness doesn't depend on the inbox alone. Messages that keep failing go to a dead-letter queue and are visible, not dropped.
 
-This record establishes the intended reliability properties. The store topology, routing, recovery and exact delivery/invocation guarantees remain under investigation in `m0-messaging`; its recorded spike findings are not resolved by this documentation consolidation. Durable competitive revision history is a separate module responsibility under ADR 0007.
+**One shared message store.** Every module's outbox, inbox and dead letters live in one Wolverine store in the `wolverine` schema of the database that holds the modules' state, so a handler's change and its envelopes commit in one transaction. The preferred design, one store per module in its own schema, was set aside: the `m0-messaging` spike found that Wolverine 6.62.0's EF Core integration maps every `DbContext`'s envelopes to one schema, leaving them in the wrong module's store (redelivered on restart, or never marked handled). Revisit when Wolverine maps envelopes per `DbContext`; until then, moving a module out includes moving its in-flight messages.
+
+**Tables.** Each module's EF Core migrations create its own tables; Wolverine's tables are created by Wolverine through Weasel, never copied into migrations. In Development the host does both at start-up; elsewhere it creates nothing (`AutoCreate.None`), `db-apply` is an explicit deployment step and `db-assert` detects drift.
+
+**Redelivery.** The inbox rejects an envelope id it has already handled while that id is remembered: the deduplication window is set explicitly in `Herald.ModuleHosting` (five minutes until H1 chooses its value). It covers transport redelivery, not a publisher sending the same event twice, which consumer idempotency covers. Messaging tests with probe modules prove these properties against PostgreSQL. Durable competitive revision history is a separate module responsibility under ADR 0007.
 
 ## Alternatives considered
 
@@ -28,5 +33,5 @@ This record establishes the intended reliability properties. The store topology,
 ## Consequences
 
 - Positive: no lost or phantom events; a crash between commit and send recovers on restart.
-- Negative: delivery is eventually consistent, and Standings can lag behind Competition by a moment; Wolverine's tables have to be part of migrations and backups.
-- Follow-ups: in M0, decide whether Wolverine creates its tables at startup or through migrations.
+- Negative: delivery is eventually consistent, and Standings can lag behind Competition by a moment; Wolverine's tables are a deployment step of their own and part of backups; messages belong to no module.
+- Follow-ups: choose the deduplication window with the first integration event (H1); wire `db-apply` into deployment (M4); revisit per-module stores when Wolverine supports them.

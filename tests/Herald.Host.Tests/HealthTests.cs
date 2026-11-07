@@ -1,14 +1,13 @@
 using System.Net;
+using Npgsql;
 using Shouldly;
+using Testcontainers.PostgreSql;
 
 namespace Herald.Host.Tests;
 
 [Collection(PostgresTests.Name)]
 public class HealthTests(PostgresFixture postgres)
 {
-    // Nothing listens on port 1, so the database never answers.
-    private const string UnreachableDatabase = "Host=localhost;Port=1;Database=herald;Username=herald;Password=herald;Timeout=2";
-
     [Fact]
     public async Task The_host_is_healthy_when_the_database_is_reachable()
     {
@@ -21,15 +20,28 @@ public class HealthTests(PostgresFixture postgres)
     }
 
     [Fact]
-    public async Task The_host_is_unhealthy_but_alive_when_the_database_does_not_answer()
+    public async Task The_host_is_unhealthy_but_alive_when_the_database_stops_answering()
     {
-        await using var host = new HostFactory(UnreachableDatabase);
+        // Its own database: pausing the shared one would break the other tests.
+        await using var database = new PostgreSqlBuilder("postgres:18.3").Build();
+        await database.StartAsync(TestContext.Current.CancellationToken);
+        var connectionString = new NpgsqlConnectionStringBuilder(database.GetConnectionString()) { Timeout = 2, CommandTimeout = 2 }.ConnectionString;
+        await using var host = new HostFactory(connectionString);
         var client = host.CreateClient();
+        (await client.GetAsync("/health", TestContext.Current.CancellationToken)).StatusCode.ShouldBe(HttpStatusCode.OK);
 
-        var health = await client.GetAsync("/health", TestContext.Current.CancellationToken);
-        var alive = await client.GetAsync("/alive", TestContext.Current.CancellationToken);
+        await database.PauseAsync(TestContext.Current.CancellationToken);
+        try
+        {
+            var health = await client.GetAsync("/health", TestContext.Current.CancellationToken);
+            var alive = await client.GetAsync("/alive", TestContext.Current.CancellationToken);
 
-        health.StatusCode.ShouldBe(HttpStatusCode.ServiceUnavailable);
-        alive.StatusCode.ShouldBe(HttpStatusCode.OK);
+            health.StatusCode.ShouldBe(HttpStatusCode.ServiceUnavailable);
+            alive.StatusCode.ShouldBe(HttpStatusCode.OK);
+        }
+        finally
+        {
+            await database.UnpauseAsync(TestContext.Current.CancellationToken);
+        }
     }
 }

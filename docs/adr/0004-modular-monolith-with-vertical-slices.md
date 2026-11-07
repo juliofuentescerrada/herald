@@ -29,7 +29,7 @@ Features may use their module's domain and persistence directly. Do not introduc
 
 An interface to something outside Herald (a result source, a clock) is a port declared where its responsibility belongs: in the feature for a use-case-specific dependency, or in `Domain` for a domain policy. Its implementation lives with the relevant technical concern. Folders appear with their first file.
 
-**Reuse follows responsibility.** Shared business concepts, invariants and policies belong in `Domain`. Persistence helpers remain in `Persistence`; hosting belongs in `Herald.ModuleHosting` when introduced by `m0-messaging`. HTTP contracts, technical validation and authorisation mechanisms do not become domain logic because two features use them. Extract a narrowly named module-local capability only for demonstrated reuse, with explicit permitted dependencies; do not create a general shared-services layer. A feature must not invoke another feature's handler to compose a workflow.
+**Reuse follows responsibility.** Shared business concepts, invariants and policies belong in `Domain`. Persistence helpers remain in `Persistence`; hosting belongs in `Herald.ModuleHosting`. HTTP contracts, technical validation and authorisation mechanisms do not become domain logic because two features use them. Extract a narrowly named module-local capability only for demonstrated reuse, with explicit permitted dependencies; do not create a general shared-services layer. A feature must not invoke another feature's handler to compose a workflow.
 
 Modules never reference each other. Their published language is the integration events in `Herald.Contracts`, separate from HTTP DTOs owned by features. Shared technical projects do not provide back doors into another module's data or use cases. `Herald.ModuleHosting` may configure modules but knows no module or business rule. Each module owns its PostgreSQL schema; there are no joins across schemas.
 
@@ -51,7 +51,7 @@ The OpenSpec change that needs to add, merge, split or rename a module does so a
 
 Organisation scope and the responsible actor enter through the application boundary and are validated for each operation, including direct API access. Each owning module preserves the required business revisions and authorship (ADR 0007). These responsibilities apply from H1, independently of later participant collaboration.
 
-**Implementation status:** this is the target design. The implemented M0 skeleton still has `Application`/`Adapters` and the corresponding accepted specifications. `m0-messaging` contains the explicit migration and architecture-test delta. The vertical-slice direction is confirmed; detailed implementation and remaining Proposed decisions still follow their change's review gates.
+**Implementation status:** `m0-messaging` implements this layout: entry points at module roots, no `Application`/`Adapters`, `Herald.ModuleHosting`, a `DbContext` per module in `Persistence`, and architecture tests with fixtures; its specifications are current. Module state is per schema; Wolverine's messages share one `wolverine` schema (ADR 0008). The vertical-slice direction is confirmed; detailed implementation and remaining Proposed decisions still follow their change's review gates.
 
 ## Alternatives considered
 
