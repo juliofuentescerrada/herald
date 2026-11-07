@@ -1,6 +1,6 @@
 # Herald — Domain Discovery, Functional Specification and Roadmap
 
-Version 0.4 · 6 November 2026 · Proposal for domain review
+Version 0.7 · 7 November 2026 · Consolidated functional baseline for domain review
 
 ## 1. Purpose and status
 
@@ -10,9 +10,11 @@ Its secondary purpose is to demonstrate a .NET/Azure reference architecture. Pro
 
 **Confirmed with the maintainer:** cover both organiser and player perspectives; support games beyond Magic; deliver in phases; produce functional documentation and a roadmap that complement the repository; expose an API for external applications; account for individual and team competitions in the initial domain definition; make roster and lineup configuration unnecessary for individual 1v1 competitions. Implementation does not start during this discovery stage.
 
-**Proposed in this document:** detailed rules, priorities and limits are recommendations for review, not automatically approved product decisions. Sensitive decisions are listed in §15. Early milestones have more detail; later extensions require refinement before implementation.
+**Decision status:** [ADR 0013](adr/0013-functional-delivery-scope.md) accepts the H1–H7 delivery sequence, including identity, scoped operator authority and direct teams in H1. The explicitly confirmed start/result and public-identity contracts in §§8/12 also remain confirmed. This does not approve every rule default. §15 is the single decision register: it separates confirmed clauses from proposed defaults, assigns an owner and gate, and links acceptance evidence. Unless explicitly marked confirmed, rules in this document remain recommendations for review.
 
-Reviewed sources: [README](https://github.com/juliofuentescerrada/herald/blob/HEAD/README.md), [roadmap](https://github.com/juliofuentescerrada/herald/blob/HEAD/docs/roadmap.md), [ADR 0004](https://github.com/juliofuentescerrada/herald/blob/HEAD/docs/adr/0004-modular-monolith-of-hexagonal-modules.md), [ADR 0006](https://github.com/juliofuentescerrada/herald/blob/HEAD/docs/adr/0006-tactical-ddd-with-domain-events.md). These references record the baseline reviewed for discovery, not a claim to have audited every repository document. This proposal does not modify the repository.
+**New in v0.7:** the lifecycle, exception, access and review matrices below make previously missing choices concrete. Rows labelled proposed are new recommendations pending the maintainer's decision, not an assertion of prior approval. The consolidated baseline is ready for decision and visual review; it does not declare H1 ready for implementation. §18 records the outstanding acceptance and visual gates.
+
+Source hierarchy: this [functional baseline](herald-functional-discovery.md) defines behaviour and decision status; the [roadmap](roadmap.md) sequences delivery; [ADR 0013](adr/0013-functional-delivery-scope.md) records accepted scope; [ADR 0004](adr/0004-modular-monolith-with-vertical-slices.md) and [ADR 0006](adr/0006-tactical-ddd-with-domain-events.md) describe proposed technical responsibilities. The [PPT](herald-domain-overview.pptx) and [visual direction](herald-visual-direction.md) illustrate this baseline and must identify proposed or simplified behaviour. Historical review notes remain evidence of the gaps found, not a competing functional specification. Accepted product decisions still require reviewed implementation specifications.
 
 No compatibility with official MTG, chess or other governing rules is claimed. Profiles describe Herald behaviour; official compatibility requires its own requirements and authoritative sources. The 1v1 and 5v5 examples below illustrate participation structures, not complete or current game regulations.
 
@@ -106,7 +108,7 @@ The previous “participant” terminology is made explicit as **entrant** for t
 | Communication | Operational notices and material changes | Facts from the other areas |
 | History and circuits | Personal/team history and cross-tournament results | Identifiable final results, participation evidence and revisions |
 
-These areas are not automatically bounded contexts. Results may belong to Competition and Standings may begin as its projection. Team management does not necessarily require a separate module in H1. The public catalogue does not decide admissions; history does not change results. Discovery must settle ownership of tournament configuration and lifecycle, currently implicit between Registration and Competition.
+These areas are not automatically bounded contexts. Results may belong to Competition and Standings may begin as its projection. Team management does not necessarily require a separate module in H1. The public catalogue does not decide admissions; history does not change results. Tournaments owns configuration, publication, visibility and lifecycle; Registration owns admission (D-08 and ADR 0004).
 
 Scheduling and standings consume entrant identities, not roster members. Roster eligibility and lineup validation remain explicit responsibilities; they must not be silently duplicated in every competition-system algorithm.
 
@@ -120,7 +122,7 @@ Publication, registration and competition must not share a single state: a publi
 | Registration window | Not open, open, closed | May reopen before the start; does not itself alter entries or pairings |
 | Competition | Preparation, running, finalised, cancelled | Finalisation is explicit after validation; temporary suspension is a later extension |
 | Round | Draft, published, running, completed | Only published rounds are visible to competitors; published revisions are announced |
-| Match | Scheduled, in play, awaiting validation, disputed, resolved, voided | State and resolution reason are separate |
+| Match | Scheduled, in play, awaiting validation, disputed, resolved, voided | State and resolution reason are separate; the proposed H1 meaning of voided is in §8.1 |
 | Entry application | Waiting, admitted, rejected, cancelled | Check-in, roster readiness and competitive withdrawal are separate dimensions |
 | Entrant check-in | Pending, confirmed, absent | Profile determines whether it is mandatory |
 | Team readiness | Incomplete, eligible, ineligible | Derived from applicable roster and attendance rules, not an extra admission slot |
@@ -130,13 +132,51 @@ Publication, registration and competition must not share a single state: a publi
 
 **CP-02 Registration closure:** prevents new applications. Closure is allowed with zero or one admitted entrant so the director can cancel or reopen. The minimum of two eligible entrants is enforced when starting. Two five-player teams satisfy this minimum; one team containing ten players does not.
 
-**CP-03 Preparation:** the director reviews attendance and eligibility, resolves exclusions and fixes the entrant list. Initial scope does not admit new entrants after the competition starts. Team rosters are frozen at the announced deadline; changing general team membership later does not rewrite tournament rosters.
+**CP-03 Preparation:** the director reviews attendance and eligibility and resolves exclusions. Closing registration does not freeze the field. Publishing pairings fixes the reviewed field for that publication: before competition start, changing it requires explicitly withdrawing publication, invalidating affected draft pairings and reviewing and republishing them. Competition start permanently freezes the field; subsequent departures are competitive withdrawals. Initial scope does not admit new entrants after the competition starts. Team rosters are frozen at the announced deadline; changing general team membership later does not rewrite tournament rosters.
 
 **CP-04 Start:** requires closed registration, at least two eligible entrants, complete rules and valid initial pairings. It fixes identifiable versions of entrants and rules, plus tournament rosters where applicable. Individual 1v1 entries require no roster freeze or lineup submission: the player is determined by the entry. Team lineups may be submitted later before their match starts, within the roster and profile; no match starts without a valid locked lineup when required. Updating a catalogue profile does not change an ongoing tournament.
 
-**CP-05 Finalisation:** requires completed stages, resolved countable matches and no open disputes. The director reviews provisional final standings before publishing them.
+**CP-05 Finalisation:** requires completed stages, valid terminal resolutions for every scheduled pairing and no open disputes. The director reviews current provisional final standings before publishing them. The proposed observable revision barrier is in §9.3 (D-24); a stale view is not permission to finalise.
 
 **CP-06 Cancellation:** requires a reason. Before starting, cancels admitted entry reservations and announces the change. After starting, preserves history, marks the competition cancelled and does not automatically declare a winner. Cancellation is not deletion.
+
+### 5.1 H1 transition contract for review
+
+**Status: proposed refinements under D-27**, constrained by the documented separation of publication, registration and competition. The operator is the authorised organisation owner in the H1 baseline; a pilot application may perform only expressly granted actions (D-12/D-21). Competitor invitations and delegated staff remain H2. Every mutation checks current authority and expected revision; a repeat with the same operation identity returns its original outcome, while stale or changed content is rejected without a partial transition.
+
+| Action and prior state | Preconditions | Proposed resulting state and effects | Acceptance |
+| --- | --- | --- | --- |
+| Publish a draft tournament | CP-01 complete; aliases of entries to be publicly shown reviewed | Publication becomes published; registration remains not open/closed; no entries, pairings or play are created | AT-02 |
+| Open or reopen registration during preparation | Valid announced window; any previously published pairings first withdrawn | Registration becomes open; existing applications retain their state; admission follows RI rules | AT-03 |
+| Close registration | Preparation; any admitted count, including zero | Registration becomes closed; do not change check-in, freeze the field, generate pairings or start | AT-02 |
+| Publish initial pairings | Registration closed; reviewed eligible field and valid draft | Publish an identifiable field/pairing revision; later pre-start field changes require withdrawal of this publication | AT-03 |
+| Withdraw initial pairing publication | Competition has not started; reason recorded | Hide the withdrawn revision from current competitor views, retain history and invalidate affected drafts; republish after review | AT-03 |
+| Start competition | CP-04; matching current published field/rules; eligible frozen team rosters | Competition becomes running; field and rule versions become fixed; do not implicitly start every match | AT-01/04 |
+| Start a match | Running competition; current published pairing; no competitive departure preventing play; valid locked team lineups where applicable | Match becomes in play; round becomes running on its first started match; record actual play separately from lineup lock. Individual start/resolution may be combined as allowed by §8 | AT-04/06 |
+| Resolve a pairing | Running competition; published pairing; allowed terminal outcome under §8.1; current revision and authority | Store one effective resolution; round becomes completed when every pairing is terminal, including a round resolved entirely administratively | AT-06 |
+| Start a later league-round match | Its own pairing and readiness checks pass | Allow it without completing all earlier rounds; retain known scheduling conflict warnings | AT-01 |
+| Finalise | CP-05 and §9.3 review barrier pass | Competition becomes finalised; publish the reviewed standings revision; registration remains closed | AT-07 |
+| Reopen finalised competition | Explicit reason; unarchive first if necessary; correction allowed under §9 | Return to running for authorised correction and renewed review; retain previous final revision; do not reopen registration or unfreeze entrants/rosters | AT-07/08 |
+| Cancel before start | Reason and current revision | Competition becomes cancelled; registration closes; active waiting/admitted applications become cancelled; withdraw current pairing publication; retain identities and prior audit | AT-09 |
+| Cancel after start | Reason and current revision | Preserve effective results and recorded play; unresolved pairings are marked voided due to tournament cancellation without points; retain roster/lineup evidence; no champion or final league ranking is declared | AT-09 |
+| Archive/unarchive | Only finalised or cancelled competitions may be archived in the proposed H1 policy | Archive removes the listing from active views without deletion or visibility changes; unarchive restores the published record with its finalised/cancelled competition state | AT-09 |
+
+Cancellation is a distinct competition outcome, not a shortcut to satisfy league finalisation. Reject new competitive writes after cancellation, including delayed API submissions. An uncertain response is reconciled through its receipt before retrying. No transition silently revives a cancelled tournament; a replacement is a new tournament in the proposed H1 policy.
+
+### 5.2 Visibility and changed dates
+
+**Status: proposed defaults under D-27; former G-02/G-03.** Changes preserve actor, reason and the old/new revision. Show their impact before confirmation. Public aliases and private roster/lineup rules in §12 remain confirmed constraints.
+
+| Change | Proposed H1 behaviour | Acceptance |
+| --- | --- | --- |
+| Public to unlisted | Exclude from discovery when the H2 directory exists; H1 permitted links still work; publish the visibility change record | AT-10 |
+| Public/unlisted to private | Immediately require operational authority for new reads; invalidate public delivery/cache entries; deny prior anonymous links and preserve already-issued competitive state | AT-10 |
+| Private to public/unlisted | Require a fresh alias/content preview; expose only approved entrant aliases and public results, never contacts, private reasons, rosters or lineups | AT-10 |
+| Postpone start before competition starts | Preview start, registration, roster-freeze and check-in deadlines separately; change only explicitly selected future deadlines; maintain valid ordering | AT-11 |
+| Postpone after roster freeze or completed check-in | Keep the roster frozen and existing check-in evidence; do not silently extend eligibility. An optional renewed attendance check is an explicit operator review, not roster reopening | AT-11 |
+| Change dates after competition starts | Keep actual start, entrant/rule freeze and recorded activity; permit announced changes to future planned match times, not retroactive start/deadline changes | AT-11 |
+
+Making previously public information private prevents subsequent disclosure by Herald; it cannot retract copies already seen. No private payload may remain accessible through public detail, history or a shared cache. Technical invalidation and time-zone conversion belong to the affected implementation specification; a change is not shown as complete before its required privacy effect is effective.
 
 ## 6. Functional use cases
 
@@ -148,6 +188,24 @@ Rules: at least one owner remains; ownership transfer requires acceptance by the
 
 Acceptance: a director of organisation A cannot edit B's private tournament. A referee without administration cannot alter entry capacity or appoint directors. A captain can act for their team but cannot settle its dispute as an organiser unless separately authorised, in which case that intervention is attributed.
 
+### F-01a H1 access and pilot authority
+
+**Status: proposed defaults under D-12/D-21/D-22.** H1 sign-in and organisation isolation are accepted scope; the following operating choices remain pending. Recommend immediate organisation creation by a signed-in person, making that person its owner. H1 has no collaborator/spectator invitation workflow and no shared team accounts. Private tournament content is readable only by an authorised operator or explicitly scoped pilot application; a guest competitor identity alone grants no access. H2 refines invitations and representation.
+
+| Actor/context | Proposed H1 authority | Explicit limit |
+| --- | --- | --- |
+| Visitor | Read published public/unlisted alias-only tournament data | No private content, registration mutation, roster or lineup access |
+| Signed-in person without organisation membership | Create an organisation; enter its owner context | Cannot gain another organisation's rights through a supplied identifier |
+| Organisation owner acting as operator | Configure/run own tournaments, manage guests and team readiness, review/finalise; view their operational records | Revalidate organisation/tournament scope on every direct link and mutation; no implied team authority outside this operator scope |
+| Pilot application | Only operations/tournaments expressly authorised by that organisation; identifiable responsible source | A credential or known application is not a global grant; no implicit other-organisation or competitor authority |
+| Guest individual/team member | Appear through operator-managed entry and approved public alias | No sign-in, account claim or mutation rights conferred by guest creation |
+
+Pilot provisioning is an explicit recorded procedure: identify the responsible owner/application, select organisation and allowed tournament operations, issue revocable access, demonstrate denied cross-scope access, and record how the owner or platform operator revokes it. A general application-management console is H5. Account recovery verifies the existing identity before restoring access; when self-recovery fails, a recorded support process must verify ownership before relinking. It must not merge guests, copy another owner's permissions or bypass the last-owner rule. The credential provider and recovery verification mechanism require the access slice's specification.
+
+Guest player/team records are organisation-scoped in the proposed H1 policy, with stable opaque identifiers and an operator-reviewed publication alias. Flag possible duplicates within the organisation for review; do not search/expose or merge another organisation's records by name/email. Explicit verified account claims and cross-organisation linkage remain H2. A grant revoked while an operation is pending prevents further privileged execution; a completed operation retains its receipt and authorship under the caller's current read authority. Specify this boundary in the API access slice rather than inferring it from possession of a receipt ID.
+
+Acceptance: AT-12/13 and the permission-denied/organisation-context mockups in §18. Failed authorisation never returns the private tournament's title, entrants or roster as an explanation.
+
 ### F-02 Prepare, announce and change a tournament
 
 The director sets listing, dates, rules, entry capacity, automatic/manual admission, optional/mandatory check-in and visibility, then previews before publication. Dates include registration opening/closure and planned start; planned time alone does not start competition.
@@ -156,7 +214,7 @@ The entry kind is individual or team, with mixed individual/team fields excluded
 
 Before starting, capacity, schedule and rules can change. Material changes after admission are versioned and announced: system, competitive rules, participation structure, venue and start time. Capacity cannot fall below admitted entries until affected entries are explicitly resolved. Changing individual/team entry kind after admissions requires cancelling or reprocessing those applications explicitly, not converting identities silently. After starting, descriptive corrections remain possible but entrant, roster and scoring changes are governed by explicit procedures.
 
-Public tournaments appear in discovery. Unlisted tournaments can be opened by link but are absent from the directory. Private tournaments require invitation or operational authority; knowing a URL is insufficient. They do not leak through public player or team history.
+Public tournaments appear in discovery. Unlisted tournaments can be opened by link but are absent from the directory. Private tournaments require operational authority in the proposed H1 access policy; H2 adds explicitly authorised invitations. Knowing a URL is insufficient. They do not leak through public player or team history.
 
 Acceptance: publishing without a complete profile fails with an explanation. A later profile edit does not change tournament rules. Cancellation cannot leave a listing appearing open for entry. A team of five players consumes one slot, not five.
 
@@ -182,7 +240,7 @@ Rules RI-01 to RI-07:
 - With manual admission, the director admits eligible entries within capacity and records exceptions to queue priority.
 - Cancellation before starting frees a slot. Reapplying does not retain priority. Rejection requires a private reason; a fresh application requires permission from the director.
 
-Team admission reserves a slot; roster readiness is separately visible. Incomplete rosters are allowed while completing registration if the announced deadline permits them, but cannot start while ineligible. A vacancy promotes one eligible team, not its individual members. A representative may not register an unrelated team without authority.
+Team admission reserves a slot; roster readiness is separately visible. Incomplete rosters are allowed while completing registration if the announced deadline permits them, but cannot start while ineligible. A vacancy promotes one admission-eligible team, not its individual members. Admission eligibility means authority and entry restrictions are satisfied; it does not require a complete roster before its announced deadline. Tournament-start readiness additionally requires an eligible frozen roster and required check-in. Match readiness additionally requires a valid locked lineup. Direct admission and promotion use the same admission eligibility rules. A representative may not register an unrelated team without authority.
 
 Organisers may add guest individuals or teams without forcing every player to create an account. Records need visible names and stable internal identities to flag possible duplicates. People are not merged solely because another person supplied the same name/email. Later account linking is verified and preserves the original entry and roster attribution.
 
@@ -192,9 +250,9 @@ Acceptance: with capacity 16 and 16 admitted entries, entry 17 waits; cancelling
 
 During a configured window, an individual checks in or a director records attendance. For teams, an authorised representative checks in the entry; member attendance and lineup readiness are separate. A captain's action does not assert that five eligible players are present unless the policy explicitly requires and records this evidence.
 
-With mandatory check-in, only admitted, checked-in and eligible entrants may start. Expiry does not automatically remove entries or promote others: the director reviews absences and explicitly frees slots before starting. No geolocation is required initially. Leaving before the field is fixed is registration cancellation; afterwards it is competitive withdrawal.
+With mandatory check-in, only admitted, checked-in and eligible entrants may start. Expiry does not automatically remove entries or promote others: the director reviews absences and explicitly frees slots before starting. No geolocation is required initially. Before competition start, leaving is registration cancellation; after start it is competitive withdrawal. Published pairings must first be withdrawn before a pre-start field change.
 
-Acceptance: an individual without mandatory check-in is excluded from initial pairings. A team with only four eligible active players cannot start a match requiring five, despite the captain having checked in. Closing registration does not mark anyone absent. Directors see why each entry is eligible or blocked.
+Acceptance: an individual who has not completed a required check-in is excluded from initial pairings. A team with only four eligible active players cannot start a match requiring five, despite the captain having checked in. Closing registration does not mark anyone absent. Directors see why each entry is eligible or blocked.
 
 ### F-06 Prepare and publish pairings
 
@@ -236,13 +294,15 @@ Entries inseparable under published criteria share position. Name/ID ordering is
 
 The director reviews and finalises. History keeps tournament, title/variant, date, organiser, entry, matches, position and withdrawal/disqualification where applicable. It does not compare incompatible game points or turn shared positions into exact ones. Cancelled competitions remain distinct.
 
-For a team entry, the rank and match outcome belong to that entrant. Team history and personal participation are separate: a roster member is not assumed to have played every match. Locked lineups preserve who actually appeared; substitutes not fielded remain registered reserves. A later team rename or member departure does not rewrite those records.
+For a team entry, the rank and match outcome belong to that entrant. Team history and personal participation are separate: a roster member is not assumed to have played every match. Locked lineups identify intended starters; actual-play evidence establishes who appeared. A lock alone grants no appearance, and substitutes not fielded remain registered reserves. A later team rename or member departure does not rewrite those records.
 
 Acceptance: withdrawn entries retain previous results. Authorised correction revises standings/history with revision disclosure. Private-tournament history remains protected. Replacing one team player between eligible matches does not change the team's points or create a new entrant.
 
 ### F-10 Operational notifications
 
-Minimum notices: admission/promotion, cancellation, material changes, roster or lineup rejection, published pairing, requested confirmation, dispute resolution and revised final results. In-app notices come first; email is an additional channel.
+**H1 announcement recommendation (D-26, proposed):** record admission changes, published pairings, cancellations, material changes and revised final results in an operator-visible change log with actor, time, reason and revision. Show permitted material changes on the public/unlisted tournament page; a private change log stays private. The organiser communicates changes to guests through their existing contact process. Herald records publication, not proof that every guest received or read it. Input/roster/lineup rejection appears immediately to the acting operator with a specific correction path. This minimum has no participant inbox or email dependency.
+
+**H2 in-app notices:** admission/promotion, cancellation, material changes, roster or lineup rejection, published pairing, requested confirmation, dispute resolution and revised final results. Email is an additional H5 channel. H1/H2 announcement scope must be stated in each affected acceptance scenario; “announce” must not silently introduce H2 delivery.
 
 Each notice identifies tournament/reason, links to current state and avoids visible duplicates for the same fact. Delivery failure does not reverse admission or resolution. The user dashboard remains authoritative. Team notices reach the assigned representatives; player-specific lineup notices follow visibility settings. Promotional preferences are separate from operational notices.
 
@@ -271,7 +331,7 @@ For n entrants there are n(n−1)/2 matches. Four entrants produce six matches i
 
 Initial tiebreaker policy: points, then shared position. This deliberately simple but complete profile is sufficient for H1. Additional criteria require a new profile before use. A unique champion is not required when final standings are tied.
 
-Withdrawal keeps effective previous results; future unplayed scheduled matches are administratively awarded to the opponent. Two withdrawn entrants produce a double absence with no points. This has fairness implications and must be announced. Policies discarding an entrant's entire record remain alternatives, not rules mixed into one tournament. A player leaving a roster does not invoke this withdrawal rule unless the team entry itself withdraws.
+Withdrawal keeps results of encounters already played; future unplayed scheduled matches are administratively awarded to the opponent. If that opponent subsequently withdraws too, the unplayed encounter is explicitly revised to double absence with no points, preserving the earlier administrative award and its reason in history. This revision is part of the withdrawal operation, affects standings once and must pass the dependency checks in §9; otherwise the operation is blocked for incident review. The final outcome must be the same whichever entrant withdraws first. Two withdrawn entrants produce a double absence with no points. This has fairness implications and must be announced. Policies discarding an entrant's entire record remain alternatives, not rules mixed into one tournament. A player leaving a roster does not invoke this withdrawal rule unless the team entry itself withdraws.
 
 ### 7.3 Single elimination
 
@@ -299,6 +359,9 @@ Qualified teams retain their entry identity; stage transition does not reopen ro
 
 ## 8. Results, standings and game-specific data
 
+**H1 result/start contract (confirmed):** the generic profile accepts winner or draw, plus resolution cause; a numeric score is not required. An authorised operator explicitly starts a match. For individual entries, recording a played result may combine start and resolution in one validated operation. For teams, start requires both eligible locked lineups; a later entered played result must reference that start evidence. Administrative outcomes may resolve an unstarted match without claiming play. A locked lineup records intended starters, not proof of participation: actual appearances require recorded play. A no-show before play credits no appearances, even with locked lineups. Record whether play occurred separately from the resolution cause; a concession may occur before or after play.
+
+
 A result separates competitive outcome, score/game or map detail, cause—played, concession, absence, bye, referee decision—validating authority, version and effective time. Points derive from the result under fixed rules.
 
 Herald does not simulate game actions or establish a winner from an action log. It can accept a game engine's result through an authorised procedure while preserving source and external reference. Active player count is not a scoring unit: five players winning a shared map do not create five map wins.
@@ -317,6 +380,26 @@ Different profiles must operate simultaneously. Editing the profile library does
 Best-of-three must specify whether it means first to two game wins and how drawn games affect the series. A generic two-win profile can accept 2–0 or 2–1; if drawn games are collected, their count is separate and may require additional games. This must not be confused with a fixed three-game aggregate.
 
 A bye has no actually played games, even if a profile assigns a statistical score for tiebreakers. Reporting and APIs must preserve that distinction. Direct team profiles do not require per-player statistics, eliminations or kills to establish the match outcome.
+
+### 8.1 Proposed H1 terminal-outcome matrix
+
+**Status: D-25 proposed defaults**, using D-04's proposed 3/1/0 profile. The existing confirmed distinction between resolution cause and whether play occurred remains unchanged. Confirmed withdrawal behaviour remains: preserve previously played effective outcomes, and revise an unplayed encounter between two withdrawn entrants to double absence with zero points regardless of withdrawal order. The additional cases below await decision.
+
+| Prior facts and operator action | Proposed terminal resolution | Points under 3/1/0 | Participation and later effect |
+| --- | --- | --- | --- |
+| Valid play produces a winner or permitted draw | Resolved: played | Winner 3/loser 0; draw 1 each | Credit only recorded actual play; do not credit unused reserves |
+| One entrant concedes before play | Resolved: concession before play | Opponent 3; conceding entrant 0 | No appearances; no fabricated score |
+| One entrant concedes or competitively withdraws during play | Resolved: concession after play | Opponent 3; departing entrant 0 | Preserve actual-play evidence and the team lineups used; future unplayed encounters follow the withdrawal policy |
+| One entrant is absent/understrength and the operator awards the encounter without play | Resolved: single absence | Ready opponent 3; absent entrant 0 | No appearances; this incident alone does not withdraw either entrant |
+| Both entrants are absent/understrength without withdrawing | Resolved: double absence | 0 each | No appearances; both remain eligible for later matches if other checks pass |
+| Both entrants withdrew before their encounter was played | Resolved: double absence | 0 each | Preserve/revise any earlier administrative award once; no appearances; order-independent confirmed withdrawal rule |
+| Encounter cannot be completed for a reason attributable to neither side | Voided: no contest, reason required | 0 each | Preserve any actual play already recorded; no winner. Proposed H1 offers no automatic replay/replacement encounter |
+| Correct an already effective resolution, including conversion to no contest | New effective resolved/voided revision under §9 | Recompute once from the new resolution | Keep predecessor, reason and actual-play evidence; never erase play merely because points become zero |
+| Tournament cancelled with unresolved encounters | Voided: tournament cancelled | No new awards | Preserve recorded facts; tournament remains cancelled, not a finalised league |
+
+An operator must explicitly choose the outcome/cause and confirm whether play occurred; opening a new-result form must not preselect a winner. A team played outcome requires valid start/lineup evidence under §8. An administrative decision cannot manufacture that evidence. A no-contest decision after play uses the same correction/impact review as other changes; it is not deletion. The permission to record a no contest and the 0/0 treatment are proposals, not existing accepted policy.
+
+**Zero active entrants (proposed D-25):** resolve every remaining pairing through the announced terminal policy. Permit league finalisation only after the normal review barrier; retain historical points/positions and withdrawal/disqualification flags, but declare no active champion. Do not silently cancel or award a champion because a departed entrant has the highest points. Product review must accept or replace this policy before AT-06 becomes executable acceptance.
 
 ## 9. Corrections, withdrawals and difficult situations
 
@@ -339,8 +422,8 @@ Initial implementation supports corrections without published dependencies. Othe
 | Double click on a result report | One report for the same operation identity |
 | Opponent does not confirm | Pending until operator action; no automatic victory |
 | Conflicting reports | Visible dispute; never two effective results |
-| Entry withdraws after pairing | Preserve pairing; resolve pending match under profile; do not overwrite resolved matches |
-| Team member leaves or is disqualified | Reassess eligibility and future lineups; do not automatically remove the team or erase previous results |
+| Entry withdraws after pairing | Preserve pairing; resolve pending match under profile; preserve played outcomes; revise future administrative awards under §7.2 when both entrants withdraw |
+| Player leaves persistent team, withdraws from tournament participation or is sanctioned | Distinguish these actions under §10.2.1; general membership departure alone does not revoke the frozen tournament eligibility |
 | Team disqualified | Reason mandatory; initial policy keeps previous results and treats future matches as absence; other policies require an explicit profile |
 | Team has too few active eligible players | Block match start; director applies published readiness/no-show policy |
 | General team roster changes | Tournament roster and locked historical lineups remain unchanged |
@@ -351,6 +434,16 @@ Initial implementation supports corrections without published dependencies. Othe
 | Player requests account deletion | Revoke access and apply identity-retention policy; do not cascade-delete opponents' results |
 | Guest player claims history | Verify identity linkage; alias coincidence is insufficient |
 | Same player appears in opposing lineups | Reject lineup/start, including when aliases differ but identity is known |
+
+### 9.3 Review barrier and durable correction evidence
+
+**Status: D-24 proposed observable contract, constrained by existing consistency/audit requirements.** The finalisation screen/API exposes (a) the current revision of competitive facts affecting standings, (b) the revision those standings have applied, and (c) the revision the operator reviewed. Finalise only when all three agree and CP-05 still passes. A concurrent result, withdrawal, sanction or correction that changes those facts invalidates the review. Return a conflict/pending-update explanation, keep the competition unfinalised and offer refresh plus review again. The UI must not show success until finalisation succeeds.
+
+This is a functional consistency boundary, not a requirement for one global counter or a particular persistence/messaging mechanism. The responsible operation validates authoritative completion and current permission as well as projection freshness. The public page may lag ordinary changes while disclosing its revision; the operator cannot approve stale final standings. Reopening preserves the previously approved final version and leads to a new reviewed finalisation with revision disclosure.
+
+Every correction preserves the prior/effective result, reason, actor/source, operation identity, time and affected participation evidence. Result, roster and lineup revisions belong to durable tournament history, not only diagnostic logs or transient delivery messages. The owning implementation slice must demonstrate that the effective change and its required evidence cannot partially succeed. This does not imply event sourcing.
+
+**Review states required:** previous/new outcome and cause; recorded-play impact; current/proposed points; affected dependency; stale revision; denied authority; failed save retaining input; uncertain response with receipt lookup; reopened final result. A published competitive dependency remains a blocker in the proposed H1 correction policy. Display the affected match/round and do not offer a partial change that claims to repair it. Acceptance: AT-07/08.
 
 ## 10. Teams, lineups, game submissions and circuits
 
@@ -386,13 +479,13 @@ The same real-world club may host tournaments and field teams, but its organiser
 | Eligibility | Player and entry eligibility | Entry plus eligible tournament roster |
 | Match preparation | Players derive from paired entries | Select eligible players and validate the lineup |
 | Start | Normal match checks; no lineup command | Lock a valid lineup before play |
-| Result | Match/entrant references and score | Same competitive references, with lineup reference where required |
+| Result | Match/entrant references and outcome; score only when the profile requires it | Same competitive references, with lineup/start evidence for played results where required |
 
 Acceptance: create an individual league, register two players, admit/check in, publish their pairing, start, submit/confirm the result and read history without any roster/lineup field, object identifier, command or screen. Repeat via an independent API client. Existing five-player team readiness checks must still reject a team with only four eligible starters. A composite team's individual board still validates its authorised player assignment.
 
 ### 10.2 Roster and lineup rules
 
-The following rules are proposed defaults, to be confirmed with the maintainer before H1:
+The following rules combine confirmed H1 scope/start constraints with proposed defaults. §15 records status per clause; the remaining defaults require a maintainer decision before their H1 slice:
 
 - **TM-01 Entry unit:** one team application creates one entrant and consumes one capacity slot. Team standings, byes, advancement, withdrawal and disqualification operate on that entrant.
 - **TM-02 Tournament roster:** the admitted team supplies identifiable players within profile minimum/maximum bounds. Its general membership is not the live source of tournament eligibility. Guest players are supported with stable identity.
@@ -405,11 +498,27 @@ The following rules are proposed defaults, to be confirmed with the maintainer b
 - **TM-09 Presence:** entrant check-in, player attendance and lineup readiness are distinct. The initial strict profile requires a full eligible lineup to start; understrength play requires a different announced profile.
 - **TM-10 Historical attribution:** record roster registration separately from actual lineup participation. Points belong to the team entry. Being an unused reserve does not count as having played all its matches.
 - **TM-11 Scheduling:** a player cannot be active on both sides of a match. Known simultaneous conflicting assignments are flagged before start. Full cross-tournament scheduling optimisation is deferred; H1 does not promise it.
-- **TM-12 Sanctions:** a member sanction and a team sanction have different scope. A member's removal blocks their future selection; previous team results change only through an explicit authorised decision.
+- **TM-12 Sanctions:** a member sanction and a team sanction have different scope. A player's competitive withdrawal or applicable sanction blocks future selection; persistent-club departure alone follows §10.2.1. Previous team results change only through an explicit authorised decision.
 
 Initial roster lifecycle: a representative submits/updates before the deadline; Herald validates bounds, identities and exclusivity; the director reviews exceptions; the eligible version is frozen. For each match a representative selects a lineup, the system validates it, and start locks the record. Invalid lineups are rejected without silently substituting another player.
 
 For H1 the organiser may perform these actions and register guest teams/players; a persistent self-service team directory is not a prerequisite. Nevertheless API identities must preserve team, entrant, player and roster/lineup distinctions from the first release. H2 introduces representation and self-service management without changing the meaning of existing competitive identifiers.
+
+### 10.2.1 Membership, competitive departure and sanctions
+
+**Status: D-23 proposed clarification**, preserving frozen roster identity and previous participation. H1 uses the operator to record competitive actions; it does not introduce a self-service team directory, transfers or in-match substitutions.
+
+| Event | Proposed effect on eligibility | Lineup and history consequence |
+| --- | --- | --- |
+| Player leaves/changes the persistent club or team | No automatic effect on eligibility in the frozen tournament roster | Preserve submitted/locked tournament selections and earlier appearances |
+| Operator records a player's explicit withdrawal from this tournament's participation | Mark the existing roster player unavailable for future play; do not delete them or add a replacement after freeze | Revalidate future selections; team entry remains admitted/active unless separately withdrawn |
+| Operator applies a player sanction | Record scope, reason and effective time; block selection/start within that scope | Keep historical appearances; any result change needs a separate authorised correction |
+| Departure/sanction affects a submitted or locked but unstarted lineup | Block start and expose the specific player/count blocker | Operator records a reasoned pre-start lineup revision using only other eligible frozen-roster members; retain the former lock and explicitly lock the replacement revision |
+| A sanction/incorrect lineup is discovered after the match starts | Do not silently rewrite the running lineup or substitute a player | Operator uses an explicit incident/result correction; retain actual participants and the previous record |
+
+If fewer than the required count remain eligible, waiting or an explicit absence/concession decision must follow the announced policy; a no contest is reserved for the neutral-cause conditions in §8.1; the system never auto-withdraws the whole team. H1 still rejects adding a new player after freeze. A player's competitive departure cannot be reversed by silently updating general membership. Exceptional reinstatement and richer substitutions are outside this proposed H1 baseline and require a separately reviewed policy.
+
+Acceptance: AT-04/05. The visual review must distinguish “left the club”, “unavailable for this tournament” and “sanctioned”; a generic “remove player” action is insufficient.
 
 ### 10.3 Direct versus composite team matches
 
@@ -471,11 +580,14 @@ The interface shows the state actually reached and the available action; it does
 
 ## 12. Observable cross-cutting requirements
 
+**H1 public identity baseline (confirmed):** public/unlisted tournament views publish only explicitly selected display aliases for entrants, results and standings. Each guest entry requires an alias reviewed by the operator before that entry first appears publicly, including when added to an already published tournament; contact details and internal identity records never supply a public-name fallback. Rosters and lineups remain private to authorised operational actors and, in H2, permitted representatives. Private tournament data remains protected. Richer public player/team history and identity retention require their separate policy before release.
+
+
 - **Authorisation:** every operation validates scope, including direct URL/API access. A public link never grants mutation powers. Team actions verify representation, not just roster membership.
 - **Auditability:** admission exceptions, profile changes, publications, results, corrections, sanctions, delegations, roster versions and lineup changes preserve actor, time, reason and previous version where relevant.
 - **Consistency:** no overcapacity or two effective winners for one match. Dependent operations wait for current results even if public read views refresh later. A team outcome is counted once regardless of active player count.
 - **Visible updates:** tables expose current time/revision and synchronisation status. Provisional pilot target: public results reflect changes within five seconds under normal conditions; measure before making a commitment.
-- **Privacy:** emails, contact details, private rejection reasons and dispute evidence are not public. Public names, roster/lineup visibility and identity retention need a product policy before public launch. Do not expose secret game submissions through team APIs.
+- **Privacy:** emails, contact details, private rejection reasons and dispute evidence are not public. The confirmed alias-only/private-roster baseline above applies to H1; richer public identity/history and retention need their separate product policy before release. Do not expose secret game submissions through team APIs.
 - **Accessibility:** core flows support keyboard use, states do not rely on colour alone and errors are associated with their fields.
 - **Dates:** preserve the tournament time zone and show reference/local conversion where different. Seasonal clock changes must not alter the intended match instant.
 - **Recovery:** reloads/retries do not duplicate applications, matches, lineups or results. Confirmed state survives and attempted operations can be reconciled.
@@ -570,7 +682,7 @@ An external application's local mode is separate. Automatic merging of local and
 
 Acceptance F-12: a test application completes a four-entry league through the API; a real consumer later completes a connected tournament under a shared profile. Duplicate submission counts once; late results for a cancelled tournament are rejected; engine error resolves nothing. Test a direct team result referencing the assigned two entrants and locked lineups. Connected Swiss requires H4; the H1 league proves the contract, not yet every consumer-specific integration.
 
-## 14. Proposed functional roadmap
+## 14. Adopted delivery sequence and proposed acceptance detail
 
 ### 14.1 Sequencing principles
 
@@ -586,7 +698,7 @@ No dates are assigned without effort/capacity estimates. Main sequence: H0 → H
 
 Deliverables: vocabulary/lifecycles, H1/H2 scope, permissions, first individual/direct-team profiles, initial API, roster/lineup invariants, league/admission/result scenarios, integration authority decision, and review of affected ADRs/roadmap.
 
-Exit: D-01–08, D-12 and team decisions D-15–18 in §15 are settled for H1; scenarios have unambiguous expected outcomes; no core flow relies on deciding rules in a handler. Validate a 1v1 journey, a two-team 5v5 match and the distinction from a composite team encounter before fixing public identifiers. Later capabilities can remain open if they do not compromise the core contract.
+Exit: the H1 clauses of the §15 decision register have explicit maintainer decisions, and the affected §18 scenarios have unambiguous expected outcomes and reviewed visual states. Scope approval alone does not close a proposed rule. Validate an individual journey, a two-team 5v5 match and the distinction from a composite encounter before fixing public identifiers. No core flow should rely on deciding rules in a handler. H2+ clauses may remain open if they do not compromise the H1 contract; bounded M0 foundations may continue independently.
 
 ### H1 — An organiser runs an individual or direct team league through web/API
 
@@ -668,9 +780,9 @@ Refine §10.6. Includes circuit calendar, eligibility, season points, best N res
 
 Exit: three example tournaments feed a season; revising one updates circuit standings without changing others. Ties resolve or remain shared under published rules. Cross-game ranking requires a separate product decision.
 
-### 14.2 Relationship to the repository roadmap
+### 14.2 Adopted mapping from the former repository roadmap
 
-| Existing milestone | Proposed treatment |
+| Former milestone | Adopted treatment (ADR 0013) |
 | --- | --- |
 | M0 Foundations | Retain bounded technical enablement; include H1 API/authority and team-aware contracts |
 | M1 League | Expand to H1; separate closure, readiness and start; include initial scoring and direct team entrants |
@@ -693,7 +805,7 @@ Exit: three example tournaments feed a season; revising one updates circuit stan
 | Pairing | F-06, §7 | No duplicates; system operates on entrants | H1/H3/H4 |
 | Results | F-07–08, TM-04 | Dispute, representative authority, retry without duplicate effect | H1/H2 |
 | Standings/history | F-09, §8–9, TM-10–12 | Traceable ranks and actual lineup participation | H1–H5 |
-| Notices | F-10 | State visible without email; correct team recipients | H2/H5 |
+| Announcements/notices | F-10, D-26 | H1 visible changes and organiser communication; H2 in-app recipients; H5 email | H1/H2/H5 |
 | API | API-01–10, F-11 | Journey without Angular; scoped identities | H1–H5 |
 | External integrations | F-12 | Connected tournament with one authority | H4 |
 | Individual simplicity | §10.1.1, IP-01–06 | Complete 1v1 journey without roster/lineup setup | H0–H2 |
@@ -701,50 +813,256 @@ Exit: three example tournaments feed a season; revising one updates circuit stan
 | Composite teams/substitutions | §10.3–10.4 | Parent aggregation once; versioned fielded players | H6 |
 | Game submissions/circuits | §10.5–10.6 | Private lists; revisable season and team continuity | H6/H7 |
 
-## 15. Domain decisions for review
+## 15. Decision register and development gates
 
-Public API support, considering teams from the initial model and avoiding explicit roster/lineup configuration for individual 1v1 competitions are confirmed. Detailed defaults below remain proposals for validation with the maintainer before becoming accepted specifications.
+This is the single register for product decisions. **Confirmed** means an explicit prior agreement or accepted ADR covers the stated clause. **Partial** separates that clause from remaining defaults. **Proposed** means the stated recommendation still needs a decision; adding detail in v0.7 does not approve it. The maintainer is the product decision owner for all rows; engineering/design supply feasibility and review evidence. Record the decision and accepted example here or in a linked accepted ADR before the listed implementation gate.
 
-| ID | Decision | Initial recommendation | Required before |
+| ID | Confirmed clause or recommendation awaiting decision | Status | Gate and evidence |
 | --- | --- | --- | --- |
-| D-01 | Connected tournament authority | Herald directs competition; external consumer executes; local mode separate | H1 contract/external adapter |
-| D-02 | External result granularity | Completed match first; detailed games/submatches extend contract | H1 API |
-| D-03 | Guests and synthetic entrants | Stable identities without forced human accounts; distinguish simulated actors | H1 |
-| D-04 | Initial profile | Single round-robin, 3/1/0, shared positions; individual/direct-team variants | H1 |
-| D-05 | Withdrawal/disqualification | Keep effective previous results; resolve future matches under §7/§9; member and team sanctions separate | H1 |
-| D-06 | Waiting-list promotion | Direct automatic promotion while open; director promotion after closure | H1 |
-| D-07 | Corrections with dependencies | Initially apply only without published dependencies; detect/block others | H1 |
-| D-08 | Tournament lifecycle ownership | **Settled:** the Tournaments module owns configuration, publication, visibility and lifecycle; Registration owns admission (ADR 0004) | H1 design |
-| D-09 | Public identity/history | Public alias without email; tournament visibility inherited; actual lineup participation distinct from roster registration | H2 public launch |
-| D-10 | Competitor confirmation | No silence-based confirmation; operator escalation; team representation required | H2 |
-| D-11 | External profile compatibility | Shared formulas, bye treatment, drawn games and participation rules | H4 |
-| D-12 | Result-source authority | Explicit tournament/organisation grant, revocable and audited | External writes H1 |
-| D-13 | Distributed execution | One executor initially; assignment/leases before multiple instances | H4 integration |
-| D-14 | Ecosystem opening | Controlled pilot consumers first; third-party registration and version commitments before general access | H5 |
-| D-15 | Competitive entry identity | Individual or team entrant distinct from player/account; two sides independent of active-player count | H0/H1 contract |
-| D-16 | First team scope | Direct team matches in H1; fixed rosters/starting lineups; composite submatches in H6 | H0/H1 |
-| D-17 | Roster freeze and exclusivity | Freeze no later than start; one active team entry per player per tournament; no new players after freeze in H1 | H1 |
-| D-18 | Team readiness and representation | Full eligible active count; identifiable captain/manager; operator resolution for understrength/no-show | H1; self-service H2 |
-| D-19 | Substitution windows | Between-match selection from frozen roster initially; richer game/map changes explicitly profiled later | H6 |
-| D-20 | Team circuit continuity | Separate stable team, roster and organisation; define which owns season points | H7 |
+| D-01 Connected authority | Recommend Herald directs the connected competition and the consumer executes; local mode stays separate | Proposed | H1 public contract must not preclude this; detailed execution agreement before H4, F-12 |
+| D-02 External result granularity | Confirmed H1 generic match outcomes need no numeric score (§8); completed-match integration first and later detail remain recommended | Partial | H1 API result contract, AT-14 |
+| D-03 Guests/synthetic entrants | Guest operator entries in H1 are accepted scope (ADR 0013); synthetic actors belong to the later connected-consumer specification | Partial | H1 guests under D-22/AT-13; synthetic identities H4 |
+| D-04 Initial profile | H1 individual/direct-team round-robin scope and the explicit start/result contract are confirmed; 3/1/0 and shared-position defaults remain the recommended profile | Partial | H1 scoring/pairing contract, AT-01/06 |
+| D-05 Withdrawal/disqualification | Preserve played outcomes; unplayed encounters between two withdrawn entrants become order-independent double absence with zero points. In-play withdrawal, sanctions and other exceptions require D-23/D-25 decisions | Partial | H1 departures/results, AT-05/06 |
+| D-06 Admission/promotion | H1 operator admission/waiting-list scope is accepted; RI queue, direct automatic promotion while open and operator promotion after closure remain recommended defaults | Partial | H1 entries, AT-03 |
+| D-07 Corrections | Recommend initially correcting only without published competitive dependencies; detect/block the others; retain predecessor and impact evidence | Proposed | H1 correction, AT-08 |
+| D-08 Lifecycle ownership | Tournaments owns configuration/publication/visibility/lifecycle; Registration owns admission; cross-owner operations need explicit responsibility and current facts | Confirmed ownership; coordination to specify | H1 publication/start/finalisation designs, AT-03/07 |
+| D-09 Public identity/history | Confirmed H1 aliases only, no public roster/lineup/contact/internal identity; private visibility inherited. Richer H2 history and retention policy remain open | Partial | H1 public read, AT-10/13; richer history H2 |
+| D-10 Competitor confirmation | Recommend no silence-based confirmation; explicit representative rights and operator escalation | Proposed | H2 reporting/disputes, UJ-04/05 |
+| D-11 External compatibility | Agree formulas, byes, draws and participation rules with the real consumer | Proposed | H4 profile/adapter |
+| D-12 Pilot result-source authority | Recommend explicit revocable organisation/tournament/operation grant and recorded responsible source; minimal provisioning procedure in F-01a | Proposed | H1 API writes, AT-12/14 |
+| D-13 Distributed execution | Recommend one executor initially; define assignment/expiry before multiple executors | Proposed | H4 integration |
+| D-14 Ecosystem opening | Recommend controlled pilot consumers first; general application management and compatibility commitments later | Proposed | H1 pilot procedure; H5 ecosystem |
+| D-15 Competitive identity contract | Preserve the documented entrant/player/account/team distinctions; final public identifier/contract shapes require review | Proposed contract detail | H1 API, AT-01/04/14 |
+| D-16 Initial delivery scope | ADR 0013 accepts H1 identity and operator-run individual/direct-team leagues through web/API; H2 participant/representative portal; H6 composite encounters and richer substitutions | Confirmed | Delivery reference; does not approve all defaults below |
+| D-17 Roster freeze/exclusivity | Recommend frozen roster no later than start, no new players after freeze, one active team entry per player/tournament | Proposed defaults within accepted H1 team scope | H1 roster, AT-04/05/11 |
+| D-18 Team start/representation | Valid locked lineups before team played start are confirmed (§8); representative powers and understrength incident policy remain recommended | Partial | H1 start under D-23/D-25; self-service representation H2 |
+| D-19 Substitution windows | H1 scope excludes in-match substitutions; richer game/map changes need explicit profiles | Confirmed exclusion; later policy proposed | H6 |
+| D-20 Circuit continuity | Recommend separating stable team, roster and organiser; decide which identity owns season points | Proposed | H7 |
+| D-21 H1 onboarding/private access | Recommend signed-in owner creation, verified recovery, operator-only private reads and scoped pilot access; spectator/collaborator invitations remain H2 (former G-01) | New proposal, F-01a | H1 access, AT-12; H2 invitation expiry/rights separately |
+| D-22 Guest identity scope | Recommend organisation-scoped opaque guest IDs, alias review and local duplicate review; no name/email merge or cross-organisation disclosure (former G-04) | New proposal, F-01a | H1 guests, AT-13; verified claims H2 |
+| D-23 Frozen-roster eligibility | Recommend no effect from persistent-club departure alone; explicit competitive withdrawal/sanction affects future readiness with retained evidence | New proposal, §10.2.1 | H1 roster/lineup, AT-05 |
+| D-24 Finalisation review barrier | Recommend current competitive-facts revision = applied standings revision = operator-reviewed revision, with rejection/review again on change (former G-05) | New proposal, §9.3 | H1 finalisation, AT-07 |
+| D-25 Terminal outcomes | Recommend the §8.1 table: in-play concession, 0/0 double absence/no contest, preserved actual-play evidence and no active champion when all entrants depart (extends former G-06) | New proposal except confirmed D-05 clause | H1 outcomes/finalisation, AT-06/09 |
+| D-26 H1 announcements | Recommend visible revisioned changes plus organiser-managed guest communication; no receipt/read claim; in-app inbox remains H2 | New proposal, F-10 | H1 publication/cancellation and pilot, AT-09/11 |
+| D-27 Lifecycle/visibility/deadlines | Recommend §§5.1–5.2 transition table, terminal-only archival, effective private-read invalidation and explicit future deadline changes without roster unfreeze (former G-02/G-03) | New proposal | Relevant H1 editor/operations slice, AT-02/03/09/10/11 |
 
-Deferred questions that do not block H1: payments, prizes, minors, official regulatory compatibility, bidirectional offline authority, rollback of played brackets, complex penalties, higher-than-pilot scale, evidence-access policy, transfers after roster freeze, cross-tournament scheduling and detailed player statistics. If the pilot includes any of these conditions, its specification is no longer deferrable.
+The former G-01–06 list is consolidated into D-21/22/24/25/27; it is not a second approval queue. H1 decisions must be closed for each affected slice. Later recommendations need not be resolved to continue unrelated foundations.
 
-## 16. Proposed incorporation into project documentation
+Deferred questions that do not block the stated H1 pilot: payments, prizes, minors, official governing-rule compatibility, bidirectional offline authority, rollback of played brackets, complex penalties, higher-than-pilot scale, detailed dispute-evidence access, transfers after roster freeze, cross-tournament scheduling and detailed player statistics. If the pilot introduces any of these conditions, its specification is no longer deferrable. H1 must still protect the private operational evidence it already holds.
 
-This file is functional baseline v0.4, not a substitute for OpenSpec or ADRs. After domain review, distribute it as follows:
+## 16. Documentation and implementation handoff
 
-- `docs/product/vision-and-scope.md`: §1–2 and API vision.
-- `docs/domain/glossary.md`: §3, especially entrant/player/team distinctions.
-- `docs/domain/capabilities-and-lifecycle.md`: §4–5.
-- `docs/functional/tournament-operations.md`: §6, §9 and §11–12.
-- `docs/functional/competition-systems.md`: §7–8.
-- `docs/functional/teams-and-lineups.md`: §10.1–10.4 and associated acceptance scenarios.
-- `docs/functional/submissions-and-circuits.md`: §10.5–10.6.
-- `docs/functional/public-api-and-integrations.md`: §13.
-- `docs/roadmap.md`: update using §14, retaining the necessary technical delivery track.
-- `docs/domain/open-decisions.md`: §15 and subsequent resolutions.
+This file is functional baseline v0.7. Keep discovery and journeys together here; do not split them into a parallel documentation tree. The roadmap records delivery order, ADRs record significant decisions, and each OpenSpec change takes a vertical slice with executable acceptance scenarios. Product agreement is not approval to implement an unspecified change.
 
-Each OpenSpec change takes a vertical slice of a milestone, references its rules and defines executable scenarios. ADRs explain technical alternatives; functional specifications explain expected behaviour. Proposed decisions do not become accepted merely by appearing in a file.
+The functional sequence H1–H7 is the product delivery reference (ADR 0013). M0 foundations and M4 cloud remain technical tracks. Proposed clauses in §15 require review before their affected implementation slice. Each OpenSpec design names the owner of the operation, its authoritative preconditions, current organisation/permission context, required durable history and the observable provisional/effective result. Cross-module coordination details stay in the technical design; they must satisfy these functional conditions rather than change them silently.
 
-Next refinement: review D-01–08, D-12 and D-15–18, then specify H1 acceptance and the initial API before designing aggregates. Teams are accounted for in core identities and initial direct-match operation; advanced submatch aggregation and seasons can be refined later without redefining a competitive entrant as a different concept.
+## 17. Initial user journeys
+
+Proposal for product review, not implementation approval.
+
+These journeys turn the rules above into user goals, touchpoints and observable outcomes. H1–H7 define product delivery; M0 and M4 retain their technical meaning. H1 includes individual/direct-team operation, identity and organisation isolation; competitor reporting/confirmation belongs to H2. The engineering roadmap follows this sequence (ADR 0013).
+
+### 17.1 Journey map
+
+| ID | Actor and goal | Functional delivery | Main touchpoints |
+| --- | --- | --- | --- |
+| UJ-01 | Organiser establishes the right organisation context | H1 owner; H2 collaboration | Organisation setup, context selector, access |
+| UJ-02 | Director runs an individual league end to end | H1 | Dashboard, editor, entries, rounds, standings |
+| UJ-03 | Director runs a direct team league | H1 operator; H2 representative actions | Entries, tournament roster, match lineup, rounds |
+| UJ-04 | Individual discovers, enters and competes | H2 | Directory, detail, own entry, current match, history |
+| UJ-05 | Captain enters and represents a team | H2 | Tournament detail, team entry, roster, lineup, match |
+| UJ-06 | Referee resolves an incident or corrects a result | H1 operator; H2 delegated referee/disputes | Operations queue, match detail, impact review |
+| UJ-07 | Spectator follows a tournament | H1 read by link; H2 discovery | Public detail, rounds, standings |
+| UJ-08 | External operator completes a league without Angular | H1 API | API documentation, receipts, revision-aware queries |
+
+### UJ-01 — Establish organisation context and delegate continuity
+
+**Goal:** organise on behalf of the correct entity and let an authorised colleague continue the work. **Trigger:** the user chooses to organise or opens an invitation. **Precondition:** an identifiable account; operational authority is scoped, never inferred from a global “admin” role. Sources: F-01, §2.2.
+
+| Step | User action | Herald response and next action | Delivery |
+| --- | --- | --- | --- |
+| 1 | Open organising access | Show existing organisation memberships; a user without membership sees the proposed creation path. Pending invitations appear only in H2 | H1/H2 |
+| 2 | Create an organisation, or accept an invitation | Creation makes the creator owner; acceptance grants only the invitation's stated scope | H1 creation; H2 invitation |
+| 3 | Select the organisation | Show its identity and accessible tournaments persistently in the admin shell | H1 |
+| 4 | Owner delegates tournament duties | Show who can direct/referee which tournaments; do not imply organisation administration | H2 |
+| 5 | Collaborator opens an assigned tournament | Show current operational state and permitted next actions so work can continue without the owner's presence | H2 |
+| 6 | Switch to another organisation | Replace the accessible context; revalidate authority on every action and direct link | H1 |
+
+**Success:** in H1, the owner operates their organisation's tournaments and another organisation's operator cannot mutate them (an H1 exit criterion). In H2, two authorised colleagues can operate the same tournament independently, and a user can act for different organisations without combining their permissions. **Recovery:** an expired/revoked invitation grants nothing; revoked access blocks subsequent writes and preserves past authorship. Removing the last owner is blocked; a successor must accept ownership transfer.
+
+**Review needed:** D-21 proposes immediate owner creation, verified recovery and private reads limited to authorised operators/pilot clients in H1. Accept or replace it before this journey is implemented. Invitation expiry and detailed collaboration roles remain H2; no separate organiser administrator is assumed.
+
+### UJ-02 — Run an individual round-robin league
+
+**Goal:** complete a small competition without a spreadsheet. **Trigger:** director creates a tournament. **Precondition:** organisation context and operational authority. Sources: CP-01–06, F-02, F-04–09, §7.2, IP-01–06.
+
+| Step | User action | Herald response and next action |
+| --- | --- | --- |
+| 1 | Create a draft from the dashboard | Ask for listing, individual profile, dates/time zone, visibility, capacity, admission and check-in policy; omit all roster/lineup controls |
+| 2 | Preview rules and publish | Validate completeness; show publication, registration and competition states separately; publication alone does not open registration |
+| 3 | Open registration and add guest players | Show actual admitted/waiting status and occupied individual slots; flag possible duplicates without merging identities |
+| 4 | Close registration and review attendance | Show admitted, eligible and checked-in facts separately; closure neither starts play nor marks absences |
+| 5 | Resolve exclusions and prepare the field | Explain every blocker; require at least two eligible entries and mandatory check-in where configured |
+| 6 | Generate/review draft pairings, then publish and start | Keep drafts private; validate the start conditions and freeze the rules and field; publication and start remain explicit actions |
+| 7 | Record each match outcome | Validate against the profile; show directly effective operator results and standings update status |
+| 8 | Review standings and finalise | Block unresolved matches/disputes; publish final positions, including shared positions under the initial profile |
+
+**Success examples:** four individual entrants produce six matches over three rounds; 3/1/0 points can be traced to effective results. Five entrants produce ten matches over five rounds, with one rest round per entrant awarding no points. The whole journey contains no roster/lineup command, identifier or screen.
+
+**Recovery:** incomplete publication preserves draft input; fewer than two eligible entrants blocks start but permits reopening/cancellation; a lost result response is reconciled before retrying. Round-robin scheduling does not force all matches of one round to finish before any later scheduled match. Withdrawal preserves previous outcomes and resolves future matches under the announced policy. Cancellation records a reason and never silently declares a winner.
+
+### UJ-03 — Run a direct team league
+
+**Goal:** operate a league whose competitive sides are teams. **Trigger/precondition:** as UJ-02, using a direct team profile. This is a variation of UJ-02; publication, pairings, aggregate results and finalisation stay the same. Sources: TM-01–12, §10.1–10.4.
+
+| Moment | Team-specific action and response |
+| --- | --- |
+| Configuration | Specify teams as capacity units, roster bounds, required active count, freeze deadline and representative powers |
+| Entry | Add a team and responsible representative; one admitted team occupies one slot regardless of player count |
+| Readiness | Record identifiable eligible players; review exclusivity and incomplete rosters; distinguish team check-in from player/lineup readiness |
+| Before competition start | Freeze an eligible tournament roster by the deadline; later general team changes do not alter it |
+| Before each match | Select the required distinct eligible starters and lock their lineup before play; show the blocker if fewer than the required count are eligible |
+| Later matches | Allow another valid selection from the frozen roster; retain earlier locked participation evidence |
+| Outcome/history | Record one aggregate team outcome; attribute actual appearances separately from registered reserve status |
+
+**Success example:** four teams each fielding five players still produce six matches. A permitted seven-person roster fields five starters; its two unused reserves are not recorded as having played. **Recovery:** four eligible starters block a five-player match even after team check-in; the operator resolves the incident under the announced policy. H1 rejects adding players after roster freeze or replacing a locked lineup during play. This journey creates no individual submatches; composite encounters remain H6.
+
+### UJ-04 — Discover, enter and compete as an individual
+
+**Goal:** always understand whether a place is secured and what to do next. **Trigger:** visitor opens the directory or a tournament link. **Precondition:** public/unlisted visibility or explicit H2 private access; sign-in before self-service mutation. Sources: F-03–05, F-07, F-09–10.
+
+| Step | User action | Herald response and next action |
+| --- | --- | --- |
+| 1 | Filter competitions and open details | Show organiser, reference time zone, location, individual entry, rules and real registration availability |
+| 2 | Sign in and apply | Return admitted, waiting for capacity or waiting for approval; displayed vacancies alone never promise admission |
+| 3 | Return to own entry | Show current status and promotion/material-change notices; after promotion, show the secured slot |
+| 4 | Check in within the window if required | Confirm only after success; show readiness or a specific blocker |
+| 5 | Open a published match | Show opponent, assignment/time and permitted action; never reveal draft pairings |
+| 6 | Report or respond to an opponent report | Keep reports pending until confirmation or authorised resolution; allow confirmation or dispute, never self-confirmation for the opponent |
+| 7 | Review the effective result and final history | Distinguish provisional/final standings and actual play from administrative outcomes |
+
+**Success:** the player completes the journey without organiser intervention except approval/incidents required by policy, and never manages a roster or lineup. **Recovery:** a last-slot race returns the actual admission outcome; cancelling a waiting/admitted application before start follows registration policy and reapplying loses queue priority. Before start, withdraw published pairings before changing the field; after competition start, use competitive withdrawal. Missing confirmation leaves the match pending; notifications link to authoritative current state rather than deciding the outcome.
+
+### UJ-05 — Enter and represent a team
+
+**Goal:** compete with a valid team while keeping representation and playing participation separate. **Trigger:** captain/manager chooses a team tournament. **Precondition:** explicit authority to represent the chosen team. Sources: F-04–07, TM-01–12.
+
+| Step | User action | Herald response and next action |
+| --- | --- | --- |
+| 1 | Inspect the tournament before applying | Show active-player count, roster bounds, deadlines and team-slot availability |
+| 2 | Select the represented team and apply | Return one team application status, not applications for every member |
+| 3 | Complete the tournament roster before its deadline | Flag identity/exclusivity issues to resolve; never silently replace players |
+| 4 | Check in the team | Show roster and match readiness separately from team check-in |
+| 5 | Submit a starting lineup before each match | Accept only eligible players from the frozen roster; show the locked version before play |
+| 6 | Report, confirm or dispute for the represented entrant | Allow only delegated powers; an arbitrary teammate has no implicit reporting rights |
+| 7 | Review team standings and participation | Show each player's actual participation; preserve earlier records after a rename or membership change |
+
+**Success:** a non-playing manager can represent the team while only selected starters with recorded play receive appearance evidence. **Recovery:** revoked representation blocks future actions; another authorised representative can continue. Lineup rejection identifies the player/count/rule to fix. The same person cannot confirm their own team's report as the opponent. Missing starters do not automatically withdraw the team. Persistent-team creation and representation verification need separate refinement before H2 implementation.
+
+### UJ-06 — Resolve an incident and safely correct an outcome
+
+**Goal:** restore an explainable competitive state without hiding earlier decisions. **Trigger:** operations queue shows an unresolved match, no-show, dispute or correction request. **Precondition:** authority over this tournament; delegation is H2, while H1 uses the operator. Sources: F-07–09, §9.
+
+| Step | User action | Herald response and next action |
+| --- | --- | --- |
+| 1 | Open the affected match | Show current revision, entrants, permitted evidence and report versions; keep private evidence out of public views |
+| 2 | Choose resolution or correction and supply a reason | Separate played result, concession, no-show and administrative decision; do not fabricate played scores |
+| 3 | Review the proposed impact | Show old/new result, points, standings and relevant published dependencies; include participation impact where applicable |
+| 4 | Confirm against the current revision | Apply one effective revision if permitted; record actor/reason and preserve predecessors |
+| 5 | Review refreshed competition state | Show standings update status and remaining blockers; expose revision disclosure in affected final results |
+
+**Success:** the decision has one competitive effect and can be explained afterwards. **Recovery:** a concurrent edit requires reloading and reviewing the new impact. Ordinary correction is blocked when published dependencies exist; identify the affected round/stage. The initial journey does not offer rollback of played brackets. Reopening a finalised competition is a separate reasoned action subject to the same checks. A director intervening in their own entry is identified; mandatory independent adjudication remains an open policy.
+
+### UJ-07 — Follow progress as a spectator
+
+**Goal:** understand who plays next and where the competition stands without an account. **Trigger:** public/unlisted link, or H2 public discovery. **Precondition:** permitted visibility. Sources: F-02–03, F-06, F-09, §12.
+
+| Step | User action | Herald response and next action |
+| --- | --- | --- |
+| 1 | Open tournament details | Show organiser, schedule/time zone, participation structure and separate lifecycle facts |
+| 2 | View rounds and matches | Show published rounds/matches, opposing entrants and resolution causes; drafts remain unavailable |
+| 3 | Inspect standings | Base them only on effective results, with provisional/final status and update revision/time |
+| 4 | Open a standing | Explain its points and published tiebreakers; shared positions remain shared |
+| 5 | Return after finalisation or revision | Show the final outcome or cancellation, with revision disclosure where applicable |
+
+**Success:** public progress is understandable without exposing contacts, private reasons or evidence. **Recovery:** stale/updating views disclose their state; a failed refresh retains context and offers retry. Private access denial reveals no tournament content through detail, discovery or history. A public link grants no mutation authority. Roster/lineup details remain private under the H1 baseline in D-09.
+
+### UJ-08 — Complete the operator journey through the API
+
+**Goal:** run UJ-02/03 from an independent client. **Trigger:** an authorised consumer starts a league. **Precondition:** explicit user/application scope and a compatible profile. Sources: F-11, API-01–10; connected execution authority in F-12 remains proposed.
+
+| Step | Client action | Herald response and next action |
+| --- | --- | --- |
+| 1 | Read contracts and context | Expose documented contracts, profile capabilities and the authorised organisation context |
+| 2 | Create/publish the league and add entries | Accept individual or team entries with distinct stable identifiers |
+| 3 | Admit and check in entrants, then prepare pairings | Freeze rosters only for teams; prepare and publish pairings before starting |
+| 4 | Read assigned matches | Require eligible team lineups to be locked where applicable; offer no team-only calls for individuals |
+| 5 | Submit an authorised aggregate result | Require operation identity and expected revision; return a receipt |
+| 6 | Reconcile and finish | Resolve uncertain transport outcomes through receipts; serve fresh standings; finalise once blockers are clear |
+
+**Success:** four entrants yield six matches and the same final standings as the browser flow. **Recovery:** retrying identical content with the same operation identity returns the original receipt; changed content conflicts. Stale revisions require a reread; revoked scope prevents further actions. Engine failure resolves nothing. If D-01 is settled as proposed (Herald directs, the consumer executes), a disconnected consumer does not create connected rounds. Credential mechanisms, receipt retention and external execution assignment require implementation specifications; this journey does not select them.
+
+### 17.2 Review and visual follow-up
+
+The [visual direction](herald-visual-direction.md) identifies current concept references, superseded images and review-state mockups. The original three concept PNGs illustrate round operations, outcomes/standings and discovery; they do not establish complete journey acceptance. The corrected outcomes/standings fixture is authoritative over the earlier round-management image where their scores/ranks differ. New review-state mockups must label pending D-21–27 policy recommendations. An exploratory prototype or screenshot is not proof of a production permission, transaction or recovery guarantee.
+
+Prioritise review of UJ-01–03, then UJ-06/07/08 for the first operator delivery; refine UJ-04/05 for H2. Before a screen implementation proposal, obtain or reuse mockups for each affected surface and relevant states: empty/loading/failure, incomplete configuration, waiting/admitted/check-in, blocked team readiness, draft/published pairings, pending/disputed/effective results and correction impact. Include mobile next-action behaviour and keyboard/error recovery.
+
+Outstanding decisions and their owners/gates are exclusively recorded in §15. The coverage and scenarios below explain how to close them; neither a new diagram nor a working prototype changes a decision status automatically.
+
+## 18. Acceptance and visual handoff
+
+The following scenarios make the review falsifiable. **They are specification candidates, not a report of passed tests.** Where a scenario cites a proposed decision, its expected outcome is conditional on accepting that proposal. The maintainer must accept or replace it before the affected implementation starts. Existing confirmed constraints continue to apply in either case.
+
+### 18.1 Acceptance fixtures
+
+| ID | Scenario and observable expected outcome | Decisions/journeys |
+| --- | --- | --- |
+| AT-01 League baseline | Four individual entrants yield six matches; five yield ten and one zero-point rest each. Under proposed 3/1/0, two equal point totals share position. Complete web/API without roster fields or commands. A later-round match may start when its own checks pass | D-04/15; UJ-02/08 |
+| AT-02 Publication and closure | Incomplete publication preserves draft inputs and names blockers. Publishing does not open registration. Closing with zero/one admitted succeeds; starting still fails with fewer than two eligible entrants | D-27, CP-01–04; UJ-02 |
+| AT-03 Field/capacity concurrency | Two operations for the final slot yield one admission. A published pre-start field cannot change silently: withdraw publication, review, republish. Reopening under the proposed policy requires withdrawal first. Identical retries never double-admit or double-promote | D-06/27; UJ-02/08 |
+| AT-04 Direct teams | Four teams yield six aggregate matches. A permitted seven-player roster fields five starters; two unused reserves receive no appearances. Four eligible starters block start. A valid locked lineup alone earns no appearances before recorded play | D-16–18; UJ-03/08 |
+| AT-05 Eligibility changes | Under D-23, leaving the persistent club after freeze leaves tournament eligibility intact. Explicit competitive withdrawal/sanction blocks future selection/start; a pre-start replacement uses eligible frozen-roster players with a retained prior lock. A running lineup is not silently overwritten | D-17/23; UJ-03/06 |
+| AT-06 Exceptional outcomes | Repeat the §8.1 rows, including in-play withdrawal, double no-show without withdrawal, a no contest before/after play and all entrants withdrawn. Preserve actual-play evidence. A-then-B and B-then-A withdrawal before play both yield 0/0 double absence and preserved revisions; later withdrawal never erases a played effective result | D-04/05/25; UJ-02/03/06 |
+| AT-07 Current finalisation | Facts revision 12 with standings applied through 11 blocks finalisation. After projection and review at 12, a concurrent correction to 13 causes conflict and Review again. Only current reviewed standings finalise; reopening retains the previous approved revision | D-24/27; UJ-02/06/07/08 |
+| AT-08 Safe correction | Show previous/new outcome, cause, points, recorded-play impact and affected dependencies. An allowed correction applies once with actor/reason/history. Published dependency blocks ordinary H1 correction. A stale save retains input but requires a fresh impact review; lost-response retry returns the original receipt | D-07/24; UJ-06/08 |
+| AT-09 Cancel/archive | Under D-27, pre-start cancellation closes active applications/registration and withdraws pairings. Post-start cancellation preserves played/effective history, adds no fabricated awards and names no champion. Reject late writes. Archive only terminal competitions without deleting history or changing visibility | D-25–27; UJ-02/07 |
+| AT-10 Visibility | Under D-27, public→unlisted removes discovery but keeps permitted links; public→private denies subsequent anonymous reads and invalidates public delivery caches; private→public requires alias/content preview. No path exposes contacts, private reasons, rosters or lineups | D-09/21/27; UJ-07 |
+| AT-11 Changed dates | Postponement previews each deadline and changes only the selected future values. An already frozen roster remains frozen; check-in evidence remains. The change log shows old/new times and reference time zone; the proposed H1 process makes no inbox-delivery claim | D-17/26/27; UJ-02/03 |
+| AT-12 Operator/pilot access | Under D-21 a signed-in newcomer creates an owner organisation. A different organisation's operator and an unscoped/revoked application cannot read private details or mutate by direct ID. Recovery restores only the verified identity's scope; context switch discards previous private context | D-12/21; UJ-01/08 |
+| AT-13 Guest/public identity | Same-name guests in two organisations remain separate under D-22; no cross-organisation lookup/merge. Public listing requires reviewed aliases and never uses contact/internal identity fallback. Guest creation grants no private-access/account rights | D-09/22; UJ-02/03/07 |
+| AT-14 Independent API | Client completes individual and direct-team operator leagues; receipts distinguish received/applied/rejected and expose current revision/error information. Same operation/content returns the original outcome, changed content conflicts, expired authority blocks new effects. No team-only payload is required for an individual operation | D-02/12/15; UJ-08 |
+
+### 18.2 Journey and state coverage
+
+The visual direction is the inventory of concrete artefacts. This matrix is the functional coverage contract. For each implementation slice, link the exact current mockup/state, record review status, and state which decisions remain proposed. A scene may demonstrate the intended composition while its policy is still pending.
+
+| Journey | Minimum surfaces/states to review | Behaviour gate |
+| --- | --- | --- |
+| UJ-01 operator context | No membership; proposed owner creation; organisation switch; denied/lost access; recovery next action | AT-12; D-21 |
+| UJ-02 individual operator | Empty dashboard; invalid/complete editor; separate publication/registration/competition facts; guest alias; waiting/admitted/check-in; draft/published pairings; terminal outcomes; current/stale finalisation | AT-01–03/06/07/09/11/13 |
+| UJ-03 direct teams | Capacity in teams; roster seven/starters five/reserves two; freeze; player identity conflict; 4-of-5 blocker; valid lock; membership departure versus competitive sanction; played versus administrative history | AT-04/05/06; D-17/23/25 |
+| UJ-06 operator incidents | Unselected new-result form; previous/new correction impact; published-dependency blocker; failed save with input retained; stale edit; receipt reconciliation; reasoned reopening | AT-07/08; D-07/24 |
+| UJ-07 spectator | Alias-only public detail/standings; provisional/updating/failed refresh; cancelled/revised final result; private denial with no content leak | AT-07/09/10/13 |
+| UJ-08 API consumer | Worked individual/team requests, permission/state/revision errors and queryable receipts; no extra application UI required | AT-01/04/12/14 |
+| UJ-04/05 participant/representative | Own entry and next action, invitations, representation, report/confirm/dispute, personal history | H2 refinement; not an H1 implementation dependency |
+
+For each affected screen, include desktop/mobile next-action behaviour and relevant empty, loading, populated, blocked, stale and failed states. Verify keyboard/error recovery and status text independently of colour. Do not use prototype persistence or a screenshot as evidence that authorisation, durable audit or concurrency has been implemented.
+
+### 18.3 Closure checklist and review traceability
+
+| Prior review finding | Consolidated source of truth | Still required before the affected slice |
+| --- | --- | --- |
+| R-01 scope/status drift | §§1/15/16 and ADR 0013 | Keep PPT/README/roadmap statuses aligned; explicitly decide remaining clauses |
+| R-02 terminal outcomes | §8.1, D-25, AT-06/09 | Accept/replace the proposed exception policy |
+| R-03 roster eligibility | §10.2.1, D-23, AT-05 | Accept/replace departure/sanction policy; review blocked/pre-start-revision screens |
+| R-04 finalisation freshness | §9.3, D-24, AT-07 | Agree observable revision contract and implement its atomic acceptance check |
+| R-05 access/guest/pilot gaps | F-01a, D-12/21/22, AT-12–14 | Decide operating policies; specify credential/recovery/grant procedure |
+| R-06 H1 announcements | F-10, D-26, AT-09/11 | Decide minimal channel/process and review change records |
+| R-07 lifecycle/visibility/deadlines | §§5.1–5.2, D-27, AT-02/03/09–11 | Accept/replace transitions and privacy/deadline effects |
+| R-09 missing H1 visual coverage | §18.2 and visual-direction inventory | Review each affected journey/state; the individual happy path does not approve teams |
+| R-10 correction/recovery states | §9.3, AT-07/08, UJ-06 | Review previous/new, stale/denied/failed/uncertain states and blocked dependencies |
+| A-03/A-04 architecture ownership/history | §§9.3/16, D-08, affected OpenSpec design | Assign authoritative cross-module checks and durable evidence without redefining product rules |
+
+H0/H1 readiness remains **pending explicit decisions and visual acceptance**. Documentation consolidation closes the ambiguity about where those decisions live; it does not turn pending defaults into accepted rules or claim the scenarios have passed. Continue bounded M0 work and prepare one reviewed H1 slice at a time.

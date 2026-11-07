@@ -10,26 +10,49 @@ context: |
 
   Conventions:
   - UI sharing (ADR 0011): an internal ui library from M0, consumed by both shells,
-    separate from api-client; feature and app-local shared components remain in their app.
-    ui supports SSR and has no app/API/session/permission/routing dependencies. Add a
+    separate from api-client; feature and app-local shared presentation remain in their app.
+    ui supports SSR and has no app/API/query-cache/session/permission/routing dependencies.
+    api-client owns no UI, navigation or business state. Add a
     component/state catalogue as development tooling with the first controls, not a third product app.
   - Frontend (ADR 0011): one Angular workspace, admin (CSR) and public/participant (hybrid)
     apps; SSG for corporate pages, SSR for dynamic public entry pages, CSR for personal
     workflows and live updates. Shared UI/tokens/API client, isolated SSR request state
     and public-only shared caches. Hosting includes an SSR runtime (ADR 0012).
-  - Everything in English. Docs are minimal: README.md, CLAUDE.md, docs/roadmap.md, docs/adr/.
-    Design notes and measurements go in the change's design.md. ADRs are superseded, never edited.
-    Design inputs already in docs/: herald-functional-discovery.md, herald-visual-direction.md,
-    assets/mockups/, herald-domain-overview.pptx.
-  - Modular monolith: one hexagonal module per bounded context; the set evolves with the design
+  - Frontend features own related routes, UI, forms, queries/mutations and tests. Features do not
+    import other features or the other app; app composition imports their explicit entry points.
+    App platform owns session/organisation context and API configuration without feature imports.
+    Enforce the import matrix in CI; define server/local-state ownership and invalidation on
+    context changes. Feature boundaries do not require NgModules or one library per feature.
+  - Everything in English. Keep one source per responsibility (ADR 0001): README for status,
+    functional-discovery for rules/journeys/decisions, roadmap for delivery, ADRs for architecture,
+    visual-direction for tokens and screen/state coverage. Design notes and measurements go in
+    the change's design.md. Proposed ADRs may be refined; accepted decisions normally supersede.
+    The maintainer authorised in-place pre-development consolidation on 2026-11-07; preserve
+    confirmed/proposed/implemented distinctions. PPT, mockups and prototypes are explanatory
+    supports, not production or independent rules. Apply Refactoring UI with square corners and
+    the documented scale. The earlier round-management PNG is superseded for semantics.
+  - openspec/specs describes the implemented skeleton. Active deltas describe target changes;
+    archived changes and dated reviews remain historical. Only m0-solution-skeleton is done;
+    m0-messaging is in progress and m0-web-shell is draft. H1 functionality has not started.
+  - Modular monolith: one module per bounded context, with Domain at the centre and vertical slices
+    (Features: one namespace per use case, one file or cohesive folder; Persistence at the edge);
+    features never depend on other features. Shared business rules belong in Domain; technical
+    reuse belongs with its responsibility, not automatically in Domain. The set evolves with the design
     (today Organisations, Tournaments, Registration, Competition, Standings) and a change that
     moves a boundary explains it in its design.md; modules talk only through integration events
-    in Herald.Contracts (ADR 0004).
+    in Herald.Contracts (ADR 0004). ModuleHosting is technical composition only. Cross-module
+    transitions identify an owner, authoritative conditions and reviewed revisions. Domain is
+    independent of infrastructure; one schema per module and no cross-schema joins.
   - Organisation, never "tenant", for the organising entity; British spelling (ADR 0003).
-  - CQRS: commands through aggregates, queries as no-tracking projections (ADR 0005).
+  - CQRS: commands through aggregates, returning identities/receipts/outcome or revision metadata
+    and typed errors; queries as no-tracking projections (ADR 0005). An acknowledgement is not
+    proof that a derived projection is current. Preserve operation identity on retries.
   - DDD: aggregates own the rules and raise domain events; integration events leave through
     the transactional outbox; consumers are idempotent; contract changes are backwards
     compatible or versioned (ADRs 0006, 0008).
+  - Durable business history is owned by the relevant module (ADR 0007): preserve predecessor
+    revisions, actor/time/reason and participation evidence with the effective state change.
+    Logs and message retention are not the competitive audit trail. Only effective results score.
   - Tests read as sentences; use-case and API tests run against real PostgreSQL (ADR 0010).
   - Original work only: nothing taken from other codebases.
   - On every /opsx:propose, identify screens to create or modify and explicitly ask the user

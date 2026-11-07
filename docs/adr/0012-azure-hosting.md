@@ -16,7 +16,7 @@ Herald shares an Azure subscription with the maintainer's other projects, Arcana
 - **Identity and secrets:** a managed identity per app reaching PostgreSQL, Service Bus and Key Vault without passwords; users sign in with Entra ID (workforce or external identities, decided with the sign-in change).
 - **Telemetry:** OpenTelemetry from the start (through Aspire's service defaults locally), exported to Application Insights in Azure.
 - **Infrastructure as code:** OpenTofu, deployed by GitHub Actions with OIDC federation, never from a laptop.
-- **Local development:** .NET Aspire runs PostgreSQL, the broker and the host.
+- **Local development target:** .NET Aspire runs PostgreSQL, the broker, the host and both Angular shells. The implemented skeleton currently starts only PostgreSQL and the host; `m0-messaging` and `m0-web-shell` add the remaining pieces.
 - **Shared platform, Herald's own resources:** Herald deploys onto the shared platform once it exists, and owns only what is specific to it:
 
   | Shared platform (planned repository) | Herald |
@@ -40,4 +40,5 @@ Herald shares an Azure subscription with the maintainer's other projects, Arcana
 - Negative: Service Bus and PostgreSQL have a fixed monthly cost even idle; cold starts after scale to zero.
 - Negative: Herald's cloud milestone depends on work in another repository.
 - Negative: SSR adds a frontend server runtime to deploy and observe alongside the API; shared caches exclude private and personalised responses and request-specific state stays isolated (ADR 0011).
+- Delivery dependency: H1 identity is not delayed until M4. Select the user identity provider and organisation-isolation approach with the H1 access slice. A remote pilot needs an accessible environment; if the shared Azure platform is not ready, explicitly plan a reviewed pilot environment rather than silently bypassing the M4 platform boundary.
 - Follow-ups: the platform repository and its ADR (the split above, how projects find the platform: `data` sources by name or a versioned lookup module rather than reading its state, the least privilege each project's pipeline needs on shared resources, and whether Arcana's server and environment are imported or recreated with platform names); then region (North Europe, as Arcana), naming and a cost estimate for Herald, in M4.

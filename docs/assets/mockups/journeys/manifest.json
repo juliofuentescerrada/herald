@@ -1,0 +1,241 @@
+{
+  "date": "2026-11-07",
+  "baseline": "functional and visual v0.7",
+  "purpose": "Documentation snapshots; not approved production screens",
+  "capture": {
+    "tool": "Playwright using installed Google Chrome",
+    "browserVersion": "157.0.8103.38",
+    "deviceScaleFactor": 1,
+    "assets": "local only; system sans-serif fallback",
+    "screenshots": [
+      {
+        "file": "admin-desktop.png",
+        "source": "index.html#admin",
+        "viewport": [
+          1600,
+          1100
+        ],
+        "fullPage": true,
+        "sha256": "6bec64bb2a6b1c88140ded42ca9e94a5fb2a805cc4e0b13527b5bc3590fe23ff"
+      },
+      {
+        "file": "discovery-desktop.png",
+        "source": "index.html#discover",
+        "viewport": [
+          1600,
+          1100
+        ],
+        "fullPage": true,
+        "sha256": "5d956030c62d9b86e7f3f96d4c028dd56a20fa782cdff117aa43b9b15f57aa12"
+      },
+      {
+        "file": "new-result-desktop.png",
+        "source": "index.html#admin",
+        "viewport": [
+          1600,
+          1100
+        ],
+        "fullPage": false,
+        "sha256": "7b4a72eba75a0b55ad771b70f7e818cdc69347ebd65318a89d3dd6f29d9a217a",
+        "stateSetup": "Open the first unresolved result (openResult(3))"
+      },
+      {
+        "file": "correction-desktop.png",
+        "source": "index.html#admin",
+        "viewport": [
+          1600,
+          1100
+        ],
+        "fullPage": false,
+        "sha256": "d9e8b2f6821eda9bcd6afc4c6946f3bbc8b93a39b6c8242c5749b93f6e0da367",
+        "stateSetup": "Open correction for the first effective result (openResult(0))"
+      },
+      {
+        "file": "state-team-blocked-desktop.png",
+        "source": "review-states.html?state=team-blocked",
+        "viewport": [
+          1600,
+          1100
+        ],
+        "fullPage": true,
+        "sha256": "63acd97a1059c12ff6c884b0bae6bc6fc997a634110783d345c58aa359b9bf26"
+      },
+      {
+        "file": "state-correction-desktop.png",
+        "source": "review-states.html?state=correction",
+        "viewport": [
+          1600,
+          1100
+        ],
+        "fullPage": true,
+        "sha256": "0668cad1173db79572d22d6abd24bf4826d597cb2390485b6c54f0eec73e8fed"
+      },
+      {
+        "file": "state-finalisation-stale-desktop.png",
+        "source": "review-states.html?state=finalisation-stale",
+        "viewport": [
+          1600,
+          1100
+        ],
+        "fullPage": true,
+        "sha256": "13a946e77586136c006d7e7c578b32d37ee034fe8e54c9c65cc642205c5a9501"
+      },
+      {
+        "file": "journey-individual-access-desktop.png",
+        "source": "journeys.html?kind=individual&step=access",
+        "viewport": [
+          1600,
+          1100
+        ],
+        "fullPage": true,
+        "sha256": "645d52cd7fd18b1e7473e1f5ee84d4d6c65785d042c0f755e93b0fdbc334e7b9"
+      },
+      {
+        "file": "journey-individual-finalise-desktop.png",
+        "source": "journeys.html?kind=individual&step=finalise",
+        "viewport": [
+          1600,
+          1100
+        ],
+        "fullPage": true,
+        "sha256": "f0d9b4ad5abbbd7d6b47284b47b23f55ae61bb7392d3d7e042a51b2c82e11154"
+      },
+      {
+        "file": "journey-team-readiness-desktop.png",
+        "source": "journeys.html?kind=team&step=readiness",
+        "viewport": [
+          1600,
+          1100
+        ],
+        "fullPage": true,
+        "sha256": "e629bdf0609828eda1bfda4eac934cf0a29583af671a7aa50ea2a29764365fe3"
+      },
+      {
+        "file": "new-result-mobile.png",
+        "source": "index.html#admin",
+        "viewport": [
+          390,
+          844
+        ],
+        "fullPage": false,
+        "sha256": "1d7678b8e3fe969986af2e27f7e1798348d1d3ce2c854cd7b7e3c878d69e847b",
+        "stateSetup": "Open the first unresolved result (openResult(3))"
+      },
+      {
+        "file": "state-entries-mobile.png",
+        "source": "review-states.html?state=entries",
+        "viewport": [
+          390,
+          844
+        ],
+        "fullPage": true,
+        "sha256": "22abe3409667f8f8bac95fa41a0b9cd5a1f64e68428208cef35a770f0b69a352"
+      },
+      {
+        "file": "state-private-denied-mobile.png",
+        "source": "review-states.html?state=private-denied",
+        "viewport": [
+          390,
+          844
+        ],
+        "fullPage": true,
+        "sha256": "44422fe57b5b1ada7083c5042b10eb18477fb95ba6cc386ec96436c4c48f571a"
+      },
+      {
+        "file": "journey-individual-setup-mobile.png",
+        "source": "journeys.html?kind=individual&step=setup",
+        "viewport": [
+          390,
+          844
+        ],
+        "fullPage": true,
+        "sha256": "f6aa252173bc59b2d94b6153ebb896e4ff69eeeb6997820231bb3af472265e51"
+      },
+      {
+        "file": "journey-individual-public-mobile.png",
+        "source": "journeys.html?kind=individual&step=public",
+        "viewport": [
+          390,
+          844
+        ],
+        "fullPage": true,
+        "sha256": "8fef5d34d436dd1b70243e6ae05c65d99876b54fc0470c13e769632e91eb9813"
+      },
+      {
+        "file": "journey-team-readiness-mobile.png",
+        "source": "journeys.html?kind=team&step=readiness",
+        "viewport": [
+          390,
+          844
+        ],
+        "fullPage": true,
+        "sha256": "b34a214de287ff2f652740ac363a9b17ad2c61719a0af4ee8444465d88c33a2f"
+      },
+      {
+        "file": "journey-team-rounds-mobile.png",
+        "source": "journeys.html?kind=team&step=rounds",
+        "viewport": [
+          390,
+          844
+        ],
+        "fullPage": true,
+        "sha256": "afd250557fb776814a33f6ade45254e54c53f848f00f0611ecf4f8bf0367cf56"
+      },
+      {
+        "file": "admin-grayscale.png",
+        "source": "index.html#admin",
+        "viewport": [
+          1600,
+          1100
+        ],
+        "fullPage": true,
+        "filter": "grayscale(1)",
+        "sha256": "d1b70aec5750979656a4c104b3c80d955712c9abbef38d11b250d8cc9417dbbc"
+      },
+      {
+        "file": "admin-blur.png",
+        "source": "index.html#admin",
+        "viewport": [
+          1600,
+          1100
+        ],
+        "fullPage": true,
+        "filter": "grayscale(1) blur(4px)",
+        "sha256": "c8b1b46728873c1aad87999acaef4a82f5123b705c9f02fa12712fd0a770851d"
+      },
+      {
+        "file": "journey-team-grayscale.png",
+        "source": "journeys.html?kind=team&step=readiness",
+        "viewport": [
+          1600,
+          1100
+        ],
+        "fullPage": true,
+        "filter": "grayscale(1)",
+        "sha256": "4240ec311024c1ba1df67d169ac39c023611e53030a9de95e7ece4484b141d6b"
+      },
+      {
+        "file": "journey-team-blur.png",
+        "source": "journeys.html?kind=team&step=readiness",
+        "viewport": [
+          1600,
+          1100
+        ],
+        "fullPage": true,
+        "filter": "grayscale(1) blur(4px)",
+        "sha256": "97708cfe781a2d594ad5538107d11a13fcd9a905992eb56ea96bcceffd5d077e"
+      }
+    ]
+  },
+  "sources": {
+    "index.html": "3bbdafd003aa03a2004e5a80dcb1ea08e853c7db43d72eabc8e4f21520b82da8",
+    "app.js": "fa83ac2a32f64936a90bc4e54eeb3d7cd117702aa11ddb968aaa245c2c2cbff5",
+    "style.css": "30802e24784f90370a81e8bb1e24ed7c35a54d90372b34cc657a080bf92f63bf",
+    "journeys.html": "6ce14fb4d517d859b1f052085c8c3fc404dd1e357c7d241323a1c209d883ba8d",
+    "review-states.css": "78da2051aff8eef26782fc365dcce60a7b827ca39e58043059af1478dbbe558d",
+    "journeys.css": "1608bfb752affdb3f3bba58c2cc1d7b74227783ce0442eb8c620d549d7122ce4",
+    "review-states.js": "294efdd3d24f4049476a62ec96e81f3cbdc629557e2d9c60ab438b9a8fb13bd1",
+    "journeys.js": "c45ee1ef1e5aabee6fd227470da1cc4e7db157386aa82923e4fcb092a5269c46",
+    "review-states.html": "07f7a9c5fa592be2de2858970bc0638282d173752e8b8d9e45b78b4fab5f5827"
+  }
+}

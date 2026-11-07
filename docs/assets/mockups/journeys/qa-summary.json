@@ -1,0 +1,162 @@
+{
+  "date": "2026-11-07",
+  "browserVersion": "157.0.8103.38",
+  "viewports": [
+    [
+      1600,
+      1100
+    ],
+    [
+      390,
+      844
+    ]
+  ],
+  "renderedCompositions": 68,
+  "pageErrors": [],
+  "documentOverflow": [],
+  "tableOverflow": [],
+  "browserChecks": [
+    {
+      "name": "New result opens without selected winner",
+      "pass": true
+    },
+    {
+      "name": "Confirmation disabled until choice",
+      "pass": true
+    },
+    {
+      "name": "Native dialog focuses outcome field",
+      "pass": true
+    },
+    {
+      "name": "Escape dismisses native result dialog",
+      "pass": true
+    },
+    {
+      "name": "individual journey starts without choice",
+      "pass": true
+    },
+    {
+      "name": "individual explicit draw previews one point each",
+      "pass": true
+    },
+    {
+      "name": "individual choice carried to next snapshot",
+      "pass": true
+    },
+    {
+      "name": "individual corrected snapshot carries choice",
+      "pass": true
+    },
+    {
+      "name": "team journey starts without choice",
+      "pass": true
+    },
+    {
+      "name": "team explicit draw previews one point each",
+      "pass": true
+    },
+    {
+      "name": "team choice carried to next snapshot",
+      "pass": true
+    },
+    {
+      "name": "team corrected snapshot carries choice",
+      "pass": true
+    }
+  ],
+  "resultStateChecks": [
+    {
+      "name": "New result has no winner",
+      "pass": true
+    },
+    {
+      "name": "Confirmation starts disabled",
+      "pass": true
+    },
+    {
+      "name": "Invalid submit changes no result",
+      "pass": true
+    },
+    {
+      "name": "Explicit outcome enables confirmation",
+      "pass": true
+    },
+    {
+      "name": "Selected draw recorded",
+      "pass": true
+    },
+    {
+      "name": "Points updated once",
+      "pass": true
+    },
+    {
+      "name": "Correction preserves existing outcome",
+      "pass": true
+    },
+    {
+      "name": "Correction requires a reason",
+      "pass": true
+    },
+    {
+      "name": "Missing correction reason changes nothing",
+      "pass": true
+    },
+    {
+      "name": "Valid correction replaces the effective result",
+      "pass": true
+    },
+    {
+      "name": "Correction does not add points twice",
+      "pass": true
+    }
+  ],
+  "syntax": "node --check passed for app.js, journeys.js and review-states.js",
+  "htmlLocalLinks": {
+    "checked": 28,
+    "missing": 0
+  },
+  "limits": [
+    "Selected captures visually inspected; render pass does not assert every pixel",
+    "No assistive-technology, production SSR, backend, permission or persistence test",
+    "Contrast from source CSS pairs and sampled computed styles, not inferred from raster images"
+  ],
+  "targetedReviewRecaptures": [
+    {
+      "file": "new-result-desktop.png",
+      "overflow": false
+    },
+    {
+      "file": "correction-desktop.png",
+      "overflow": false
+    },
+    {
+      "file": "state-finalisation-stale-desktop.png",
+      "overflow": false
+    },
+    {
+      "file": "journey-team-readiness-desktop.png",
+      "overflow": false
+    },
+    {
+      "file": "new-result-mobile.png",
+      "overflow": false
+    },
+    {
+      "file": "state-private-denied-mobile.png",
+      "overflow": false
+    },
+    {
+      "file": "journey-team-readiness-mobile.png",
+      "overflow": false
+    },
+    {
+      "file": "journey-team-grayscale.png",
+      "overflow": false
+    },
+    {
+      "file": "journey-team-blur.png",
+      "overflow": false
+    }
+  ]
+}
