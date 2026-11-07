@@ -53,13 +53,13 @@ M0 has no domain, so two probe modules that exist only in a test project (a send
 4. A redelivered envelope is handled once within the deduplication window, also after a host restart (redelivered through the sending agent with a fixed envelope id, as found in the spike). The window is set explicitly (`Durability.KeepAfterMessageHandling`) in the shared module hosting, not left at Wolverine's 5-minute default; its value is chosen with the first real integration event.
 5. A handler that always throws leaves the message in the receiver's dead letters.
 
-They run against PostgreSQL in Testcontainers over Wolverine's durable local queues, which go through the outbox and inbox without a broker, and wait for delivery with Wolverine's message tracking rather than delays.
+They run against PostgreSQL in Testcontainers over Wolverine's durable local queues, which go through the outbox and inbox without a broker, and wait for delivery with Wolverine's message tracking rather than delays. Where the expected outcome is that nothing happens (a duplicate rejected, nothing recovered after a restart), there is no event to wait for, so those tests pause for a fixed five seconds; each test uses a database of its own in one PostgreSQL container. A deliberate mutation (the shared store moved into a module schema) fails three of them.
 
 Alternatives: technical code (a ping) in real modules, which puts non-domain code in production; or proving the outbox only with H1's first integration event, which leaves M0's exit criterion unmet.
 
 ### A shared project plugs a module into the host
 
-The probes prove something only if they are registered exactly like the real modules, so the module registration (its `DbContext`, handler discovery and, later, its topic) is one helper, not a copy per module. It lives in a new project, `Herald.ModuleHosting` (how a module is hosted: the name keeps it from becoming a drawer for anything shared), referenced by the modules and the host. Architecture tests keep `Domain` from depending on it, and it references no module.
+The probes prove something only if they are registered exactly like the real modules, so the module registration (its `DbContext`, handler discovery and, later, its topic) is one helper, not a copy per module, and so is what every host of modules shares: `UseHeraldMessaging` (store, transactions, durable queues, deduplication window) and `AddHeraldApi`/`MapHeraldApi` (Wolverine endpoints and the OpenAPI document). The probe host uses the same three. It lives in a new project, `Herald.ModuleHosting` (how a module is hosted: the name keeps it from becoming a drawer for anything shared), referenced by the modules and the host. Architecture tests keep `Domain` from depending on it, and it references no module.
 
 This modifies the `module-boundaries` spec, which allows a module to reference only `Herald.BuildingBlocks` and `Herald.Contracts`.
 
@@ -93,7 +93,7 @@ This change moves each module's entry point to its root and removes the empty `A
 
 The architecture tests change with it: `Domain` depends on no infrastructure (Wolverine, EF Core, Npgsql, ASP.NET Core, `Herald.Contracts`, the shared project); a feature does not depend on another feature; the rule "Application does not depend on Adapters" goes. This modifies the `module-boundaries` spec, together with the shared project above.
 
-Wolverine's HTTP endpoints stay (ADR 0005), so ADR 0005's OpenAPI follow-up is answered here: the receiving probe module exposes one Wolverine endpoint, and a test checks that it appears in the OpenAPI document (`Microsoft.AspNetCore.OpenApi`) with its route and response type. Writing the document at build time and generating the client stay in `m0-web-shell`.
+Wolverine's HTTP endpoints stay (ADR 0005), so ADR 0005's OpenAPI follow-up is answered here: the receiving probe module exposes one Wolverine endpoint, and a test checks that it appears in the OpenAPI document (`Microsoft.AspNetCore.OpenApi`) with its route and response type. The document is served at `/openapi/v1.json` in Development only, like `/health`; what Azure exposes is decided in M4. Writing the document at build time and generating the client stay in `m0-web-shell`.
 
 Alternatives: keep the hexagonal layers (the first version of ADR 0004); the same slices named after the hexagon (`Features` as the driving side, `Ports` and `Persistence` as the driven side), dropped in favour of folders that appear only when needed.
 

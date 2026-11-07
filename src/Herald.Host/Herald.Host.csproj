@@ -2,7 +2,6 @@
   <ItemGroup>
     <PackageReference Include="Aspire.Npgsql" />
     <PackageReference Include="WolverineFx.AzureServiceBus" />
-    <PackageReference Include="WolverineFx.Http" />
     <PackageReference Include="WolverineFx.RuntimeCompilation" />
   </ItemGroup>
   <ItemGroup>

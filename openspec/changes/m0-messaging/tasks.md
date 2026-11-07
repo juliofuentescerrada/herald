@@ -26,13 +26,13 @@
 
 ## 4. Messaging tests with probe modules
 
-- [ ] 4.1 Create `tests/Herald.Messaging.Tests` with a sender and a receiver probe module registered through `Herald.ModuleHosting`, against PostgreSQL in Testcontainers, waiting with Wolverine's message tracking
-- [ ] 4.2 Test that a handler's change and its message commit together and the message is delivered
-- [ ] 4.3 Test that a throwing handler leaves neither the change nor an outgoing envelope
-- [ ] 4.4 Test that a message between the probes is recorded in `wolverine` and in no module schema, leaves nothing pending, and is not delivered again after a host restart
-- [ ] 4.5 Test that a redelivered message is handled once within the explicitly configured deduplication window, including after a host restart (as found in 1.3)
-- [ ] 4.6 Test that a message whose handler always throws ends in the dead letters with its receiving endpoint
-- [ ] 4.7 Give the receiver probe a Wolverine HTTP endpoint and test that it appears in the OpenAPI document with its route, method and response type
+- [x] 4.1 Create `tests/Herald.Messaging.Tests` with a sender and a receiver probe module registered through `Herald.ModuleHosting`, against PostgreSQL in Testcontainers, waiting with Wolverine's message tracking
+- [x] 4.2 Test that a handler's change and its message commit together and the message is delivered
+- [x] 4.3 Test that a throwing handler leaves neither the change nor an outgoing envelope
+- [x] 4.4 Test that a message between the probes is recorded in `wolverine` and in no module schema, leaves nothing pending, and is not delivered again after a host restart
+- [x] 4.5 Test that a redelivered message is handled once within the explicitly configured deduplication window, including after a host restart (as found in 1.3)
+- [x] 4.6 Test that a message whose handler always throws ends in the dead letters with its receiving endpoint
+- [x] 4.7 Give the receiver probe a Wolverine HTTP endpoint and test that it appears in the OpenAPI document with its route, method and response type
 
 ## 5. Generated code
 

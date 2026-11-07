@@ -15,5 +15,6 @@
   <Folder Name="/tests/">
     <Project Path="tests/Herald.Architecture.Tests/Herald.Architecture.Tests.csproj" />
     <Project Path="tests/Herald.Host.Tests/Herald.Host.Tests.csproj" />
+    <Project Path="tests/Herald.Messaging.Tests/Herald.Messaging.Tests.csproj" />
   </Folder>
 </Solution>

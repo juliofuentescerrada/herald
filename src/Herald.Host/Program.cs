@@ -8,7 +8,6 @@ using Herald.Tournaments;
 using JasperFx;
 using Wolverine;
 using Wolverine.AzureServiceBus;
-using Wolverine.Http;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -38,11 +37,11 @@ builder.UseWolverine(options =>
         .AddCompetitionModule()
         .AddStandingsModule();
 });
-builder.Services.AddWolverineHttp();
+builder.Services.AddHeraldApi();
 
 var app = builder.Build();
 
 app.MapDefaultEndpoints();
-app.MapWolverineEndpoints();
+app.MapHeraldApi();
 
 return await app.RunJasperFxCommands(args);
