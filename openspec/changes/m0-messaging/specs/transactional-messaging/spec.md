@@ -1,14 +1,18 @@
 ## ADDED Requirements
 
-### Requirement: Each module keeps its messages in its own schema
-Each module SHALL store its outgoing (outbox), incoming (inbox) and failed (dead letter) messages in its own PostgreSQL schema, next to its state; the host's `wolverine` schema SHALL hold no module's messages.
+### Requirement: Messages are kept in one shared store
+Every module's outgoing (outbox), incoming (inbox) and failed (dead letter) messages SHALL be stored in one message store in the `wolverine` schema of the database that holds the modules' state; module schemas SHALL hold no message tables.
 
-#### Scenario: A message between modules is stored by both modules
+#### Scenario: A message between modules passes through the shared store
 - **WHEN** a handler in one module publishes a message that a handler in another module receives
-- **THEN** the sent envelope is recorded in the sender's schema and the received envelope in the receiver's schema, and neither in the `wolverine` schema
+- **THEN** the envelope is recorded in the `wolverine` schema, none in either module's schema, and after delivery no envelope remains pending
+
+#### Scenario: Nothing is delivered again after a restart
+- **WHEN** a message between modules has been handled and the host restarts
+- **THEN** the receiving handler does not run again
 
 ### Requirement: State and outgoing messages commit together
-A handler's state change and the messages it publishes SHALL be committed in one transaction in its module's schema, and messages SHALL be sent only after that commit.
+A handler's state change and the messages it publishes SHALL be committed in one transaction, and messages SHALL be sent only after that commit.
 
 #### Scenario: The handler succeeds
 - **WHEN** a handler saves a change and publishes a message, and completes
@@ -30,15 +34,15 @@ A message delivered more than once with the same identity within the configured 
 - **THEN** the receiving handler does not run again
 
 ### Requirement: Failing messages are kept
-A message whose handler keeps failing SHALL end in the receiving module's dead letters after its retries, not be dropped.
+A message whose handler keeps failing SHALL end in the dead letters after its retries, recorded with the endpoint that received it, not be dropped.
 
 #### Scenario: A handler that always fails
 - **WHEN** a message is delivered to a handler that throws every time
-- **THEN** after the retries the message is in the receiving module's dead letters
+- **THEN** after the retries the message is in the dead letters, with the receiving endpoint
 
 ### Requirement: Modules plug into the host in one place
-Each module SHALL register its message store, its `DbContext` and the routing of its handlers and endpoints through `Herald.ModuleHosting`, from its entry point, so that test modules and real modules are hosted the same way.
+Each module SHALL register its `DbContext` and the discovery of its handlers and endpoints through `Herald.ModuleHosting`, from its entry point, so that test modules and real modules are hosted the same way.
 
 #### Scenario: A module is hosted
 - **WHEN** the host starts with a module registered through its entry point
-- **THEN** the module's handlers and endpoints use the message store in the module's schema
+- **THEN** the module's handlers and endpoints save their messages in the shared store in the same transaction as the module's `DbContext`
