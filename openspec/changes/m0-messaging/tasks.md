@@ -2,7 +2,7 @@
 
 - [x] 1.1 In the scratchpad, a console host with Wolverine 6.62.0, two "modules" (assemblies) with a `DbContext` each and an ancillary store in their own schema of one PostgreSQL database, plus the main store in `wolverine`
 - [x] 1.2 Check that a handler's row and its published message commit or roll back together in its module's schema (design point 2) and that a message between the two lands in the receiver's inbox schema (point 3)
-- [ ] 1.3 Check whether a test can redeliver an envelope with the same id and see it handled once (point 3); if not, record how the requirement is tested instead
+- [x] 1.3 Check whether a test can redeliver an envelope with the same id and see it handled once (point 3); if not, record how the requirement is tested instead
 - [ ] 1.4 Check the envelope tables through each module's EF Core migrations (`MapWolverineEnvelopeStorage`) and how the main store's tables are created (point 4)
 - [x] 1.5 Check that each module configures its store and routing from its own registration (a Wolverine extension through DI), with the host calling one method per module (point 5)
 - [ ] 1.6 Start the Azure Service Bus emulator with Aspire (`AddAzureServiceBus().RunAsEmulator()`, topics and subscriptions declared in the AppHost) and send and receive through Wolverine's transport; record whether Wolverine's provisioning must be turned off (point 6)
@@ -30,7 +30,7 @@
 - [ ] 4.2 Test that a handler's change and its message commit together and the message is delivered
 - [ ] 4.3 Test that a throwing handler leaves neither the change nor an outgoing envelope
 - [ ] 4.4 Test that the sent envelope is in the sender's schema, the received one in the receiver's, and none in `wolverine`
-- [ ] 4.5 Test that a redelivered message is handled once (as found in 1.3)
+- [ ] 4.5 Test that a redelivered message is handled once within the explicitly configured deduplication window, including after a host restart (as found in 1.3)
 - [ ] 4.6 Test that a message whose handler always throws ends in the receiver's dead letters
 - [ ] 4.7 Give the receiver probe a Wolverine HTTP endpoint and test that it appears in the OpenAPI document with its route, method and response type
 

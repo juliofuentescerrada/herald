@@ -19,11 +19,15 @@ A handler's state change and the messages it publishes SHALL be committed in one
 - **THEN** neither the change nor an outgoing envelope remains, and nothing is delivered
 
 ### Requirement: A message is handled once
-A message delivered more than once with the same identity SHALL be handled once by its receiver.
+A message delivered more than once with the same identity within the configured deduplication window SHALL be handled once by its receiver. The window SHALL be set explicitly in Herald's messaging configuration rather than left to a library default.
 
 #### Scenario: A redelivered message
-- **WHEN** the same message is delivered twice to a module
+- **WHEN** the same message is delivered twice to a module within the deduplication window
 - **THEN** the receiving handler runs once
+
+#### Scenario: A redelivery after the host restarts
+- **WHEN** the same message is delivered again after the host restarts, still within the deduplication window
+- **THEN** the receiving handler does not run again
 
 ### Requirement: Failing messages are kept
 A message whose handler keeps failing SHALL end in the receiving module's dead letters after its retries, not be dropped.
