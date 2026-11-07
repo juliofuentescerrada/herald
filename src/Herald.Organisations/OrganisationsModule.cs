@@ -1,4 +1,5 @@
 using Herald.ModuleHosting;
+using Herald.Organisations.Persistence;
 using Wolverine;
 
 namespace Herald.Organisations;
@@ -6,5 +7,5 @@ namespace Herald.Organisations;
 public static class OrganisationsModule
 {
     public static WolverineOptions AddOrganisationsModule(this WolverineOptions options) =>
-        options.AddHeraldModule(typeof(OrganisationsModule).Assembly);
+        options.AddHeraldModule<OrganisationsDbContext>(OrganisationsDbContext.Schema);
 }

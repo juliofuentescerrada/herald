@@ -33,8 +33,8 @@ context: |
     the documented scale. The earlier round-management PNG is superseded for semantics.
   - openspec/specs describes the implemented skeleton. Active deltas describe target changes;
     archived changes and dated reviews remain historical. Only m0-solution-skeleton is done;
-    m0-messaging is in progress (spike done, modules already vertical slices with
-    Herald.ModuleHosting) and m0-web-shell is draft. H1 functionality has not started.
+    m0-messaging is in progress (spike done; vertical slices, module DbContexts and Wolverine
+    in the host done; messaging tests, generated code and docs remain) and m0-web-shell is draft. H1 functionality has not started.
   - Modular monolith: one module per bounded context, with Domain at the centre and vertical slices
     (Features: one namespace per use case, one file or cohesive folder; Persistence at the edge);
     features never depend on other features. Shared business rules belong in Domain; technical

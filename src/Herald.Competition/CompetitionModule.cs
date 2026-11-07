@@ -1,3 +1,4 @@
+using Herald.Competition.Persistence;
 using Herald.ModuleHosting;
 using Wolverine;
 
@@ -6,5 +7,5 @@ namespace Herald.Competition;
 public static class CompetitionModule
 {
     public static WolverineOptions AddCompetitionModule(this WolverineOptions options) =>
-        options.AddHeraldModule(typeof(CompetitionModule).Assembly);
+        options.AddHeraldModule<CompetitionDbContext>(CompetitionDbContext.Schema);
 }

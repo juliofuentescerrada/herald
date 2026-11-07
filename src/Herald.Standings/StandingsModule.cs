@@ -1,4 +1,5 @@
 using Herald.ModuleHosting;
+using Herald.Standings.Persistence;
 using Wolverine;
 
 namespace Herald.Standings;
@@ -6,5 +7,5 @@ namespace Herald.Standings;
 public static class StandingsModule
 {
     public static WolverineOptions AddStandingsModule(this WolverineOptions options) =>
-        options.AddHeraldModule(typeof(StandingsModule).Assembly);
+        options.AddHeraldModule<StandingsDbContext>(StandingsDbContext.Schema);
 }

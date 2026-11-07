@@ -5,6 +5,7 @@
     <UserSecretsId>herald-apphost</UserSecretsId>
   </PropertyGroup>
   <ItemGroup>
+    <PackageReference Include="Aspire.Hosting.Azure.ServiceBus" />
     <PackageReference Include="Aspire.Hosting.PostgreSQL" />
   </ItemGroup>
   <ItemGroup>

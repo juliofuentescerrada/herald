@@ -18,11 +18,11 @@
 
 ## 3. Persistence and Wolverine in the host
 
-- [ ] 3.1 Add the packages to `Directory.Packages.props` with the versions pinned in the spike, checking each licence
-- [ ] 3.2 Give each module a `Persistence/<Module>DbContext` in its schema, registered through `Herald.ModuleHosting` with Wolverine's EF Core integration, with the envelope entities mapped to the shared store by Wolverine (they stay out of migrations), a design-time factory and an initial migration holding only the module's own tables
-- [ ] 3.3 Configure Wolverine in the host: one shared store in `wolverine`, EF Core transactions, durable local queues, Wolverine HTTP endpoints, the Service Bus transport with one topic per publishing module (no provisioning, system queues off), migrations applied and Wolverine's tables created at start-up in Development and tests, `AutoCreate.None` elsewhere, and JasperFx's commands (`db-apply`, `db-assert`, `codegen`) run from the host
-- [ ] 3.4 Replace `Aspire.Npgsql` with Aspire's EF Core integration for the five contexts on the `herald` connection, keeping a single database health check; the existing health tests still pass
-- [ ] 3.5 Add the Service Bus emulator to the AppHost with the modules' topics and subscriptions; run the AppHost and confirm in the dashboard that PostgreSQL, the emulator and the host are running and healthy
+- [x] 3.1 Add the packages to `Directory.Packages.props` with the versions pinned in the spike, checking each licence
+- [x] 3.2 Give each module a `Persistence/<Module>DbContext` in its schema, registered through `Herald.ModuleHosting` with Wolverine's EF Core integration, with the envelope entities mapped to the shared store by Wolverine (they stay out of migrations), a design-time factory and an initial migration holding only the module's own tables
+- [x] 3.3 Configure Wolverine in the host: one shared store in `wolverine`, EF Core transactions, durable local queues, Wolverine HTTP endpoints, the Service Bus transport with one topic per publishing module (no provisioning, system queues off), migrations applied and Wolverine's tables created at start-up in Development and tests, `AutoCreate.None` elsewhere, and JasperFx's commands (`db-apply`, `db-assert`, `codegen`) run from the host
+- [x] 3.4 Keep `Aspire.Npgsql`: the five contexts and Wolverine's store use its `herald` data source, keeping a single database health check; the health tests pass, the unavailable-database one now pausing the database after start-up (Wolverine `Balanced` needs the database to start)
+- [x] 3.5 Add the Service Bus emulator to the AppHost with the modules' topics and subscriptions; run the AppHost and confirm in the dashboard that PostgreSQL, the emulator and the host are running and healthy
 
 ## 4. Messaging tests with probe modules
 

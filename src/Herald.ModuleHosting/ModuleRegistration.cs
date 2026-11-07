@@ -1,5 +1,8 @@
-using System.Reflection;
+using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.DependencyInjection;
+using Npgsql;
 using Wolverine;
+using Wolverine.EntityFrameworkCore;
 
 namespace Herald.ModuleHosting;
 
@@ -8,9 +11,13 @@ namespace Herald.ModuleHosting;
 // once the service collection is read-only, too late for a module's own services.
 public static class ModuleRegistration
 {
-    public static WolverineOptions AddHeraldModule(this WolverineOptions options, Assembly module)
+    public static WolverineOptions AddHeraldModule<TDbContext>(this WolverineOptions options, string schema)
+        where TDbContext : DbContext
     {
-        options.Discovery.IncludeAssembly(module);
+        options.Discovery.IncludeAssembly(typeof(TDbContext).Assembly);
+        options.Services.AddDbContextWithWolverineIntegration<TDbContext>((services, database) =>
+            ModuleDatabase.Configure(database, services.GetRequiredService<NpgsqlDataSource>(), schema));
+        options.Services.AddSingleton<IModuleMigration, ModuleMigration<TDbContext>>();
         return options;
     }
 }
