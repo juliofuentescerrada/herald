@@ -1,6 +1,6 @@
 ## Context
 
-**Status — 7 November 2026:** in-progress proposal and spike. The architecture consolidation aligns slice boundaries and milestone names only. Messaging storage, transport and code-generation details below remain candidates where their checks are incomplete; the spike is complete; per-module stores fail in Wolverine 6.62.0, so one shared store is used (decided 2026-11-07). No messaging implementation is implied.
+**Status — 8 November 2026:** implemented in the `m0-messaging` branch, pending the maintainer's review and archive. The spike is complete; per-module stores fail in Wolverine 6.62.0, so one shared store is used (decided 2026-11-07). The decisions below are those implemented; the spike findings record the evidence.
 
 Second M0 change, on top of `m0-solution-skeleton` (archived): the five modules exist, empty, each with `Domain`, `Application` and `Adapters` folders and its `AddXxxModule()` entry point in `Adapters`; the host checks database health through `Aspire.Npgsql`. This change wires Wolverine, EF Core and the outbox/inbox (ADRs 0005, 0007, 0008) and a broker (ADR 0009), with no domain yet: base types arrive with the first aggregate in H1.
 

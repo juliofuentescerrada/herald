@@ -26,7 +26,7 @@ Standings are derived and carry the effective input revision they reflect. Their
 
 - **Event sourcing** (Marten, or tables of our own): full history and natural projections, but a larger learning step on top of the rest, and a different model for every aggregate. It stays a candidate for a later ADR, for Competition first.
 - **SQL Server / Azure SQL:** equally capable; PostgreSQL keeps Herald aligned with the maintainer's other projects and with Wolverine's PostgreSQL support.
-- **A database per module:** stronger isolation, but more resources and operational coordination for this project. A module could still transact its state with its own outbox; the detailed store topology is evaluated in `m0-messaging`.
+- **A database per module:** stronger isolation, but more resources and operational coordination for this project. A module could still transact its state with its own outbox; `m0-messaging` chose one shared message store in the same database (ADR 0008).
 
 ## Consequences
 

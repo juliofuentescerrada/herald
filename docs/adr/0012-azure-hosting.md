@@ -16,7 +16,7 @@ Herald shares an Azure subscription with the maintainer's other projects, Arcana
 - **Identity and secrets:** a managed identity per app reaching PostgreSQL, Service Bus and Key Vault without passwords; users sign in with Entra ID (workforce or external identities, decided with the sign-in change).
 - **Telemetry:** OpenTelemetry from the start (through Aspire's service defaults locally), exported to Application Insights in Azure.
 - **Infrastructure as code:** OpenTofu, deployed by GitHub Actions with OIDC federation, never from a laptop.
-- **Local development target:** .NET Aspire runs PostgreSQL, the broker, the host and both Angular shells. The implemented skeleton currently starts only PostgreSQL and the host; `m0-messaging` and `m0-web-shell` add the remaining pieces.
+- **Local development target:** .NET Aspire runs PostgreSQL, the broker, the host and both Angular shells. `m0-messaging` adds the Service Bus emulator to PostgreSQL and the host; `m0-web-shell` adds the Angular shells.
 - **Shared platform, Herald's own resources:** Herald deploys onto the shared platform once it exists, and owns only what is specific to it:
 
   | Shared platform (planned repository) | Herald |

@@ -42,6 +42,6 @@
 
 ## 6. Docs
 
-- [ ] 6.1 Revise ADR 0005 (follow-ups: pre-generated code in production; Wolverine endpoints in OpenAPI), ADR 0008 (module tables through EF migrations, Wolverine's tables through `db-apply` outside Development, one shared store and why per-module stores were set aside) and ADR 0009 (the emulator through Aspire, the AppHost as the only topology source), all still Proposed
-- [ ] 6.2 `CLAUDE.md` commands: add a migration to a module, apply and check Wolverine's tables (`db-apply`, `db-assert`), regenerate Wolverine's code; Status
-- [ ] 6.3 `docs/roadmap.md`: mark `m0-messaging`
+- [x] 6.1 Revise ADR 0005 (follow-ups: pre-generated code in production; Wolverine endpoints in OpenAPI), ADR 0008 (module tables through EF migrations, Wolverine's tables through `db-apply` outside Development, one shared store and why per-module stores were set aside) and ADR 0009 (the emulator through Aspire, the AppHost as the only topology source), all still Proposed
+- [x] 6.2 `CLAUDE.md` commands: add a migration to a module, apply and check Wolverine's tables (`db-apply`, `db-assert`), regenerate Wolverine's code; Status
+- [x] 6.3 `docs/roadmap.md`: mark `m0-messaging`

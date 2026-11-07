@@ -12,7 +12,7 @@ It is also a reference: a small project that shows, end to end, how its maintain
 
 ## Status
 
-Pre-development design, with the first M0 foundations implemented: the .NET solution skeleton, empty modules, PostgreSQL/host startup, architecture checks and CI. No tournament functionality or production Angular application exists yet. `m0-messaging` is in progress; `m0-web-shell` is a draft proposal. Architecture and product targets are not implementation claims.
+Pre-development design, with the first M0 foundations implemented: the .NET solution skeleton, empty modules, PostgreSQL/host startup, architecture checks and CI. No tournament functionality or production Angular application exists yet. `m0-messaging` (vertical-slice modules, Wolverine with the transactional outbox and inbox, the Service Bus emulator, pre-generated code) is implemented in its branch, pending review and archive; `m0-web-shell` is a draft proposal. Architecture and product targets are not implementation claims.
 
 The documentation baseline was consolidated on 7 November 2026. Detailed product policies remain explicitly confirmed or proposed in the functional decision ledger. The reviews and their original evidence are historical snapshots, tracked by the [consolidation change](openspec/changes/documentation-consolidation/design.md).
 
