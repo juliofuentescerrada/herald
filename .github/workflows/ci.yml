@@ -23,4 +23,14 @@ jobs:
       - run: dotnet restore Herald.slnx
       - run: dotnet format Herald.slnx --verify-no-changes --no-restore
       - run: dotnet build Herald.slnx -c Release --no-restore
+      - name: Wolverine's generated code is current
+        run: |
+          dotnet run --project src/Herald.Host -c Release --no-build -- codegen delete
+          dotnet run --project src/Herald.Host -c Release --no-build -- codegen write
+          changes="$(git diff --name-status -- src/Herald.Host/Internal/Generated; git ls-files --others --exclude-standard -- src/Herald.Host/Internal/Generated)"
+          if [ -n "$changes" ]; then
+            echo "::error::Wolverine's generated code is stale; run 'dotnet run --project src/Herald.Host -- codegen write' and commit it."
+            echo "$changes"
+            exit 1
+          fi
       - run: dotnet test --solution Herald.slnx -c Release --no-build

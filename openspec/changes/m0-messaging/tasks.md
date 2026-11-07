@@ -36,9 +36,9 @@
 
 ## 5. Generated code
 
-- [ ] 5.1 Configure dynamic code generation in Development and tests, static elsewhere, and fix the generated code's output path to `Herald.Host/Internal/Generated`
-- [ ] 5.2 Generate and commit the code in `Herald.Host/Internal/Generated`, exclude it from `dotnet format`, and confirm the host handles a message in Production with it, without compiling code
-- [ ] 5.3 Add the CI step that regenerates the code and fails on a difference; confirm it fails on a pull request that changes a handler without regenerating
+- [x] 5.1 Configure dynamic code generation in Development and tests, static elsewhere, and fix the generated code's output path to `Herald.Host/Internal/Generated`
+- [x] 5.2 Generate and commit the code in `Herald.Host/Internal/Generated`, exclude it from `dotnet format`, and confirm the host starts in Production on it (static, application assembly `Herald.Host`); with no handler in any module yet the code is two empty registries, so handling a message in Production is first confirmed with H1's first handler
+- [x] 5.3 Add the CI step that regenerates the code and fails on a difference; confirm it fails on a pull request that changes a handler without regenerating
 
 ## 6. Docs
 

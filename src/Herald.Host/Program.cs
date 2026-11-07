@@ -6,6 +6,7 @@ using Herald.ServiceDefaults;
 using Herald.Standings;
 using Herald.Tournaments;
 using JasperFx;
+using JasperFx.CodeGeneration;
 using Wolverine;
 using Wolverine.AzureServiceBus;
 
@@ -24,6 +25,11 @@ if (setUpDatabaseOnStartup)
 builder.UseWolverine(options =>
 {
     options.UseHeraldMessaging(setUpDatabaseOnStartup);
+
+    // Generated at run time in Development and tests; elsewhere loaded from the code committed in
+    // Internal/Generated (`dotnet run --project src/Herald.Host -- codegen write`), so nothing is compiled.
+    options.ApplicationAssembly = typeof(Program).Assembly;
+    options.CodeGeneration.TypeLoadMode = builder.Environment.IsDevelopment() ? TypeLoadMode.Dynamic : TypeLoadMode.Static;
 
     // The AppHost declares the topology; Herald's host creates no topics, subscriptions or queues.
     options.UseAzureServiceBus(builder.Configuration.GetConnectionString("messaging")
