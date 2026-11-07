@@ -1,5 +1,7 @@
 # module-boundaries Specification
 
+> Implementation status: this specification describes the archived M0 skeleton. The target vertical-slice migration is proposed in [m0-messaging](../../changes/m0-messaging/specs/module-boundaries/spec.md), following [ADR 0004](../../../docs/adr/0004-modular-monolith-with-vertical-slices.md). It has not been implemented or archived.
+
 ## Purpose
 The dependency rules between modules, layers and the shared projects (ADR 0004), enforced by architecture tests over one module list that evolves with the design.
 

@@ -1,0 +1,96 @@
+{
+  "review_date": "2026-11-07",
+  "source_root": "/home/julio/Code/herald",
+  "source_head": "08c3308dcf775bc03add59a768303d7d07cd1bc0",
+  "includes_uncommitted_source_changes": true,
+  "sources": [
+    {
+      "path": "README.md",
+      "sha256": "5b6ed6e246cdfc76324789d3f3ad6b808a25ae56adcc8e0c2f2b2c4134e8f69b"
+    },
+    {
+      "path": "CLAUDE.md",
+      "sha256": "c071a6445a71ef760bd7d3371dc6d04153af08b6d82ff91722e3c068038516da"
+    },
+    {
+      "path": "openspec/config.yaml",
+      "sha256": "2bfdeed78349514b545f219c3bd881e745af001c656a26e68982007db2499f55"
+    },
+    {
+      "path": "docs/herald-functional-discovery.md",
+      "sha256": "0ad1af25fd31d2d72ee399ac4303b75f30de3d24a8b1949ab37c95073783354f"
+    },
+    {
+      "path": "docs/herald-visual-direction.md",
+      "sha256": "e4f1b50bb44f6faf00df1354e3bae52d93c8bfbce7cf70f94e8c0157968f3ea2"
+    },
+    {
+      "path": "docs/roadmap.md",
+      "sha256": "5ff66cdce1d09bf27a1aabf4e3c3e9c899210d953c37f8540bcdf09fb563d848"
+    },
+    {
+      "path": "docs/adr/0001-record-architecture-decisions.md",
+      "sha256": "964d633a5cd878ffba06ab1e89e75ee9b063797a22f1e2ee966ca13ac57c3742"
+    },
+    {
+      "path": "docs/adr/0002-product-scope-v1.md",
+      "sha256": "abaee178d1435e7d8913d9e1fc129afe648268e073684cac1c8132ab78426b0d"
+    },
+    {
+      "path": "docs/adr/0003-english-everywhere.md",
+      "sha256": "ebd3004d2635d4dfd35791d69c40f8c32c7041ad9aab2b1df74b20f506c28513"
+    },
+    {
+      "path": "docs/adr/0004-modular-monolith-of-hexagonal-modules.md",
+      "sha256": "d65566e9d3c0b586ec304b59cc29783becd785df3b0de75b14179d32c05d7e30"
+    },
+    {
+      "path": "docs/adr/0011-angular-front-end-and-generated-api-contract.md",
+      "sha256": "b593b3a69af4c5c115d6fc0ef474fc2f99b3ea6a7bc0ce608ec3f8c2b3f145b1"
+    },
+    {
+      "path": "docs/adr/0012-azure-hosting.md",
+      "sha256": "27c633464019a4d964a8bdf25dd184921e5d5ec3750bcc5e0045467bbf1c586d"
+    },
+    {
+      "path": "docs/adr/0013-functional-delivery-scope.md",
+      "sha256": "801cbef1c2dfdfa996ef5a34204e84a17004453e18fd9d5e423cc853f45ab5ab"
+    },
+    {
+      "path": "docs/herald-domain-overview.pptx",
+      "sha256": "4c4d9b6fec0ad63a6d3655064588235212fed3211e12a7d07796c49c10534824"
+    },
+    {
+      "path": "docs/assets/mockups/herald-round-management.png",
+      "sha256": "88463a275ddf6d336f6f6cd6b4c99b8bcc3bd41a30d3e5094b06893ef38c732e"
+    },
+    {
+      "path": "docs/assets/mockups/herald-match-outcomes-and-standings.png",
+      "sha256": "87ba606f4cb8e50f5cb58c944dce07acbbe653ee249154499e632944b907752f"
+    },
+    {
+      "path": "docs/assets/mockups/herald-tournament-discovery.png",
+      "sha256": "4578a28216b87c52a3142821737b8719deb9eb1d6f02f850f3489c45eba55d26"
+    },
+    {
+      "path": "openspec/changes/frontend-visual-prototype/design.md",
+      "sha256": "f1b431b22fa4025d00e5f90dada793675873e502ca8e7fb27e0d56fac4fc5f37"
+    },
+    {
+      "path": "prototypes/frontend/index.html",
+      "sha256": "a4f055601f87bd465d55b7555664ab3a57b71154a9aa5326418566f20b56631a"
+    },
+    {
+      "path": "prototypes/frontend/app.js",
+      "sha256": "9055c4f6eecf777cb9e197a1ed9b530e4c2fbd12b510f56eddc205c10c211711"
+    },
+    {
+      "path": "prototypes/frontend/style.css",
+      "sha256": "2c5ae625521ba677a52c8fa531fd0ce2606d28a2f0e51bde7558b8295a0c0c2a"
+    },
+    {
+      "path": ".agents/skills/refactoring-ui/SKILL.md",
+      "sha256": "d10d15b81aa00f427811741d83ac2bb918aabfae3d4489c751615bdf85e1674c"
+    }
+  ]
+}

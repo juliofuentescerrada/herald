@@ -1,0 +1,104 @@
+{
+  "review_date": "2026-11-07",
+  "scope": "High-level technical architecture; detailed messaging work excluded at user request",
+  "source_root": "/home/julio/Code/herald",
+  "source_head": "08c3308dcf775bc03add59a768303d7d07cd1bc0",
+  "includes_uncommitted_source_changes": true,
+  "remote_snapshot": {
+    "repository": "juliofuentescerrada/herald",
+    "default_branch": "main",
+    "branches": [
+      "main",
+      "m0-solution-skeleton"
+    ],
+    "open_pull_requests": 0,
+    "main_adr0004_blob": "75c2e540c202213f598f93c693fbbefab5d371f3",
+    "main_adr0011_blob": "9572b92147c5865273698643c6cfd80e3e25ebf8"
+  },
+  "sources": [
+    {
+      "path": "CLAUDE.md",
+      "sha256": "c071a6445a71ef760bd7d3371dc6d04153af08b6d82ff91722e3c068038516da"
+    },
+    {
+      "path": "README.md",
+      "sha256": "5b6ed6e246cdfc76324789d3f3ad6b808a25ae56adcc8e0c2f2b2c4134e8f69b"
+    },
+    {
+      "path": "openspec/config.yaml",
+      "sha256": "2bfdeed78349514b545f219c3bd881e745af001c656a26e68982007db2499f55"
+    },
+    {
+      "path": "docs/adr/0004-modular-monolith-of-hexagonal-modules.md",
+      "sha256": "d65566e9d3c0b586ec304b59cc29783becd785df3b0de75b14179d32c05d7e30"
+    },
+    {
+      "path": "docs/adr/0005-cqrs-with-wolverine.md",
+      "sha256": "0334a89b4c116be0a3329fe708723ac6c1f9ff8c1887469031d059443508bf53"
+    },
+    {
+      "path": "docs/adr/0006-tactical-ddd-with-domain-events.md",
+      "sha256": "aee81591c3a9404230c9ddf53ed8491d734b1e3e3718e4a0df4f0de363c91d98"
+    },
+    {
+      "path": "docs/adr/0007-postgresql-ef-core-state-stored.md",
+      "sha256": "c0c87da4d89b676f898f61661006cfd9ddf7463d70fe82616377ae5191ee1f57"
+    },
+    {
+      "path": "docs/adr/0008-transactional-outbox-and-inbox.md",
+      "sha256": "91c8fd03fe5440d5d206c84f091a167c257f993a53ef92d53bdabe64bfea7f48"
+    },
+    {
+      "path": "docs/adr/0010-tests-as-specifications.md",
+      "sha256": "f583b1303509fadcc2ca050e6a42c61747b46e2022fed957f18a9266e52da2ec"
+    },
+    {
+      "path": "docs/adr/0011-angular-front-end-and-generated-api-contract.md",
+      "sha256": "b593b3a69af4c5c115d6fc0ef474fc2f99b3ea6a7bc0ce608ec3f8c2b3f145b1"
+    },
+    {
+      "path": "docs/adr/0012-azure-hosting.md",
+      "sha256": "27c633464019a4d964a8bdf25dd184921e5d5ec3750bcc5e0045467bbf1c586d"
+    },
+    {
+      "path": "docs/roadmap.md",
+      "sha256": "5ff66cdce1d09bf27a1aabf4e3c3e9c899210d953c37f8540bcdf09fb563d848"
+    },
+    {
+      "path": "docs/herald-functional-discovery.md",
+      "sha256": "0ad1af25fd31d2d72ee399ac4303b75f30de3d24a8b1949ab37c95073783354f"
+    },
+    {
+      "path": "openspec/specs/module-boundaries/spec.md",
+      "sha256": "6edc23eaf52fdcf617a9e7b845037cb8258f56e76e5128517077bf312fa065ad"
+    },
+    {
+      "path": "openspec/changes/m0-messaging/design.md",
+      "sha256": "ae3644e093ae85cde9d7614f0820e9813c81b1b4135c092677fe6129c5a1839b"
+    },
+    {
+      "path": "openspec/changes/m0-messaging/tasks.md",
+      "sha256": "562d34b742560bb7ce76b2c321f5cf82951cb992c3f70e6054e060a10774d2cc"
+    },
+    {
+      "path": "openspec/changes/m0-messaging/proposal.md",
+      "sha256": "bda349e459c5dceeaa6b0b89d31891702a103b34ee863f12e3bbf8d1b12dfef0"
+    },
+    {
+      "path": "openspec/changes/m0-messaging/specs/module-boundaries/spec.md",
+      "sha256": "6455fb3005ee497243506a3df1175bef94387ba619271dd8cbf2fff0651e6a32"
+    },
+    {
+      "path": "openspec/changes/frontend-visual-prototype/design.md",
+      "sha256": "f1b431b22fa4025d00e5f90dada793675873e502ca8e7fb27e0d56fac4fc5f37"
+    },
+    {
+      "path": "tests/Herald.Architecture.Tests/ModuleTests.cs",
+      "sha256": "dc2572dd802c613f49b00c5ab1f33c5e5eeb8ce7a6c094ae42fafff01bac0547"
+    },
+    {
+      "path": "src/Herald.Registration/Adapters/RegistrationModule.cs",
+      "sha256": "51f8be71d6bff829408cc80bc67ea2d63a965d50b9d325120b9cd273bd519bdd"
+    }
+  ]
+}

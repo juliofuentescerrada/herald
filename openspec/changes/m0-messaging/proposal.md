@@ -1,6 +1,6 @@
 ## Why
 
-Every module will change state and tell other modules about it, and ADR 0008 promises that neither can happen without the other. Nothing proves that yet: the skeleton has empty modules and no Wolverine, EF Core or broker. This second M0 change wires them and proves the outbox and inbox before M1's first aggregate depends on them, answering the M0 follow-ups of ADRs 0005, 0008 and 0009.
+Every module will change state and tell other modules about it, and ADR 0008 promises that neither can happen without the other. Nothing proves that yet: the skeleton has empty modules and no Wolverine, EF Core or broker. This second M0 change wires them and proves the outbox and inbox before H1's first aggregate depends on them, answering the M0 follow-ups of ADRs 0005, 0008 and 0009.
 
 ## What Changes
 
@@ -14,7 +14,7 @@ Every module will change state and tell other modules about it, and ADR 0008 pro
 - **Pre-generated Wolverine code** for production, committed in the host, with a start-up assertion and a CI check that fails when it is stale; dynamic generation in development and tests.
 - Docs: ADRs 0005, 0008 and 0009 answer their M0 follow-ups; `CLAUDE.md` commands (migrations, code generation); the roadmap.
 
-Out of scope: domain base types and the first aggregate (M1); a broker test in CI (M1, with the first integration event); the build-time OpenAPI document and the TypeScript client (`m0-web-shell`); broker health and Azure resources (M4). No screens: mockups are not applicable.
+Out of scope: domain base types and the first aggregate (H1); a broker test in CI (H1, with the first integration event); the build-time OpenAPI document and the TypeScript client (`m0-web-shell`); broker health and Azure resources (M4). No screens: mockups are not applicable.
 
 ## Capabilities
 

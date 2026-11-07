@@ -1,12 +1,12 @@
 # Herald visual direction and design system
 
-Version 0.2 · 6 November 2026 · Design proposal for review
+Version 0.7 · 7 November 2026 · Consolidated visual baseline for review
 
 ## 1. Purpose and status
 
-This document translates the functional proposal into a visual direction, shared design foundations and two application experiences: tournament administration and public discovery/participation. It is a first design proposal, not an approved brand specification or implementation.
+This document translates the functional proposal into a visual direction, shared design foundations and two application experiences: tournament administration and public discovery/participation. It records the confirmed visual constraints, reviewable documentation prototypes and remaining approval gates. It does not approve product defaults or production implementation.
 
-The baseline is `docs/herald-functional-discovery.md` v0.4. Confirmed requirements remain authoritative: individual and team entrants, implicit participation in individual 1v1, scoped permissions, distinct lifecycle dimensions, effective results, and an externally consumable API.
+The baseline is `docs/herald-functional-discovery.md` v0.7. Confirmed requirements remain authoritative: individual and team entrants, implicit participation in individual 1v1, scoped permissions, distinct lifecycle dimensions, effective results, and an externally consumable API. The single decision register in discovery §15 distinguishes accepted scope from proposed rules. Wireframes use illustrative data and label pending policies; visual completeness does not settle those decisions.
 
 The maintainer's visual direction is contemporary video-game competition and sport: neutral surfaces, strong hierarchy and one intense contrasting accent. Administration retains the proposed compact operational layout. The public experience uses more expressive composition within the same modern identity. The existing illustrated repository wordmark is not a visual constraint for this proposal; the initial mockups use a typographic HERALD wordmark without redesigning or deleting the existing asset.
 
@@ -44,7 +44,9 @@ The following are initial reference values. Semantic tokens, rather than raw col
 | Neutral 50 | `#FAFBFC` | Public light canvas |
 | Neutral 100 | `#F3F4F6` | Admin canvas and neutral background |
 | Surface | `#FFFFFF` | Tables, fields and elevated surfaces |
-| Line | `#D8DDE4` | Dividers and input boundaries |
+| Line | `#D8DDE4` | Non-interactive dividers and surface separation |
+| Control line | `#747D89` | Input and neutral-button boundaries on light surfaces |
+| Inverse control line | `#AEB6C0` | Control boundaries on graphite |
 | Volt 400 | `#C7F23A` | Primary action and selected emphasis |
 | Volt 500 | `#B4DD28` | Primary hover/pressed candidate |
 | Volt 50 | `#F1F9D8` | Pale accent background |
@@ -52,7 +54,8 @@ The following are initial reference values. Semantic tokens, rather than raw col
 | Success 700 | `#246141` | Positive completion feedback |
 | Warning 800 | `#805400` | Action required or readiness warning |
 | Danger 700 | `#A12632` | Destructive actions and unresolved critical issues |
-| Focus | `#2559C3` | Keyboard focus indicator |
+| Focus | `#2559C3` | Keyboard focus indicator on light surfaces |
+| Inverse focus | `#9DBBFF` | Keyboard focus indicator on graphite |
 
 Electric lime is the brand/action accent, with graphite text on lime-filled controls. Danger red remains a semantic error/destructive colour with distinct labels and icons. Success green, warning amber and informational teal have separate meanings. Lime is not a small-text colour on white and does not replace the visible focus ring.
 
@@ -71,13 +74,16 @@ Electric lime is the brand/action accent, with graphite text on lime-filled cont
 | `color.action.primary.hover` | Volt 500 |
 | `color.action.primary.text` | Ink 950 |
 | `color.brand.accent` | Volt 400 |
-| `color.border.default` | Line |
-| `color.focus.ring` | Focus |
+| `color.border.default` | Line, for non-interactive separation |
+| `color.border.control` | Control line |
+| `color.border.control.inverse` | Inverse control line |
+| `color.focus.ring` | Focus on light surfaces |
+| `color.focus.ring.inverse` | Inverse focus on graphite |
 | `color.feedback.success` | Success 700 |
 | `color.feedback.warning` | Warning 800 |
 | `color.feedback.danger` | Danger 700 |
 
-State backgrounds use a pale tint of the relevant semantic hue, with explicit text. Positive status does not turn an entire table row green. Every status has a readable label and, where helpful, an icon.
+State backgrounds use a pale tint of the relevant semantic hue, with explicit text. Positive status does not turn an entire table row green. Every status has a readable label and, where helpful, an icon. Every status variant defines its own foreground and background: a neutral badge over event artwork must not inherit the artwork's inverse text colour. Focus and control boundaries use surface-specific mappings; decorative dividers need not look like controls.
 
 ## 4. Typography, space and geometry
 
@@ -94,12 +100,16 @@ State backgrounds use a pale tint of the relevant semantic hue, with explicit te
 | Spacing scale | 4, 8, 12, 16, 24, 32, 48, 64 px |
 | Input height | 40 px admin desktop; 44–48 px public/touch |
 | Table row | 48 px compact desktop; 56–64 px comfortable |
-| Radius | 6 px controls; 10–12 px event cards/dialogs; no arbitrary mix |
+| Radius | 0 px throughout: square corners for controls, cards, dialogs, notices, status labels and avatar containers |
 | Elevation | Borders first; restrained shadow for overlays and menus |
 | Content width | Public max 1200 px; admin fluid with protected table readability |
 | Motion | Short 120–180 ms feedback; reduced-motion alternative; no ornamental looping animation |
 
-Use sentence case for actions and headings. Icons share one consistent outline family and stroke. Pair icons with labels for unfamiliar or consequential actions. Do not encode game identity, eligibility or match status through icons alone.
+Spacing uses the declared scale, including 12 px. Border and focus strokes (1 and 3 px), 44 px interaction targets, column/content widths, icon sizes and breakpoints are dimensions rather than spacing steps. The public shell retains a fluid `max(5vw, 24px)` outer gutter; this is an explicit responsive exception. Negative 8 px navigation alignment remains on the spacing scale.
+
+**Confirmed geometry:** use square corners throughout both experiences. The shared `radius.default` token is `0`; do not introduce rounded or pill-shaped component variants. Existing raster mockups predate this decision; this rule takes precedence.
+
+Use sentence case for actions and headings. **Confirmed icon library:** use Tabler Icons for application iconography, with the outline family and a consistent stroke. Use 20 px for standard controls, 24 px for navigation and 16 px for compact metadata, with an 8 px icon-to-label gap. Decorative icons are hidden from assistive technology; icon-only actions require accessible names, and consequential actions retain visible labels. The exploratory frontend prototype is exempt and does not need the dependency installed. Pair icons with labels for unfamiliar or consequential actions. Do not encode game identity, eligibility or match status through icons alone.
 
 ## 5. Shared component contracts
 
@@ -145,7 +155,7 @@ A composite team encounter later adds submatch/board navigation. The direct 5v5 
 
 Pending reports display `Awaiting confirmation`, with reporting source and time where visible. Effective results alone drive standings. A dispute remains visibly unresolved until a decision. `No-show`, `Concession` and `Bye` have explicit causes rather than fabricated scores.
 
-A correction flow shows old/new result and impact before confirmation. If dependencies prevent correction, present the affected round/stage and the reason for blocking. Ordinary result entry does not expose a generic “force update” escape hatch.
+New-result entry starts with no selected outcome and keeps confirmation unavailable until an explicit selection. A correction starts from the existing effective result. A correction flow shows old/new result and impact before confirmation. If dependencies prevent correction, present the affected round/stage and the reason for blocking. Ordinary result entry does not expose a generic “force update” escape hatch.
 
 ### 6.4 Permission-aware next actions
 
@@ -197,22 +207,45 @@ The detail page leads with identity and key conditions. Registration panel shows
 
 Public navigation collapses into a labelled menu. Filters use a compact summary and full-screen filter sheet. Cards stack, while standings keep rank/name/points visible and expose additional details on demand. Admin mobile prioritises pending matches and incidents as stacked operational rows; it need not reproduce a wide desktop table at reduced scale. Consequential actions remain labelled and touch-friendly.
 
-## 9. First mockup set and review criteria
+## 9. Visual references, journeys and state coverage
 
-### Concept images
+### 9.1 Reference authority
 
-- [Admin round management](assets/mockups/herald-round-management.png)
-- [Match outcomes and standings](assets/mockups/herald-match-outcomes-and-standings.png)
-- [Public tournament discovery](assets/mockups/herald-tournament-discovery.png)
+- **Canonical individual round/outcome concept:** [match outcomes and standings](assets/mockups/herald-match-outcomes-and-standings.png). Its explicit winners, 3/1/0 points and shared positions are the consistent scene to review.
+- **Superseded historical image:** [original round management](assets/mockups/herald-round-management.png). Keep for provenance only. Its ambiguous Win/Loss labels, points and ranks are not an acceptance reference.
+- **H2 public direction:** [tournament discovery](assets/mockups/herald-tournament-discovery.png). It does not add discovery or self-service to H1.
 
-Initial generated mockups are concept references with illustrative data, not implemented screens or exact component measurements. This specification governs exact semantics and token values if raster rendering introduces small deviations. Final logo treatment requires a separate identity decision; the current concept uses a typographic wordmark and does not assume the illustrated repository asset belongs in the interface.
+All raster concepts predate the confirmed square geometry and exact tokens. This guide governs geometry, controls and state semantics; the functional decision register governs which rules are confirmed. The canonical image is a composition and coherent-data reference, not a production screen or a complete workflow.
 
-| Mockup | Purpose | Questions to review |
+### 9.2 Deterministic documentation prototypes
+
+- [H1 operator journeys](../prototypes/frontend/journeys.html): navigable individual and direct-team variations, from organisation access through setup, entries, readiness, rounds, result, correction, final review and public following. Jumping to a step loads an illustrative snapshot. No command, account creation or publication is executed.
+- [H1 state review](../prototypes/frontend/review-states.html): twelve named fixtures for missing, blocked, current, stale and unavailable states. Each names its functional sources and pending policies.
+- [Individual results demo](../prototypes/frontend/index.html): the existing eight-entrant in-memory league, with six-matches-per-four-entry semantics preserved in the separate journey fixtures. Includes H2 discovery direction, labelled as such in the prototype notes.
+- [Browser captures and provenance](assets/mockups/journeys/README.md): representative desktop/mobile, grayscale and blur views; validation scope is explicit.
+- [Opening instructions and scope](../prototypes/frontend/README.md), [validation and Refactoring UI diagnostic](../openspec/changes/frontend-visual-prototype/design.md).
+
+The prototypes are documentation assets. They do not create an Angular workspace, a third product application, an API, authentication, permission enforcement or persistence. Their existence supplies review material; it does not approve all H1 screens. Exact component technology, interaction/accessibility verification and affected OpenSpec approval remain required before production implementation.
+
+### 9.3 H1 screen/state inventory
+
+“Represented” means there is a deterministic view to inspect. It does not mean the policy is accepted or the operation implemented. Query parameters below select a fixture in the linked HTML.
+
+| Journey / surface | Represented references and states | Still required before the affected production slice |
 | --- | --- | --- |
-| Admin round operations | Validate compact operational composition and individual flow | Are pending work and the next action obvious? Are results readable? Is the interface calm enough for long sessions? |
-| Visitor discovery | Validate the public tone and discovery hierarchy | Is it welcoming across game types? Can entry mode, timing and availability be understood quickly? Does it share the admin identity? |
+| UJ-01 organisation and access | Journeys `step=access`; state `onboarding`: no membership and proposed owner creation. State `private-denied`: generic denial without tournament content | Organisation switch, revoked access and verified recovery; decide D-21 and review their interactions |
+| UJ-02 individual setup | Journeys `kind=individual&step=setup`; state `configuration`: preserved draft input, missing reference zone, publication blocked; individual-only fields | Empty tournament dashboard; visibility preview; cancellation/archival and deadline-change states under D-27 |
+| UJ-02 entries/check-in | Journeys `step=entries`; state `entries`: admitted/confirmed, pending check-in, waiting after final-slot conflict, explicit review action | Guest creation/duplicate review and alias editor under D-22; confirmation of the admission/promotion policy |
+| UJ-03 team preparation | Journeys `kind=team&step=setup` and `step=readiness`; states `team-blocked`/`team-ready`: one team slot, roster seven, five starters/two reserves, freeze, 4-of-5 blocker and both valid locks | Identity conflict and competitive sanction/departure variants under D-23; valid lock is not evidence of play |
+| UJ-02/03 rounds and results | Journeys `step=rounds`/`step=result`; individual demo; state `administrative-result`: played versus pre-play no-show, no fabricated score or appearances | Draft/published pairing revision changes and remaining D-25 terminal outcomes, including double absence/no contest |
+| UJ-06 correction and recovery | Journeys `step=correction`; new-result form has no default winner; states `correction` and `recovery`: finalised blocker, reasoned reopening entry point, retained input and uncertain-response reconciliation | Published-dependency and stale-impact-review fixtures with the actual affected dependency; no invented sequential dependency between round-robin rounds |
+| UJ-02/06 finalisation | Journeys `step=finalise`; states `finalisation-stale`/`finalisation-current`: separate facts, standings and reviewed revisions, disabled stale finalisation and review-again action | Decide D-24; verify concurrent correction, recovery and reasoned reopening end to end |
+| UJ-07 public following | Journeys `step=public`; states `public-following`/`private-denied`: aliases, current revision, shared position, revised final result and no private content | Public loading/failed refresh/cancellation and visibility-transition variants; confirm D-21/D-27 |
+| UJ-08 independent API | Functional journey and AT-14; state `recovery` illustrates receipt semantics without an extra API console | Worked individual/team requests, receipt/error examples and revocation scenarios in the API specification |
 
-Before implementation, follow with deterministic layout prototypes and a component/state catalogue. After approving the direction, prioritise H1 screens: tournament configuration, entries/check-in, team roster/lineup variant, round operations and final standings. Add the H2 public detail and participant journey next. A mobile next-action screen should accompany those prototypes.
+H2 discovery, participant admission/check-in, team representation and report/confirm/dispute journeys remain separate follow-up work. The existing directory is a future composition reference. H1 public detail/read-by-link is already required and is represented above.
+
+Review desktop and mobile next actions for each affected slice. Loading, empty, populated, blocked, stale and failure states should be added to the component/state catalogue where applicable; this inventory does not claim that twelve fixtures exhaust that catalogue.
 
 ## 10. Accessibility and semantic acceptance
 
@@ -227,19 +260,13 @@ Before implementation, follow with deterministic layout prototypes and a compone
 
 The accessibility target is a design requirement, not a compliance claim for unimplemented mockups. Reference: [W3C WCAG 2.2](https://www.w3.org/TR/WCAG22/) and [Understanding Contrast (Minimum)](https://www.w3.org/WAI/WCAG22/Understanding/contrast-minimum). The 44 px touch target is a product design target, not a statement that AA requires every target to be 44 px.
 
-## 11. Decisions to validate
+## 11. Confirmed constraints and remaining visual decisions
 
-1. Graphite/neutral/electric-lime identity as the baseline direction.
-2. Light neutral operational content with graphite navigation, plus a bolder competition-focused public masthead.
-3. A shared sans-serif family with heavier public display headings.
-4. Operational density and secondary standings placement on desktop.
-5. Use of public event imagery versus a primarily typographic directory.
-6. Initial reusable component technology after the visual/functional contracts are stable. This document does not select a frontend component library.
+Confirmed constraints: modern neutral competition identity, compact operational administration, square corners throughout, a shared visual foundation and Tabler outline icons for the eventual application. The documentation prototypes can retain their dependency-free icon/text treatment.
 
-The maintainer should review both first mockups together. Approving separate appearances without comparing their shared controls risks producing two products rather than two experiences of Herald.
+Still proposed: the exact electric-lime accent, detailed density and standings placement, public imagery, complete typography/interaction states and the component implementation foundation. Review the admin/public compositions together, then approve each affected journey and its exception states. A polished example does not imply approval of every screen, proposed policy or dependency.
 
-
-The neutral, modern competition direction is confirmed by the maintainer. Electric lime is the initial accent proposal, not yet approved. Admin composition remains compact and operational.
+The v0.7 consolidation preserves these decisions while correcting contradictory references and adding deterministic review surfaces. The current Refactoring UI assessment and its exact render/test scope are recorded in the prototype change's design note rather than repeated as a product-wide quality claim.
 
 ## Appendix: initial text contrast checks
 
@@ -255,3 +282,19 @@ Calculated from the proposed hexadecimal values using relative sRGB luminance. T
 | Lime on white | 1.30:1 | Do not use for normal text |
 | Informational teal on white | 5.92:1 | Pass |
 | Danger text on white | 7.40:1 | Pass |
+
+### Surface-specific mappings checked on 7 November 2026
+
+Calculated from CSS tokens using relative sRGB luminance. These are pair checks for the named contexts, not certification of every rendered state, raster image or accessibility requirement.
+
+| Pair / purpose | Ratio | Interpretation |
+| --- | --- | --- |
+| Neutral status `#171A1E` on `#E7EAF0` | 14.49:1 | Explicit text mapping also works over inverse artwork |
+| Control border `#747D89` on white | 4.17:1 | Control boundary, distinct from decorative Line |
+| Control border on admin canvas | 3.79:1 | Control boundary on the sampled light canvas |
+| Inverse control border `#AEB6C0` on graphite | 8.52:1 | Inverse neutral control boundary |
+| Focus `#2559C3` on white | 6.37:1 | Light-surface focus indicator |
+| Inverse focus `#9DBBFF` on graphite | 9.13:1 | Graphite-surface focus indicator |
+| Inverse focus on inverse hover `#30363E` | 6.38:1 | Sampled inverse hover context |
+
+The previous blue-on-graphite combination was 2.74:1 and the neutral badge inherited text produced 1.13:1; they are replaced in the documentation prototypes. Validate actual adjacent colours, keyboard visibility, focus restoration and all component states when implementing the shared controls.

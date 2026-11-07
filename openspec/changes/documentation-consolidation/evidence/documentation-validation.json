@@ -1,0 +1,22 @@
+{
+  "date": "2026-11-07",
+  "scope": "Repository documentation/prototype artefacts; no production runtime assertion",
+  "markdown_files_checked": 57,
+  "local_file_links_checked": 165,
+  "missing_local_file_links": [],
+  "original_source_files_compared": 35,
+  "changed_original_source_files": [],
+  "specification_validation": {
+    "command": "openspec validate --all --strict",
+    "exit_code": 0,
+    "output": "\u2713 spec/continuous-integration\n\u2713 change/documentation-consolidation\n\u2713 change/frontend-visual-prototype\n\u2713 spec/local-environment\n\u2713 change/m0-messaging\n\u2713 change/m0-web-shell\n\u2713 spec/module-boundaries\nTotals: 7 passed, 0 failed (7 items)\n- Validating..."
+  },
+  "whitespace_validation": {
+    "command": "git diff --check",
+    "exit_code": 0,
+    "output": ""
+  },
+  "tracked_production_changes": "",
+  "untracked_production_changes": "",
+  "all_passed": true
+}

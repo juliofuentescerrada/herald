@@ -1,7 +1,8 @@
-# 0002. Product scope of v1: game-agnostic tournaments in three formats
+# 0002. Game-agnostic product foundation and historical delivery scope
 
-- Status: Proposed
+- Status: Superseded by 0013 for delivery scope
 - Date: 2026-11-06
+- Consolidated: 2026-11-07
 
 ## Context
 
@@ -11,17 +12,17 @@ A tournament for a card game, chess or padel differs in details (draws, points, 
 
 ## Decision
 
-v1 runs tournaments for individual players in three formats:
+The original proposal grouped three individual competition systems into v1:
 
 - **League**: everyone plays everyone (round robin), points per result, a table.
 - **Knockout**: a single-elimination bracket, byes when the field isn't a power of two, the winner advances.
 - **Single match**: two players, one result.
 
-It covers registration (capacity, waiting list, closing), the schedule or bracket, reporting and confirming results, and live standings.
+That delivery grouping is historical. ADR 0013 and the functional roadmap now govern delivery: H1 is an operator-run individual or direct-team league with scoped identity, web/API, guests, fixed rosters/lineups, aggregate results and public following by link. H2 adds the participant portal and reporting/confirmation; H3 adds elimination and single match. Teams and the API are not deferred optional extensions.
 
 The core is game-agnostic. A game's rules are a **policy** (draws allowed or not, points per win, draw and loss, tiebreakers, matches of one game or best of three), chosen when the tournament is created. A game's data enters through an adapter.
 
-Out of v1: Swiss pairing, teams, payments, prizes, scheduling of tables and times, and any content owned by a game publisher.
+Retained boundary: the core contains no publisher-owned content. Payments, monetary prizes and advanced scheduling remain outside the initial delivery. Basic table/server/time assignments may be exposed by H1 without promising an advanced scheduling engine. Swiss, richer profiles and further systems follow the functional roadmap.
 
 ## Alternatives considered
 
@@ -33,4 +34,4 @@ Out of v1: Swiss pairing, teams, payments, prizes, scheduling of tables and time
 
 - Positive: three formats share one model and differ in a strategy, which is the kind of variation DDD is good at.
 - Negative: game-agnostic means some generality the first game doesn't need; the policy has to stay small to avoid becoming a rules engine.
-- Follow-ups: Swiss and a first game profile (for example a card game with best-of-three and its usual tiebreakers) as later milestones; a simulated-results adapter as an optional one.
+- Follow-ups: use ADR 0013 and the functional decision ledger for current milestones and profile decisions. External clients are part of H1's API contract; real connected execution is refined in H4.

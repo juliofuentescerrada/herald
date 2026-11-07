@@ -1,10 +1,10 @@
 ## 1. Spike (throwaway, outside the solution)
 
-- [ ] 1.1 In the scratchpad, a console host with Wolverine 6.62.0, two "modules" (assemblies) with a `DbContext` each and an ancillary store in their own schema of one PostgreSQL database, plus the main store in `wolverine`
+- [x] 1.1 In the scratchpad, a console host with Wolverine 6.62.0, two "modules" (assemblies) with a `DbContext` each and an ancillary store in their own schema of one PostgreSQL database, plus the main store in `wolverine`
 - [ ] 1.2 Check that a handler's row and its published message commit or roll back together in its module's schema (design point 2) and that a message between the two lands in the receiver's inbox schema (point 3)
 - [ ] 1.3 Check whether a test can redeliver an envelope with the same id and see it handled once (point 3); if not, record how the requirement is tested instead
 - [ ] 1.4 Check the envelope tables through each module's EF Core migrations (`MapWolverineEnvelopeStorage`) and how the main store's tables are created (point 4)
-- [ ] 1.5 Check that each module configures its store and routing from its own registration (a Wolverine extension through DI), with the host calling one method per module (point 5)
+- [x] 1.5 Check that each module configures its store and routing from its own registration (a Wolverine extension through DI), with the host calling one method per module (point 5)
 - [ ] 1.6 Start the Azure Service Bus emulator with Aspire (`AddAzureServiceBus().RunAsEmulator()`, topics and subscriptions declared in the AppHost) and send and receive through Wolverine's transport; record whether Wolverine's provisioning must be turned off (point 6)
 - [ ] 1.7 Measure host start-up with dynamic and with pre-generated code (point 7)
 - [ ] 1.8 Record the findings and the pinned versions in `design.md`; if points 1–2 or 6 fail, stop and revise the design with the maintainer before going on
@@ -13,8 +13,8 @@
 
 - [ ] 2.1 Move each module's entry point to its root (namespace `Herald.<Module>`), remove the empty `Application` and `Adapters` folders, and update the host's usings
 - [ ] 2.2 Create `Herald.ModuleHosting` (referenced by modules and host) with the module registration found in the spike: store in the module's schema, `DbContext`, routing of the module's handlers and endpoints
-- [ ] 2.3 Update the architecture tests to the `module-boundaries` spec: entry point at the root, `Domain` without `Herald.ModuleHosting`, features independent by namespace, `Herald.ModuleHosting` references no module or host; remove the Application/Adapters rule
-- [ ] 2.4 Temporarily add a feature depending on another feature, confirm the rule fails naming both types, and remove it
+- [ ] 2.3 Update the architecture tests to the `module-boundaries` spec: entry point at the root, domain independence, feature independence including nested namespaces, no Persistence-to-Features dependency, shared-project limits; remove the Application/Adapters rule
+- [ ] 2.4 Prove the checks with representative passing and failing fixtures, including nested feature dependencies and an unused forbidden project reference; state separately what namespace, project and database checks prove
 
 ## 3. Persistence and Wolverine in the host
 

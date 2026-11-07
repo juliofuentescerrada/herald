@@ -7,11 +7,11 @@
 
 Integration events need a broker in Azure. Herald is a public, personal, open-source project, so every dependency has to be free for that use, in the version that would be installed.
 
-Checked on 2026-11-06:
+Historical package assessment recorded on 2026-11-06; recheck the exact selected versions and their vendor terms before installation. The consolidation does not assert that these are still the latest releases:
 
-- **MediatR 14.3.0** (latest): the package licence offers the Reciprocal Public License 1.5 or Lucky Penny Software's commercial licence. Its community tier is free for individuals and small organisations but needs a registered licence key, and RPL 1.5 would push its reciprocal terms onto Herald's MIT code.
-- **MassTransit 9.2.5** (latest): the package README says it "is a commercial product that must be licensed". The only free option its vendor lists is a full discount for non-profit organisations under 1 million USD in annual expenses, which a personal project is not. Version 8 is Apache 2.0, but its announced support ends with 2026.
-- **WolverineFx 6.62.0** (latest) and the packages Herald would use (`EntityFrameworkCore`, `PostgreSQL`, `AzureServiceBus`, `Http`, `FluentValidation`): MIT, targeting .NET 10.
+- **MediatR 14.3.0**: the recorded assessment identified reciprocal/commercial terms and a community registration/key requirement, adding licensing obligations the project preferred to avoid.
+- **MassTransit 9.2.5**: the recorded assessment identified commercial licensing; version 8's older licensing/support position was not selected as the foundation for a new project.
+- **WolverineFx 6.62.0** and the candidate integration packages (`EntityFrameworkCore`, `PostgreSQL`, `AzureServiceBus`, `Http`, `FluentValidation`): recorded as MIT and compatible with the planned .NET stack. The messaging change records the exact packages ultimately used.
 
 ## Decision
 
@@ -29,4 +29,4 @@ Use **Azure Service Bus** (topics and subscriptions, one topic per publishing mo
 
 - Positive: one MIT library for mediation, outbox, inbox and transport; the broker is replaceable through Wolverine's transports.
 - Negative: Herald depends heavily on Wolverine; if its licence changes, this ADR is superseded and the cost of leaving is real. Licence terms checked on a date age.
-- Follow-ups: in M0, check the Azure Service Bus emulator under Aspire with Wolverine's transport (its resource creation may need the emulator's configuration file instead); if it doesn't work, use Wolverine's PostgreSQL transport locally and record it.
+- Follow-ups: the `m0-messaging` spike checks the local emulator, transport and provisioning. A failed assumption requires a revised decision in that change; this ADR does not preselect a fallback broker or store topology. Preserve that work in its own branch.

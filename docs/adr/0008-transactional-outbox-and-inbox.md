@@ -2,10 +2,11 @@
 
 - Status: Proposed
 - Date: 2026-11-06
+- Consolidated: 2026-11-07 (terminology and scope only)
 
 ## Context
 
-When a result is reported, Competition saves the match and has to tell Standings. If it saves and then publishes, a failure in between loses the event; if it publishes and then saves, a failure tells Standings about a result that never happened. Brokers also deliver at least once, so a consumer can see the same message twice.
+When a result becomes effective, Competition saves the match and has to tell Standings. A pending H2 competitor report does not change competitive points. If Competition saves and then publishes, a failure in between loses the event; if it publishes and then saves, a failure tells Standings about a result that never happened. Brokers also deliver at least once, so a consumer can see the same message twice.
 
 ## Decision
 
@@ -15,6 +16,8 @@ Use Wolverine's durable messaging with `WolverineFx.EntityFrameworkCore` and `Wo
 - **Inbox:** incoming messages are stored before they are handled and marked when done, so a redelivered message is not processed twice.
 
 Every consumer is also idempotent by design (a result already applied is ignored), so correctness doesn't depend on the inbox alone. Messages that keep failing go to a dead-letter queue and are visible, not dropped.
+
+This record establishes the intended reliability properties. The store topology, routing, recovery and exact delivery/invocation guarantees remain under investigation in `m0-messaging`; its recorded spike findings are not resolved by this documentation consolidation. Durable competitive revision history is a separate module responsibility under ADR 0007.
 
 ## Alternatives considered
 

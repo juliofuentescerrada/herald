@@ -2,6 +2,7 @@
 
 - Status: Proposed | Accepted | Superseded by NNNN | Deprecated
 - Date: YYYY-MM-DD
+- Revised: YYYY-MM-DD (when an authorised consolidation or a Proposed decision is refined)
 
 ## Context
 
@@ -20,3 +21,5 @@ What we will do, stated plainly.
 - Positive: …
 - Negative: … (always at least one)
 - Follow-ups: what has to happen because of this, and when to revisit it.
+
+State which direction is confirmed, which defaults remain proposed, and which change implements it. Decision status does not imply implementation status.

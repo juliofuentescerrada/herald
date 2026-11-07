@@ -1,0 +1,51 @@
+{
+  "source_checkout": "/home/julio/Code/herald",
+  "source_head": "08c3308dcf775bc03add59a768303d7d07cd1bc0",
+  "original_checkout_unchanged": true,
+  "copied_inputs": [
+    {
+      "path": "docs/adr/README.md",
+      "sha256": "0fb958509093855d124755384e101d347bfd8cb4b0f6ba0e6a6bb5b0ef2cc466"
+    },
+    {
+      "path": "docs/adr/0013-functional-delivery-scope.md",
+      "sha256": "801cbef1c2dfdfa996ef5a34204e84a17004453e18fd9d5e423cc853f45ab5ab"
+    },
+    {
+      "path": "docs/herald-functional-discovery.md",
+      "sha256": "0ad1af25fd31d2d72ee399ac4303b75f30de3d24a8b1949ab37c95073783354f"
+    },
+    {
+      "path": "docs/herald-visual-direction.md",
+      "sha256": "e4f1b50bb44f6faf00df1354e3bae52d93c8bfbce7cf70f94e8c0157968f3ea2"
+    },
+    {
+      "path": "docs/roadmap.md",
+      "sha256": "5ff66cdce1d09bf27a1aabf4e3c3e9c899210d953c37f8540bcdf09fb563d848"
+    },
+    {
+      "path": "openspec/changes/m0-messaging/design.md",
+      "sha256": "ae3644e093ae85cde9d7614f0820e9813c81b1b4135c092677fe6129c5a1839b"
+    },
+    {
+      "path": "openspec/changes/m0-messaging/tasks.md",
+      "sha256": "562d34b742560bb7ce76b2c321f5cf82951cb992c3f70e6054e060a10774d2cc"
+    },
+    {
+      "path": "openspec/changes/frontend-visual-prototype/design.md",
+      "sha256": "f1b431b22fa4025d00e5f90dada793675873e502ca8e7fb27e0d56fac4fc5f37"
+    },
+    {
+      "path": "prototypes/frontend/index.html",
+      "sha256": "a4f055601f87bd465d55b7555664ab3a57b71154a9aa5326418566f20b56631a"
+    },
+    {
+      "path": "prototypes/frontend/app.js",
+      "sha256": "9055c4f6eecf777cb9e197a1ed9b530e4c2fbd12b510f56eddc205c10c211711"
+    },
+    {
+      "path": "prototypes/frontend/style.css",
+      "sha256": "2c5ae625521ba677a52c8fa531fd0ce2606d28a2f0e51bde7558b8295a0c0c2a"
+    }
+  ]
+}

@@ -1,6 +1,8 @@
 ## Context
 
-Second M0 change, on top of `m0-solution-skeleton` (archived): the five modules exist, empty, each with `Domain`, `Application` and `Adapters` folders and its `AddXxxModule()` entry point in `Adapters`; the host checks database health through `Aspire.Npgsql`. This change wires Wolverine, EF Core and the outbox/inbox (ADRs 0005, 0007, 0008) and a broker (ADR 0009), with no domain yet: base types arrive with the first aggregate in M1.
+**Status — 7 November 2026:** in-progress proposal and spike. The architecture consolidation aligns slice boundaries and milestone names only. Messaging storage, transport and code-generation details below remain candidates where their checks are incomplete; the recorded inbox failure is unresolved and belongs to this change. No messaging implementation is implied.
+
+Second M0 change, on top of `m0-solution-skeleton` (archived): the five modules exist, empty, each with `Domain`, `Application` and `Adapters` folders and its `AddXxxModule()` entry point in `Adapters`; the host checks database health through `Aspire.Npgsql`. This change wires Wolverine, EF Core and the outbox/inbox (ADRs 0005, 0007, 0008) and a broker (ADR 0009), with no domain yet: base types arrive with the first aggregate in H1.
 
 Decisions taken in exploration (2026-11-06), to be confirmed by the spike where marked.
 
@@ -15,7 +17,7 @@ Wolverine 6.62.0 supports this as ancillary message stores (checked in the packa
 - The host registers the **main store** in a `wolverine` schema. Wolverine requires one; it holds node and agent information only, no module's messages. It is the host's schema, not a module's.
 - Each module registers an **ancillary store** in its schema (`PersistMessagesWithPostgresql(..., schemaName, MessageStoreRole.Ancillary)`), enrols its `DbContext` in it (`Enroll<TDbContext>()`), and routes every handler and endpoint of its assembly to it (`Policies.UseAncillaryStorageFromAssemblyContaining<T>(...)`).
 - A message crossing modules is stored in the sender's outbox and in the receiver's inbox: Wolverine assigns an incoming envelope to the store of the handler that receives it.
-- The envelope tables are part of each module's EF Core model (`MapWolverineEnvelopeStorage(modelBuilder, schema)`), so each module's migrations create them. This is the candidate answer to ADR 0008's follow-up (migrations, not creation at startup), confirmed by the spike.
+- The envelope tables are part of each module's EF Core model (`MapWolverineEnvelopeStorage(modelBuilder, schema)`), so each module's migrations create them. This is the candidate answer to ADR 0008's follow-up (migrations, not creation at startup), pending spike point 4.
 - Each module configures its store from its own entry point, keeping the host at one call per module; the mechanism (a Wolverine extension registered through DI) is confirmed by the spike.
 
 Alternative: one shared store in a `wolverine` schema for every module. Simpler to configure and one set of recovery agents, but the outbox and inbox belong to no module, and splitting a module out would mean moving its messages out of a shared table.
@@ -57,7 +59,7 @@ M0 has no domain, so two probe modules that exist only in a test project (a send
 
 They run against PostgreSQL in Testcontainers over Wolverine's durable local queues, which go through the outbox and inbox without a broker, and wait for delivery with Wolverine's message tracking rather than delays.
 
-Alternatives: technical code (a ping) in real modules, which puts non-domain code in production; or proving the outbox only with M1's first integration event, which leaves M0's exit criterion unmet.
+Alternatives: technical code (a ping) in real modules, which puts non-domain code in production; or proving the outbox only with H1's first integration event, which leaves M0's exit criterion unmet.
 
 ### A shared project plugs a module into the host
 
@@ -87,11 +89,11 @@ ADR 0004 is revised (still Proposed): with Wolverine's endpoints the HTTP entry 
 Herald.Registration/
   RegistrationModule.cs      entry point, at the root (namespace Herald.Registration)
   Domain/                    aggregates, value objects, events, policies; no infrastructure
-  Features/                  one namespace (usually one file) per use case: command or query + its Wolverine endpoint or handler
+  Features/                  one namespace (one file or cohesive folder) per use case: request, validation, endpoint/handler and response
   Persistence/               DbContext, mappings, migrations, envelope tables (the module's schema)
 ```
 
-This change moves each module's entry point to its root and removes the empty `Application` and `Adapters` folders; `Features` appears with the first use case (M1), `Persistence` with each module's `DbContext` here.
+This change moves each module's entry point to its root and removes the empty `Application` and `Adapters` folders; `Features` appears with the first use case (H1), `Persistence` with each module's `DbContext` here.
 
 The architecture tests change with it: `Domain` depends on no infrastructure (Wolverine, EF Core, Npgsql, ASP.NET Core, `Herald.Contracts`, the shared project); a feature does not depend on another feature; the rule "Application does not depend on Adapters" goes. This modifies the `module-boundaries` spec, together with the shared project above.
 
@@ -105,7 +107,18 @@ The host moves from `Aspire.Npgsql` to Aspire's EF Core integration for PostgreS
 
 ### No broker in CI in M0
 
-The messaging tests above need no broker. The emulator runs through Aspire locally and in the spike (point 6); a test through the broker joins CI with the first real integration event (M1), so pull requests don't start the emulator's two containers before there is routing worth testing.
+The messaging tests above need no broker. The emulator runs through Aspire locally and in the spike (point 6); a test through the broker joins CI with the first real integration event (H1), so pull requests don't start the emulator's two containers before there is routing worth testing.
+
+## Spike findings (in progress)
+
+Spike in the scratchpad (2026-11-06): two module assemblies, each with a `DbContext` and an ancillary store in its schema of one PostgreSQL 18.3 database, the main store in `wolverine`, durable local queues, Wolverine 6.62.0.
+
+- **Point 1 (same database, different schemas): works.** Six stores start; each module's envelope tables live in its schema.
+- **Point 2 (state and message together): works.** A handler that publishes and then throws leaves neither its row nor a delivered message.
+- **Point 3 (receiver's inbox): fails over local queues.** A message published by module A's handler and handled by module B is stored as incoming in **A's** schema; B's handler commits in B's schema and marks the envelope handled in B's store, where it has no row. The row in A stays `Incoming`, unowned, and A's recovery agent delivers it again on every restart: in the spike B handled it twice. Dead letters, in contrast, land in the receiver's schema.
+- **Point 5 (module-level configuration): works, differently than planned.** `services.ConfigureWolverine(...)` cannot register a store (Wolverine applies it once the service collection is read-only). A module registers instead on `WolverineOptions` (`opts.AddRegistrationModule()`, with `opts.Services` for its `DbContext`), called inside the host's `UseWolverine`: still one call per module.
+- **Code generation:** core Wolverine no longer ships Roslyn; dynamic generation needs `WolverineFx.RuntimeCompilation` (MIT). Static production code can leave it out.
+- Not yet run: points 4 (migrations), 6 (emulator), 7 (start-up times).
 
 ## Risks / Trade-offs
 
@@ -116,4 +129,4 @@ The messaging tests above need no broker. The emulator runs through Aspire local
 
 ## Open Questions
 
-None left from exploration; the spike may raise new ones.
+The receiver-inbox failure recorded above, redelivery behaviour, migrations, emulator integration and start-up measurements remain open in this messaging investigation. Reconcile the candidate design, specifications and unchecked tasks with the spike evidence before implementation. The documentation consolidation does not choose a resolution or declare these details accepted.

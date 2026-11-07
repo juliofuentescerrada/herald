@@ -2,6 +2,7 @@
 
 - Status: Proposed
 - Date: 2026-11-06
+- Consolidated: 2026-11-07
 
 ## Context
 
@@ -13,12 +14,16 @@ The use cases need a pipeline: validation, a transaction, the outbox (ADR 0008),
 
 Separate commands from queries in every module:
 
-- A **command** goes through an aggregate, changes state and returns at most the id it created. It never returns read models.
+- A **command** changes state through the owning aggregate's invariants. Its response may include the created identity, operation receipt, applied/rejected/pending outcome and relevant revision or error metadata. It does not construct an unrelated read model or pretend an eventually updated projection is current. Read that projection through its query.
 - A **query** never loads an aggregate and never changes state. It projects to a read model with no tracking, or reads a table that a projection maintains (the Standings module).
 
 Commands, queries and the handlers of domain and integration events run through **Wolverine** (`WolverineFx`, MIT, 6.62.0 when this was written): its in-process bus invokes the handlers, and its middleware gives the pipeline (validation with `WolverineFx.FluentValidation`, transactions with `WolverineFx.EntityFrameworkCore`). HTTP endpoints use `WolverineFx.Http`, so an endpoint is a handler too.
 
 Wolverine is an adapter concern. `Domain` doesn't reference it; a module's `Features` (its endpoints and handlers, ADR 0004) may use its attributes and return values, and everything else Wolverine-specific stays in the module's composition and the host.
+
+Each feature owns its HTTP request/response and typed business errors; those contracts are distinct from aggregates and integration events. An HTTP endpoint and its use case can share a method without introducing an extra service/dispatcher layer. Queries may use their own module's persistence directly. Shared business behaviour is expressed in Domain, not by calling another feature's handler.
+
+H1 mutation contracts preserve operation identity across retries and use expected revisions to reject stale intent. The same operation identity/content returns its original receipt; changed content conflicts. A revision conflict requires a new review, not blind retry. Functional discovery defines the consumer behaviour; the implementing slice specifies the concrete HTTP contract and receipt retention.
 
 ## Alternatives considered
 
