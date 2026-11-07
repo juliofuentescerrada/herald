@@ -1,3 +1,5 @@
+using Herald.Architecture.Tests.Fixtures.Schemas;
+using Microsoft.EntityFrameworkCore;
 using Shouldly;
 
 namespace Herald.Architecture.Tests;
@@ -43,5 +45,21 @@ public class FixtureTests
         var file = Path.Combine(ProjectReferences.RepositoryRoot, "tests", "Herald.Architecture.Tests", "Fixtures", "Projects", "ModuleWithUnusedForbiddenReference.xml");
 
         ProjectReferences.InFile(file).Except(["Herald.BuildingBlocks", "Herald.Contracts", "Herald.ModuleHosting"]).ShouldBe(["Herald.Standings"]);
+    }
+
+    [Fact]
+    public void A_module_model_with_its_tables_in_its_schema_passes()
+    {
+        using var context = new CompliantContext(new DbContextOptionsBuilder<CompliantContext>().UseNpgsql("Host=localhost").Options);
+
+        SchemaRules.TablesOutsideTheModuleSchema(context, "scoring").ShouldBeEmpty();
+    }
+
+    [Fact]
+    public void A_table_in_another_modules_schema_fails()
+    {
+        using var context = new ViolatingContext(new DbContextOptionsBuilder<ViolatingContext>().UseNpgsql("Host=localhost").Options);
+
+        SchemaRules.TablesOutsideTheModuleSchema(context, "scoring").ShouldBe(["Score in schema 'standings'"]);
     }
 }

@@ -14,7 +14,7 @@
 - [x] 2.1 Move each module's entry point to its root (namespace `Herald.<Module>`), remove the empty `Application` and `Adapters` folders, and update the host's usings
 - [x] 2.2 Create `Herald.ModuleHosting` (referenced by modules and host) with the module registration found in the spike, called inside the host's `UseWolverine`: discovery of the module's handlers and endpoints (its `DbContext` registration joins it in 3.2, with the first `DbContext`)
 - [x] 2.3 Update the architecture tests to the `module-boundaries` spec: entry point at the root, domain independence, feature independence including nested namespaces, no Persistence-to-Features dependency, shared-project limits; remove the Application/Adapters rule
-- [x] 2.4 Prove the checks with representative passing and failing fixtures, including nested feature dependencies and an unused forbidden project reference; state separately what namespace, project and database checks prove
+- [x] 2.4 Prove the checks with representative passing and failing fixtures, including nested feature dependencies, an unused forbidden project reference and, once modules have a `DbContext`, a table outside the module schema; state separately what namespace, project and schema checks prove
 
 ## 3. Persistence and Wolverine in the host
 
