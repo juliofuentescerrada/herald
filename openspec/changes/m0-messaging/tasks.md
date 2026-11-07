@@ -3,7 +3,7 @@
 - [x] 1.1 In the scratchpad, a console host with Wolverine 6.62.0, two "modules" (assemblies) with a `DbContext` each and an ancillary store in their own schema of one PostgreSQL database, plus the main store in `wolverine`
 - [x] 1.2 Check that a handler's row and its published message commit or roll back together in its module's schema (design point 2) and that a message between the two lands in the receiver's inbox schema (point 3)
 - [x] 1.3 Check whether a test can redeliver an envelope with the same id and see it handled once (point 3); if not, record how the requirement is tested instead
-- [ ] 1.4 Check the envelope tables through each module's EF Core migrations (`MapWolverineEnvelopeStorage`) and how the main store's tables are created (point 4)
+- [x] 1.4 Check the envelope tables through each module's EF Core migrations (`MapWolverineEnvelopeStorage`) and how the main store's tables are created (point 4)
 - [x] 1.5 Check that each module configures its store and routing from its own registration (a Wolverine extension through DI), with the host calling one method per module (point 5)
 - [ ] 1.6 Start the Azure Service Bus emulator with Aspire (`AddAzureServiceBus().RunAsEmulator()`, topics and subscriptions declared in the AppHost) and send and receive through Wolverine's transport; record whether Wolverine's provisioning must be turned off (point 6)
 - [ ] 1.7 Measure host start-up with dynamic and with pre-generated code (point 7)
@@ -19,8 +19,8 @@
 ## 3. Persistence and Wolverine in the host
 
 - [ ] 3.1 Add the packages to `Directory.Packages.props` with the versions pinned in the spike, checking each licence
-- [ ] 3.2 Give each module a `Persistence/<Module>DbContext` in its schema, with the envelope tables mapped, a design-time factory and an initial migration
-- [ ] 3.3 Configure Wolverine in the host: main store in `wolverine`, EF Core transactions, durable local queues, Wolverine HTTP endpoints, the Service Bus transport with one topic per publishing module, migrations applied at start-up in Development
+- [ ] 3.2 Give each module a `Persistence/<Module>DbContext` in its schema, with the envelope tables mapped (they stay out of migrations), a design-time factory and an initial migration holding only the module's own tables
+- [ ] 3.3 Configure Wolverine in the host: main store in `wolverine`, EF Core transactions, durable local queues, Wolverine HTTP endpoints, the Service Bus transport with one topic per publishing module, migrations applied and Wolverine's tables created at start-up in Development and tests, `AutoCreate.None` elsewhere, and JasperFx's commands (`db-apply`, `db-assert`, `codegen`) run from the host
 - [ ] 3.4 Replace `Aspire.Npgsql` with Aspire's EF Core integration for the five contexts on the `herald` connection, keeping a single database health check; the existing health tests still pass
 - [ ] 3.5 Add the Service Bus emulator to the AppHost with the modules' topics and subscriptions; run the AppHost and confirm in the dashboard that PostgreSQL, the emulator and the host are running and healthy
 
@@ -42,6 +42,6 @@
 
 ## 6. Docs
 
-- [ ] 6.1 Revise ADR 0005 (follow-ups: pre-generated code in production; Wolverine endpoints in OpenAPI), ADR 0008 (envelope tables through each module's migrations, one store per module) and ADR 0009 (the emulator works locally, or what the spike found), all still Proposed
-- [ ] 6.2 `CLAUDE.md` commands: add a migration to a module, regenerate Wolverine's code; Status
+- [ ] 6.1 Revise ADR 0005 (follow-ups: pre-generated code in production; Wolverine endpoints in OpenAPI), ADR 0008 (module tables through EF migrations, Wolverine's tables through `db-apply` outside Development, one store per module) and ADR 0009 (the emulator works locally, or what the spike found), all still Proposed
+- [ ] 6.2 `CLAUDE.md` commands: add a migration to a module, apply and check Wolverine's tables (`db-apply`, `db-assert`), regenerate Wolverine's code; Status
 - [ ] 6.3 `docs/roadmap.md`: mark `m0-messaging`
