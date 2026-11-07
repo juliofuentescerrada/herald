@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk.Web">
   <ItemGroup>
     <PackageReference Include="Aspire.Npgsql" />
+    <PackageReference Include="WolverineFx.RuntimeCompilation" />
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Herald.ServiceDefaults\Herald.ServiceDefaults.csproj" />

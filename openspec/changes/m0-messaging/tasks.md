@@ -11,15 +11,15 @@
 
 ## 2. Modules as vertical slices and Herald.ModuleHosting
 
-- [ ] 2.1 Move each module's entry point to its root (namespace `Herald.<Module>`), remove the empty `Application` and `Adapters` folders, and update the host's usings
-- [ ] 2.2 Create `Herald.ModuleHosting` (referenced by modules and host) with the module registration found in the spike: `DbContext` registered with Wolverine's EF Core integration (envelopes in the shared store), discovery of the module's handlers and endpoints
-- [ ] 2.3 Update the architecture tests to the `module-boundaries` spec: entry point at the root, domain independence, feature independence including nested namespaces, no Persistence-to-Features dependency, shared-project limits; remove the Application/Adapters rule
-- [ ] 2.4 Prove the checks with representative passing and failing fixtures, including nested feature dependencies and an unused forbidden project reference; state separately what namespace, project and database checks prove
+- [x] 2.1 Move each module's entry point to its root (namespace `Herald.<Module>`), remove the empty `Application` and `Adapters` folders, and update the host's usings
+- [x] 2.2 Create `Herald.ModuleHosting` (referenced by modules and host) with the module registration found in the spike, called inside the host's `UseWolverine`: discovery of the module's handlers and endpoints (its `DbContext` registration joins it in 3.2, with the first `DbContext`)
+- [x] 2.3 Update the architecture tests to the `module-boundaries` spec: entry point at the root, domain independence, feature independence including nested namespaces, no Persistence-to-Features dependency, shared-project limits; remove the Application/Adapters rule
+- [x] 2.4 Prove the checks with representative passing and failing fixtures, including nested feature dependencies and an unused forbidden project reference; state separately what namespace, project and database checks prove
 
 ## 3. Persistence and Wolverine in the host
 
 - [ ] 3.1 Add the packages to `Directory.Packages.props` with the versions pinned in the spike, checking each licence
-- [ ] 3.2 Give each module a `Persistence/<Module>DbContext` in its schema, with the envelope entities mapped to the shared store by Wolverine (they stay out of migrations), a design-time factory and an initial migration holding only the module's own tables
+- [ ] 3.2 Give each module a `Persistence/<Module>DbContext` in its schema, registered through `Herald.ModuleHosting` with Wolverine's EF Core integration, with the envelope entities mapped to the shared store by Wolverine (they stay out of migrations), a design-time factory and an initial migration holding only the module's own tables
 - [ ] 3.3 Configure Wolverine in the host: one shared store in `wolverine`, EF Core transactions, durable local queues, Wolverine HTTP endpoints, the Service Bus transport with one topic per publishing module (no provisioning, system queues off), migrations applied and Wolverine's tables created at start-up in Development and tests, `AutoCreate.None` elsewhere, and JasperFx's commands (`db-apply`, `db-assert`, `codegen`) run from the host
 - [ ] 3.4 Replace `Aspire.Npgsql` with Aspire's EF Core integration for the five contexts on the `herald` connection, keeping a single database health check; the existing health tests still pass
 - [ ] 3.5 Add the Service Bus emulator to the AppHost with the modules' topics and subscriptions; run the AppHost and confirm in the dashboard that PostgreSQL, the emulator and the host are running and healthy

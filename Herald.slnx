@@ -5,6 +5,7 @@
     <Project Path="src/Herald.Competition/Herald.Competition.csproj" />
     <Project Path="src/Herald.Contracts/Herald.Contracts.csproj" />
     <Project Path="src/Herald.Host/Herald.Host.csproj" />
+    <Project Path="src/Herald.ModuleHosting/Herald.ModuleHosting.csproj" />
     <Project Path="src/Herald.Organisations/Herald.Organisations.csproj" />
     <Project Path="src/Herald.Registration/Herald.Registration.csproj" />
     <Project Path="src/Herald.ServiceDefaults/Herald.ServiceDefaults.csproj" />

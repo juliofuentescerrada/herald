@@ -6,4 +6,7 @@ internal static class RuleResult
 {
     public static void ShouldHaveNoFailingTypes(this NetArchTest.Rules.TestResult result) =>
         (result.FailingTypes ?? []).Select(type => $"{type.FullName}: {type.Explanation}").ShouldBeEmpty();
+
+    public static string[] FailingTypeNames(this NetArchTest.Rules.TestResult result) =>
+        [.. (result.FailingTypes ?? []).Select(type => type.FullName)];
 }

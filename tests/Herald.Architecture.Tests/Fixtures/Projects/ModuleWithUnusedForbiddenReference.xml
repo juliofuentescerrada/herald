@@ -1,0 +1,7 @@
+<!-- A module project file referencing another module without using any of its types. -->
+<Project Sdk="Microsoft.NET.Sdk">
+  <ItemGroup>
+    <ProjectReference Include="..\Herald.BuildingBlocks\Herald.BuildingBlocks.csproj" />
+    <ProjectReference Include="..\Herald.Standings\Herald.Standings.csproj" />
+  </ItemGroup>
+</Project>

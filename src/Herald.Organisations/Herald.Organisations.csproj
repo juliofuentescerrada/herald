@@ -3,5 +3,6 @@
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
     <ProjectReference Include="..\Herald.BuildingBlocks\Herald.BuildingBlocks.csproj" />
     <ProjectReference Include="..\Herald.Contracts\Herald.Contracts.csproj" />
+    <ProjectReference Include="..\Herald.ModuleHosting\Herald.ModuleHosting.csproj" />
   </ItemGroup>
 </Project>

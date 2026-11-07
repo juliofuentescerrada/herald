@@ -5,15 +5,15 @@ namespace Herald.Architecture.Tests;
 
 public class ModuleTests
 {
-    private static readonly string[] _infrastructure = ["Wolverine", "Microsoft.EntityFrameworkCore", "Npgsql", "Microsoft.AspNetCore"];
+    private static readonly string[] _permittedProjects = ["Herald.BuildingBlocks", "Herald.Contracts", "Herald.ModuleHosting"];
 
     [Fact]
-    public void Every_listed_module_is_found_and_has_its_entry_point()
+    public void Every_listed_module_is_found_and_has_its_entry_point_at_its_root()
     {
         foreach (var module in Modules.Names)
         {
             var assembly = Modules.Load(module);
-            assembly.GetType($"Herald.{module}.Adapters.{module}Module").ShouldNotBeNull($"{module} has no entry point");
+            assembly.GetType($"Herald.{module}.{module}Module").ShouldNotBeNull($"{module} has no entry point at its root");
         }
     }
 
@@ -28,33 +28,26 @@ public class ModuleTests
 
     [Theory]
     [MemberData(nameof(Modules.All), MemberType = typeof(Modules))]
-    public void A_module_references_no_Herald_project_but_the_building_blocks_and_the_contracts(string module)
+    public void A_module_references_no_Herald_project_but_the_building_blocks_the_contracts_and_module_hosting(string module) =>
+        ProjectReferences.Of($"Herald.{module}").ShouldBeSubsetOf(_permittedProjects);
+
+    [Theory]
+    [MemberData(nameof(Modules.All), MemberType = typeof(Modules))]
+    public void The_domain_depends_only_on_the_building_blocks(string module) =>
+        SliceRules.DomainDependsOnlyOnTheBuildingBlocks(Modules.Load(module), $"Herald.{module}").ShouldHaveNoFailingTypes();
+
+    [Theory]
+    [MemberData(nameof(Modules.All), MemberType = typeof(Modules))]
+    public void Features_do_not_depend_on_each_other(string module)
     {
-        Modules.Load(module).GetReferencedAssemblies()
-            .Select(reference => reference.Name)
-            .Where(name => name!.StartsWith("Herald.", StringComparison.Ordinal))
-            .ShouldBeSubsetOf(["Herald.BuildingBlocks", "Herald.Contracts"]);
+        foreach (var result in SliceRules.FeaturesAreIndependent(Modules.Load(module), $"Herald.{module}"))
+        {
+            result.ShouldHaveNoFailingTypes();
+        }
     }
 
     [Theory]
     [MemberData(nameof(Modules.All), MemberType = typeof(Modules))]
-    public void The_domain_depends_only_on_the_building_blocks(string module)
-    {
-        string[] forbidden = ["Herald.Contracts", $"Herald.{module}.Application", $"Herald.{module}.Adapters", .. _infrastructure];
-
-        Types.InAssembly(Modules.Load(module))
-            .That().ResideInNamespace($"Herald.{module}.Domain")
-            .ShouldNot().HaveDependencyOnAny(forbidden)
-            .GetResult().ShouldHaveNoFailingTypes();
-    }
-
-    [Theory]
-    [MemberData(nameof(Modules.All), MemberType = typeof(Modules))]
-    public void The_application_layer_does_not_depend_on_adapters(string module)
-    {
-        Types.InAssembly(Modules.Load(module))
-            .That().ResideInNamespace($"Herald.{module}.Application")
-            .ShouldNot().HaveDependencyOnAny($"Herald.{module}.Adapters")
-            .GetResult().ShouldHaveNoFailingTypes();
-    }
+    public void Persistence_does_not_depend_on_features(string module) =>
+        SliceRules.PersistenceDoesNotDependOnFeatures(Modules.Load(module), $"Herald.{module}").ShouldHaveNoFailingTypes();
 }
