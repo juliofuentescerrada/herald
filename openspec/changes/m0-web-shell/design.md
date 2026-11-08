@@ -283,6 +283,31 @@ Headless Chrome on the production builds of public, admin and the catalogue, eig
   The control shows the check detects a repeat. W-06 already expected it: Angular's transfer cache skips requests with authorisation headers, so personal data loads in the browser. Its requests return 404 because the built server has no `/api`; the development proxy is task 4.4's, and in production same-origin routing is M4's (ingress).
 - **Deferred:** API-backed metadata for tournament pages, visibility and cache policy belong to the first public tournament feature (spec: "Public rendering is selected by route").
 
+### Local startup through Aspire (task 4.4, 8 November 2026)
+
+- **AppHost:**
+  - Adds `Aspire.Hosting.JavaScript` 13.6.4, MIT (checked in the package's nuspec).
+  - Two `AddJavaScriptApp` resources on `web/`: `admin` runs `start:admin` with `WithPnpm()`; `public` runs `start:public` with `WithPnpm(install: false)` and `WaitForCompletion` on admin's installer, reached through `JavaScriptPackageInstallerAnnotation`.
+  - Both have `WithHttpEndpoint(port: 4200/4300, env: "PORT")`, `HERALD_API_URL` set to the host's `http` endpoint, and `WaitFor(host)`.
+  - The fixed ports are Aspire's proxy; `ng serve` listens on dynamic ports behind it.
+- **Workspace:**
+  - `start:admin` / `start:public` run `ng serve <app> --port ${PORT:-4200|4300}`.
+  - `proxy.conf.mjs` (in both apps' `serve` options) forwards `/api` to `HERALD_API_URL`, or to the host's launch address `http://localhost:5180` when an app runs without the AppHost.
+  - `web/README.md` documents startup, the checks and `NG_ALLOWED_HOSTS` for the built server.
+- **Evidence** (`dotnet run --project src/Herald.AppHost`, Node 26.13 and pnpm 12.18.0 on `PATH`, Docker Desktop):
+  - **Startup:** the real AppHost started PostgreSQL, the Service Bus emulator, the host and both apps in about 15 s with the workspace already installed. `admin-installer` went `Running → Finished` in 2 s; `public-installer` exists but stayed `NotStarted`, so only one install ran. Aspire's proxy (`dcp`) listened on 4200, 4300 and 5180. Host `/health`: `Healthy`.
+  - **`/api` reaches the host on every path.** The host has no `/api` endpoint until the first feature, so its own 404 is the expected answer, recognisable by its `server: Kestrel` header (a proxy failure would be a 502 or 504).
+    - `ng serve`'s proxy on 4200 and on 4300: 404 with `server: Kestrel`.
+    - From the admin browser, `fetch('/api/…')`: 404 with `Kestrel`.
+    - From public's SSR, the fixture shows a failed request to `http://localhost:5180/api/_fixtures/public: 404`, the host's address taken from `HERALD_API_URL`.
+  - **Browser** (headless Chrome through Aspire):
+    - public `/`: 200, served from the dev server's prerender (`ssg`), hydrates with no warnings and makes no `/api` request;
+    - `/_fixtures/client`: renders in the browser;
+    - an unknown URL: 404 with its page, which hydrates;
+    - admin `/`: Overview.
+  - **Shutdown:** SIGINT to the Aspire CLI process (`dotnet run` does not forward it) freed the ports in 2 s; the `ng serve` processes and the Aspire containers were gone within 6 s.
+  - **Not covered:** Windows (`${PORT:-…}` needs a POSIX shell; pass the port with `WithArgs` if needed). The trusted developer certificate failed for NSS (Chromium/Firefox), which the HTTP endpoints do not need.
+
 ## Validation and completion
 
 Before implementation: resolve W-01–06, review affected shell states and approve the bounded change. During implementation: compile both apps, check library imports and negative fixtures, verify deterministic API/client generation, render at desktop/mobile widths and exercise keyboard/error recovery, run SSG/hydration and concurrent-request isolation fixtures, and start both apps through Aspire. Record actual commands, versions and results here. Archive only after the tasks and acceptance scenarios are complete; schema validation alone is not completion.
