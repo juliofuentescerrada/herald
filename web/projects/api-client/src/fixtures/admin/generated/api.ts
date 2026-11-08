@@ -32,6 +32,10 @@ export interface FixtureItemRevised {
   revision: number;
 }
 
+export interface FixtureRevisionAccepted {
+  operationId: string;
+}
+
 export interface ProblemDetails {
   /** @nullable */
   type?: string | null;
@@ -118,13 +122,13 @@ export class HeraldApiFixturesAdminService {
  * PUT_api_fixtures_items_itemId
  * @summary PUT_api_fixtures_items_itemId
  */
- reviseFixtureItem<TData = FixtureItemRevised>(itemId: string,
+ reviseFixtureItem<TData = FixtureItemRevised | FixtureRevisionAccepted>(itemId: string,
     reviseFixtureItemBody: ReviseFixtureItem, options?: HttpClientBodyOptions): Observable<TData>;
- reviseFixtureItem<TData = FixtureItemRevised>(itemId: string,
+ reviseFixtureItem<TData = FixtureItemRevised | FixtureRevisionAccepted>(itemId: string,
     reviseFixtureItemBody: ReviseFixtureItem, options?: HttpClientEventOptions): Observable<HttpEvent<TData>>;
- reviseFixtureItem<TData = FixtureItemRevised>(itemId: string,
+ reviseFixtureItem<TData = FixtureItemRevised | FixtureRevisionAccepted>(itemId: string,
     reviseFixtureItemBody: ReviseFixtureItem, options?: HttpClientResponseOptions): Observable<AngularHttpResponse<TData>>;
-  reviseFixtureItem<TData = FixtureItemRevised>(
+  reviseFixtureItem<TData = FixtureItemRevised | FixtureRevisionAccepted>(
     itemId: string,
     reviseFixtureItemBody: ReviseFixtureItem, options?: HttpClientObserveOptions): Observable<TData | HttpEvent<TData> | AngularHttpResponse<TData>> {
     if (options?.observe === 'events') {
@@ -158,4 +162,4 @@ export class HeraldApiFixturesAdminService {
 
 };
 
-export type ReviseFixtureItemClientResult = NonNullable<FixtureItemRevised>
+export type ReviseFixtureItemClientResult = NonNullable<FixtureItemRevised | FixtureRevisionAccepted>

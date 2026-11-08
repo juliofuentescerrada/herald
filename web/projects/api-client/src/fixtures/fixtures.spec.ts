@@ -10,6 +10,7 @@ import {
 } from './public/generated/api';
 import {
   FixtureItemRevised,
+  FixtureRevisionAccepted,
   HeraldApiFixturesAdminService,
   ValidationProblemDetails,
 } from './admin/generated/api';
@@ -49,7 +50,7 @@ describe('The generated client', () => {
     expect([note, revision]).toEqual([null, 3]);
   });
 
-  it('sends a command body and returns its receipt with the new revision', async () => {
+  it('sends a command body and returns the applied result with the new revision', async () => {
     const result = firstValueFrom(
       TestBed.inject(HeraldApiFixturesAdminService).reviseFixtureItem(id, {
         name: 'Renamed',
@@ -62,8 +63,27 @@ describe('The generated client', () => {
     expect(request.request.body).toEqual({ name: 'Renamed', note: 'n', expectedRevision: 3 });
     request.flush({ id, revision: 4 });
 
-    const receipt: FixtureItemRevised = await result;
-    expect(receipt.revision).toBe(4);
+    // The declared answer is applied or accepted: the caller has to tell them apart.
+    const answer: FixtureItemRevised | FixtureRevisionAccepted = await result;
+    expect('revision' in answer && answer.revision).toBe(4);
+  });
+
+  it('returns an accepted receipt as it is, without turning it into an applied result', async () => {
+    const result = firstValueFrom(
+      TestBed.inject(HeraldApiFixturesAdminService).reviseFixtureItem(
+        id,
+        { name: 'Renamed', note: null, expectedRevision: 3 },
+        { observe: 'response' },
+      ),
+    );
+    http
+      .expectOne(`/api/fixtures/items/${id}`)
+      .flush({ operationId: 'op-1' }, { status: 202, statusText: 'Accepted' });
+
+    const response = await result;
+    expect(response.status).toBe(202);
+    expect(response.body).toEqual({ operationId: 'op-1' });
+    expect(response.body && 'revision' in response.body).toBe(false);
   });
 
   it('exposes validation errors as the generated ValidationProblemDetails', async () => {
@@ -76,16 +96,14 @@ describe('The generated client', () => {
         }),
       ),
     );
-    http
-      .expectOne(`/api/fixtures/items/${id}`)
-      .flush(
-        {
-          title: 'One or more validation errors occurred.',
-          status: 400,
-          errors: { name: ['Name is required.'] },
-        },
-        { status: 400, statusText: 'Bad Request', headers: problem },
-      );
+    http.expectOne(`/api/fixtures/items/${id}`).flush(
+      {
+        title: 'One or more validation errors occurred.',
+        status: 400,
+        errors: { name: ['Name is required.'] },
+      },
+      { status: 400, statusText: 'Bad Request', headers: problem },
+    );
 
     expect(problemOf<ValidationProblemDetails>(await result)?.errors).toEqual({
       name: ['Name is required.'],

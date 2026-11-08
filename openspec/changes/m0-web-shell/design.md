@@ -405,6 +405,68 @@ Headless Chrome on the production builds of public, admin and the catalogue, eig
 
 ## Validation and completion
 
+### Completion run (task 6.1, 8 November 2026)
+
+Checked-out commit `2d3519f`. .NET SDK 10.0.114, Node 26.13.0, pnpm 12.18.0, Docker 29.5.3. The same commit is green in GitHub Actions (run 42514450800, jobs `dotnet` and `web`), the first green run since `5909702` (see task 4.3).
+
+| Check | Command | Result |
+| --- | --- | --- |
+| .NET format | `dotnet format Herald.slnx --verify-no-changes` | passes |
+| .NET build | `dotnet build Herald.slnx -c Release` | 0 warnings, 0 errors |
+| .NET tests | `dotnet test --solution Herald.slnx -c Release --no-build` | 54 of 54 |
+| Install | `pnpm install --frozen-lockfile` | passes |
+| Lint | `pnpm lint` | 5 projects pass |
+| Boundaries | `pnpm lint:boundaries` | 15 planted violations, 15 reported, 0 mismatches |
+| Unit tests | `pnpm test:all` | admin 13, public 10, catalogue 5, ui 19, api-client 8 |
+| SSR isolation | `pnpm test:ssr` | 50 concurrent requests isolated; the API received no credentials |
+| Production builds | `pnpm build:all` from an empty `dist` | 3 builds; no file in `dist/public` or `dist/admin` contains "fixture" |
+| Generated contract | CI step *The OpenAPI documents and generated clients are current*, run as written in `ci.yml` | passes |
+
+- **Combined startup:** `dotnet run --project src/Herald.AppHost`.
+  - Admin (4200) and public (4300) answered 200 after about 8 s, with the workspace installed and the images present.
+  - The host's `/health` was `Healthy`, and both OpenAPI documents answered 200 in Development.
+  - `/api/anything` through 4200, through 4300 and on the host at 5180 returned Kestrel's 404 (the host has no `/api` endpoint yet).
+  - Public `/` was served `ssg`.
+  - Stopped with SIGINT to `aspire run`; no process, container or port (4200, 4300, 5180) was left.
+- **Visual and hydration evidence** stays in tasks 3.5, 4.1 and 4.3: this run changed no screen.
+
 Before implementation: resolve W-01–06, review affected shell states and approve the bounded change. During implementation: compile both apps, check library imports and negative fixtures, verify deterministic API/client generation, render at desktop/mobile widths and exercise keyboard/error recovery, run SSG/hydration and concurrent-request isolation fixtures, and start both apps through Aspire. Record actual commands, versions and results here. Archive only after the tasks and acceptance scenarios are complete; schema validation alone is not completion.
 
-Document validation on 8 November 2026, after recording what `m0-messaging` delivered: `openspec validate m0-web-shell --strict` passed. This checks proposal structure only; review gates 1.1–1.3 and every implementation task remain open.
+### Acceptance review (task 6.3, 8 November 2026)
+
+Every scenario of the four delta specs, with the evidence recorded above.
+
+| Spec | Scenario | Evidence |
+| --- | --- | --- |
+| api-description | A Wolverine endpoint appears in its document | 5.1: probe endpoint in the public document, absent from admin (messaging test) |
+| api-description | An endpoint without a group is rejected | 5.1–5.2: host test lists it; negative control |
+| frontend-boundaries | A new feature is covered automatically | 2.x: boundary fixture "a feature added after the policies" |
+| frontend-boundaries | A feature imports another feature | 2.x: relative, alias, barrel and lazy fixtures reported with source and target |
+| frontend-boundaries | Composition accesses a feature entry point | 2.x: allowed through `index.ts`; internals reported |
+| frontend-boundaries | Platform imports a feature store; local shared imports feature internals | 2.x: both planted and reported |
+| frontend-boundaries | A common control imports an API query; an app deep-imports a shared library; an app imports the component foundation | 2.x: `api-client` into `ui`, deep `ui` import, `ng-primitives`/Tabler from a feature, all reported |
+| frontend-boundaries | A forbidden edge uses a lazy import; a valid workspace passes | 2.x: dynamic import reported; `pnpm lint` and `lint:boundaries` in CI (6.1) |
+| frontend-boundaries | Operational context changes; another tab holds the old context | 2.x: admin `AppContext` tests (no cache or draft survives; the other tab reloads; control without the broadcast fails) |
+| frontend-boundaries | Access is revoked or the user signs out | W-06: sign-out and revocation use the same `replace()` full load, which the tests cover. A server-side trigger (such as a 401) waits for H1's authentication, as W-06 records |
+| frontend-boundaries | A client receives transport acknowledgement | 6.3, below: 202 accepted receipt kept distinct from the 200 applied result |
+| frontend-shells | Both shells build; a visitor opens the M0 public page | 3.4, 4.5, 6.1 |
+| frontend-shells | Initial content without JavaScript; the public page hydrates | 4.1: `ssg` HTML, browser hydration without warnings |
+| frontend-shells | A server-rendered fixture uses the selected runtime; an unknown URL | 4.1: SSR fixture; server-rendered 404 |
+| frontend-shells | Server data reaches hydration once | 4.3: one server call, none from the browser; control repeats |
+| frontend-shells | Fixtures stay out of production | 4.1, 4.5, 6.1: no "fixture" in production output |
+| frontend-shells | Concurrent requests have different contexts; a feature sends credentials during SSR; protected fixture data reaches a cache boundary | 4.2: `pnpm test:ssr` (in CI) and its negative controls |
+| frontend-shells | Both apps use a common control; the catalogue renders every control on the server; keyboard and error recovery | 3.2–3.3, 3.5 |
+| frontend-shells | A shell state lacks a reviewed reference; desktop and narrow compositions are reviewed | gates 1.1–1.4; 3.5 review record |
+| frontend-shells | A developer starts the AppHost | 4.4, 6.1 |
+| generated-api-client | The host contract is exported; export needs no running services | 5.1–5.2: `openapi` command with nothing on 5432 |
+| generated-api-client | The public app imports the admin client | 2.x: boundary fixture reported |
+| generated-api-client | Regeneration is stable; a representative contract is generated | 5.2: no diff on a second run; fixture types and tests |
+| generated-api-client | An API change leaves stale client code; committed artifacts match | 5.4: controls A–D fail; passes unchanged, also in GitHub Actions |
+| generated-api-client | Browser and server contexts use the client; an error or revision is returned | 5.3: two applications; 5.2: typed errors, revision, no navigation or retry |
+| generated-api-client | The frontend contract work is integrated | 5.1–5.4: `AddHeraldApi` is the only source; messaging unchanged |
+
+- **Gap found and closed during this review:** *A client receives transport acknowledgement* asks for a fixture that tells an accepted receipt from an applied result, and the 5.2 fixtures had only the applied one. `reviseFixtureItem` now also declares `202` with `FixtureRevisionAccepted { operationId }`. The generated method returns `FixtureItemRevised | FixtureRevisionAccepted`, so a caller cannot read a revision without telling them apart; the test that assigned the answer straight to `FixtureItemRevised` no longer compiled and now narrows it.
+  - New test: a 202 answer comes back as it is, with its status and `operationId` and no revision. The client neither waits, nor polls, nor converts it into a result.
+  - Regenerated: the fixture admin document and client. The drift step passes once they are staged.
+  - Checks: api-client tests 9, lint, spec type check and .NET format pass.
+- **Validation:** `openspec validate m0-web-shell --strict` passes.

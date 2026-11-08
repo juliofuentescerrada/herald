@@ -6,12 +6,16 @@ using Wolverine.Http;
 namespace Herald.ApiFixtures;
 
 // Representative shapes for the generated client: a typed response with an optional field and a
-// revision, a command with its receipt, and the typed errors (not found, validation, permission, conflict).
+// revision, a command whose answer is either applied (200) or only accepted (202), and the typed errors
+// (not found, validation, permission, conflict).
 public sealed record FixtureItem(Guid Id, string Name, string? Note, int Revision);
 
 public sealed record ReviseFixtureItem(string Name, string? Note, int ExpectedRevision);
 
 public sealed record FixtureItemRevised(Guid Id, int Revision);
+
+// Accepted, not yet applied: the caller follows the operation; nothing about the item has changed yet.
+public sealed record FixtureRevisionAccepted(Guid OperationId);
 
 public static class GetFixtureItemEndpoint
 {
@@ -27,6 +31,7 @@ public static class ReviseFixtureItemEndpoint
     [WolverinePut("/api/fixtures/items/{itemId}")]
     [EndpointGroupName(HeraldApi.Admin)]
     [EndpointName("reviseFixtureItem")]
+    [ProducesResponseType<FixtureRevisionAccepted>(StatusCodes.Status202Accepted)]
     [ProducesResponseType<ValidationProblemDetails>(StatusCodes.Status400BadRequest, "application/problem+json")]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status403Forbidden, "application/problem+json")]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict, "application/problem+json")]

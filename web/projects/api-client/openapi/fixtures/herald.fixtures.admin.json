@@ -35,6 +35,16 @@
           "required": true
         },
         "responses": {
+          "202": {
+            "description": "Accepted",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FixtureRevisionAccepted"
+                }
+              }
+            }
+          },
           "400": {
             "description": "Bad Request",
             "content": {
@@ -98,6 +108,18 @@
           "revision": {
             "type": "integer",
             "format": "int32"
+          }
+        }
+      },
+      "FixtureRevisionAccepted": {
+        "required": [
+          "operationId"
+        ],
+        "type": "object",
+        "properties": {
+          "operationId": {
+            "type": "string",
+            "format": "uuid"
           }
         }
       },
