@@ -25,6 +25,8 @@
               }
             ],
             "styles": [
+              "projects/ui/src/styles/tokens.css",
+              "projects/ui/src/styles/base.css",
               "projects/admin/src/styles.css"
             ]
           },
@@ -97,6 +99,8 @@
               }
             ],
             "styles": [
+              "projects/ui/src/styles/tokens.css",
+              "projects/ui/src/styles/base.css",
               "projects/public/src/styles.css"
             ],
             "server": "projects/public/src/main.server.ts",
@@ -247,16 +251,12 @@
               }
             ],
             "styles": [
+              "projects/ui/src/styles/tokens.css",
+              "projects/ui/src/styles/base.css",
               "projects/catalogue/src/styles.css"
             ],
             "server": "projects/catalogue/src/main.server.ts",
-            "outputMode": "server",
-            "security": {
-              "allowedHosts": []
-            },
-            "ssr": {
-              "entry": "projects/catalogue/src/server.ts"
-            }
+            "outputMode": "static"
           },
           "configurations": {
             "production": {

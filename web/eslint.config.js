@@ -29,7 +29,8 @@ module.exports = defineConfig([
     files: ['projects/ui/**/*.ts'],
     rules: {
       '@angular-eslint/directive-selector': ['error', { type: 'attribute', prefix: 'herald', style: 'camelCase' }],
-      '@angular-eslint/component-selector': ['error', { type: 'element', prefix: 'herald', style: 'kebab-case' }],
+      // Controls that enhance a native element (button, link) are attribute components: <button herald-button>.
+      '@angular-eslint/component-selector': ['error', { type: ['element', 'attribute'], prefix: 'herald', style: 'kebab-case' }],
     },
   },
   {

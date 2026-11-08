@@ -1,0 +1,50 @@
+.herald-notice {
+  display: flex;
+  align-items: flex-start;
+  gap: var(--herald-space-3);
+  max-width: 75ch;
+  padding: var(--herald-space-3) var(--herald-space-4);
+  border-left: 4px solid var(--herald-notice-accent);
+  border-radius: var(--herald-radius-default);
+  background: var(--herald-notice-surface);
+  color: var(--herald-notice-text);
+  font-size: var(--herald-text-base);
+}
+.herald-notice[data-tone='info'] {
+  --herald-notice-accent: var(--herald-color-feedback-info);
+  --herald-notice-surface: var(--herald-color-feedback-info-surface);
+  --herald-notice-text: #174a46;
+}
+.herald-notice[data-tone='success'] {
+  --herald-notice-accent: var(--herald-color-feedback-success);
+  --herald-notice-surface: var(--herald-color-feedback-success-surface);
+  --herald-notice-text: var(--herald-color-feedback-success);
+}
+.herald-notice[data-tone='warning'] {
+  --herald-notice-accent: var(--herald-color-feedback-warning);
+  --herald-notice-surface: var(--herald-color-feedback-warning-surface);
+  --herald-notice-text: var(--herald-color-feedback-warning-text);
+}
+.herald-notice[data-tone='danger'] {
+  --herald-notice-accent: var(--herald-color-feedback-danger);
+  --herald-notice-surface: var(--herald-color-feedback-danger-surface);
+  --herald-notice-text: var(--herald-color-text-primary);
+}
+.herald-notice-icon { margin-top: 2px; color: var(--herald-notice-accent); }
+.herald-notice-body { flex: 1; min-width: 0; }
+.herald-notice-body > :last-child { margin-bottom: 0; }
+.herald-notice-heading { display: block; margin-bottom: var(--herald-space-1); }
+.herald-notice[data-tone='danger'] .herald-notice-heading { color: var(--herald-color-feedback-danger); }
+.herald-notice-dismiss {
+  display: inline-grid;
+  place-items: center;
+  min-width: var(--herald-target-min);
+  min-height: var(--herald-target-min);
+  margin: calc(-1 * var(--herald-space-3)) calc(-1 * var(--herald-space-4)) calc(-1 * var(--herald-space-3)) 0;
+  border: 0;
+  border-radius: var(--herald-radius-default);
+  background: transparent;
+  color: inherit;
+  cursor: pointer;
+}
+.herald-notice-dismiss:hover { background: rgb(0 0 0 / 6%); }

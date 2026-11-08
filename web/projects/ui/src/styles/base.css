@@ -1,0 +1,15 @@
+/* Document defaults shared by every Herald app. */
+*, *::before, *::after { box-sizing: border-box; }
+body {
+  margin: 0;
+  font-family: var(--herald-font-family);
+  font-size: var(--herald-text-base);
+  line-height: 1.5;
+  color: var(--herald-color-text-primary);
+}
+h1, h2, h3 { line-height: 1.2; margin-top: 0; }
+button, input, select, textarea { font: inherit; }
+:focus-visible { outline: 3px solid var(--herald-color-focus-ring); outline-offset: 3px; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { transition-duration: 0ms !important; animation-duration: 0ms !important; }
+}
