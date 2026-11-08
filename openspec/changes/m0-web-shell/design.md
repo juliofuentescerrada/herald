@@ -75,14 +75,25 @@ Reuse the supplied references where sufficient. Missing states remain explicitly
 
 | ID | Decision | Evidence needed |
 | --- | --- | --- |
-| W-01 | Workspace location, package manager and pinned Node/Angular/tool versions | Compatibility, free-use licences, reproducible local/CI builds |
+| W-01 | Workspace location, package manager and pinned Node/Angular/tool versions | **Decided 2026-11-08**, below |
 | W-02 | Boundary-check tooling and public-entry conventions | Negative fixtures covering aliases, dynamic imports, barrels, deep imports and new features |
 | W-03 | Component foundation and catalogue tooling | SSR support, keyboard/focus/error states, required shell controls only, reviewed visuals |
 | W-04 | OpenAPI export mechanism, generator, transport and artifact paths | Export without starting the host (or a recorded reason), Wolverine endpoints included, typed errors, deterministic output, SSR/request-scoping and hydration plan |
 | W-05 | Concrete route render modes and Aspire integration | Representative SSG/hydration, SSR fixture, CSR app bootstrap and both local URLs |
 | W-06 | State scope and reset mechanism | Concurrent SSR isolation and client identity/organisation-change fixtures without production auth |
 
-Exact library/generator versions and a component foundation are deliberately unselected. These draft requirements are proposed targets, not evidence that the choices or implementation are approved.
+### W-01: workspace, package manager and versions (decided 2026-11-08)
+
+- **Location:** one Angular CLI workspace in `web/` at the repository root, beside the .NET `src/` and `tests/`: the two ecosystems build and test separately, and CI runs them as separate steps. The apps and libraries are workspace projects (`web/projects/admin`, `web/projects/public`, `web/projects/ui`, `web/projects/api-client`), created without a default application.
+- **Package manager:** pnpm 12, pinned exactly in `web/package.json` (`"packageManager": "pnpm@12.18.0"`), with `pnpm-lock.yaml` committed and `pnpm install --frozen-lockfile` in CI; CI installs that exact pnpm from `packageManager`. Chosen by the maintainer over npm for its strict handling of undeclared dependencies; the import matrix itself is still W-02's.
+- **Node:** 26, the Active LTS (supported until April 2029), in `web/.nvmrc`, read by local version managers and by CI's `node-version-file`; `engines.node` is `>=26 <27`, enforced (`engine-strict`). Locally, Node 26 is installed alongside 24 with nvm.
+- **Angular:** 22.2.5, the current stable (`@angular/*`, `@angular/ssr`, `@angular/cli`, `@angular/build`), with the CLI's ranges in `package.json` and exact resolution in the lockfile. Angular 23 is not yet a release candidate; moving to it is an `ng update` in a change of its own, not a reason to wait.
+- **TypeScript:** 6.0.x, because Angular 22.2 requires `>=6.0 <6.1`; TypeScript 7 waits for Angular's support. **Tests:** Vitest 5, Angular 22's default test runner, not a separate choice.
+- **Licences:** Angular, `@angular/ssr`, pnpm, Node and Vitest are MIT; TypeScript is Apache-2.0. The full transitive licence check runs when the workspace is created (task 2.1), as in `m0-messaging`.
+- **Evidence** (throwaway scaffold, 2026-11-08, nothing committed): `ng new --ssr` with Angular CLI 22.2.5 and pnpm 12.18.0 created the workspace and passed its tests (2 of 2) in a `node:26` (26.13.0) container; the container could not complete `ng build` within Docker Desktop's 1.92 GB, so the build was checked on Node 24.15: browser and server bundles, one prerendered route, no blocked install scripts. Repeat the build on Node 26 when the workspace is created.
+- **Rejected:** npm (bundled with Node, the CLI default and what the sibling Arcana uses; pnpm's stricter dependency handling was preferred); `src/web/` (mixes two toolchains under the .NET source root); Node 24 (maintenance LTS until April 2028, which H1–H3 would outlive).
+
+Remaining library/generator versions and the component foundation are deliberately unselected until W-02–W-06. These draft requirements are proposed targets, not evidence that the choices or implementation are approved.
 
 ## Validation and completion
 
