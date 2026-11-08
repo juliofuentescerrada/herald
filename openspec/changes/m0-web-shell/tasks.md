@@ -31,8 +31,8 @@
 
 ## 5. Generated API contract
 
-- [ ] 5.1 Implement the reviewed build-time OpenAPI export on the host's `AddHeraldApi` description; require no deployment credentials or schema mutation, and no running database unless W-04 records why
-- [ ] 5.2 Generate and commit the OpenAPI document and TypeScript client with pinned tooling and config, including representative typed response/error fixtures
+- [ ] 5.1 Split `AddHeraldApi` into public and admin documents with strict group inclusion, add the host test that fails for an ungrouped endpoint, update the existing document tests, and export both with Wolverine's `openapi` command without a database, credentials or schema mutation
+- [ ] 5.2 Generate and commit both OpenAPI documents and their orval clients behind `@herald/api-client/public` and `/admin`, with pinned tooling and config, explicit operation ids, the `ProblemDetails` error adapter, including representative typed response/error fixtures
 - [ ] 5.3 Verify the generated client has no UI/navigation/business cache policy and remains usable through reviewed browser/server transport configuration
 - [ ] 5.4 Add CI regeneration checks; prove a stale document/client fails and two unchanged generations produce no diff
 

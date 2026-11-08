@@ -1,22 +1,26 @@
 ## Status
 
-Draft target requirements for `m0-web-shell`. The generator, transport, exact versions and export paths are unselected until review.
+Draft target requirements for `m0-web-shell`. Export, generator, transport and paths are decided in design.md (W-04); implementation is pending.
 
 ## ADDED Requirements
 
-### Requirement: The host build exports the authoritative API contract
-The reviewed host build target SHALL write an OpenAPI document from the host's actual endpoint descriptions, including Wolverine endpoints, extending the description `api-description` already provides (`AddHeraldApi`). Generation SHALL NOT rely on a frontend-authored substitute schema. The export command and build ordering SHALL be documented and reproducible without deployment credentials, schema mutation or external services solely for contract generation.
+### Requirement: The host exports the authoritative API contracts
+A host command that builds the host without starting it SHALL write the public and admin OpenAPI documents from the host's actual endpoint descriptions, including Wolverine endpoints, extending the description `api-description` already provides (`AddHeraldApi`). Generation SHALL NOT rely on a frontend-authored substitute schema. The export command and build ordering SHALL be documented and reproducible without deployment credentials, schema mutation or external services solely for contract generation.
 
 #### Scenario: The host contract is exported
 - **WHEN** the documented export command runs after endpoint-description support is available
-- **THEN** the output describes the available endpoints with their routes, methods and declared request/response/error types
+- **THEN** each document describes only the endpoints of its group with their routes, methods and declared request/response/error types
 
 #### Scenario: Export needs no running services
 - **WHEN** the export runs without a reachable database or broker
 - **THEN** it either produces the document or the change records why the export starts a host against a disposable database, and no handwritten endpoint definitions are introduced
 
 ### Requirement: TypeScript contracts and client are generated reproducibly
-A pinned generator and checked-in configuration SHALL generate TypeScript contracts/client from the exported OpenAPI document. The document and generated output SHALL be committed. Two runs with unchanged inputs SHALL produce no diff. Generated files SHALL contain no handwritten workflow code.
+A pinned generator and checked-in configuration SHALL generate TypeScript contracts/client for each exported OpenAPI document, exposed through separate public and admin entry points of `api-client`. The public application SHALL NOT import the admin entry point. The document and generated output SHALL be committed. Two runs with unchanged inputs SHALL produce no diff. Generated files SHALL contain no handwritten workflow code.
+
+#### Scenario: The public app imports the admin client
+- **WHEN** code in the public application imports the admin entry point of `api-client`
+- **THEN** boundary checks fail
 
 #### Scenario: Regeneration is stable
 - **WHEN** generation runs twice from unchanged host source and tool configuration
