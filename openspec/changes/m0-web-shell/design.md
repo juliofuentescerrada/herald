@@ -77,7 +77,7 @@ Reuse the supplied references where sufficient. Missing states remain explicitly
 | --- | --- | --- |
 | W-01 | Workspace location, package manager and pinned Node/Angular/tool versions | **Decided 2026-11-08**, below |
 | W-02 | Boundary-check tooling and public-entry conventions | **Decided 2026-11-08**, below |
-| W-03 | Component foundation and catalogue tooling | SSR support, keyboard/focus/error states, required shell controls only, reviewed visuals |
+| W-03 | Component foundation and catalogue tooling | **Decided 2026-11-08, pending the experiment in task 3.1**, below |
 | W-04 | OpenAPI export mechanism, generator, transport and artifact paths | Export without starting the host (or a recorded reason), Wolverine endpoints included, typed errors, deterministic output, SSR/request-scoping and hydration plan |
 | W-05 | Concrete route render modes and Aspire integration | Representative SSG/hydration, SSR fixture, CSR app bootstrap and both local URLs |
 | W-06 | State scope and reset mechanism | Concurrent SSR isolation and client identity/organisation-change fixtures without production auth |
@@ -103,7 +103,18 @@ Reuse the supplied references where sufficient. Missing states remain explicitly
 - **In the workspace:** the negative fixtures live in a lint test that expects each planted violation and fails if one stops being reported, so a rule that silently stops matching breaks CI; they are not production features (task 2.3).
 - **Rejected:** Sheriff (`@softarc/sheriff-*` 0.20, MIT), designed for Angular feature boundaries but still pre-1.0; `dependency-cruiser` 18 (MIT), whole-graph checks with no editor feedback and a second configuration language; Nx module boundaries, which need an Nx workspace and treat projects, not feature folders, as the unit; ESLint's `no-restricted-imports`, which cannot express "any other feature" without listing every feature.
 
-Remaining library/generator versions and the component foundation are deliberately unselected until W-03–W-06. These draft requirements are proposed targets, not evidence that the choices or implementation are approved.
+### W-03: component foundation and catalogue (decided 2026-11-08, pending the experiment in task 3.1)
+
+- **Foundation:** `ng-primitives` 0.131.4 (Apache-2.0), headless: it ships no styles, so Herald's tokens, square corners and spacing scale apply without overriding a theme. It supports SSR and zoneless applications, Angular 21 and 22, and brings the controls H1 will need (button, form field, dialog, tabs, select, combobox, toast, tooltip, pagination, focus trap). Its interaction primitives (press, hover, focus-visible) expose state as `data-*` attributes, which map onto the required states of the visual direction (§5.1). Its peers are `@angular/cdk` (MIT) and `@floating-ui/dom` (MIT).
+- **Containing its risk:** it is pre-1.0, mostly written by a single maintainer, and has published breaking changes about monthly (0.125, 0.128, 0.131.3). Therefore it is pinned exactly (no range) and each upgrade is a reviewed change; only `ui` may import it, enforced by `eslint-plugin-boundaries`' external-dependency rule (W-02), so apps see `@herald/ui` alone and a breaking release touches one library. If the project stalls, `ui` moves to the fallback below without changing the apps; `@angular/cdk` is already installed as its peer.
+- **M0 controls:** only what the shells need: button, navigation links, alert/notice, status label and loading presentation. Dialog, select, tabs, drawer and toast arrive with the H1 features that use them.
+- **Catalogue:** a development-only Angular project, `web/projects/catalogue`, built with the same `@angular/build` as the apps and never deployed (ADR 0011: tooling, not a third product app). Its pages are prerendered, which checks every control under SSR; state, keyboard and focus tests run in Vitest, with an `axe-core` (MPL-2.0) accessibility check. Classified as its own element in W-02's configuration: it may import `ui` only.
+- **Experiment (task 3.1), before any `ui` code:** on a throwaway W-01 scaffold, build a button with every state (including loading) and tabs using Herald's tokens and radius 0; prerender a catalogue page with no SSR errors and clean hydration; cover keyboard and focus in Vitest plus `axe-core`; check that importing `ng-primitives` from an app fails lint. Record the result here. A failure reopens W-03 with the fallback.
+- **Fallback:** `@angular/cdk` with `@angular/aria` 22.2.6 (MIT, maintained by the Angular team, versioned with Angular): lower risk, but no button, form field, toast, tooltip or press/hover states, which Herald would write itself, and its documentation states neither stability nor SSR support.
+- **Rejected:** styled libraries (Angular Material, PrimeNG), whose themes fight the square geometry and tokens; spartan/brain 1.9 (MIT), which requires Tailwind 4 while the visual direction uses its own tokens; Storybook 10.6 (MIT) for the catalogue, because `@storybook/angular` requires `@angular-devkit/build-angular` (a second, webpack-based build pipeline with more install scripts to approve) and does not exercise SSR.
+- **Licences:** checked for the exact versions above on npm; the transitive check runs with the workspace (task 2.1).
+
+Remaining library/generator versions are deliberately unselected until W-04–W-06. These draft requirements are proposed targets, not evidence that the choices or implementation are approved.
 
 ## Validation and completion
 

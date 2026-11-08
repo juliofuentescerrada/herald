@@ -41,6 +41,10 @@ App platform SHALL own narrow identity/organisation-context and API-configuratio
 - **WHEN** app code imports a private path inside `ui` or `api-client`
 - **THEN** boundary checks fail even when the path resolves successfully for the compiler
 
+#### Scenario: An app imports the component foundation directly
+- **WHEN** app code imports the external component foundation that `ui` wraps
+- **THEN** boundary checks fail, because only `ui` may depend on it
+
 ### Requirement: CI verifies dependency directions
 CI SHALL enforce the dependency rules for relative imports, path aliases, barrel re-exports and dynamic route imports. Reviewed positive and negative fixtures SHALL prove that allowed composition works and forbidden edges are rejected. Temporary forbidden code SHALL NOT remain in production sources.
 

@@ -48,6 +48,10 @@ The `ui` library SHALL contain only the shared controls/tokens required by the r
 - **WHEN** the same control is rendered in the admin and public shells
 - **THEN** its semantics, focus and error behaviour are shared while its surrounding composition may differ
 
+#### Scenario: The catalogue renders every control on the server
+- **WHEN** the development-only catalogue is prerendered and hydrated
+- **THEN** every shell control renders without server errors or hydration mismatches, and the catalogue is not part of either production artifact
+
 #### Scenario: Keyboard and error recovery are exercised
 - **WHEN** a reviewer navigates the shell and control fixtures using the keyboard and triggers an error
 - **THEN** focus and reading order remain understandable, errors have text and an actionable recovery path, and valid entered data is preserved where applicable
