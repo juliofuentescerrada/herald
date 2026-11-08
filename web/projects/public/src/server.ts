@@ -32,6 +32,10 @@ app.use(
     maxAge: '1y',
     index: false,
     redirect: false,
+    // Only hashed bundles are immutable; HTML and the favicon must pick up a new release.
+    setHeaders: (res, path) => {
+      if (!/-[A-Z0-9]{8}\.(js|css)$/.test(path)) res.setHeader('Cache-Control', 'no-cache');
+    },
   }),
 );
 

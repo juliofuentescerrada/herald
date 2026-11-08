@@ -308,6 +308,26 @@ Headless Chrome on the production builds of public, admin and the catalogue, eig
   - **Shutdown:** SIGINT to the Aspire CLI process (`dotnet run` does not forward it) freed the ports in 2 s; the `ng serve` processes and the Aspire containers were gone within 6 s.
   - **Not covered:** Windows (`${PORT:-…}` needs a POSIX shell; pass the port with `WithArgs` if needed). The trusted developer certificate failed for NSS (Chromium/Firefox), which the HTTP endpoints do not need.
 
+### Production builds (task 4.5, 8 November 2026)
+
+- **Builds** (`pnpm build:all` from an empty `dist`, Node 26.13, Angular CLI 22.2.5): all three pass without warnings. Initial transfer sizes: admin 88.8 kB, public 97.5 kB, catalogue 74.1 kB.
+- **Artifacts:**
+  - `dist/admin`: `browser` only, with no server output and no prerendered routes. It is served as static files with an `index.html` fallback (hosting is M4's).
+  - `dist/public`: `browser` (hashed bundles, `index.html` prerendered for `/`, `index.csr.html`, favicon), `server` (`server.mjs` and its chunks) and `prerendered-routes.json`, which lists only `/`. No file in `dist/public` or `dist/admin` contains "fixture".
+  - `dist/catalogue`: static and prerendered; a development tool that is never deployed.
+- **The public artifact runs on its own:** copied outside the workspace, with no `node_modules`, `PORT=4891 NG_ALLOWED_HOSTS=localhost node server/server.mjs` starts. The server bundle imports only Node built-ins.
+
+| Request | Status | Rendering | `Cache-Control` |
+| --- | --- | --- | --- |
+| `/` | 200 | `ssg` | none |
+| `/index.html`, `/index.csr.html`, `/favicon.ico` | 200 | static | `no-cache` |
+| hashed `main-….js`, `styles-….css` | 200 | static | `public, max-age=31536000` |
+| `/_fixtures/ssr`, `/tournaments/private-cup`, `/missing.js` | 404 | `ssr`, not-found page | none |
+| any page with `Host: evil.example` | 400 | | |
+
+- **Fix found by this check:** the scaffold's `express.static` gave every file a one-year cache, including the unhashed `index.html`, `index.csr.html` and favicon, so a release would not reach browsers that had cached them. `server.ts` now sends `no-cache` for any file whose name has no build hash and keeps the one-year cache for hashed bundles. Public tests (10) and lint pass.
+- **Not done here:** no cloud resources. The CDN, ingress, same-origin `/api` routing and the admin fallback belong to M4 (ADR 0012).
+
 ## Validation and completion
 
 Before implementation: resolve W-01–06, review affected shell states and approve the bounded change. During implementation: compile both apps, check library imports and negative fixtures, verify deterministic API/client generation, render at desktop/mobile widths and exercise keyboard/error recovery, run SSG/hydration and concurrent-request isolation fixtures, and start both apps through Aspire. Record actual commands, versions and results here. Archive only after the tasks and acceptance scenarios are complete; schema validation alone is not completion.
