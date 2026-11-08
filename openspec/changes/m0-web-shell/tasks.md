@@ -1,7 +1,7 @@
 ## 1. Review gates
 
 - [ ] 1.1 Review this draft against ADR 0011 and confirm its shell-only scope; record implementation approval before production changes
-- [ ] 1.2 Reuse the referenced mockups where sufficient and obtain/review missing admin/public shell, narrow-screen, control and recovery states; record references in design.md
+- [x] 1.2 Reuse the referenced mockups where sufficient and obtain/review missing admin/public shell, narrow-screen, control and recovery states; record references in design.md (8 November 2026: shell-state prototype and captures approved)
 - [x] 1.3 Resolve W-01–06 with exact versions, licences, generator/transport, UI foundation, catalogue, boundary checks and state/rendering decisions (8 November 2026: all recorded in design.md; W-03 is confirmed by task 3.1's experiment)
 - [x] 1.4 Coordinate OpenAPI export, host/AppHost/CI ownership and integration order with m0-messaging without changing its transport design (8 November 2026: `m0-messaging` is archived; what it delivered, the constraints it leaves and this change's ownership are recorded in design.md; the export mechanism is part of W-04)
 
@@ -16,7 +16,7 @@
 ## 3. Shared UI and shells
 
 - [ ] 3.1 Run the W-03 experiment on a throwaway scaffold before any ui code: ng-primitives button (all states) and tabs with Herald tokens and radius 0, prerendered catalogue page with clean hydration, Vitest keyboard/focus and axe checks, and a failing lint for an app importing ng-primitives; record the result in design.md, reopening W-03 if it fails
-- [ ] 3.2 Implement only reviewed shell controls/tokens in ui and consume them from both apps with square corners and the documented scale
+- [ ] 3.2 Implement only reviewed shell controls/tokens in ui and consume them from both apps with square corners and the documented scale, with Tabler outline icons (`@tabler/icons-angular`) exposed only through ui
 - [ ] 3.3 Add the development-only catalogue project (prerendered, never deployed); cover relevant keyboard, focus, error, disabled/loading and recovery states
 - [ ] 3.4 Implement reviewed admin CSR and public shell layouts at desktop/narrow widths without tournament or participant functionality
 - [ ] 3.5 Review blur/grayscale hierarchy, spacing, typography, contrast, reading order and keyboard/error recovery; record actual evidence

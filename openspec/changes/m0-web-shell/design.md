@@ -69,7 +69,25 @@ Apply Refactoring UI while preserving the visual guide's confirmed square corner
 
 The earlier [round-management image](../../../docs/assets/mockups/herald-round-management.png) is superseded for result semantics and is not the current functional reference. The prototype is disposable; its illustrative authority and in-memory state are not implementation evidence. Do not include tournament editor, team roster, result or finalisation screens in M0 to fill visual gaps.
 
-Reuse the supplied references where sufficient. Missing states remain explicitly pending visual input/review before implementation, as required by CLAUDE and OpenSpec context. No new request for implementation approval is implied by preparing this draft. Record the agreed shell/state references here when that review occurs.
+Reuse the supplied references where sufficient. Missing states remain explicitly pending visual input/review before implementation, as required by CLAUDE and OpenSpec context.
+
+### Reviewed references (approved 8 November 2026)
+
+The maintainer approved the shell-state prototype [`shell-states.html`](../../../prototypes/frontend/shell-states.html) and its [captures](../../../docs/assets/mockups/shell/README.md) (desktop and mobile, headless Chrome, no page errors or horizontal overflow) as the gate 1.2 visual input. Together with the reused references below they cover every surface and state in the table above.
+
+| Surface/state | Approved reference |
+| --- | --- |
+| Admin shell, wide and narrow; missing context; denied access | Reused: `journey-individual-access-desktop.png`, `journey-individual-setup-mobile.png`, `state-private-denied-mobile.png` |
+| Public shell and representative page, wide and narrow (Menu disclosure) | `shell-public-shell-{desktop,mobile,mobile-menu}.png` |
+| Shared controls: variants × default/hover/focus/pressed, loading, unavailable with reason, labels, notice, alert, field error | `shell-controls-{desktop,mobile}.png` |
+| Offline/API unavailable with retry | `shell-api-unavailable-{desktop,mobile}.png` |
+| Section failed to load (reload) | `shell-route-failed-{desktop,mobile}.png` |
+| Public and admin not found (generic) | `shell-not-found-public-*.png`, `shell-not-found-admin-*.png` |
+| Context replaced in another tab | `shell-context-replaced-{desktop,mobile}.png` |
+
+Approved choices: the destructive variant is outlined in red rather than filled; loading keeps the label and width with a square spinner and a status announcement; the hero copy is placeholder text and the hero carries no illustration in M0. The captures do not prove keyboard order, screen-reader output or exact contrast; task 3.5 records that evidence from the catalogue.
+
+**Icons.** The visual guide confirms Tabler Icons (outline, consistent stroke; 20 px controls, 24 px navigation, 16 px metadata, 8 px gap; decorative icons hidden, icon-only actions named). The prototype is exempt and draws none. The application uses `@tabler/icons-angular` 3.50.0 (MIT, peer `@angular/core` ≥ 21, with `@tabler/icons` 3.50.0), consumed only through `ui` like the component foundation.
 
 ## Decisions required before implementation
 

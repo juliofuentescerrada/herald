@@ -1,0 +1,83 @@
+<!doctype html>
+<html lang="en">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>Herald · M0 shell states</title><link rel="stylesheet" href="style.css"><link rel="stylesheet" href="review-states.css"><link rel="stylesheet" href="journeys.css"><link rel="stylesheet" href="shell-states.css"></head>
+<body class="journey-page shell-page">
+<div class="journey-demo"><strong>M0 shell states</strong><span>Documentation fixtures for m0-web-shell · 8 November 2026 · nothing is sent or saved</span>
+<nav class="shell-fixtures" aria-label="Shell states"><a href="?state=public-shell" data-state-link="public-shell">Public shell</a><a href="?state=controls" data-state-link="controls">Controls</a><a href="?state=api-unavailable" data-state-link="api-unavailable">API unavailable</a><a href="?state=route-failed" data-state-link="route-failed">Section failed to load</a><a href="?state=not-found-public" data-state-link="not-found-public">Public not found</a><a href="?state=not-found-admin" data-state-link="not-found-admin">Admin not found</a><a href="?state=context-replaced" data-state-link="context-replaced">Context replaced</a></nav></div>
+
+<!-- Public shell: representative static page. Narrow widths replace the links with a disclosure menu. -->
+<section class="shell-state" id="public-shell" aria-label="Public shell">
+<header class="publicnav shell-publicnav"><a class="brand" href="?state=public-shell">HERALD<em>.</em></a>
+<button type="button" class="shell-menu-button" aria-expanded="false" aria-controls="public-menu">Menu</button>
+<nav class="links shell-public-links" id="public-menu" aria-label="Main"><a href="?state=public-shell" aria-current="page">Home</a><a href="?state=not-found-public">Tournaments</a><a class="shell-workspace-link" href="?state=context-replaced">Organiser workspace</a></nav></header>
+<main><section class="hero shell-hero"><div><p class="eyebrow">Tournaments for every game</p><h1>Run the event. Herald keeps the score.</h1><p>Leagues and knockouts with clear results, fair standings and a public page your players can follow.</p><a class="review-button primary" href="?state=context-replaced">Open the organiser workspace</a></div></section>
+<section class="shell-page-body"><h2>Why organisers use Herald</h2><div class="shell-points"><div><h3>One record of every result</h3><p>Corrections keep their reason and who made them.</p></div><div><h3>Standings players trust</h3><p>Only effective results count, and shared positions stay shared.</p></div><div><h3>A page to share</h3><p>Players follow the published competition by link.</p></div></div></section></main>
+<footer class="shell-footer"><span>Herald</span><a href="?state=not-found-public">Privacy</a><a href="?state=not-found-public">Terms</a></footer>
+</section>
+
+<!-- Shared controls for the catalogue: variants and states, including loading and an explained unavailable action. -->
+<section class="shell-state" id="controls" aria-label="Controls">
+<div class="journey-layout"><aside class="journey-rail"><a class="brand" href="?state=controls">HERALD</a><div class="org">Northside Gaming<small>Organisation workspace</small></div><nav class="journey-steps" aria-label="Workspace"><a href="?state=controls" aria-current="page">Overview</a><a href="?state=route-failed">Tournaments</a><a href="?state=not-found-admin">Organisation</a></nav></aside>
+<main class="journey-main"><header><h1>Shared controls</h1><p>Each control in every state the shells use. The catalogue renders these on the server and in the browser.</p></header>
+<div class="review-screen shell-catalogue">
+<h2>Buttons</h2>
+<table class="shell-matrix"><thead><tr><th scope="col">Variant</th><th scope="col">Default</th><th scope="col">Hover</th><th scope="col">Keyboard focus</th><th scope="col">Pressed</th></tr></thead><tbody>
+<tr><th scope="row">Primary</th><td><button class="primary">Publish</button></td><td><button class="primary is-hover">Publish</button></td><td><button class="primary is-focus">Publish</button></td><td><button class="primary is-active">Publish</button></td></tr>
+<tr><th scope="row">Secondary</th><td><button class="secondary">Save draft</button></td><td><button class="secondary is-hover">Save draft</button></td><td><button class="secondary is-focus">Save draft</button></td><td><button class="secondary is-active">Save draft</button></td></tr>
+<tr><th scope="row">Quiet</th><td><button class="quiet">Cancel</button></td><td><button class="quiet is-hover">Cancel</button></td><td><button class="quiet is-focus">Cancel</button></td><td><button class="quiet is-active">Cancel</button></td></tr>
+<tr><th scope="row">Destructive</th><td><button class="destructive">Withdraw entry</button></td><td><button class="destructive is-hover">Withdraw entry</button></td><td><button class="destructive is-focus">Withdraw entry</button></td><td><button class="destructive is-active">Withdraw entry</button></td></tr>
+</tbody></table>
+<div class="shell-control-pair">
+<div><h3>Loading</h3><p class="shell-help">Keeps its width and label, blocks a repeat and does not claim success.</p><button class="primary is-loading" aria-disabled="true" aria-describedby="loading-status"><span class="shell-spinner" aria-hidden="true"></span>Publishing…</button><p class="shell-status" id="loading-status" role="status">Publishing the tournament. You can keep reading this page.</p></div>
+<div><h3>Unavailable, with a reason</h3><p class="shell-help">The reason sits next to the action and is announced with it.</p><button class="primary" disabled aria-describedby="unavailable-reason">Start competition</button><p class="field-error" id="unavailable-reason">One admitted entry has not checked in.</p></div>
+</div>
+<h2>Status labels</h2>
+<div class="tags shell-tags"><span class="tag">Draft</span><span class="tag live">Live</span><span class="tag good">Finalised</span><span class="tag wait">Check-in pending</span><span class="tag shell-tag-danger">Publication blocked</span></div>
+<h2>Feedback</h2>
+<p class="notice">Information: results count once they are effective. Pending reports never change standings.</p>
+<div class="shell-alert" role="alert"><strong>The tournament could not be published.</strong><p>The reference time zone is missing. Your other settings were kept.</p><a class="review-button" href="?state=controls">Choose a time zone</a></div>
+<h2>Field</h2>
+<div class="shell-field"><label for="field-name">Tournament name <span class="shell-required">Required</span></label><p class="shell-help" id="field-name-help">Shown on the public page.</p><input id="field-name" aria-describedby="field-name-help field-name-error" aria-invalid="true" value=""><p class="field-error" id="field-name-error">Enter a tournament name.</p></div>
+</div></main></div>
+</section>
+
+<!-- API unavailable: the shell stays, the data view explains, keeps what the user saw and offers retry. -->
+<section class="shell-state" id="api-unavailable" aria-label="API unavailable">
+<div class="journey-layout"><aside class="journey-rail"><a class="brand" href="?state=controls">HERALD</a><div class="org">Northside Gaming<small>Organisation workspace</small></div><nav class="journey-steps" aria-label="Workspace"><a href="?state=controls">Overview</a><a href="?state=api-unavailable" aria-current="page">Tournaments</a><a href="?state=not-found-admin">Organisation</a></nav></aside>
+<main class="journey-main"><div class="shell-banner" role="status"><strong>You are offline.</strong> Changes cannot be sent until the connection returns. Nothing you entered has been lost.</div>
+<header><h1>Tournaments</h1><p>Leagues and knockouts in Northside Gaming.</p></header>
+<div class="review-screen shell-failure"><h2>Tournaments could not be loaded</h2><p>Herald could not reach the server. This page shows nothing out of date: retry when you are back online.</p><div class="actions"><button class="primary" data-demo-action="Retry repeats the read. Reads are safe to retry; unsent changes are never resubmitted automatically.">Try again</button></div><p class="shell-help">Last attempt 10:42. If the problem continues, check the status page your organisation uses.</p></div>
+<p class="shell-feedback" id="review-feedback" role="status" hidden></p></main></div>
+</section>
+
+<!-- A lazy section failed to load, typically after a new release: only a full load fixes it. -->
+<section class="shell-state" id="route-failed" aria-label="Section failed to load">
+<div class="journey-layout"><aside class="journey-rail"><a class="brand" href="?state=controls">HERALD</a><div class="org">Northside Gaming<small>Organisation workspace</small></div><nav class="journey-steps" aria-label="Workspace"><a href="?state=controls">Overview</a><a href="?state=route-failed" aria-current="page">Tournaments</a><a href="?state=not-found-admin">Organisation</a></nav></aside>
+<main class="journey-main"><div class="review-screen shell-failure"><h1>This section did not load</h1><p>Herald may have been updated since you opened it. Reload to get the current version; you will return to this page.</p><div class="actions"><button class="primary" data-demo-action="Reload performs a full load of the same address, which fetches the current release.">Reload page</button><a class="review-button" href="?state=controls">Go to overview</a></div></div>
+<p class="shell-feedback" id="review-feedback-route" role="status" hidden></p></main></div>
+</section>
+
+<!-- Public not found: server-rendered with status 404; reveals nothing about private tournaments. -->
+<section class="shell-state" id="not-found-public" aria-label="Public not found">
+<header class="publicnav shell-publicnav"><a class="brand" href="?state=public-shell">HERALD<em>.</em></a>
+<button type="button" class="shell-menu-button" aria-expanded="false" aria-controls="public-menu-404">Menu</button>
+<nav class="links shell-public-links" id="public-menu-404" aria-label="Main"><a href="?state=public-shell">Home</a><a href="?state=not-found-public">Tournaments</a><a class="shell-workspace-link" href="?state=context-replaced">Organiser workspace</a></nav></header>
+<main class="shell-page-body shell-not-found"><p class="eyebrow">Error 404</p><h1>Page not found</h1><p>The address may be mistyped, or the page may no longer be published.</p><div class="actions"><a class="review-button primary" href="?state=public-shell">Go to the home page</a></div></main>
+</section>
+
+<!-- Admin not found: inside the shell, generic, so it never confirms that a record exists elsewhere. -->
+<section class="shell-state" id="not-found-admin" aria-label="Admin not found">
+<div class="journey-layout"><aside class="journey-rail"><a class="brand" href="?state=controls">HERALD</a><div class="org">Northside Gaming<small>Organisation workspace</small></div><nav class="journey-steps" aria-label="Workspace"><a href="?state=controls">Overview</a><a href="?state=route-failed">Tournaments</a><a href="?state=not-found-admin">Organisation</a></nav></aside>
+<main class="journey-main"><div class="review-screen shell-failure"><h1>Page not found in Northside Gaming</h1><p>It may have been removed, or it may belong to an organisation you are not working in.</p><div class="actions"><a class="review-button primary" href="?state=controls">Go to overview</a></div></div></main></div>
+</section>
+
+<!-- Context replaced in another tab: this tab reloaded (W-06) and says why, once. -->
+<section class="shell-state" id="context-replaced" aria-label="Context replaced">
+<div class="journey-layout"><aside class="journey-rail"><a class="brand" href="?state=controls">HERALD</a><div class="org">Southside Club<small>Organisation workspace</small></div><nav class="journey-steps" aria-label="Workspace"><a href="?state=context-replaced" aria-current="page">Overview</a><a href="?state=route-failed">Tournaments</a><a href="?state=not-found-admin">Organisation</a></nav></aside>
+<main class="journey-main"><div class="shell-banner shell-banner-info" role="status"><span><strong>You are now working in Southside Club.</strong> The organisation was changed in another tab, so this tab reloaded. Nothing from Northside Gaming is shown.</span><button class="quiet" data-dismiss>Dismiss</button></div>
+<header><h1>Overview</h1><p>Southside Club's tournaments and next actions appear here.</p></header>
+<div class="review-screen"><p class="review-explanation">Signing out in another tab reloads this one too and leads to sign-in (its screen belongs to H1 authentication).</p></div></main></div>
+</section>
+
+<script src="shell-states.js"></script>
+</body></html>
