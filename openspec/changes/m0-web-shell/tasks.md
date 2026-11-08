@@ -3,7 +3,7 @@
 - [ ] 1.1 Review this draft against ADR 0011 and confirm its shell-only scope; record implementation approval before production changes
 - [ ] 1.2 Reuse the referenced mockups where sufficient and obtain/review missing admin/public shell, narrow-screen, control and recovery states; record references in design.md
 - [ ] 1.3 Resolve W-01–06 with exact versions, licences, generator/transport, UI foundation, catalogue, boundary checks and state/rendering decisions
-- [ ] 1.4 Coordinate OpenAPI export, host/AppHost/CI ownership and integration order with m0-messaging without changing its transport design
+- [x] 1.4 Coordinate OpenAPI export, host/AppHost/CI ownership and integration order with m0-messaging without changing its transport design (8 November 2026: `m0-messaging` is archived; what it delivered, the constraints it leaves and this change's ownership are recorded in design.md; the export mechanism is part of W-04)
 
 ## 2. Workspace and dependency boundaries
 
@@ -30,7 +30,7 @@
 
 ## 5. Generated API contract
 
-- [ ] 5.1 Implement the reviewed build-time OpenAPI export after endpoint-description integration is available; require no deployment credentials or schema mutation
+- [ ] 5.1 Implement the reviewed build-time OpenAPI export on the host's `AddHeraldApi` description; require no deployment credentials or schema mutation, and no running database unless W-04 records why
 - [ ] 5.2 Generate and commit the OpenAPI document and TypeScript client with pinned tooling and config, including representative typed response/error fixtures
 - [ ] 5.3 Verify the generated client has no UI/navigation/business cache policy and remains usable through reviewed browser/server transport configuration
 - [ ] 5.4 Add CI regeneration checks; prove a stale document/client fails and two unchanged generations produce no diff
