@@ -23,7 +23,7 @@ The two design-only reviews were moved under `documentation-consolidation/review
 
 ## Prototype and mockups
 
-The [visual prototype design](../frontend-visual-prototype/design.md) records completed checks and their scope. The [local usage guide](../../../prototypes/frontend/README.md) distinguishes the in-memory individual demo from static journey snapshots and exception fixtures. The [gallery of 21 captures](../../../docs/assets/mockups/journeys/README.md) includes desktop/mobile, grayscale and blur evidence.
+The [visual prototype design](../2026-11-08-frontend-visual-prototype/design.md) records completed checks and their scope. The [local usage guide](../../../../prototypes/frontend/README.md) distinguishes the in-memory individual demo from static journey snapshots and exception fixtures. The [gallery of 21 captures](../../../../docs/assets/mockups/journeys/README.md) includes desktop/mobile, grayscale and blur evidence.
 
 - Chrome/Playwright rendered 68 compositions at exact 1600×1100 and 390×844 viewports with no JavaScript errors or page/table horizontal overflow. This supersedes the earlier CLI measurements taken before viewport resize.
 - 12 browser interaction checks and 11 result-state/correction checks passed; all three scripts passed syntax checks and all 28 static HTML references resolved.

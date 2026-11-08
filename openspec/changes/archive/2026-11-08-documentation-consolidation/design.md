@@ -4,7 +4,7 @@
 
 ## Authority and provenance
 
-The maintainer explicitly asked to consolidate both reviews into the existing documentation and allowed ADRs to be rewritten during pre-development. This is the dated exception recorded in [ADR 0001](../../../docs/adr/0001-record-architecture-decisions.md), not a new general rule for silently changing accepted decisions.
+The maintainer explicitly asked to consolidate both reviews into the existing documentation and allowed ADRs to be rewritten during pre-development. This is the dated exception recorded in [ADR 0001](../../../../docs/adr/0001-record-architecture-decisions.md), not a new general rule for silently changing accepted decisions.
 
 Work takes place in the isolated `predevelopment-review/herald` worktree, based on `08c3308dcf775bc03add59a768303d7d07cd1bc0`. The original checkout contained newer, uncommitted functional, visual, roadmap, ADR 0013, messaging-spike and prototype inputs. Those files were copied before editing here. [source-baseline.json](source-baseline.json) records the source checkout, HEAD and hashes; the original checkout is not the output destination.
 
@@ -14,13 +14,13 @@ The [functional/visual review](reviews/predevelopment-readiness-review/design.md
 
 The source-responsibility table in ADR 0001 governs precedence. In particular:
 
-- [Functional discovery](../../../docs/herald-functional-discovery.md) owns vocabulary, rules, journeys, the decision ledger and conditional acceptance examples.
-- [ADR 0013](../../../docs/adr/0013-functional-delivery-scope.md) accepts H1–H7 scope. ADR 0002 is superseded for delivery scope. Confirmed scope does not accept every proposed functional default.
-- [ADRs](../../../docs/adr/README.md) own technical decisions; their individual Proposed/Accepted status remains visible. Backend slices and frontend features are the confirmed direction, with implementation choices still gated.
-- [Visual direction](../../../docs/herald-visual-direction.md) owns tokens, canonical references and screen/state coverage. PPT and prototypes explain those sources with sample data.
-- [Roadmap](../../../docs/roadmap.md) owns sequence and change status. `openspec/specs/` still describes the implemented skeleton. Active deltas describe the target until implementation and archival.
+- [Functional discovery](../../../../docs/herald-functional-discovery.md) owns vocabulary, rules, journeys, the decision ledger and conditional acceptance examples.
+- [ADR 0013](../../../../docs/adr/0013-functional-delivery-scope.md) accepts H1–H7 scope. ADR 0002 is superseded for delivery scope. Confirmed scope does not accept every proposed functional default.
+- [ADRs](../../../../docs/adr/README.md) own technical decisions; their individual Proposed/Accepted status remains visible. Backend slices and frontend features are the confirmed direction, with implementation choices still gated.
+- [Visual direction](../../../../docs/herald-visual-direction.md) owns tokens, canonical references and screen/state coverage. PPT and prototypes explain those sources with sample data.
+- [Roadmap](../../../../docs/roadmap.md) owns sequence and change status. `openspec/specs/` still describes the implemented skeleton. Active deltas describe the target until implementation and archival.
 
-Only `m0-solution-skeleton` is implemented. Its `Application`/`Adapters` layout is historical but still accurately describes current code. `m0-messaging` owns the proposed backend migration and its unresolved spike. [m0-web-shell](../m0-web-shell/proposal.md) is a draft; there is no production Angular workspace. H1 functionality has not begun.
+Only `m0-solution-skeleton` is implemented. Its `Application`/`Adapters` layout is historical but still accurately describes current code. `m0-messaging` owns the proposed backend migration and its unresolved spike. [m0-web-shell](../2026-11-08-m0-web-shell/proposal.md) is a draft; there is no production Angular workspace. H1 functionality has not begun.
 
 ## Functional and visual review closure
 

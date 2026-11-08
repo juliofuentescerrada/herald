@@ -223,7 +223,7 @@ All raster concepts predate the confirmed square geometry and exact tokens. This
 - [H1 state review](../prototypes/frontend/review-states.html): twelve named fixtures for missing, blocked, current, stale and unavailable states. Each names its functional sources and pending policies.
 - [Individual results demo](../prototypes/frontend/index.html): the existing eight-entrant in-memory league, with six-matches-per-four-entry semantics preserved in the separate journey fixtures. Includes H2 discovery direction, labelled as such in the prototype notes.
 - [Browser captures and provenance](assets/mockups/journeys/README.md): representative desktop/mobile, grayscale and blur views; validation scope is explicit.
-- [Opening instructions and scope](../prototypes/frontend/README.md), [validation and Refactoring UI diagnostic](../openspec/changes/frontend-visual-prototype/design.md).
+- [Opening instructions and scope](../prototypes/frontend/README.md), [validation and Refactoring UI diagnostic](../openspec/changes/archive/2026-11-08-frontend-visual-prototype/design.md).
 
 The prototypes are documentation assets. They do not create an Angular workspace, a third product application, an API, authentication, permission enforcement or persistence. Their existence supplies review material; it does not approve all H1 screens. Exact component technology, interaction/accessibility verification and affected OpenSpec approval remain required before production implementation.
 

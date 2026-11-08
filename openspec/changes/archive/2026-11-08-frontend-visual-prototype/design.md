@@ -2,9 +2,9 @@
 
 ## Current review baseline — 7 November 2026
 
-Functional/visual baseline v0.7. This change supplies disposable documentation prototypes, not production Angular implementation, an API or an extra product application. [Opening instructions](../../../prototypes/frontend/README.md) cover direct file access and a local HTTP server. No install, build or remote asset is required.
+Functional/visual baseline v0.7. This change supplies disposable documentation prototypes, not production Angular implementation, an API or an extra product application. [Opening instructions](../../../../prototypes/frontend/README.md) cover direct file access and a local HTTP server. No install, build or remote asset is required.
 
-The [visual guide](../../../docs/herald-visual-direction.md) is the visual reference; discovery §15 remains the single register for accepted scope and proposed policies. Graphite/neutral surfaces, square corners and the declared spacing scale including 12px are preserved. Lime remains the proposed accent. System sans-serif fallback is used locally; the selected production Tabler library need not be installed in this prototype.
+The [visual guide](../../../../docs/herald-visual-direction.md) is the visual reference; discovery §15 remains the single register for accepted scope and proposed policies. Graphite/neutral surfaces, square corners and the declared spacing scale including 12px are preserved. Lime remains the proposed accent. System sans-serif fallback is used locally; the selected production Tabler library need not be installed in this prototype.
 
 ### Review surfaces and boundaries
 
@@ -37,7 +37,7 @@ Chrome 157.0.8103.38 through installed Playwright, local file URLs, 7 November 2
 - Nine affected captures were refreshed after the second review: readiness separates publication/start, canonical decision IDs replace old gap IDs, and modal images use viewport-only capture. No horizontal overflow in these targeted checks.
 - 12 browser interaction checks passed: empty result and disabled confirmation, focus on the native result select, Escape dismissal, explicit draw preview and query-state propagation through correction for both individual and team journeys.
 - 11 result-state checks passed in Chrome: invalid submission does not change a result; selection enables confirmation; draw points apply once; correction prefills the prior result, requires a reason, replaces the effective result and does not duplicate points.
-- `node --check` passed for all three scripts; 28 static local HTML references resolved. The [manifest](../../../docs/assets/mockups/journeys/manifest.json) records sources, hashes and viewports; the [QA summary](../../../docs/assets/mockups/journeys/qa-summary.json) records the assertions.
+- `node --check` passed for all three scripts; 28 static local HTML references resolved. The [manifest](../../../../docs/assets/mockups/journeys/manifest.json) records sources, hashes and viewports; the [QA summary](../../../../docs/assets/mockups/journeys/qa-summary.json) records the assertions.
 
 Text/control/focus contrast was calculated from source CSS pairs and sampled computed styles, never estimated from the generated PNGs. Examples: neutral badge 14.49:1; control line on white 4.17:1 and canvas 3.79:1; focus on white 6.37:1; inverse focus on graphite 9.13:1 and inverse hover 6.38:1. These ratios cover the named pairs, not every interaction or accessibility requirement. The exact mapping and earlier corrected failures are recorded in the guide appendix.
 
