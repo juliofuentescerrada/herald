@@ -247,6 +247,28 @@ Headless Chrome on the production builds of public, admin and the catalogue, eig
   No file in the production `dist/public` contains "fixture". `prerendered-routes.json` lists only `/`.
 - **Browser** (headless Chrome, development build behind the built server): `/`, the SSR fixture and the 404 page hydrate with no warnings ("6 components hydrated, 1 skipped": the Menu icon, which `herald-icon` skips by design). The SSR fixture's button responds after hydration and its text stays "Rendered on the server". The client fixture renders its heading in the browser. From the 404 page, *Go to the home page* navigates on the client. The only console error is the 404 status of the document itself.
 
+### SSR isolation and the server transport (task 4.2, 8 November 2026)
+
+- **Server transport** (`projects/public/src/app/platform/server-api.ts`, installed only by `app.config.server.ts` through `provideServerApi(process.env['HERALD_API_URL'])`). `ServerApiBackend` replaces `FetchBackend` (`withFetch` resolves `HttpBackend` to it). It runs after every interceptor and does three things:
+  - removes `Authorization` and `Cookie` and sends with `credentials: 'omit'`, whatever the feature set, for every request;
+  - rewrites this site's `/api/…` to `HERALD_API_URL`;
+  - when that variable is missing, fails with an explicit error instead of calling itself.
+- **What W-05's experiment did not show:** on the server, Angular resolves relative URLs against the incoming request before the backend sees them. The backend receives `http://<public host>/api/…`, not `/api/…`, and the first version, which matched the prefix, sent the request to the public server itself (404). The backend now compares origins against `REQUEST`. A URL on another host that happens to contain `/api/` is not rewritten, but its credentials are still stripped. The transfer cache still keys requests before the backend, so 4.3 checks that hydration does not repeat them.
+- **TanStack on the server:** `provideServerApi` sets `notifyManager.setScheduler((cb) => cb())` (W-06). The SSR fixture's query appears resolved in the HTML.
+- **SSR fixture:** with `?marker=…` it stores the marker in a request-local service (`providedIn: 'root'`) and queries `/api/_fixtures/echo` while setting `Authorization` itself. The query key is **the same in every request** while its answer depends on the request. That is the case a shared cache would leak; a key containing the marker would hide the leak (see the controls).
+- **`pnpm test:ssr`** (`ssr-checks/isolation.mjs`, also in CI): it builds public for development and starts the built server against a stub API with random latency. It then sends 50 concurrent requests, each with its own marker, `Cookie` and `Authorization`, and requires that:
+  - each response renders only its own marker in the provider and in the query;
+  - no response contains another request's marker or any credential;
+  - the API received 50 requests without credentials;
+  - later responses (`/` and the fixture without a marker) carry nothing from earlier requests.
+  
+  Result: passes.
+- **Negative controls** (the files were restored and checked with `git status`):
+  - A `QueryClient` shared by the process: 55 failures (one request rendered another's marker and the rest did not render their own). The first version of the fixture put the marker in the query key and **passed** with the shared client; that is why the key is now fixed.
+  - Credentials not stripped: 51 failures (the API saw credentials on every request).
+- **Protected data and caches:** the server only makes anonymous requests, so no protected data enters the HTML, the transfer state or a shared cache. The check confirms that no credential appears in any response and that later public responses carry nothing from earlier ones. Personal content loads in the browser after hydration (W-06).
+- **Tests:** public 10. Three new ones for the transport: stripping and rewriting with the query preserved, another host stripped but not rewritten, and an explicit error without `HERALD_API_URL`. Admin 13, ui 19, catalogue 5. Lint, boundaries 15/15 and production builds pass, with no fixtures in `dist/public`.
+
 ## Validation and completion
 
 Before implementation: resolve W-01–06, review affected shell states and approve the bounded change. During implementation: compile both apps, check library imports and negative fixtures, verify deterministic API/client generation, render at desktop/mobile widths and exercise keyboard/error recovery, run SSG/hydration and concurrent-request isolation fixtures, and start both apps through Aspire. Record actual commands, versions and results here. Archive only after the tasks and acceptance scenarios are complete; schema validation alone is not completion.

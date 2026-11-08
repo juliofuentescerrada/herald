@@ -1,15 +1,18 @@
+import { provideHttpClient } from '@angular/common/http';
 import { RESPONSE_INIT } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { RenderMode } from '@angular/ssr';
+import { provideTanStackQuery } from '@tanstack/angular-query-experimental';
 import { App } from './app';
 import { routes } from './app.routes';
 import { serverRoutes } from './app.routes.server';
 import { fixtureRoutes } from './fixtures';
 import * as production from './fixtures.production';
+import { QUERY_CLIENT } from './platform';
 
 async function open(url: string, response: ResponseInit | null = null) {
-  TestBed.configureTestingModule({ providers: [provideRouter(routes), { provide: RESPONSE_INIT, useValue: response }] });
+  TestBed.configureTestingModule({ providers: [provideRouter(routes), provideHttpClient(), provideTanStackQuery(QUERY_CLIENT), { provide: RESPONSE_INIT, useValue: response }] });
   const fixture = TestBed.createComponent(App);
   await TestBed.inject(Router).navigateByUrl(url);
   await fixture.whenStable();

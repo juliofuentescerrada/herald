@@ -2,9 +2,10 @@ import { mergeApplicationConfig, ApplicationConfig } from '@angular/core';
 import { provideServerRendering, withRoutes } from '@angular/ssr';
 import { appConfig } from './app.config';
 import { serverRoutes } from './app.routes.server';
+import { provideServerApi } from './platform';
 
 const serverConfig: ApplicationConfig = {
-  providers: [provideServerRendering(withRoutes(serverRoutes))],
+  providers: [provideServerRendering(withRoutes(serverRoutes)), provideServerApi(process.env['HERALD_API_URL'])],
 };
 
 export const config = mergeApplicationConfig(appConfig, serverConfig);

@@ -11,7 +11,8 @@
     "lint": "ng lint",
     "lint:boundaries": "node boundary-fixtures/check.mjs",
     "test:all": "ng test admin --watch=false && ng test public --watch=false && ng test catalogue --watch=false && ng test ui --watch=false",
-    "build:all": "ng build admin && ng build public && ng build catalogue"
+    "build:all": "ng build admin && ng build public && ng build catalogue",
+    "test:ssr": "ng build public --configuration development --output-path dist/public-dev && node ssr-checks/isolation.mjs dist/public-dev"
   },
   "private": true,
   "packageManager": "pnpm@12.18.0",

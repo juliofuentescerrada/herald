@@ -55,4 +55,6 @@ jobs:
       - name: Boundary fixtures are reported exactly
         run: pnpm lint:boundaries
       - run: pnpm test:all
+      - name: SSR isolation (concurrent requests, credentials stripped)
+        run: pnpm test:ssr
       - run: pnpm build:all

@@ -24,7 +24,7 @@
 ## 4. Rendering and local environment
 
 - [x] 4.1 Configure the W-05 render modes, the 404 route and the development-only fixtures; verify the prerendered page has initial HTML and hydrates, and that production artifacts contain no fixtures
-- [ ] 4.2 Verify with concurrent requests that the SSR fixture isolates providers and query state, that the server transport strips credentials, and that TanStack queries render on the server (synchronous `notifyManager` scheduler)
+- [x] 4.2 Verify with concurrent requests that the SSR fixture isolates providers and query state, that the server transport strips credentials, and that TanStack queries render on the server (synchronous `notifyManager` scheduler)
 - [ ] 4.3 Implement the server `HttpBackend` rewrite to `HERALD_API_URL`, verify the browser makes no repeat request on hydration, and defer real API-backed tournament metadata/visibility/cache acceptance to its feature change
 - [ ] 4.4 Start both web apps through Aspire alongside the existing services (one pnpm installer, `HERALD_API_URL`, dev `/api` proxy) and verify reachable URLs and API calls from browser and SSR
 - [ ] 4.5 Build both production apps and verify the public app's static/server output without creating cloud resources
