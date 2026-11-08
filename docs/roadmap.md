@@ -12,7 +12,7 @@ Each milestone ends with something that works end to end. From M0 on, every mile
 | `m0-web-shell` | Implemented and archived: Angular workspace (`web/`) with admin and public shells, `ui` and catalogue, render modes and SSR isolation, Aspire startup, public/admin OpenAPI documents with the generated client and CI drift checks | The first H1 features add behaviour; the first public tournament page verifies API-backed SSR transfer, metadata and visibility/cache isolation; M4 hosts the SSR runtime |
 | H1 functionality | Not started | Bounded OpenSpec slices for identity, configuration, entry/readiness, operations, history and public reads |
 
-The two audit notes are historical evidence. Their [consolidation record](../openspec/changes/documentation-consolidation/design.md) maps findings to the maintained sources and distinguishes documentation closure from product approval and implementation.
+The two audit notes are historical evidence. Their [consolidation record](../openspec/changes/archive/2026-11-08-documentation-consolidation/design.md) maps findings to the maintained sources and distinguishes documentation closure from product approval and implementation.
 
 ## Target delivery
 
