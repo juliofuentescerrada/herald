@@ -2,7 +2,7 @@
 
 - [ ] 1.1 Review this draft against ADR 0011 and confirm its shell-only scope; record implementation approval before production changes
 - [ ] 1.2 Reuse the referenced mockups where sufficient and obtain/review missing admin/public shell, narrow-screen, control and recovery states; record references in design.md
-- [ ] 1.3 Resolve W-01–06 with exact versions, licences, generator/transport, UI foundation, catalogue, boundary checks and state/rendering decisions
+- [x] 1.3 Resolve W-01–06 with exact versions, licences, generator/transport, UI foundation, catalogue, boundary checks and state/rendering decisions (8 November 2026: all recorded in design.md; W-03 is confirmed by task 3.1's experiment)
 - [x] 1.4 Coordinate OpenAPI export, host/AppHost/CI ownership and integration order with m0-messaging without changing its transport design (8 November 2026: `m0-messaging` is archived; what it delivered, the constraints it leaves and this change's ownership are recorded in design.md; the export mechanism is part of W-04)
 
 ## 2. Workspace and dependency boundaries
@@ -11,7 +11,7 @@
 - [ ] 2.2 Establish app composition, platform and local presentation boundaries without precreating product feature hierarchies
 - [ ] 2.3 Add CI import checks for relative/alias/barrel/dynamic imports, cross-feature/app access and library internals; discover new features automatically
 - [ ] 2.4 Verify allowed imports pass and temporary forbidden-import fixtures fail with actionable source/target diagnostics
-- [ ] 2.5 Configure TanStack Query/signals ownership and context scoping/reset hooks; verify isolation using fixtures without production sign-in
+- [ ] 2.5 Provide the `QueryClient` through a token, the platform context with `replace()` (full load and `BroadcastChannel`) and scoped query keys; verify reset and cross-tab reload with fixtures without production sign-in
 
 ## 3. Shared UI and shells
 
@@ -24,7 +24,7 @@
 ## 4. Rendering and local environment
 
 - [ ] 4.1 Configure the W-05 render modes, the 404 route and the development-only fixtures; verify the prerendered page has initial HTML and hydrates, and that production artifacts contain no fixtures
-- [ ] 4.2 Verify the non-domain SSR fixture isolates mutable providers, credentials and query state across concurrent requests
+- [ ] 4.2 Verify with concurrent requests that the SSR fixture isolates providers and query state, that the server transport strips credentials, and that TanStack queries render on the server (synchronous `notifyManager` scheduler)
 - [ ] 4.3 Implement the server `HttpBackend` rewrite to `HERALD_API_URL`, verify the browser makes no repeat request on hydration, and defer real API-backed tournament metadata/visibility/cache acceptance to its feature change
 - [ ] 4.4 Start both web apps through Aspire alongside the existing services (one pnpm installer, `HERALD_API_URL`, dev `/api` proxy) and verify reachable URLs and API calls from browser and SSR
 - [ ] 4.5 Build both production apps and verify the public app's static/server output without creating cloud resources

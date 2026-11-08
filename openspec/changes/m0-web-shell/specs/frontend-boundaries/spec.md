@@ -63,6 +63,10 @@ Features SHALL own server queries/mutations through TanStack Query and local int
 - **WHEN** a test changes identity or organisation context after filling a context-scoped cache and draft
 - **THEN** the old protected data and draft cannot be observed or reused under the new context
 
+#### Scenario: Another tab holds the old context
+- **WHEN** one tab replaces the identity or organisation context
+- **THEN** the other tabs of the same application reload and drop that context's data
+
 #### Scenario: Access is revoked or the user signs out
 - **WHEN** a test context emits sign-out or revocation
 - **THEN** the configured state lifecycle prevents further use of that context's protected data

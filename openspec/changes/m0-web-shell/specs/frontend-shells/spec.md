@@ -49,6 +49,10 @@ SSR SHALL isolate mutable providers, credentials and query state between request
 - **WHEN** two concurrent SSR test requests use distinct credentials/context markers and query data
 - **THEN** neither rendered response nor request-local provider observes the other's protected state
 
+#### Scenario: A feature sends credentials during server rendering
+- **WHEN** a request made while rendering on the server carries an `Authorization` header or a cookie
+- **THEN** the server transport strips them and the host receives an anonymous request
+
 #### Scenario: Protected fixture data reaches a cache boundary
 - **WHEN** a test renders protected context data alongside a public response
 - **THEN** protected data is excluded from shared public cache entries and later public responses

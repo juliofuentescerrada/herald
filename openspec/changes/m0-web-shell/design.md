@@ -80,7 +80,7 @@ Reuse the supplied references where sufficient. Missing states remain explicitly
 | W-03 | Component foundation and catalogue tooling | **Decided 2026-11-08, pending the experiment in task 3.1**, below |
 | W-04 | OpenAPI export mechanism, generator, transport and artifact paths | **Decided 2026-11-08**, below |
 | W-05 | Concrete route render modes and Aspire integration | **Decided 2026-11-08**, below |
-| W-06 | State scope and reset mechanism | Concurrent SSR isolation and client identity/organisation-change fixtures without production auth |
+| W-06 | State scope and reset mechanism | **Decided 2026-11-08**, below |
 
 ### W-01: workspace, package manager and versions (decided 2026-11-08)
 
@@ -148,7 +148,23 @@ Reuse the supplied references where sufficient. Missing states remain explicitly
   - Not covered: Windows (`$PORT` relies on the script running under `sh`; pass the port with `WithArgs` if needed), Herald's real host and AppHost with PostgreSQL and the emulator, concurrent-request isolation (W-06).
 - **Rejected:** `AddViteApp` (Angular CLI uses Vite internally but is not started with Vite's command); CORS on the host with absolute API URLs in the apps (more moving parts, while production routing is M4's anyway); rewriting `/api` in an interceptor (breaks the transfer cache); one installer per app.
 
-Remaining library versions are deliberately unselected until W-06. These draft requirements are proposed targets, not evidence that the choices or implementation are approved.
+### W-06: state scope and reset (decided 2026-11-08)
+
+- **Server rendering is anonymous.** The public server's `HttpBackend` strips `Authorization` and `Cookie` and sends no credentials, whatever a feature sets, so the server never holds protected data and no shared or transfer cache can carry it. Personal content (a player's panel, their next match) loads in the browser after hydration. Angular's transfer cache already skips requests with authorisation headers, so those repeat in the browser by design.
+- **No mutable module-level state.** Angular gives each SSR request its own injector, so `providedIn: 'root'` is per request; a module-level variable is shared by every request the Node process serves. The `QueryClient` therefore comes from an `InjectionToken` with `factory: () => new QueryClient()`, passed to `provideTanStackQuery`: one per request on the server, one per document in the browser. TanStack's documented `provideTanStackQuery(new QueryClient())` is the trap this rule exists for.
+- **TanStack on the server:** the server configuration sets `notifyManager.setScheduler(cb => cb())`. TanStack registers its Angular pending task only when it is notified that a query is fetching, and its default scheduler delivers that notification late, so the render finished as `pending`. The setting is process-wide configuration, not per-request state. With it, the HttpClient transfer cache carries the response to hydration and the browser's `QueryClient` gets it without a request; no TanStack dehydration is needed.
+- **The server backend** extends `FetchBackend` (rewriting to `HERALD_API_URL` and stripping credentials, W-05) instead of wrapping it, which also keeps Angular's check that SSR uses `fetch` (NG02801) quiet.
+- **Reset by full load.** Each app's platform exposes the context as read-only signals (identity, organisation) and one way to change it, `replace(target)`, which posts to a `BroadcastChannel` and calls `location.assign(target)`. Sign-out, a user change, revocation and an organisation change all use it. The document's query cache, signals, services, route injectors and in-flight requests go with it; features read the context and never change it. Other tabs of the same origin receive the message and reload.
+- **Nothing protected in web storage:** no protected data in `localStorage` or `sessionStorage` and no persisted query cache, so a reload really clears it. The context after a load comes from the URL and, from H1, from the session.
+- **Query keys** still start with their scope (`['org', organisationId, …]`) so a key never means different data in two contexts; the full load, not the key, is what guarantees the reset.
+- **Evidence** (throwaway W-05 workspace, `@tanstack/angular-query-experimental` 5.107.1 (MIT), headless Chrome through `playwright-core`, 2026-11-08, nothing committed):
+  - 50 concurrent SSR requests with the same query key and a different value each, each with a `Cookie` and a fixture-set `Authorization`: with a module-level `QueryClient`, 25 rendered another request's value, 24 rendered `pending` and 1 its own; with the token, 50 of 50 rendered their own. The stub host received no credentials in any request.
+  - Before the scheduler setting, the SSR rendered `pending` with the request already sent; after it, the data was in the HTML, hydration was clean and the browser made no API request.
+  - Organisation A loaded `org/A/data`; after `replace()` to B the cache held only `org/B/data`, and a second tab on A reloaded on the broadcast.
+  - Not covered: tabs of the other app (a different origin) are not notified; a server-side revocation signal (such as a 401) has no trigger until H1's authentication; Herald's real host.
+- **Rejected:** an in-app reset (clearing the query cache, scoping every key, navigating and cleaning route injectors with `withAutoCleanupInjectors`): smoother, but every source of state has to be covered, and one service that keeps something leaks the previous context; it remains the upgrade if H1 shows organisation changes are frequent. Forwarding the user's credentials during SSR: it would make server output personal and every cache a risk. TanStack's dehydration for SSR: the HttpClient transfer cache already carries the data.
+
+All W-01–W-06 decisions are recorded; W-03 is confirmed by its experiment in task 3.1. These draft requirements are proposed targets, not evidence that the choices or implementation are approved.
 
 ## Validation and completion
 
