@@ -79,7 +79,7 @@ Reuse the supplied references where sufficient. Missing states remain explicitly
 | W-02 | Boundary-check tooling and public-entry conventions | **Decided 2026-11-08**, below |
 | W-03 | Component foundation and catalogue tooling | **Decided 2026-11-08, pending the experiment in task 3.1**, below |
 | W-04 | OpenAPI export mechanism, generator, transport and artifact paths | **Decided 2026-11-08**, below |
-| W-05 | Concrete route render modes and Aspire integration | Representative SSG/hydration, SSR fixture, CSR app bootstrap and both local URLs |
+| W-05 | Concrete route render modes and Aspire integration | **Decided 2026-11-08**, below |
 | W-06 | State scope and reset mechanism | Concurrent SSR isolation and client identity/organisation-change fixtures without production auth |
 
 ### W-01: workspace, package manager and versions (decided 2026-11-08)
@@ -131,7 +131,24 @@ Reuse the supplied references where sufficient. Missing states remain explicitly
   - Not covered: the host test for ungrouped endpoints, SSR transfer caching with the generated client (W-05/W-06 and the first public page), nullable OpenAPI 3.1 types.
 - **Rejected:** `Microsoft.Extensions.ApiDescription.Server` (starts the host); a test host exporting the document (needs PostgreSQL for every generation); one document for both apps; NSwag (legacy decorators, class-based models, blob transport); `@hey-api/openapi-ts` 0.99 (pre-1.0); `ng-openapi-gen` 1.1 (no typed errors); `openapi-typescript` with `openapi-fetch` (`fetch` transport, TypeScript `^5.x` peer).
 
-Remaining library versions are deliberately unselected until W-05–W-06. These draft requirements are proposed targets, not evidence that the choices or implementation are approved.
+### W-05: render modes, SSR runtime and Aspire (decided 2026-11-08)
+
+- **Admin:** CSR only: no `@angular/ssr`, no server output; a static build served with an `index.html` fallback.
+- **Public:** `outputMode: 'server'` and an explicit `app.routes.server.ts`. In M0: `/` (the representative corporate page) `Prerender`; `/_fixtures/ssr` `Server`; `/_fixtures/client` `Client` (standing in for participant workflows); `**` `Server`, so an unknown URL gets a server-rendered page with status 404 (`RESPONSE_INIT`) rather than a 200 with an empty app. Hydration is `provideClientHydration(withEventReplay())`; incremental hydration waits for a page that needs it.
+- **Fixtures** live in one file that exports both their routes and their server routes; the production configuration replaces it with an empty one (`fileReplacements`), so fixture code is absent from production artifacts.
+- **SSR runtime:** the `server.ts` that `ng new --ssr` generates: Express 5 (MIT) with `AngularNodeAppEngine`, listening on `PORT`. Where it runs, and whether Express gives way to `node:http`, is M4's, with its cold-start measurements.
+- **API URL:** both apps call relative `/api` URLs. In the browser in development, each app's `ng serve` forwards `/api` to the host with a `proxy.conf.mjs`; in production the same-origin routing is M4's (ingress). On the server, the public app rewrites `/api` requests to `HERALD_API_URL` **in its server `HttpBackend`**, which runs after every interceptor. An interceptor would rewrite the URL before the transfer cache computes its key, and the browser would repeat the request; in the backend, the cache keys it by the same relative URL the browser uses, and hydration reads it from `ng-state`.
+- **Aspire:** `Aspire.Hosting.JavaScript` 13.6.4 (MIT), two `AddJavaScriptApp` resources on `web/` running `start:admin` and `start:public` (`ng serve <app> --port $PORT`), each with `WithHttpEndpoint(env: "PORT")`, `HERALD_API_URL` from the host's endpoint (`WithEnvironment`) and `WaitFor(host)`. One install per workspace: admin's `WithPnpm()` creates the installer, and public uses `WithPnpm(install: false)` and `WaitForCompletion` on it; two installers run `pnpm install` concurrently in the same folder and the second app never starts.
+- **For M4:** Angular 22's SSR server rejects requests whose `Host` is not allowed (400, SSRF protection): production configures `security.allowedHosts` or `NG_ALLOWED_HOSTS` with the real domains. The production server serves no `/api`; the ingress must route it to the host on the same domain.
+- **Evidence** (throwaway workspace and AppHost, Angular 22.2.5, pnpm 12.18.0, Node 26.13, Aspire 13.6.4, a minimal stub host instead of Herald's, 2026-11-08, nothing committed):
+  - Production build: admin had browser output only; public prerendered `/` with its content (`ng-server-context="ssg"`); fixture code absent and fixture routes 404; an unknown URL 404 from the server.
+  - Development build behind the built server: `/_fixtures/ssr` returned the API's data in its HTML. With the URL rewritten by an interceptor, headless Chrome repeated the API request on hydration; with the rewrite in `HttpBackend` it made none.
+  - Through Aspire (`ng serve`): both apps answered on their URLs (4200, 4300); `/api` reached the host from the admin browser and from public SSR; `/`, `/_fixtures/ssr` and `/_fixtures/client` hydrated in headless Chrome with no warnings and no API requests on the public pages; the prerendered button handled clicks after hydration.
+  - Failures found on the way: two installers (public never started); the stub host without launch settings had no endpoint, so the apps could not resolve the host's URL (Herald's host has them).
+  - Not covered: Windows (`$PORT` relies on the script running under `sh`; pass the port with `WithArgs` if needed), Herald's real host and AppHost with PostgreSQL and the emulator, concurrent-request isolation (W-06).
+- **Rejected:** `AddViteApp` (Angular CLI uses Vite internally but is not started with Vite's command); CORS on the host with absolute API URLs in the apps (more moving parts, while production routing is M4's anyway); rewriting `/api` in an interceptor (breaks the transfer cache); one installer per app.
+
+Remaining library versions are deliberately unselected until W-06. These draft requirements are proposed targets, not evidence that the choices or implementation are approved.
 
 ## Validation and completion
 

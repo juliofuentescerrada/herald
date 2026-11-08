@@ -30,6 +30,18 @@ Admin and authenticated participant workflows SHALL use CSR. Corporate/static pu
 - **WHEN** the non-domain SSR fixture is requested from the built public server output
 - **THEN** it returns initial HTML through the server route while admin remains configured for CSR
 
+#### Scenario: An unknown public URL is requested
+- **WHEN** the public server receives a URL that matches no route
+- **THEN** it renders a not-found page with HTTP status 404
+
+#### Scenario: Server data reaches hydration once
+- **WHEN** the SSR fixture fetches API data on the server and the browser hydrates the page
+- **THEN** the browser reuses the transferred response and makes no repeat API request
+
+#### Scenario: Fixtures stay out of production
+- **WHEN** the public application is built for production
+- **THEN** fixture routes and their code are absent and their URLs return 404
+
 ### Requirement: Server requests do not share mutable context
 SSR SHALL isolate mutable providers, credentials and query state between requests. Shared public caches SHALL contain public data only. The reviewed generator/transport integration SHALL document its server-to-browser data-transfer mechanism and SHALL NOT assume that a generated fetch client participates automatically in Angular HttpClient transfer caching.
 

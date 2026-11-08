@@ -23,10 +23,10 @@
 
 ## 4. Rendering and local environment
 
-- [ ] 4.1 Configure selective SSG/SSR/CSR modes and verify a representative static public page has initial HTML and hydrates correctly
+- [ ] 4.1 Configure the W-05 render modes, the 404 route and the development-only fixtures; verify the prerendered page has initial HTML and hydrates, and that production artifacts contain no fixtures
 - [ ] 4.2 Verify the non-domain SSR fixture isolates mutable providers, credentials and query state across concurrent requests
-- [ ] 4.3 Record the selected client transport/data-transfer strategy and defer real API-backed tournament metadata/visibility/cache acceptance to its feature change
-- [ ] 4.4 Start both web apps through Aspire alongside the existing services with explicit API configuration and reachable URLs
+- [ ] 4.3 Implement the server `HttpBackend` rewrite to `HERALD_API_URL`, verify the browser makes no repeat request on hydration, and defer real API-backed tournament metadata/visibility/cache acceptance to its feature change
+- [ ] 4.4 Start both web apps through Aspire alongside the existing services (one pnpm installer, `HERALD_API_URL`, dev `/api` proxy) and verify reachable URLs and API calls from browser and SSR
 - [ ] 4.5 Build both production apps and verify the public app's static/server output without creating cloud resources
 
 ## 5. Generated API contract
