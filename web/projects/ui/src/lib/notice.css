@@ -30,7 +30,7 @@
   --herald-notice-surface: var(--herald-color-feedback-danger-surface);
   --herald-notice-text: var(--herald-color-text-primary);
 }
-.herald-notice-icon { margin-top: 2px; color: var(--herald-notice-accent); }
+.herald-notice-icon { color: var(--herald-notice-accent); }
 .herald-notice-body { flex: 1; min-width: 0; }
 .herald-notice-body > :last-child { margin-bottom: 0; }
 .herald-notice-heading { display: block; margin-bottom: var(--herald-space-1); }
@@ -41,6 +41,7 @@
   min-width: var(--herald-target-min);
   min-height: var(--herald-target-min);
   margin: calc(-1 * var(--herald-space-3)) calc(-1 * var(--herald-space-4)) calc(-1 * var(--herald-space-3)) 0;
+  padding: 0;
   border: 0;
   border-radius: var(--herald-radius-default);
   background: transparent;

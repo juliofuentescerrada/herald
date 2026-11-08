@@ -24,7 +24,7 @@
 
     @if (failedUrl(); as url) {
       <section class="failure" aria-labelledby="failure-heading">
-        <h1 id="failure-heading">This section did not load</h1>
+        <h1 id="failure-heading" tabindex="-1" #failureHeading>This section did not load</h1>
         <p>Herald may have been updated since you opened it. Reload to get the current version; you will return to this page.</p>
         <div class="actions">
           <button herald-button variant="primary" type="button" (click)="reload(url)">Reload page</button>

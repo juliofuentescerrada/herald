@@ -19,7 +19,7 @@
 - [x] 3.2 Implement only reviewed shell controls/tokens in ui and consume them from both apps with square corners and the documented scale, with Tabler outline icons (`@tabler/icons-angular`) exposed only through ui
 - [x] 3.3 Add the development-only catalogue project (prerendered, never deployed); cover relevant keyboard, focus, error, disabled/loading and recovery states
 - [x] 3.4 Implement reviewed admin CSR and public shell layouts at desktop/narrow widths without tournament or participant functionality
-- [ ] 3.5 Review blur/grayscale hierarchy, spacing, typography, contrast, reading order and keyboard/error recovery; record actual evidence
+- [x] 3.5 Review blur/grayscale hierarchy, spacing, typography, contrast, reading order and keyboard/error recovery; record actual evidence
 
 ## 4. Rendering and local environment
 

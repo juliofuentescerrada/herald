@@ -3,7 +3,7 @@
 .hero h1 { max-width: 16ch; margin-bottom: var(--herald-space-4); font-size: 56px; line-height: 1.03; letter-spacing: -2px; }
 .lead { max-width: 48ch; margin: 0 0 var(--herald-space-6); color: var(--herald-color-text-inverse-secondary); font-size: 18px; }
 .points { max-width: 1280px; margin: 0 auto; padding: var(--herald-space-12) max(5vw, 24px); }
-.points h2 { margin-bottom: var(--herald-space-6); font-size: 24px; }
+.points h2 { margin-bottom: var(--herald-space-6); font-size: 28px; }
 .points-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--herald-space-8); }
 .points h3 { margin-bottom: var(--herald-space-2); font-size: 18px; }
 .points p { margin: 0; color: var(--herald-color-text-secondary); font-size: var(--herald-text-lg); }

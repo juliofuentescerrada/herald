@@ -56,6 +56,7 @@ describe('The admin shell', () => {
   it('offers a reload when a section fails to load, and clears it after leaving', async () => {
     const { text, element, navigate } = await openShell('/tournaments');
     expect(text('h1')).toBe('This section did not load');
+    expect(document.activeElement).toBe(element.querySelector('h1'));
     // The reload goes through the document's location; jsdom cannot navigate, so only the button is checked.
     expect(element.querySelector('.failure button')?.textContent?.trim()).toBe('Reload page');
 
