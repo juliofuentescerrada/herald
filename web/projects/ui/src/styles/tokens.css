@@ -1,0 +1,62 @@
+/* Herald semantic tokens (visual direction §§3–4). Components consume these, never raw colours. */
+:root {
+  --herald-color-canvas-admin: #f3f4f6;
+  --herald-color-canvas-public: #fafbfc;
+  --herald-color-surface-default: #ffffff;
+  --herald-color-surface-inverse: #171a1e;
+  --herald-color-surface-inverse-raised: #2b3036;
+  --herald-color-text-primary: #171a1e;
+  --herald-color-text-secondary: #5e6673;
+  --herald-color-text-inverse: #ffffff;
+  --herald-color-text-inverse-secondary: #b3b8bf;
+  --herald-color-action-primary: #c7f23a;
+  --herald-color-action-primary-hover: #b4dd28;
+  --herald-color-action-primary-pressed: #a7ce20;
+  --herald-color-action-primary-text: #171a1e;
+  --herald-color-action-neutral-hover: #e9ecf0;
+  --herald-color-action-neutral-pressed: #d8dde4;
+  --herald-color-action-disabled: #e7eaf0;
+  --herald-color-action-inverse-hover: #30363e;
+  --herald-color-action-inverse-pressed: #454d58;
+  --herald-color-brand-accent: #c7f23a;
+  --herald-color-border-default: #d8dde4;
+  --herald-color-border-control: #747d89;
+  --herald-color-border-control-strong: #5e6673;
+  --herald-color-border-control-inverse: #aeb6c0;
+  --herald-color-focus-ring: #2559c3;
+  --herald-color-focus-ring-inverse: #9dbbff;
+  --herald-color-feedback-info: #236f69;
+  --herald-color-feedback-info-surface: #e0f0ec;
+  --herald-color-feedback-success: #246141;
+  --herald-color-feedback-success-surface: #edf5e8;
+  --herald-color-feedback-warning: #805400;
+  --herald-color-feedback-warning-text: #5c3d00;
+  --herald-color-feedback-warning-surface: #fff1da;
+  --herald-color-feedback-danger: #a12632;
+  --herald-color-feedback-danger-surface: #fbe9eb;
+  --herald-color-feedback-danger-pressed: #f5d3d7;
+  --herald-color-neutral-surface: #e7eaf0;
+
+  --herald-space-1: 4px;
+  --herald-space-2: 8px;
+  --herald-space-3: 12px;
+  --herald-space-4: 16px;
+  --herald-space-6: 24px;
+  --herald-space-8: 32px;
+  --herald-space-12: 48px;
+  --herald-space-16: 64px;
+
+  --herald-font-family: Inter, system-ui, -apple-system, 'Segoe UI', Roboto, Arial, sans-serif;
+  --herald-text-sm: 12px;
+  --herald-text-base: 14px;
+  --herald-text-lg: 16px;
+
+  --herald-radius-default: 0;
+  --herald-target-min: 44px;
+  --herald-motion-fast: 150ms;
+}
+
+/* Graphite surfaces switch focus and control boundaries to their inverse mappings. */
+[data-herald-surface='inverse'] {
+  --herald-color-focus-ring: var(--herald-color-focus-ring-inverse);
+}

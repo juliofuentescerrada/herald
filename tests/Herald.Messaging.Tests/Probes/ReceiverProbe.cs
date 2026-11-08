@@ -1,4 +1,5 @@
 using Herald.ModuleHosting;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Wolverine;
 using Wolverine.Http;
@@ -51,6 +52,7 @@ public sealed record ReceiptCount(Guid RecordId, int Count);
 public static class ReceiptCountEndpoint
 {
     [WolverineGet("/probe/receipts/{recordId}")]
+    [EndpointGroupName(HeraldApi.Public)]
     public static async Task<ReceiptCount> Get(Guid recordId, ReceiverDbContext database) =>
         new(recordId, await database.Receipts.CountAsync(receipt => receipt.RecordId == recordId));
 }

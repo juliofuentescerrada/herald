@@ -61,7 +61,7 @@ The generated client owns no toasts, routing or business cache policy. Feature c
 
 The generator/transport decision specifies how data is transferred from SSR to the browser. Do not assume a generated fetch-based client participates automatically in Angular's HttpClient transfer cache. Isolate mutable providers, credentials and query clients between SSR requests; test concurrent requests and hydration with the selected integration. Route-level dependency injection is an organisation mechanism, not a security boundary.
 
-**Implementation status:** production Angular code has not been created. The disposable prototype is a visual reference, not the seed architecture or proof of SSR/authentication. The `m0-web-shell` proposal establishes the shells and these boundaries; individual H1 feature proposals add behaviour and their reviewed visual states.
+**Implementation status:** `m0-web-shell` implemented the workspace (`web/`), both shells, the `ui` library and catalogue, the import matrix in CI, the render modes with SSR isolation, Aspire startup, and the public/admin OpenAPI documents with an orval-generated client and a CI drift check; its `design.md` records the decisions (W-01–W-06) and evidence. No feature exists yet. The disposable prototype is a visual reference, not the seed architecture or proof of SSR/authentication. Individual H1 feature proposals add behaviour and their reviewed visual states.
 
 ## Alternatives considered
 
@@ -83,7 +83,7 @@ The generator/transport decision specifies how data is transferred from SSR to t
 - Positive: one frontend stack, with initial HTML for public entry pages and client-side interaction for operational workflows; corporate content can be served statically.
 - Negative: two app builds and an SSR runtime alongside the .NET API. Hydration, browser-API compatibility, request isolation and caching need verification; API latency and cold starts can delay the first public response.
 - Positive: shared UI behaviour and accessibility with independent portal compositions. Negative: shared UI changes need checking in both apps; the library boundary and catalogue require maintenance.
-- Follow-ups: `m0-web-shell` chooses the component foundation, generator/transport and route configuration, and adds boundary/build checks. The first H1 features define data lifetimes, write/retry contracts and concrete composition. The first public tournament page verifies API data transfer/hydration, metadata and visibility/cache isolation. M4 decides runtime placement and measures cold starts.
+- Follow-ups: `m0-web-shell` answered the component foundation (`ng-primitives`, W-03), generator and transport (orval on `HttpClient`, W-04) and route configuration (W-05), and added boundary, build, SSR-isolation and contract-drift checks. The first H1 features define data lifetimes, write/retry contracts and concrete composition. The first public tournament page verifies API data transfer/hydration, metadata and visibility/cache isolation. M4 decides runtime placement and measures cold starts.
 
 ## References
 

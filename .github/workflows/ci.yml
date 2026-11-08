@@ -34,3 +34,40 @@ jobs:
             exit 1
           fi
       - run: dotnet test --solution Herald.slnx -c Release --no-build
+
+  web:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: web
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+        with:
+          package_json_file: web/package.json
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: web/.nvmrc
+          cache: pnpm
+          cache-dependency-path: web/pnpm-lock.yaml
+      - uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
+        with:
+          global-json-file: global.json
+      - run: pnpm install --frozen-lockfile
+      - name: The OpenAPI documents and generated clients are current
+        run: |
+          pnpm api:generate
+          generated=(projects/api-client/openapi ':(glob)projects/api-client/src/**/generated/**')
+          changes="$(git diff --name-status -- "${generated[@]}"; git ls-files --others --exclude-standard -- "${generated[@]}")"
+          if [ -n "$changes" ]; then
+            echo "::error::The OpenAPI documents or generated clients are stale; run 'pnpm api:generate' in web/ and commit them."
+            echo "$changes"
+            exit 1
+          fi
+      - run: pnpm lint
+      - name: Boundary fixtures are reported exactly
+        run: pnpm lint:boundaries
+      - run: pnpm test:all
+      - name: SSR isolation (concurrent requests, credentials stripped)
+        run: pnpm test:ssr
+      - run: pnpm build:all

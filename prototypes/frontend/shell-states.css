@@ -1,0 +1,81 @@
+/* M0 shell states: documentation-only compositions on the shared tokens. All corners remain square. */
+.shell-fixtures{display:flex;flex-wrap:wrap;gap:var(--space-2) var(--space-4);flex-basis:100%}
+.shell-fixtures a[aria-current="page"]{font-weight:700;text-decoration-thickness:3px}
+.shell-state[hidden]{display:none}
+
+/* Public shell */
+.shell-publicnav .links a{min-height:44px;display:inline-flex;align-items:center}
+.shell-publicnav .links a[aria-current="page"]{text-decoration:underline;text-underline-offset:6px;text-decoration-thickness:2px}
+.shell-workspace-link{border:1px solid var(--control-border-inverse);padding:0 var(--space-4);font-weight:600}
+.shell-menu-button{display:none}
+.shell-hero{grid-template-columns:1fr}
+.shell-hero h1{max-width:16ch}
+.shell-page-body{max-width:1280px;margin:0 auto;padding:var(--space-12) max(5vw,24px)}
+.shell-page-body h2{margin-bottom:var(--space-6)}
+.shell-points{display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:var(--space-8)}
+.shell-points h3{margin-bottom:var(--space-2)}.shell-points p{color:var(--muted);margin:0}
+.shell-footer{display:flex;gap:var(--space-6);padding:var(--space-6) max(5vw,24px);border-top:1px solid var(--line);background:white;font-size:14px}
+.shell-footer span{margin-right:auto;font-weight:700}.shell-footer a{text-decoration:underline;text-underline-offset:3px}
+.shell-not-found{max-width:65ch;margin:0;padding:var(--space-16) max(5vw,24px)}
+.shell-not-found .actions{justify-content:flex-start;margin-top:var(--space-6)}
+
+/* Catalogue */
+.shell-catalogue h2{font-size:20px;margin:var(--space-8) 0 var(--space-4)}.shell-catalogue h2:first-child{margin-top:0}
+.shell-matrix th[scope="row"]{font-weight:600;color:var(--ink)}.shell-matrix td{padding:var(--space-3)}
+.shell-control-pair{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-8);margin-top:var(--space-6)}
+.shell-control-pair h3{font-size:16px;margin-bottom:var(--space-1)}
+.shell-help{color:var(--muted);font-size:14px;margin:0 0 var(--space-3)}
+.shell-status{font-size:14px;margin:var(--space-2) 0 0}
+.shell-tags{margin:0}
+.shell-tag-danger{background:#fbe9eb;color:#a12632}
+.shell-required{font-size:12px;color:var(--muted);margin-left:var(--space-2)}
+.shell-field{max-width:420px}.shell-field input[aria-invalid="true"]{border-color:#a12632}
+button.is-hover{background:#e9ecf0}button.primary.is-hover{background:#b4dd28}button.secondary.is-hover{border-color:#5e6673}button.quiet.is-hover{background:#f3f4f6;color:var(--ink)}
+button.is-focus{outline:3px solid var(--focus-ring);outline-offset:3px}
+button.is-active{background:#d8dde4}button.primary.is-active{background:#a7ce20}
+button.destructive{background:white;color:#a12632;border-color:#a12632}
+button.destructive:hover,button.destructive.is-hover{background:#fbe9eb}
+button.destructive:active,button.destructive.is-active{background:#f5d3d7}
+button.is-loading{display:inline-flex;align-items:center;gap:var(--space-2);cursor:progress}
+.shell-spinner{width:14px;height:14px;border:2px solid currentColor;border-right-color:transparent;flex:none}
+@media(prefers-reduced-motion:no-preference){.shell-spinner{animation:shell-spin .8s linear infinite}}
+@keyframes shell-spin{to{transform:rotate(360deg)}}
+
+/* Feedback and failure */
+.shell-alert{border-left:4px solid #a12632;background:#fbe9eb;padding:var(--space-4) var(--space-6);margin:var(--space-4) 0;max-width:75ch}
+.shell-alert strong{color:#a12632}.shell-alert p{margin:var(--space-2) 0 var(--space-4)}
+.shell-banner{background:#fff1da;color:#5c3d00;border-left:4px solid #805400;padding:var(--space-3) var(--space-4);margin-bottom:var(--space-6);font-size:14px;display:flex;align-items:center;gap:var(--space-4)}
+.shell-banner-info{background:#e0f0ec;color:#174a46;border-left-color:#236f69}
+.shell-banner span{flex:1}.shell-banner button{color:inherit;flex:none}
+.shell-failure{max-width:720px}.shell-failure h1,.shell-failure h2{margin-bottom:var(--space-3)}
+.shell-failure .actions{justify-content:flex-start;margin:var(--space-6) 0 var(--space-4)}
+.shell-feedback{margin-top:var(--space-4);font-size:14px;max-width:720px}
+
+@media(max-width:700px){
+  .shell-fixtures{gap:var(--space-1) var(--space-3)}
+  .shell-menu-button{display:inline-flex;align-items:center;margin-left:auto;background:transparent;color:white;border-color:var(--control-border-inverse)}
+  .shell-publicnav{flex-wrap:wrap}
+  .shell-publicnav .shell-public-links{display:none;flex-basis:100%;flex-direction:column;align-items:stretch;gap:0;padding-top:var(--space-2)}
+  .shell-publicnav.is-open .shell-public-links{display:flex}
+  .shell-publicnav .links a{display:flex;border-top:1px solid #34383e;padding:0 var(--space-2)}
+  .shell-workspace-link{border:1px solid var(--control-border-inverse);margin-top:var(--space-3);justify-content:center}
+  .shell-points{grid-template-columns:1fr;gap:var(--space-6)}
+  .shell-page-body{padding:var(--space-8) var(--space-4)}
+  .shell-not-found{padding:var(--space-12) var(--space-4)}
+  .shell-control-pair{grid-template-columns:1fr}
+  .shell-matrix thead{position:absolute;width:1px;height:1px;overflow:hidden;clip-path:inset(50%)}
+  .shell-matrix tr{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-2);padding:var(--space-3) 0;border-bottom:1px solid var(--line)}
+  .shell-matrix th[scope="row"]{grid-column:1/-1;padding:0}.shell-matrix td{padding:0;border:0}
+  .shell-banner{flex-direction:column;align-items:flex-start}
+  .shell-failure .actions{flex-direction:column;align-items:stretch}
+}
+
+/* Review fixes: public pages are full-bleed; matrix buttons match other controls; narrow matrix keeps state names. */
+.shell-state>main:not(.shell-not-found){padding:0}
+.shell-hero .eyebrow{font-size:12px;text-transform:uppercase}
+.shell-matrix td{font-size:16px}
+@media(max-width:700px){
+  .shell-matrix td::before{display:block;font-size:12px;color:var(--muted);margin-bottom:var(--space-1)}
+  .shell-matrix td:nth-child(2)::before{content:'Default'}.shell-matrix td:nth-child(3)::before{content:'Hover'}
+  .shell-matrix td:nth-child(4)::before{content:'Keyboard focus'}.shell-matrix td:nth-child(5)::before{content:'Pressed'}
+}

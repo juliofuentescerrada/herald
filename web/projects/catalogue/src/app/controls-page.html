@@ -1,0 +1,96 @@
+<main>
+  <header>
+    <p class="eyebrow">Development tool · never deployed</p>
+    <h1>Herald controls</h1>
+    <p>Each shared control in the states the shells use. Hover, press and keyboard focus are live: use the pointer and the Tab key.</p>
+  </header>
+
+  <section aria-labelledby="buttons">
+    <h2 id="buttons">Buttons</h2>
+    <table>
+      <thead><tr><th scope="col">Variant</th><th scope="col">Default</th><th scope="col">Unavailable</th><th scope="col">Loading</th></tr></thead>
+      <tbody>
+        @for (item of variants; track item.variant) {
+          <tr>
+            <th scope="row">{{ item.variant }}</th>
+            <td><button herald-button [variant]="item.variant" (click)="presses.set(presses() + 1)">{{ item.label }}</button></td>
+            <td><button herald-button [variant]="item.variant" [disabled]="true">{{ item.label }}</button></td>
+            <td><button herald-button [variant]="item.variant" [loading]="true" (click)="presses.set(presses() + 1)">{{ item.label }}</button></td>
+          </tr>
+        }
+      </tbody>
+    </table>
+    <p role="status" class="help">Actions run: {{ presses() }}. Unavailable and loading buttons never add one.</p>
+    <div class="pair">
+      <div>
+        <h3>Unavailable, with a reason</h3>
+        <button herald-button variant="primary" [disabled]="true" aria-describedby="start-reason">Start competition</button>
+        <p class="reason" id="start-reason">One admitted entry has not checked in.</p>
+      </div>
+      <div>
+        <h3>Link with button appearance</h3>
+        <a herald-button variant="primary" href="#buttons">Open the organiser workspace</a>
+      </div>
+    </div>
+  </section>
+
+  <section aria-labelledby="icons">
+    <h2 id="icons">Icons</h2>
+    <p class="row">
+      <span class="sample"><herald-icon name="home" size="navigation" /> Navigation, 24 px</span>
+      <span class="sample"><herald-icon name="refresh" /> Control, 20 px</span>
+      <span class="sample"><herald-icon name="info-circle" size="metadata" /> Metadata, 16 px</span>
+      <button herald-button><herald-icon name="refresh" />Try again</button>
+      <button herald-button variant="quiet" aria-label="Open menu"><herald-icon name="menu" /></button>
+    </p>
+  </section>
+
+  <section aria-labelledby="labels">
+    <h2 id="labels">Status labels</h2>
+    <p class="row">
+      <herald-status-label>Draft</herald-status-label>
+      <herald-status-label tone="info">Live</herald-status-label>
+      <herald-status-label tone="success">Finalised</herald-status-label>
+      <herald-status-label tone="warning">Check-in pending</herald-status-label>
+      <herald-status-label tone="danger">Publication blocked</herald-status-label>
+    </p>
+  </section>
+
+  <section aria-labelledby="feedback">
+    <h2 id="feedback">Feedback</h2>
+    <div class="stack">
+      @if (infoShown()) {
+        <herald-notice tone="info" heading="You are now working in Southside Club." [dismissible]="true" (dismissed)="infoShown.set(false)">
+          The organisation was changed in another tab, so this tab reloaded.
+        </herald-notice>
+      }
+      <herald-notice tone="warning" iconName="wifi-off" heading="You are offline.">
+        Changes cannot be sent until the connection returns. Nothing you entered has been lost.
+      </herald-notice>
+      <herald-notice tone="success" heading="Results saved.">Standings use them once they are effective.</herald-notice>
+      <herald-notice tone="danger" heading="The tournament could not be published.">
+        <p>The reference time zone is missing. Your other settings were kept.</p>
+        <a herald-button href="#feedback">Choose a time zone</a>
+      </herald-notice>
+      <herald-notice tone="info" iconName="refresh" heading="This section did not load.">
+        <p>Herald may have been updated since you opened it. Reload to get the current version.</p>
+        <button herald-button variant="primary">Reload page</button>
+      </herald-notice>
+    </div>
+  </section>
+
+  <section aria-labelledby="navigation">
+    <h2 id="navigation">Navigation links</h2>
+    <nav class="rail" data-herald-surface="inverse" aria-label="Workspace example">
+      <a herald-nav-link href="#navigation" aria-current="page"><herald-icon name="home" size="navigation" />Overview</a>
+      <a herald-nav-link href="#navigation">Tournaments</a>
+      <a herald-nav-link href="#navigation">Organisation</a>
+    </nav>
+  </section>
+
+  <section aria-labelledby="recovery">
+    <h2 id="recovery">Error and recovery</h2>
+    <p class="help">The first attempt fails and the retry succeeds; the name you enter is kept throughout.</p>
+    <app-recovery-demo />
+  </section>
+</main>

@@ -1,0 +1,12 @@
+{
+  "compilerOptions": {
+    "baseUrl": ".",
+    "paths": {
+      "@fixture/beta": ["./projects/admin/src/app/features/beta/index.ts"],
+      "@fixture/ui": ["./projects/ui/src/public-api.ts"],
+      "@fixture/api-client/public": ["./projects/api-client/src/public/index.ts"],
+      "@fixture/api-client/admin": ["./projects/api-client/src/admin/index.ts"]
+    }
+  },
+  "include": ["**/*.ts"]
+}

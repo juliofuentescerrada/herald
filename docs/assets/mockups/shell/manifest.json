@@ -1,0 +1,162 @@
+{
+  "date": "2026-11-08",
+  "purpose": "M0 shell state proposals for m0-web-shell review (gate 1.2); not approved production screens",
+  "capture": {
+    "tool": "playwright-core using installed Google Chrome, headless",
+    "deviceScaleFactor": 1,
+    "assets": "local only; system sans-serif fallback",
+    "checks": "no page errors and no horizontal document overflow in any capture",
+    "screenshots": [
+      {
+        "file": "shell-api-unavailable-desktop.png",
+        "source": "prototypes/frontend/shell-states.html?state=api-unavailable",
+        "viewport": [
+          1600,
+          1100
+        ],
+        "fullPage": true,
+        "sha256": "4d705bea8cbe7cedec0939c2d92a4133d66bd4efb5b7fddab1a82dbab03e6177"
+      },
+      {
+        "file": "shell-api-unavailable-mobile.png",
+        "source": "prototypes/frontend/shell-states.html?state=api-unavailable",
+        "viewport": [
+          390,
+          844
+        ],
+        "fullPage": true,
+        "sha256": "9c0960942139d95d64556b74117ce6c8e74b4600f6316e8b84941e08e71807ef"
+      },
+      {
+        "file": "shell-context-replaced-desktop.png",
+        "source": "prototypes/frontend/shell-states.html?state=context-replaced",
+        "viewport": [
+          1600,
+          1100
+        ],
+        "fullPage": true,
+        "sha256": "bb5f7261c481b50d490c87c9654fa0a049b86903824cda8b112f351550d1642f"
+      },
+      {
+        "file": "shell-context-replaced-mobile.png",
+        "source": "prototypes/frontend/shell-states.html?state=context-replaced",
+        "viewport": [
+          390,
+          844
+        ],
+        "fullPage": true,
+        "sha256": "09f590308ccf0b150df609a7a83bc5c026c7304aaaa92f56a9f67b2e91c84039"
+      },
+      {
+        "file": "shell-controls-desktop.png",
+        "source": "prototypes/frontend/shell-states.html?state=controls",
+        "viewport": [
+          1600,
+          1100
+        ],
+        "fullPage": true,
+        "sha256": "a5f683c80c4d766bcade41ba69f4eaeaa26d724b0a77058b48275f664755baaa"
+      },
+      {
+        "file": "shell-controls-mobile.png",
+        "source": "prototypes/frontend/shell-states.html?state=controls",
+        "viewport": [
+          390,
+          844
+        ],
+        "fullPage": true,
+        "sha256": "e7d0b97a8664a1bd88854ea338dd3d8fbe3bfb9c077ddd8eb0518582273cc832"
+      },
+      {
+        "file": "shell-not-found-admin-desktop.png",
+        "source": "prototypes/frontend/shell-states.html?state=not-found-admin",
+        "viewport": [
+          1600,
+          1100
+        ],
+        "fullPage": true,
+        "sha256": "e0a3f8df8b9cb13645be236c7a16abaea68d887907cff9984c2a7eeea48f65c4"
+      },
+      {
+        "file": "shell-not-found-admin-mobile.png",
+        "source": "prototypes/frontend/shell-states.html?state=not-found-admin",
+        "viewport": [
+          390,
+          844
+        ],
+        "fullPage": true,
+        "sha256": "adbe51f3c1751545628d45973dbccc8037b6bb53b982fd2c1104cc11270842d9"
+      },
+      {
+        "file": "shell-not-found-public-desktop.png",
+        "source": "prototypes/frontend/shell-states.html?state=not-found-public",
+        "viewport": [
+          1600,
+          1100
+        ],
+        "fullPage": true,
+        "sha256": "926c5190fe5c23e1ea342341d12a9c25874171b0f962cb8e25c5d5c4238f0a9d"
+      },
+      {
+        "file": "shell-not-found-public-mobile.png",
+        "source": "prototypes/frontend/shell-states.html?state=not-found-public",
+        "viewport": [
+          390,
+          844
+        ],
+        "fullPage": true,
+        "sha256": "a3b4830af19b9a90912360952326e971b7e306156b0a493be813f62b8d5a00cf"
+      },
+      {
+        "file": "shell-public-shell-desktop.png",
+        "source": "prototypes/frontend/shell-states.html?state=public-shell",
+        "viewport": [
+          1600,
+          1100
+        ],
+        "fullPage": true,
+        "sha256": "faa89d7e1828ffa68bedd2af55d4df39cfdfa1b13faf4ef442b9b7bdaa9cf914"
+      },
+      {
+        "file": "shell-public-shell-mobile-menu.png",
+        "source": "prototypes/frontend/shell-states.html?state=public-shell&menu=open",
+        "viewport": [
+          390,
+          844
+        ],
+        "fullPage": true,
+        "sha256": "5bb5bb10f6470280cc66396e510e6616ee3c805ff96450e3aac7a02eed5bbd5e"
+      },
+      {
+        "file": "shell-public-shell-mobile.png",
+        "source": "prototypes/frontend/shell-states.html?state=public-shell",
+        "viewport": [
+          390,
+          844
+        ],
+        "fullPage": true,
+        "sha256": "200e49e16307b570412d8de91ab77f5ad84cb585b9f9c1496968a5c9407fec4c"
+      },
+      {
+        "file": "shell-route-failed-desktop.png",
+        "source": "prototypes/frontend/shell-states.html?state=route-failed",
+        "viewport": [
+          1600,
+          1100
+        ],
+        "fullPage": true,
+        "sha256": "8f9f7d12c6f08d31f9de12de602be49f48b61595b31f0e0568887147b0b25ba0"
+      },
+      {
+        "file": "shell-route-failed-mobile.png",
+        "source": "prototypes/frontend/shell-states.html?state=route-failed",
+        "viewport": [
+          390,
+          844
+        ],
+        "fullPage": true,
+        "sha256": "c9831065fa0023493c314a7e9c2b5e3de784f4d2364b0c1beaca294db4ad2071"
+      }
+    ]
+  }
+}
