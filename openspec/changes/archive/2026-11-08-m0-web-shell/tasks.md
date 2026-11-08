@@ -40,4 +40,4 @@
 
 - [x] 6.1 Run the agreed frontend builds/tests, boundary checks, rendering/isolation checks and combined startup; record commands, versions and results in design.md
 - [x] 6.2 Update actual commands/status in README, CLAUDE, roadmap and ADR 0011 follow-ups without marking H1 functionality complete
-- [ ] 6.3 Validate the implemented change, review its acceptance and archive it only after every completion gate passes
+- [x] 6.3 Validate the implemented change, review its acceptance and archive it only after every completion gate passes

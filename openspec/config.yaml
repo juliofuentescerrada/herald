@@ -33,7 +33,7 @@ context: |
     the documented scale. The earlier round-management PNG is superseded for semantics.
   - openspec/specs describes what is implemented. Active deltas describe target changes;
     archived changes and dated reviews remain historical. m0-solution-skeleton and m0-messaging
-    are done; m0-web-shell is implemented. H1 functionality has not started.
+    and m0-web-shell are done. H1 functionality has not started.
   - Modular monolith: one module per bounded context, with Domain at the centre and vertical slices
     (Features: one namespace per use case, one file or cohesive folder; Persistence at the edge);
     features never depend on other features. Shared business rules belong in Domain; technical
