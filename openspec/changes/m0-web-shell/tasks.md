@@ -15,7 +15,7 @@
 
 ## 3. Shared UI and shells
 
-- [ ] 3.1 Run the W-03 experiment on a throwaway scaffold before any ui code: ng-primitives button (all states) and tabs with Herald tokens and radius 0, prerendered catalogue page with clean hydration, Vitest keyboard/focus and axe checks, and a failing lint for an app importing ng-primitives; record the result in design.md, reopening W-03 if it fails
+- [x] 3.1 Run the W-03 experiment on a throwaway scaffold before any ui code: ng-primitives button (all states) and tabs with Herald tokens and radius 0, prerendered catalogue page with clean hydration, Vitest keyboard/focus and axe checks, and a failing lint for an app importing ng-primitives; record the result in design.md, reopening W-03 if it fails
 - [ ] 3.2 Implement only reviewed shell controls/tokens in ui and consume them from both apps with square corners and the documented scale, with Tabler outline icons (`@tabler/icons-angular`) exposed only through ui
 - [ ] 3.3 Add the development-only catalogue project (prerendered, never deployed); cover relevant keyboard, focus, error, disabled/loading and recovery states
 - [ ] 3.4 Implement reviewed admin CSR and public shell layouts at desktop/narrow widths without tournament or participant functionality

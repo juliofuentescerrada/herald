@@ -113,7 +113,7 @@ Use sentence case for actions and headings. **Confirmed icon library:** use Tabl
 
 ## 5. Shared component contracts
 
-Implementation boundary (ADR 0011): an internal Angular `ui` library supplies shared tokens and common controls to both applications. Portal compositions, feature components and app-local shared components stay within their app. Shared controls support SSR and expose presentation contracts without API, session, permission or app-routing dependencies. A component/state catalogue is development tooling introduced with the first controls, not a third product application. The choice of external component foundation versus our own controls remains open.
+Implementation boundary (ADR 0011): an internal Angular `ui` library supplies shared tokens and common controls to both applications. Portal compositions, feature components and app-local shared components stay within their app. Shared controls support SSR and expose presentation contracts without API, session, permission or app-routing dependencies. A component/state catalogue is development tooling introduced with the first controls, not a third product application. Its controls are built on `ng-primitives` (headless), which only `ui` may import (`m0-web-shell` W-03).
 
 | Component | Common contract | Admin emphasis | Public emphasis |
 | --- | --- | --- | --- |
@@ -264,7 +264,7 @@ The accessibility target is a design requirement, not a compliance claim for uni
 
 Confirmed constraints: modern neutral competition identity, compact operational administration, square corners throughout, a shared visual foundation and Tabler outline icons for the eventual application. The documentation prototypes can retain their dependency-free icon/text treatment.
 
-Still proposed: the exact electric-lime accent, detailed density and standings placement, public imagery, complete typography/interaction states and the component implementation foundation. Review the admin/public compositions together, then approve each affected journey and its exception states. A polished example does not imply approval of every screen, proposed policy or dependency.
+Still proposed: the exact electric-lime accent, detailed density and standings placement, public imagery, and complete typography/interaction states. Review the admin/public compositions together, then approve each affected journey and its exception states. A polished example does not imply approval of every screen, proposed policy or dependency.
 
 The v0.7 consolidation preserves these decisions while correcting contradictory references and adding deterministic review surfaces. The current Refactoring UI assessment and its exact render/test scope are recorded in the prototype change's design note rather than repeated as a product-wide quality claim.
 
