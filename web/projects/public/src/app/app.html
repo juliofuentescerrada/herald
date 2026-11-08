@@ -1,1 +1,16 @@
+<header class="header" data-herald-surface="inverse" [class.menu-open]="menuOpen()">
+  <a class="brand" routerLink="/">HERALD<span class="brand-dot" aria-hidden="true">.</span></a>
+  <button herald-button class="menu-button" type="button" aria-controls="public-menu" [attr.aria-expanded]="menuOpen()" (click)="menuOpen.set(!menuOpen())">
+    <herald-icon [name]="menuOpen() ? 'x' : 'menu'" />Menu
+  </button>
+  <nav class="links" id="public-menu" aria-label="Main">
+    <a routerLink="/" routerLinkActive ariaCurrentWhenActive="page" [routerLinkActiveOptions]="{ exact: true }">Home</a>
+    <a herald-button class="workspace-link" [href]="workspaceUrl">Organiser workspace</a>
+  </nav>
+</header>
+
 <router-outlet />
+
+<footer class="footer">
+  <span>Herald</span>
+</footer>

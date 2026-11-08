@@ -1,0 +1,16 @@
+.hero { padding: var(--herald-space-16) max(5vw, 24px); background: var(--herald-color-surface-inverse); color: var(--herald-color-text-inverse); }
+.eyebrow { margin: 0 0 var(--herald-space-4); color: var(--herald-color-brand-accent); font-size: var(--herald-text-sm); font-weight: 800; letter-spacing: 2px; text-transform: uppercase; }
+.hero h1 { max-width: 16ch; margin-bottom: var(--herald-space-4); font-size: 56px; line-height: 1.03; letter-spacing: -2px; }
+.lead { max-width: 48ch; margin: 0 0 var(--herald-space-6); color: var(--herald-color-text-inverse-secondary); font-size: 18px; }
+.points { max-width: 1280px; margin: 0 auto; padding: var(--herald-space-12) max(5vw, 24px); }
+.points h2 { margin-bottom: var(--herald-space-6); font-size: 24px; }
+.points-grid { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: var(--herald-space-8); }
+.points h3 { margin-bottom: var(--herald-space-2); font-size: 18px; }
+.points p { margin: 0; color: var(--herald-color-text-secondary); font-size: var(--herald-text-lg); }
+
+@media (max-width: 700px) {
+  .hero { padding: var(--herald-space-8) var(--herald-space-4); }
+  .hero h1 { font-size: 40px; letter-spacing: -1.5px; }
+  .points { padding: var(--herald-space-8) var(--herald-space-4); }
+  .points-grid { grid-template-columns: 1fr; gap: var(--herald-space-6); }
+}

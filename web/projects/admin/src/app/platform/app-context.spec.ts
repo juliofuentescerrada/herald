@@ -75,6 +75,17 @@ describe('The admin context', () => {
     firstTab.destroy();
     secondTab.destroy();
   });
+
+  it('tells the reloaded tab once that the context was replaced elsewhere', () => {
+    sessionStorage.clear();
+    const before = loadDocument({ identity: 'ana', organisation: 'northside' });
+    expect(before.context.replacedElsewhere()).toBe(false);
+    before.context['channel']?.onmessage?.(new MessageEvent('message', { data: 'replaced' }));
+    expect(before.location.reload).toHaveBeenCalledOnce();
+
+    expect(loadDocument({ identity: 'ana', organisation: 'southside' }).context.replacedElsewhere()).toBe(true);
+    expect(loadDocument({ identity: 'ana', organisation: 'southside' }).context.replacedElsewhere()).toBe(false);
+  });
 });
 
 describe('Organisation query keys', () => {

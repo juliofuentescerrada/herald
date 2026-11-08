@@ -15,6 +15,16 @@ export const CONTEXT_LOCATION = new InjectionToken<Pick<Location, 'assign' | 're
 });
 
 const channelName = 'herald-admin-context';
+const replacedKey = 'herald-context-replaced';
+
+/** Session storage survives the reload of this tab only; unavailable storage just loses the notice. */
+const sessionStore = (document: Document): Pick<Storage, 'getItem' | 'setItem' | 'removeItem'> | null => {
+  try {
+    return document.defaultView?.sessionStorage ?? null;
+  } catch {
+    return null;
+  }
+};
 
 /**
  * Identity and organisation as read-only signals. The only way to change them is a full load
@@ -26,12 +36,20 @@ export class AppContext {
   private readonly location = inject(CONTEXT_LOCATION);
   private readonly initial = inject(INITIAL_CONTEXT);
   private readonly channel = typeof BroadcastChannel === 'undefined' ? null : new BroadcastChannel(channelName);
+  private readonly store = sessionStore(inject(DOCUMENT));
 
   readonly identity = signal(this.initial.identity).asReadonly();
   readonly organisation = signal(this.initial.organisation).asReadonly();
+  /** True once, in the document that loaded because another tab replaced the context. */
+  readonly replacedElsewhere = signal(this.store?.getItem(replacedKey) === '1').asReadonly();
 
   constructor() {
-    if (this.channel) this.channel.onmessage = () => this.location.reload();
+    this.store?.removeItem(replacedKey);
+    if (this.channel)
+      this.channel.onmessage = () => {
+        this.store?.setItem(replacedKey, '1');
+        this.location.reload();
+      };
     inject(DestroyRef).onDestroy(() => this.channel?.close());
   }
 

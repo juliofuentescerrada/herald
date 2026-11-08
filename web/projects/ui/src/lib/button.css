@@ -64,3 +64,12 @@
 @keyframes herald-spin { to { transform: rotate(360deg); } }
 .herald-button[data-variant='quiet'][data-disabled='true'],
 .herald-button[data-variant='quiet'][data-disabled=''] { background: transparent; border-color: transparent; }
+
+/* On graphite, non-primary buttons are outlined in the inverse colours. */
+[data-herald-surface='inverse'] .herald-button:not([data-variant='primary']) {
+  border-color: var(--herald-color-border-control-inverse);
+  background: transparent;
+  color: var(--herald-color-text-inverse);
+}
+[data-herald-surface='inverse'] .herald-button:not([data-variant='primary'])[data-hover] { background: var(--herald-color-action-inverse-hover); }
+[data-herald-surface='inverse'] .herald-button:not([data-variant='primary'])[data-press] { background: var(--herald-color-action-inverse-pressed); }

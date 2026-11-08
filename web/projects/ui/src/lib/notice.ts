@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, computed, input, output, ViewEncapsulation } from '@angular/core';
+import { booleanAttribute, ChangeDetectionStrategy, Component, computed, input, output, ViewEncapsulation } from '@angular/core';
 import { Icon, IconName } from './icon';
 
 export type NoticeTone = 'info' | 'success' | 'warning' | 'danger';
@@ -45,7 +45,7 @@ export class Notice {
   readonly heading = input<string>();
   /** Overrides the tone's icon, for example `refresh` for a section that must reload. */
   readonly iconName = input<IconName>();
-  readonly dismissible = input(false);
+  readonly dismissible = input(false, { transform: booleanAttribute });
   readonly dismissLabel = input('Dismiss');
   readonly dismissed = output<void>();
 

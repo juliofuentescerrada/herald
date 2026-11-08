@@ -16,6 +16,8 @@
   --herald-color-action-neutral-hover: #e9ecf0;
   --herald-color-action-neutral-pressed: #d8dde4;
   --herald-color-action-disabled: #e7eaf0;
+  --herald-color-action-inverse-hover: #30363e;
+  --herald-color-action-inverse-pressed: #454d58;
   --herald-color-brand-accent: #c7f23a;
   --herald-color-border-default: #d8dde4;
   --herald-color-border-control: #747d89;

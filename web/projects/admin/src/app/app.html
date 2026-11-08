@@ -1,1 +1,38 @@
-<router-outlet />
+<div class="shell">
+  <aside class="rail" data-herald-surface="inverse">
+    <a class="brand" routerLink="/">HERALD</a>
+    <p class="context">
+      @if (context.organisation(); as organisation) {
+        <span class="context-name">{{ organisation }}</span>
+      } @else {
+        <span class="context-name">No organisation selected</span>
+      }
+      <span class="context-kind">Organisation workspace</span>
+    </p>
+    <nav class="nav" aria-label="Workspace">
+      <a herald-nav-link routerLink="/" routerLinkActive ariaCurrentWhenActive="page" [routerLinkActiveOptions]="{ exact: true }">Overview</a>
+    </nav>
+  </aside>
+
+  <main class="page">
+    @if (replacedNoticeOpen()) {
+      <herald-notice class="page-notice" dismissible (dismissed)="replacedNoticeOpen.set(false)"
+        [heading]="context.organisation() ? 'You are now working in ' + context.organisation() + '.' : 'Your working context changed.'">
+        It was changed in another tab, so this tab reloaded. Nothing from the previous context is shown.
+      </herald-notice>
+    }
+
+    @if (failedUrl(); as url) {
+      <section class="failure" aria-labelledby="failure-heading">
+        <h1 id="failure-heading">This section did not load</h1>
+        <p>Herald may have been updated since you opened it. Reload to get the current version; you will return to this page.</p>
+        <div class="actions">
+          <button herald-button variant="primary" type="button" (click)="reload(url)">Reload page</button>
+          <a herald-button routerLink="/">Go to overview</a>
+        </div>
+      </section>
+    } @else {
+      <router-outlet />
+    }
+  </main>
+</div>
