@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+  <!-- Test-only endpoints whose OpenAPI documents exercise the generated client (m0-web-shell 5.2); never deployed. -->
+  <PropertyGroup>
+    <RunWorkingDirectory>$(MSBuildProjectDirectory)</RunWorkingDirectory>
+  </PropertyGroup>
+  <ItemGroup>
+    <Using Remove="Xunit" />
+  </ItemGroup>
+  <ItemGroup>
+    <PackageReference Include="WolverineFx.RuntimeCompilation" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Herald.ModuleHosting\Herald.ModuleHosting.csproj" />
+  </ItemGroup>
+</Project>

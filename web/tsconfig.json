@@ -9,12 +9,15 @@
     "noFallthroughCasesInSwitch": true,
     "skipLibCheck": true,
     "isolatedModules": true,
+    "moduleDetection": "force",
     "experimentalDecorators": true,
     "importHelpers": true,
     "target": "ES2022",
     "module": "preserve",
     "paths": {
-      "@herald/ui": ["./projects/ui/src/public-api.ts"]
+      "@herald/ui": ["./projects/ui/src/public-api.ts"],
+      "@herald/api-client/public": ["./projects/api-client/src/public/index.ts"],
+      "@herald/api-client/admin": ["./projects/api-client/src/admin/index.ts"]
     }
   },
   "angularCompilerOptions": {

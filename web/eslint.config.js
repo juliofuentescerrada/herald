@@ -11,6 +11,8 @@ const ui = { element: { type: 'ui', fileInternalPath: 'src/public-api.ts' } };
 const entry = (type) => ({ element: { type, ...app, fileInternalPath: 'index.ts' } });
 
 module.exports = defineConfig([
+  // Written by orval (pnpm api:generate), never by hand; CI checks it matches the documents instead.
+  { ignores: ['projects/api-client/src/**/generated/**'] },
   {
     files: ['**/*.ts'],
     extends: [

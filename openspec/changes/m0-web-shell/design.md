@@ -328,6 +328,50 @@ Headless Chrome on the production builds of public, admin and the catalogue, eig
 - **Fix found by this check:** the scaffold's `express.static` gave every file a one-year cache, including the unhashed `index.html`, `index.csr.html` and favicon, so a release would not reach browsers that had cached them. `server.ts` now sends `no-cache` for any file whose name has no build hash and keeps the one-year cache for hashed bundles. Public tests (10) and lint pass.
 - **Not done here:** no cloud resources. The CDN, ingress, same-origin `/api` routing and the admin fallback belong to M4 (ADR 0012).
 
+### Two OpenAPI documents and their export (task 5.1, 8 November 2026)
+
+- **`HeraldApi`** (`src/Herald.ModuleHosting`): the constants `Public` and `Admin` and the list `Documents`. `AddHeraldApi` registers one `Microsoft.AspNetCore.OpenApi` document per group with `ShouldInclude = d => d.GroupName == document`. `MapHeraldApi` still calls `MapOpenApi()` in Development only, which serves `/openapi/public.json` and `/openapi/admin.json`; `/openapi/v1.json` no longer exists. Endpoints declare their group with `[EndpointGroupName(HeraldApi.Public)]` (namespace `Microsoft.AspNetCore.Routing`).
+- **Tests:**
+  - Host: the host serves each document in Development (one case per document); every endpoint the API explorer describes belongs to `public` or `admin`. Otherwise the test fails, lists each endpoint with its method, route and group, and says which attribute to add.
+  - Messaging: the probe module's endpoint, now in the `public` group, appears in the public document with its route, method and response type, and not in the admin one.
+- **Negative control:** a temporary ungrouped `[WolverineGet("/api/temporary-ungrouped")]` in the host made the host test fail with `["GET /api/temporary-ungrouped (group: none)"]`. The file was removed and checked with `git status`.
+- **Export:** with nothing listening on port 5432, `dotnet run --project src/Herald.Host -- openapi -d public -o <path>` and the same with `-d admin` wrote both documents (OpenAPI 3.1.1, titles `Herald.Host | public` and `Herald.Host | admin`, no paths yet). They are identical apart from `info`. The command builds the host without starting it: no database, no broker, and no schema change. Committing the documents and their clients is task 5.2.
+- **Checks:** `dotnet format --verify-no-changes` passes and so do all 54 .NET tests.
+
+### Generated documents and clients (task 5.2, 8 November 2026)
+
+- **Fixtures** (W-04 left their place to this task): `tests/Herald.ApiFixtures`, a web project that is in the solution but never deployed. It uses the same `AddHeraldApi`/`MapHeraldApi` and Wolverine without persistence, and has two endpoints:
+  - public `GET /api/fixtures/items/{itemId}` (`getFixtureItem`): `FixtureItem` with a nullable `note` and a `revision`, and 404 `ProblemDetails`;
+  - admin `PUT /api/fixtures/items/{itemId}` (`reviseFixtureItem`): body `ReviseFixtureItem` with `expectedRevision`, receipt `FixtureItemRevised`, 400 `ValidationProblemDetails`, and 403 and 409 `ProblemDetails`.
+  
+  Errors are declared with `[ProducesResponseType<…>(status, "application/problem+json")]`, which Wolverine honours.
+- **Operation ids:** `[EndpointName("…")]`. Wolverine gives every endpoint a name of its own (`GET_api_fixtures_items_itemId`, also used as the summary), and an explicit attribute wins in the document. The host test (5.1) now also requires the attribute: `Every_endpoint_of_the_host_belongs_to_exactly_one_OpenAPI_document_and_names_its_operation`. Its first version looked for any `IEndpointNameMetadata` and passed an unnamed endpoint, because of Wolverine's own name. The negative control caught it, and the test now looks for `EndpointNameAttribute`. Control: one temporary endpoint without a group and one without a name were both listed (`group: none`, `operation: none`), and the files were removed.
+- **Strict numbers (a change to `AddHeraldApi`):** with the web defaults, .NET reads numbers from strings too, and describes every `int` as `type: [integer, string]` with a `pattern`. The client would then get `revision: number | string`. `AddHeraldApi` sets `JsonNumberHandling.Strict` through `ConfigureHttpJsonOptions`. Now the documents say `integer`, and Wolverine applies the same rule: on the running fixture host, `"expectedRevision": 1` returned 200 and `"1"` returned 400 `problem+json`.
+- **Generation** (`pnpm api:generate`, i.e. `node projects/api-client/generate.mjs`):
+  - It builds each host, exports `public` and `admin` with `openapi` (no database), and runs orval with `web/orval.config.ts`.
+  - Four targets, each an `api.ts` in `mode: 'single'`, `client: 'angular'`, `clean: true`.
+  - Documents: `projects/api-client/openapi/herald.{public,admin}.json` and `openapi/fixtures/herald.fixtures.{public,admin}.json`.
+  - Code: `src/{public,admin}/generated/` and `src/fixtures/{public,admin}/generated/`.
+  - orval 8.47.0 (MIT) is pinned exactly in `devDependencies`. The lockfile only gains packages (57: orval, its plugins and their dependencies); none is removed or changes version.
+  - **Release age:** pnpm added `minimumReleaseAgeExclude` for orval's 15 packages, because 8.47.0 was published on 2026-11-07 at 21:13 UTC, inside pnpm's minimum release age.
+- **Output:** `FixtureItem { id: string; name: string; note: string | null; revision: number }`, the request and receipt interfaces, and the generated `ProblemDetails` and `ValidationProblemDetails` (`errors: {[key: string]: string[]}`). Services: `@Injectable({ providedIn: 'root' })` with `inject(HttpClient)` and relative `/api/…` URLs, with no state of their own. The host's documents have no paths yet, so their `api.ts` is only orval's header comment.
+- **Entry points:**
+  - `src/public/index.ts` and `src/admin/index.ts` re-export their generated client and `problemOf`, and are mapped as `@herald/api-client/public` and `/admin` in `tsconfig.json`.
+  - `"moduleDetection": "force"` lets an entry point re-export a generated file that has no declarations yet.
+  - They are not ng-packagr secondary entry points: the apps consume the library from source, like `ui`, and `public-api.ts` only points to them.
+- **Error adapter** (`src/problem.ts`): `problemOf<T>(error)` returns the body of an `HttpErrorResponse` whose content type is `application/problem+json`, typed as the generated type the caller names. Otherwise it returns `undefined`. Nothing navigates, notifies or retries.
+- **Lint:** `projects/api-client/src/**/generated/**` is ignored, because orval's style breaks four stylistic rules. CI compares it with the documents instead (task 5.4).
+- **Tests** (`src/fixtures/fixtures.spec.ts`, now in `pnpm test:all`): six tests through `HttpTestingController`.
+  - The GET requests its declared route and returns `FixtureItem`; `null` and the revision keep their declared types.
+  - The PUT sends its body and returns the receipt.
+  - A 400 is read as `ValidationProblemDetails` with its `errors`; 403 and 409 are read as `ProblemDetails`, and the error is still an `HttpErrorResponse`.
+  - A 502 in plain text and a network failure read as no problem.
+- **Checks:**
+  - A second `pnpm api:generate` produced no difference (`diff -r` of the whole library).
+  - Library type check, lint, boundaries 15/15, and the Vitest suites: admin 13, public 10, catalogue 5, ui 19, api-client 6. Production builds pass.
+  - .NET: format and 54 tests.
+- **Documentation:** `web/README.md`, section *API client*.
+
 ## Validation and completion
 
 Before implementation: resolve W-01–06, review affected shell states and approve the bounded change. During implementation: compile both apps, check library imports and negative fixtures, verify deterministic API/client generation, render at desktop/mobile widths and exercise keyboard/error recovery, run SSG/hydration and concurrent-request isolation fixtures, and start both apps through Aspire. Record actual commands, versions and results here. Archive only after the tasks and acceptance scenarios are complete; schema validation alone is not completion.

@@ -1,2 +1,2 @@
-// The generated public and admin clients arrive with task 5.2.
+// Import an entry point instead: `@herald/api-client/public` or `@herald/api-client/admin` (W-04).
 export {};

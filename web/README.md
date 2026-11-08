@@ -36,3 +36,15 @@ pnpm build:all                      # production builds
 ```
 
 To run a built public server locally, allow the host: `NG_ALLOWED_HOSTS=localhost PORT=4000 node dist/public/server/server.mjs`. Without it, Angular answers 400 (SSRF protection).
+
+## API client
+
+`@herald/api-client/public` and `@herald/api-client/admin` are generated, not written: orval 8.47.0 (`orval.config.ts`) turns the host's OpenAPI documents (`projects/api-client/openapi/`) into an Angular service on `HttpClient` plus model interfaces. Errors stay `HttpErrorResponse`; `problemOf<ProblemDetails>(error)` reads their typed body.
+
+After changing an endpoint, regenerate and commit the documents and the clients (needs the .NET SDK, not a database):
+
+```sh
+pnpm api:generate
+```
+
+Every endpoint declares its document and operation, or a host test fails: `[EndpointGroupName(HeraldApi.Public)]` (or `Admin`) and `[EndpointName("getThing")]`; the operation becomes the method name. The host has no endpoints yet, so the test-only host `tests/Herald.ApiFixtures` provides representative responses and errors, generated into `src/fixtures/` and covered by its tests.

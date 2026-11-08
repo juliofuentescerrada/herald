@@ -31,8 +31,8 @@
 
 ## 5. Generated API contract
 
-- [ ] 5.1 Split `AddHeraldApi` into public and admin documents with strict group inclusion, add the host test that fails for an ungrouped endpoint, update the existing document tests, and export both with Wolverine's `openapi` command without a database, credentials or schema mutation
-- [ ] 5.2 Generate and commit both OpenAPI documents and their orval clients behind `@herald/api-client/public` and `/admin`, with pinned tooling and config, explicit operation ids, the `ProblemDetails` error adapter, including representative typed response/error fixtures
+- [x] 5.1 Split `AddHeraldApi` into public and admin documents with strict group inclusion, add the host test that fails for an ungrouped endpoint, update the existing document tests, and export both with Wolverine's `openapi` command without a database, credentials or schema mutation
+- [x] 5.2 Generate and commit both OpenAPI documents and their orval clients behind `@herald/api-client/public` and `/admin`, with pinned tooling and config, explicit operation ids, the `ProblemDetails` error adapter, including representative typed response/error fixtures
 - [ ] 5.3 Verify the generated client has no UI/navigation/business cache policy and remains usable through reviewed browser/server transport configuration
 - [ ] 5.4 Add CI regeneration checks; prove a stale document/client fails and two unchanged generations produce no diff
 
