@@ -281,6 +281,7 @@ Headless Chrome on the production builds of public, admin and the catalogue, eig
 | control: `?marker=control` (sets `Authorization`) | 1 | no | 2 (a repeat and TanStack's retry) | pending, then error |
 
   The control shows the check detects a repeat. W-06 already expected it: Angular's transfer cache skips requests with authorisation headers, so personal data loads in the browser. Its requests return 404 because the built server has no `/api`; the development proxy is task 4.4's, and in production same-origin routing is M4's (ingress).
+- **CI correction (found while checking task 5.4's run):** from this task's push (`5909702`) onwards, CI's `pnpm test:all` failed in `routes.spec.ts` (*render the fixtures…*, 5 s timeout), while it passed locally. The SSR fixture's new query sent a real request from jsdom to `http://localhost:3000/api/_fixtures/public`. Locally `whenStable()` returned with the query still `pending`, so the result depended on the environment. Neither a silent server on port 3000 nor `CI=true` reproduced the hang. The test now uses `provideHttpClientTesting()`, waits for the request, answers it, checks that the page renders the data and calls `verify()`: no request leaves the test. It passed three runs in a row locally.
 - **Deferred:** API-backed metadata for tournament pages, visibility and cache policy belong to the first public tournament feature (spec: "Public rendering is selected by route").
 
 ### Local startup through Aspire (task 4.4, 8 November 2026)
