@@ -1,6 +1,6 @@
 ## Status
 
-Draft target requirements for `m0-web-shell`. Required shell/state visuals and tooling choices remain review gates before implementation.
+Target requirements for `m0-web-shell`, approved for implementation on 8 November 2026. Visuals and tooling are decided in design.md; implementation is in progress.
 
 ## ADDED Requirements
 

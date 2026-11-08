@@ -1,6 +1,6 @@
 ## Status and context
 
-**Draft; implementation and final shell visuals are not approved.** The authorised pre-development consolidation prepares this change without creating production code. ADR 0011 defines the direction; exact tooling and remaining visual states are reviewed before implementation. `m0-solution-skeleton` and `m0-messaging` are implemented and archived; this draft was updated on 8 November 2026 with what `m0-messaging` delivered (task 1.4).
+**Approved for implementation on 8 November 2026** (gates 1.1–1.4 closed). The decisions below (W-01–W-06) and the reviewed visual references are the implementation contract. ADR 0011 defines the direction. `m0-solution-skeleton` and `m0-messaging` are implemented and archived; this design was updated on 8 November 2026 with what `m0-messaging` delivered (task 1.4).
 
 Sources: [ADR 0011](../../../docs/adr/0011-angular-front-end-and-generated-api-contract.md), [roadmap](../../../docs/roadmap.md), [functional baseline](../../../docs/herald-functional-discovery.md), [visual direction](../../../docs/herald-visual-direction.md), [CLAUDE](../../../CLAUDE.md) and [OpenSpec context](../../config.yaml). Product scope follows ADR 0013; this technical foundation adds no H1/H2 capability.
 
@@ -183,6 +183,17 @@ Approved choices: the destructive variant is outlined in red rather than filled;
 - **Rejected:** an in-app reset (clearing the query cache, scoping every key, navigating and cleaning route injectors with `withAutoCleanupInjectors`): smoother, but every source of state has to be covered, and one service that keeps something leaks the previous context; it remains the upgrade if H1 shows organisation changes are frequent. Forwarding the user's credentials during SSR: it would make server output personal and every cache a risk. TanStack's dehydration for SSR: the HttpClient transfer cache already carries the data.
 
 All W-01–W-06 decisions are recorded; W-03 is confirmed by its experiment in task 3.1. These draft requirements are proposed targets, not evidence that the choices or implementation are approved.
+
+## Implementation record
+
+### Workspace and boundaries (tasks 2.1–2.5, 8 November 2026)
+
+- **Workspace** (`web/`): `ng new --create-application=false` with Angular CLI 22.2.5 and pnpm 12.18.0 on Node 26.13.0; projects `admin` (CSR), `public` (SSR scaffold), `catalogue` (dev-only, SSR scaffold), libraries `ui` (`@herald/ui`, mapped to its source entry, selector prefix `herald`) and `api-client` (empty until 5.2). `engineStrict` and the four approved install scripts live in `pnpm-workspace.yaml`. The W-01 build that Docker could not run now passes on Node 26: all three apps build, `public` and `catalogue` prerender one route.
+- **Licences** (`pnpm licenses list`, all dependencies): MIT 307, ISC 22, BSD 13, Apache-2.0 14, BlueOak/0BSD/CC0/MIT-0 6, plus `caniuse-lite` (CC-BY-4.0, browser data) and `lightningcss` (MPL-2.0, build tool); all free for an open-source project.
+- **Import matrix:** one root `eslint.config.js` (ESLint 10.14, typescript-eslint 8.71, angular-eslint 22.6.0, eslint-plugin-boundaries 7.4.2, eslint-import-resolver-typescript 4.4.5). Two settings the W-02 experiment did not need: `checkAllOrigins: true`, without which external packages (`ng-primitives`, `@tabler/*`) are never checked, and placing the libraries before the app `src` descriptor so their files are not classified as bootstrap. Library imports must reach `src/public-api.ts` (`ui`) or `src/{public,admin}/index.ts` (`api-client`); the public app may reach only `src/public/index.ts`.
+- **Fixtures:** `web/boundary-fixtures/` plants 15 violations marked `// violation` (relative, alias, barrel and dynamic feature-to-feature imports; a feature added after the policies; composition into a feature's internals; feature into composition; platform and shared into features; a deep `ui` import; `ng-primitives` and Tabler from a feature; `api-client` into `ui`; the public app into the admin client and into the admin app). `pnpm lint:boundaries` passed (15 planted, 15 reported, 0 mismatches) and failed with one mismatch when a mark was removed. `pnpm lint` passes for all five projects.
+- **State:** `QUERY_CLIENT` (an `InjectionToken` factory) in both apps' platform; the admin platform's `AppContext` (read-only signals, `replace()` posting to `BroadcastChannel('herald-admin-context')` and calling `location.assign`), started by `provideAppContext()`; `organisationKey()`. Seven admin tests pass: no setter on the context, replacement is a full load, no cached query or draft survives into the next document, the other tab reloads (and the test fails when the broadcast is removed), and scoped keys. The public app gets its context with its first participant feature.
+- **CI:** a `web` job (pinned `pnpm/action-setup` 6.1.1, `setup-node` 7.1.0 reading `.nvmrc`) runs `install --frozen-lockfile`, `lint`, `lint:boundaries`, `test:all` and `build:all`.
 
 ## Validation and completion
 

@@ -1,17 +1,17 @@
 ## 1. Review gates
 
-- [ ] 1.1 Review this draft against ADR 0011 and confirm its shell-only scope; record implementation approval before production changes
+- [x] 1.1 Review this draft against ADR 0011 and confirm its shell-only scope; record implementation approval before production changes (8 November 2026: approved by the maintainer)
 - [x] 1.2 Reuse the referenced mockups where sufficient and obtain/review missing admin/public shell, narrow-screen, control and recovery states; record references in design.md (8 November 2026: shell-state prototype and captures approved)
 - [x] 1.3 Resolve W-01–06 with exact versions, licences, generator/transport, UI foundation, catalogue, boundary checks and state/rendering decisions (8 November 2026: all recorded in design.md; W-03 is confirmed by task 3.1's experiment)
 - [x] 1.4 Coordinate OpenAPI export, host/AppHost/CI ownership and integration order with m0-messaging without changing its transport design (8 November 2026: `m0-messaging` is archived; what it delivered, the constraints it leaves and this change's ownership are recorded in design.md; the export mechanism is part of W-04)
 
 ## 2. Workspace and dependency boundaries
 
-- [ ] 2.1 Create the reviewed workspace with admin/public applications, separate ui/api-client libraries and explicit public entry points
-- [ ] 2.2 Establish app composition, platform and local presentation boundaries without precreating product feature hierarchies
-- [ ] 2.3 Add CI import checks for relative/alias/barrel/dynamic imports, cross-feature/app access and library internals; discover new features automatically
-- [ ] 2.4 Verify allowed imports pass and temporary forbidden-import fixtures fail with actionable source/target diagnostics
-- [ ] 2.5 Provide the `QueryClient` through a token, the platform context with `replace()` (full load and `BroadcastChannel`) and scoped query keys; verify reset and cross-tab reload with fixtures without production sign-in
+- [x] 2.1 Create the reviewed workspace with admin/public applications, separate ui/api-client libraries and explicit public entry points
+- [x] 2.2 Establish app composition, platform and local presentation boundaries without precreating product feature hierarchies
+- [x] 2.3 Add CI import checks for relative/alias/barrel/dynamic imports, cross-feature/app access and library internals; discover new features automatically
+- [x] 2.4 Verify allowed imports pass and temporary forbidden-import fixtures fail with actionable source/target diagnostics
+- [x] 2.5 Provide the `QueryClient` through a token, the platform context with `replace()` (full load and `BroadcastChannel`) and scoped query keys; verify reset and cross-tab reload with fixtures without production sign-in
 
 ## 3. Shared UI and shells
 

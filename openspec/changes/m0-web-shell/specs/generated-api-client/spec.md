@@ -1,6 +1,6 @@
 ## Status
 
-Draft target requirements for `m0-web-shell`. Export, generator, transport and paths are decided in design.md (W-04); implementation is pending.
+Target requirements for `m0-web-shell`, approved for implementation on 8 November 2026. Export, generator, transport and paths are decided in design.md (W-04).
 
 ## ADDED Requirements
 

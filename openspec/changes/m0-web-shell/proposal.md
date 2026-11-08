@@ -1,6 +1,6 @@
 ## Status
 
-**Draft, prepared 7 November 2026. Not approved for implementation.** This proposal records the frontend foundation described by ADR 0011. Toolchain choices and shell/state mockups still need review. Validation of these documents does not satisfy those gates.
+**Approved for implementation on 8 November 2026.** Prepared 7 November 2026. The maintainer confirmed the shell-only scope (gate 1.1) after the shell-state visuals were approved (gate 1.2) and W-01–W-06 were decided (gate 1.3); see `design.md`. Implementation starts with the workspace, then the W-03 experiment (task 3.1).
 
 ## Why
 

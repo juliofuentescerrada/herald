@@ -1,6 +1,6 @@
 ## Status
 
-Draft target requirements for `m0-web-shell`. These describe intended acceptance once implementation is authorised; they are not implemented capabilities.
+Target requirements for `m0-web-shell`, approved for implementation on 8 November 2026. They are not implemented capabilities until the change is archived.
 
 ## ADDED Requirements
 

@@ -1,0 +1,1 @@
+export { alphaRoutes } from './alpha';
