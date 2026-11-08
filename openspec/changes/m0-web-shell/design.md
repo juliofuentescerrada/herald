@@ -372,6 +372,36 @@ Headless Chrome on the production builds of public, admin and the catalogue, eig
   - .NET: format and 54 tests.
 - **Documentation:** `web/README.md`, section *API client*.
 
+### The client's independence and transport (task 5.3, 8 November 2026)
+
+- **What the generated code may import:** generated files are no longer ignored by ESLint. They are left out of the style rules only, and a block of their own lets them import only `@angular/core`, `@angular/common/http` and `rxjs` (`no-restricted-imports` with a regular expression). The boundary rules still apply. Negative control: `@angular/router`, `@tanstack/angular-query-experimental` and `@herald/ui` added to a generated file gave three errors (plus the boundary error for `ui`). The file was restored.
+- **No state of its own:** each service is `@Injectable({ providedIn: 'root' })` with `inject(HttpClient)`, relative URLs and no module-level variables. Options pass through to `HttpClient` (`transferCache` and `withCredentials` included), so the caller decides them.
+- **Tests** (`src/fixtures/transport.spec.ts`, two):
+  - **Two applications** (`createApplication`, each with its own root injector, as each SSR request has). Each has an interceptor that adds its own base URL and `Authorization` from a request-scoped token. The two requests overlap and are answered in reverse order. Each carries only its own application's base URL and credential, each gets its own answer, and the services are distinct instances.
+  - **With no interceptor:** the request goes to the relative `/api/…` with no headers, `withCredentials: false` and no `transferCache`.
+- **Server:** `ServerApiBackend` acts on every `HttpClient` request after the interceptors, so it treats the generated client's requests like any other: rewrite to `HERALD_API_URL`, credentials stripped. Its unit tests and `pnpm test:ssr` (50 concurrent requests) cover it, and nothing in the generated client changes it. The first public feature checks SSR transfer and hydration with a real generated operation (spec: "Contract generation builds on the existing API description").
+- **Tests:** api-client 8; lint passes.
+
+### Drift check in CI (task 5.4, 8 November 2026)
+
+- **CI step** (job `web`, after `pnpm install` and before lint and tests, with `setup-dotnet` from `global.json`), *The OpenAPI documents and generated clients are current*:
+  - It runs `pnpm api:generate`, which first builds both hosts.
+  - It fails if `git diff --name-status` or untracked files show anything under `projects/api-client/openapi` or `projects/api-client/src/**/generated/**`.
+  - Its message names the files and the command (`pnpm api:generate` in `web/`), in the shape of the Wolverine check.
+- **Evidence:** the step's script was taken from `ci.yml` as written and run with GitHub's shell (`bash --noprofile --norc -eo pipefail`) from `web/`:
+
+| Case | Result | Files named |
+| --- | --- | --- |
+| Unchanged sources, twice | passes both times | |
+| A: a property added to a fixture contract (`string? Tag = null`) without regenerating | fails | both fixture documents and both fixture clients (the edit touched a record in each) |
+| B: a hand edit committed in a generated client (`revision: number \| string`) | fails | `M …/fixtures/public/generated/api.ts` |
+| C: `herald.admin.json` missing from the commit | fails | `projects/api-client/openapi/herald.admin.json` (untracked) |
+| D: a stray committed file in `generated/` | fails | `D …/public/generated/extra.ts` (orval's `clean` removes it) |
+
+  B to D were simulated by staging the stale state, because `git diff` compares with the index. A first simulation that left them unstaged passed: regeneration had simply overwritten them. Everything was restored and checked with `git status`.
+- **Not run on GitHub yet:** the push of this task runs it for the first time on the pull request.
+- **Documentation:** `CLAUDE.md` (*Commands*) and `web/README.md`.
+
 ## Validation and completion
 
 Before implementation: resolve W-01–06, review affected shell states and approve the bounded change. During implementation: compile both apps, check library imports and negative fixtures, verify deterministic API/client generation, render at desktop/mobile widths and exercise keyboard/error recovery, run SSG/hydration and concurrent-request isolation fixtures, and start both apps through Aspire. Record actual commands, versions and results here. Archive only after the tasks and acceptance scenarios are complete; schema validation alone is not completion.

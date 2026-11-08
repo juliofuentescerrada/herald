@@ -47,4 +47,6 @@ After changing an endpoint, regenerate and commit the documents and the clients 
 pnpm api:generate
 ```
 
-Every endpoint declares its document and operation, or a host test fails: `[EndpointGroupName(HeraldApi.Public)]` (or `Admin`) and `[EndpointName("getThing")]`; the operation becomes the method name. The host has no endpoints yet, so the test-only host `tests/Herald.ApiFixtures` provides representative responses and errors, generated into `src/fixtures/` and covered by its tests.
+CI regenerates them and fails, naming the files, if the committed ones differ. Every endpoint declares its document and operation, or a host test fails: `[EndpointGroupName(HeraldApi.Public)]` (or `Admin`) and `[EndpointName("getThing")]`; the operation becomes the method name. The host has no endpoints yet, so the test-only host `tests/Herald.ApiFixtures` provides representative responses and errors, generated into `src/fixtures/` and covered by its tests.
+
+Generated code may import only `@angular/core`, `@angular/common/http` and `rxjs` (lint). It keeps no base URL, credential or cache of its own: each application supplies them through its `HttpClient` providers and interceptors, and on the server the public app's `ServerApiBackend` rewrites `/api` and strips credentials.

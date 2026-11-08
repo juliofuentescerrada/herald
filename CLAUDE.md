@@ -43,6 +43,7 @@ Docker is required for the tests and the AppHost.
 - Add a migration to a module (`dotnet-ef` tool): `dotnet ef migrations add <Name> --project src/Herald.<Module> --output-dir Persistence/Migrations`
 - Wolverine's tables outside Development (a deployment step): `dotnet run --project src/Herald.Host -- db-apply`; check for drift with `db-assert`. In Development the host applies migrations and creates them at start-up.
 - After changing a handler or endpoint, regenerate Wolverine's code and commit it (CI fails otherwise): `dotnet run --project src/Herald.Host -- codegen write`
+- After changing an endpoint, regenerate the OpenAPI documents and the web client and commit them (CI fails otherwise): `cd web && pnpm api:generate`. Every endpoint declares `[EndpointGroupName(HeraldApi.Public)]` (or `Admin`) and `[EndpointName("operation")]`, or a host test fails.
 
 ## Status
 

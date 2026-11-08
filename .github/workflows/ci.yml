@@ -50,7 +50,20 @@ jobs:
           node-version-file: web/.nvmrc
           cache: pnpm
           cache-dependency-path: web/pnpm-lock.yaml
+      - uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
+        with:
+          global-json-file: global.json
       - run: pnpm install --frozen-lockfile
+      - name: The OpenAPI documents and generated clients are current
+        run: |
+          pnpm api:generate
+          generated=(projects/api-client/openapi ':(glob)projects/api-client/src/**/generated/**')
+          changes="$(git diff --name-status -- "${generated[@]}"; git ls-files --others --exclude-standard -- "${generated[@]}")"
+          if [ -n "$changes" ]; then
+            echo "::error::The OpenAPI documents or generated clients are stale; run 'pnpm api:generate' in web/ and commit them."
+            echo "$changes"
+            exit 1
+          fi
       - run: pnpm lint
       - name: Boundary fixtures are reported exactly
         run: pnpm lint:boundaries

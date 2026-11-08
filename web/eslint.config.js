@@ -8,13 +8,14 @@ const boundaries = require('eslint-plugin-boundaries');
 const app = { captured: { app: '{{ from.element.captured.app }}' } };
 // Elements other than libraries are entered only through their index.ts (W-02).
 const ui = { element: { type: 'ui', fileInternalPath: 'src/public-api.ts' } };
+// Written by orval (pnpm api:generate), never by hand (W-04).
+const generated = 'projects/api-client/src/**/generated/**';
 const entry = (type) => ({ element: { type, ...app, fileInternalPath: 'index.ts' } });
 
 module.exports = defineConfig([
-  // Written by orval (pnpm api:generate), never by hand; CI checks it matches the documents instead.
-  { ignores: ['projects/api-client/src/**/generated/**'] },
   {
     files: ['**/*.ts'],
+    ignores: [generated],
     extends: [
       eslint.configs.recommended,
       tseslint.configs.recommended,
@@ -25,6 +26,20 @@ module.exports = defineConfig([
     rules: {
       '@angular-eslint/directive-selector': ['error', { type: 'attribute', prefix: 'app', style: 'camelCase' }],
       '@angular-eslint/component-selector': ['error', { type: 'element', prefix: 'app', style: 'kebab-case' }],
+    },
+  },
+  // Generated code is not held to the style rules (CI compares it with the documents instead, task 5.4),
+  // but it may import only DI, HttpClient and RxJS: no app, UI, routing, session or query cache (task 5.3).
+  {
+    files: [generated],
+    languageOptions: { parser: tseslint.parser },
+    rules: {
+      'no-restricted-imports': ['error', {
+        patterns: [{
+          regex: '^(?!(@angular/core|@angular/common/http|rxjs)$)',
+          message: 'Generated clients depend only on @angular/core, @angular/common/http and rxjs.',
+        }],
+      }],
     },
   },
   {
