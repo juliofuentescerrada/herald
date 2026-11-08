@@ -230,6 +230,23 @@ Headless Chrome on the production builds of public, admin and the catalogue, eig
 - **Error recovery:** the catalogue's recovery demo keeps the typed entry after a failure and succeeds on retry (task 3.3). The admin failed section recovers with a full load (task 3.4). The context-replaced notice appears once and can be dismissed.
 - **Limits:** Inter is not installed on the review machine, so the captures use the system fallback (no font is downloaded, by design). No screen reader was run; the review relies on roles, names and order checked by axe and the tests.
 
+### Render modes, 404 and fixtures (task 4.1, 8 November 2026)
+
+- **Routes** (`projects/public/src/app`): `app.routes.server.ts` prerenders `''`, renders `**` per request, and adds the fixtures' server routes between them. The `**` route is a not-found page that sets `RESPONSE_INIT.status = 404` when rendered on the server and says nothing about unpublished tournaments (eyebrow, heading, *Go to the home page*).
+- **Fixtures:** `fixtures.ts` exports `fixtureRoutes` and `fixtureServerRoutes`. `/_fixtures/ssr` is `Server`: it says where it was rendered, through the transfer state, and has a counter that proves hydration. `/_fixtures/client` is `Client`. Their pages live in `fixture-pages.ts`, loaded lazily. The production configuration's `fileReplacements` swaps in `fixtures.production.ts` (empty arrays), so neither the routes nor the pages are bundled. 4.2 and 4.3 extend the SSR fixture with API data and isolation.
+- **Tests:** public 7. Three are new: an unknown address renders the not-found page with status 404; the home page is prerendered and anything else is server-rendered; each fixture uses its mode, the production replacement is empty, and the SSR fixture renders.
+- **Built server** (`node dist/public/server/server.mjs` with `NG_ALLOWED_HOSTS=localhost`; without it every request is a 400, as W-05 recorded for M4):
+
+| Request | Production build | Development build |
+| --- | --- | --- |
+| `/` | 200, `ng-server-context="ssg"`, page content | same |
+| `/_fixtures/ssr` | 404, not-found page | 200, `ssr`, "Rendered on the server" |
+| `/_fixtures/client` | 404, not-found page | 200, shell only (rendered in the browser) |
+| `/tournaments/private-cup` | 404, `ssr`, not-found page | same |
+
+  No file in the production `dist/public` contains "fixture". `prerendered-routes.json` lists only `/`.
+- **Browser** (headless Chrome, development build behind the built server): `/`, the SSR fixture and the 404 page hydrate with no warnings ("6 components hydrated, 1 skipped": the Menu icon, which `herald-icon` skips by design). The SSR fixture's button responds after hydration and its text stays "Rendered on the server". The client fixture renders its heading in the browser. From the 404 page, *Go to the home page* navigates on the client. The only console error is the 404 status of the document itself.
+
 ## Validation and completion
 
 Before implementation: resolve W-01–06, review affected shell states and approve the bounded change. During implementation: compile both apps, check library imports and negative fixtures, verify deterministic API/client generation, render at desktop/mobile widths and exercise keyboard/error recovery, run SSG/hydration and concurrent-request isolation fixtures, and start both apps through Aspire. Record actual commands, versions and results here. Archive only after the tasks and acceptance scenarios are complete; schema validation alone is not completion.

@@ -126,7 +126,13 @@
                   "maximumError": "8kB"
                 }
               ],
-              "outputHashing": "all"
+              "outputHashing": "all",
+              "fileReplacements": [
+                {
+                  "replace": "projects/public/src/app/fixtures.ts",
+                  "with": "projects/public/src/app/fixtures.production.ts"
+                }
+              ]
             },
             "development": {
               "optimization": false,
