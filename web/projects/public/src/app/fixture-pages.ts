@@ -8,6 +8,10 @@ import { Button } from '@herald/ui';
 
 const renderedKey = makeStateKey<string>('fixture-rendered');
 
+interface PublicResponse {
+  readonly message: string;
+}
+
 interface EchoResponse {
   readonly marker: string;
   readonly sawCredentials: boolean;
@@ -20,9 +24,10 @@ export class RequestMarker {
 }
 
 /**
- * Server-rendered per request, then hydrated. With `?marker=…` it also stores the marker in a
- * request-local service and queries the API with a credential that the server transport must strip;
- * the isolation check (`pnpm test:ssr`) renders many markers at once and compares.
+ * Server-rendered per request, then hydrated. Without a marker it reads public API data, which the
+ * browser must reuse from the transfer state instead of requesting again (W-05). With `?marker=…`
+ * it stores the marker in a request-local service and queries the API with a credential that the
+ * server transport must strip; the isolation check (`pnpm test:ssr`) renders many at once.
  */
 @Component({
   selector: 'app-server-fixture-page',
@@ -32,7 +37,9 @@ export class RequestMarker {
       <p class="eyebrow">Development fixture · never deployed</p>
       <h1>Server-rendered fixture</h1>
       <p>Rendered on the {{ renderedBy }} for this request.</p>
-      @if (marker.value()) {
+      @if (!marker.value()) {
+        <p>Public API data: <strong data-check="public">@if (publicData.data(); as data) { {{ data.message }} } @else if (publicData.isError()) { error: {{ publicData.error()?.message }} } @else { pending }</strong></p>
+      } @else {
         <dl>
           <dt>Request marker</dt><dd data-check="provider">{{ marker.value() }}</dd>
           <dt>API answer</dt>
@@ -58,6 +65,12 @@ export class ServerFixturePage {
   protected readonly presses = signal(0);
   protected readonly marker = inject(RequestMarker);
   private readonly http = inject(HttpClient);
+
+  protected readonly publicData = injectQuery(() => ({
+    queryKey: ['fixture', 'public'],
+    enabled: this.marker.value() === '',
+    queryFn: () => lastValueFrom(this.http.get<PublicResponse>('/api/_fixtures/public')),
+  }));
 
   protected readonly echo = injectQuery(() => ({
     // The same key in every request while the answer depends on the request: a shared cache would leak it.

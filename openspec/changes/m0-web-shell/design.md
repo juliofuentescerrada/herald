@@ -269,6 +269,20 @@ Headless Chrome on the production builds of public, admin and the catalogue, eig
 - **Protected data and caches:** the server only makes anonymous requests, so no protected data enters the HTML, the transfer state or a shared cache. The check confirms that no credential appears in any response and that later public responses carry nothing from earlier ones. Personal content loads in the browser after hydration (W-06).
 - **Tests:** public 10. Three new ones for the transport: stripping and rewriting with the query preserved, another host stripped but not rewritten, and an explicit error without `HERALD_API_URL`. Admin 13, ui 19, catalogue 5. Lint, boundaries 15/15 and production builds pass, with no fixtures in `dist/public`.
 
+### Server rewrite and hydration without a repeat request (task 4.3, 8 November 2026)
+
+- **Rewrite:** `ServerApiBackend` (task 4.2) rewrites this site's `/api/…` to `HERALD_API_URL` and keeps the path and query. Unit tests cover it.
+- **Fixture:** without `?marker`, `/_fixtures/ssr` reads `/api/_fixtures/public` through TanStack and `HttpClient`, with no credentials. With a marker, the isolation query from 4.2 is unchanged; `pnpm test:ssr` still passes, and its stub also answers the public route.
+- **Browser** (headless Chrome, development build behind the built server, a stub API that counts calls):
+
+| Page | API calls from the server | Response in `ng-state` | Browser requests to `/api` | After hydration |
+| --- | --- | --- | --- | --- |
+| `/_fixtures/ssr` (public data) | 1 | yes | 0 | the data stays, no warnings |
+| control: `?marker=control` (sets `Authorization`) | 1 | no | 2 (a repeat and TanStack's retry) | pending, then error |
+
+  The control shows the check detects a repeat. W-06 already expected it: Angular's transfer cache skips requests with authorisation headers, so personal data loads in the browser. Its requests return 404 because the built server has no `/api`; the development proxy is task 4.4's, and in production same-origin routing is M4's (ingress).
+- **Deferred:** API-backed metadata for tournament pages, visibility and cache policy belong to the first public tournament feature (spec: "Public rendering is selected by route").
+
 ## Validation and completion
 
 Before implementation: resolve W-01–06, review affected shell states and approve the bounded change. During implementation: compile both apps, check library imports and negative fixtures, verify deterministic API/client generation, render at desktop/mobile widths and exercise keyboard/error recovery, run SSG/hydration and concurrent-request isolation fixtures, and start both apps through Aspire. Record actual commands, versions and results here. Archive only after the tasks and acceptance scenarios are complete; schema validation alone is not completion.

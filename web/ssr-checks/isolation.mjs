@@ -17,8 +17,9 @@ const api = createServer((req, res) => {
   apiCalls.push({ path: url.pathname, marker: url.searchParams.get('marker'), sawCredentials });
   // Random latency interleaves the renders.
   setTimeout(() => {
-    res.writeHead(url.pathname === '/api/_fixtures/echo' ? 200 : 404, { 'content-type': 'application/json' });
-    res.end(JSON.stringify({ marker: url.searchParams.get('marker'), sawCredentials }));
+    const known = ['/api/_fixtures/echo', '/api/_fixtures/public'].includes(url.pathname);
+    res.writeHead(known ? 200 : 404, { 'content-type': 'application/json' });
+    res.end(JSON.stringify({ marker: url.searchParams.get('marker'), sawCredentials, message: 'Public data from the API' }));
   }, Math.random() * 50);
 }).listen(0);
 await new Promise((ok) => api.once('listening', ok));
