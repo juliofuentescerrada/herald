@@ -55,8 +55,9 @@ public static class ServiceDefaults
 
     public static WebApplication MapDefaultEndpoints(this WebApplication app)
     {
-        // Exposing health in Azure (Container Apps probes) is decided in M4.
-        if (app.Environment.IsDevelopment())
+        // Exposing health in Azure (Container Apps probes) is decided in M4. The end-to-end suite (E2E)
+        // waits on /health before its journeys.
+        if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("E2E"))
         {
             app.MapHealthChecks("/health");
             app.MapHealthChecks("/alive", new HealthCheckOptions

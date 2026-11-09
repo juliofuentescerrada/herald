@@ -6,8 +6,8 @@
 
 ## 2. Host and admin configuration
 
-- [ ] 2.1 Host `E2E` environment: no Azure Service Bus, external transports off, migrations and Wolverine tables at start-up; start-up guard against production markers; host test for the guard
-- [ ] 2.2 Admin runtime configuration: optional `protocolMode` and `knownAuthorities` (written by `write-runtime-config.mjs` when set); Vitest for both defaults and overrides
+- [x] 2.1 Host `E2E` environment: no Azure Service Bus, external transports off, migrations and Wolverine tables at start-up; start-up guard against production markers; host test for the guard
+- [x] 2.2 Admin runtime configuration: optional `protocolMode` and `knownAuthorities` (written by `write-runtime-config.mjs` when set); Vitest for both defaults and overrides
 
 ## 3. Suite infrastructure
 
