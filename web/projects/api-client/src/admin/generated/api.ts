@@ -4,4 +4,241 @@
  * Herald.Host | admin
  * OpenAPI spec version: 1.0.0
  */
+import {
+  HttpClient
+} from '@angular/common/http';
+import type {
+  HttpContext,
+  HttpEvent,
+  HttpParams
+} from '@angular/common/http';
 
+import type {
+  HttpHeaders,
+  HttpResponse as AngularHttpResponse
+} from '@angular/common/http';
+
+import {
+  Injectable,
+  inject
+} from '@angular/core';
+
+import type {
+  Observable
+} from 'rxjs';
+
+export interface CreatedOrganisation {
+  id: string;
+  name: string;
+}
+
+export interface CreateOrganisation {
+  organisationId: string;
+  name: string;
+}
+
+export type HttpValidationProblemDetailsErrors = {[key: string]: string[]};
+
+export interface HttpValidationProblemDetails {
+  /** @nullable */
+  type?: string | null;
+  /** @nullable */
+  title?: string | null;
+  /** @nullable */
+  status?: number | null;
+  /** @nullable */
+  detail?: string | null;
+  /** @nullable */
+  instance?: string | null;
+  errors?: HttpValidationProblemDetailsErrors;
+}
+
+export interface IResult { [key: string]: unknown }
+
+export interface OrganisationSummary {
+  id: string;
+  name: string;
+}
+
+export interface OwnedOrganisation {
+  id: string;
+  name: string;
+}
+
+export interface ProblemDetails {
+  /** @nullable */
+  type?: string | null;
+  /** @nullable */
+  title?: string | null;
+  /** @nullable */
+  status?: number | null;
+  /** @nullable */
+  detail?: string | null;
+  /** @nullable */
+  instance?: string | null;
+}
+
+export interface SignedInPerson {
+  displayName: string;
+  organisations: OwnedOrganisation[];
+}
+
+interface HttpClientOptions {
+  readonly headers?: HttpHeaders | Record<string, string | string[]>;
+  readonly context?: HttpContext;
+  readonly params?:
+        | HttpParams
+      | Record<string, string | number | boolean | Array<string | number | boolean>>;
+  readonly reportProgress?: boolean;
+  readonly withCredentials?: boolean;
+  readonly credentials?: RequestCredentials;
+  readonly keepalive?: boolean;
+  readonly priority?: RequestPriority;
+  readonly cache?: RequestCache;
+  readonly mode?: RequestMode;
+  readonly redirect?: RequestRedirect;
+  readonly referrer?: string;
+  readonly integrity?: string;
+  readonly referrerPolicy?: ReferrerPolicy;
+  readonly transferCache?: {includeHeaders?: string[]} | boolean;
+  readonly timeout?: number;
+}
+
+type HttpClientBodyOptions = HttpClientOptions & {
+  readonly observe?: 'body';
+};
+
+type HttpClientEventOptions = HttpClientOptions & {
+  readonly observe: 'events';
+};
+
+type HttpClientResponseOptions = HttpClientOptions & {
+  readonly observe: 'response';
+};
+
+type HttpClientObserveOptions = HttpClientOptions & {
+  readonly observe?: 'body' | 'events' | 'response';
+};
+
+
+
+
+
+
+
+@Injectable({ providedIn: 'root' })
+export class HeraldHostAdminService {
+  private readonly http = inject(HttpClient);
+/**
+ * GET_api_organisations_organisationId
+ * @summary GET_api_organisations_organisationId
+ */
+ getOrganisation<TData = OrganisationSummary>(organisationId: string, options?: HttpClientBodyOptions): Observable<TData>;
+ getOrganisation<TData = OrganisationSummary>(organisationId: string, options?: HttpClientEventOptions): Observable<HttpEvent<TData>>;
+ getOrganisation<TData = OrganisationSummary>(organisationId: string, options?: HttpClientResponseOptions): Observable<AngularHttpResponse<TData>>;
+  getOrganisation<TData = OrganisationSummary>(
+    organisationId: string, options?: HttpClientObserveOptions): Observable<TData | HttpEvent<TData> | AngularHttpResponse<TData>> {
+    if (options?.observe === 'events') {
+      return this.http.get<TData>(
+      `/api/organisations/${organisationId}`,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'events',
+      }
+    );
+    }
+
+    if (options?.observe === 'response') {
+      return this.http.get<TData>(
+      `/api/organisations/${organisationId}`,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'response',
+      }
+    );
+    }
+
+    return this.http.get<TData>(
+      `/api/organisations/${organisationId}`,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'body',
+      }
+    );
+  }
+
+/**
+ * GET_api_me
+ * @summary GET_api_me
+ */
+ getMe<TData = SignedInPerson>( options?: HttpClientBodyOptions): Observable<TData>;
+ getMe<TData = SignedInPerson>( options?: HttpClientEventOptions): Observable<HttpEvent<TData>>;
+ getMe<TData = SignedInPerson>( options?: HttpClientResponseOptions): Observable<AngularHttpResponse<TData>>;
+  getMe<TData = SignedInPerson>(
+     options?: HttpClientObserveOptions): Observable<TData | HttpEvent<TData> | AngularHttpResponse<TData>> {
+    if (options?.observe === 'events') {
+      return this.http.get<TData>(
+      `/api/me`,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'events',
+      }
+    );
+    }
+
+    if (options?.observe === 'response') {
+      return this.http.get<TData>(
+      `/api/me`,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'response',
+      }
+    );
+    }
+
+    return this.http.get<TData>(
+      `/api/me`,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'body',
+      }
+    );
+  }
+
+/**
+ * POST_api_organisations
+ * @summary POST_api_organisations
+ */
+ createOrganisation<TData = IResult | CreatedOrganisation>(createOrganisationBody: CreateOrganisation, options?: HttpClientBodyOptions): Observable<TData>;
+ createOrganisation<TData = IResult | CreatedOrganisation>(createOrganisationBody: CreateOrganisation, options?: HttpClientEventOptions): Observable<HttpEvent<TData>>;
+ createOrganisation<TData = IResult | CreatedOrganisation>(createOrganisationBody: CreateOrganisation, options?: HttpClientResponseOptions): Observable<AngularHttpResponse<TData>>;
+  createOrganisation<TData = IResult | CreatedOrganisation>(
+    createOrganisationBody: CreateOrganisation, options?: HttpClientObserveOptions): Observable<TData | HttpEvent<TData> | AngularHttpResponse<TData>> {
+    if (options?.observe === 'events') {
+      return this.http.post<TData>(
+      `/api/organisations`,
+      createOrganisationBody,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'events',
+      }
+    );
+    }
+
+    if (options?.observe === 'response') {
+      return this.http.post<TData>(
+      `/api/organisations`,
+      createOrganisationBody,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'response',
+      }
+    );
+    }
+
+    return this.http.post<TData>(
+      `/api/organisations`,
+      createOrganisationBody,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'body',
+      }
+    );
+  }
+
+};
+
+export type GetOrganisationClientResult = NonNullable<OrganisationSummary>
+export type GetMeClientResult = NonNullable<SignedInPerson>
+export type CreateOrganisationClientResult = NonNullable<IResult | CreatedOrganisation>

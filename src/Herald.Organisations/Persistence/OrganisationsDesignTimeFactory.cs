@@ -6,5 +6,6 @@ namespace Herald.Organisations.Persistence;
 // Used only by the EF Core tools to build migrations.
 public sealed class OrganisationsDesignTimeFactory : IDesignTimeDbContextFactory<OrganisationsDbContext>
 {
-    public OrganisationsDbContext CreateDbContext(string[] args) => new(ModuleDatabase.DesignTimeOptions<OrganisationsDbContext>(OrganisationsDbContext.Schema));
+    public OrganisationsDbContext CreateDbContext(string[] args) =>
+        new(ModuleDatabase.DesignTimeOptions<OrganisationsDbContext>(OrganisationsDbContext.Schema), new OrganisationContext());
 }

@@ -44,6 +44,7 @@ builder.UseWolverine(options =>
         .AddStandingsModule();
 });
 builder.Services.AddHeraldApi();
+builder.Services.AddHeraldAuthentication(builder.Configuration);
 
 var app = builder.Build();
 

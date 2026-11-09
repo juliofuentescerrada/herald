@@ -18,6 +18,9 @@ public static class ModuleRegistration
         options.Services.AddDbContextWithWolverineIntegration<TDbContext>((services, database) =>
             ModuleDatabase.Configure(database, services.GetRequiredService<NpgsqlDataSource>(), schema));
         options.Services.AddSingleton<IModuleMigration, ModuleMigration<TDbContext>>();
+        options.Services.AddOrganisationContext();
+        // The scope's instance, which the membership step has entered; generated code must not construct its own.
+        options.CodeGeneration.AlwaysUseServiceLocationFor<OrganisationContext>();
         return options;
     }
 }

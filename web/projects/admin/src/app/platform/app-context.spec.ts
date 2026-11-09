@@ -1,8 +1,9 @@
 import { createEnvironmentInjector, EnvironmentInjector, Injectable, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { QueryClient } from '@tanstack/angular-query-experimental';
-import { AppContext, CONTEXT_LOCATION, ContextSnapshot, INITIAL_CONTEXT, organisationKey } from './app-context';
+import { AppContext, CONTEXT_LOCATION, ContextSnapshot, INITIAL_CONTEXT, organisationInPath, organisationKey } from './app-context';
 import { QUERY_CLIENT } from './query-client';
+import { Session } from './session';
 
 /** Stands in for a feature's local draft state. */
 @Injectable({ providedIn: 'root' })
@@ -10,7 +11,7 @@ class DraftFixture {
   readonly draft = signal('');
 }
 
-const fakeLocation = () => ({ assign: vi.fn(), reload: vi.fn() });
+const fakeLocation = () => ({ assign: vi.fn(), reload: vi.fn(), replace: vi.fn() });
 
 /** A document: a root injector with its own context and location, as a full load creates. */
 function loadDocument(context: ContextSnapshot, location = fakeLocation()) {
@@ -88,6 +89,45 @@ describe('The admin context', () => {
   });
 });
 
+describe('Signing out in another tab', () => {
+  afterEach(() => TestBed.resetTestingModule());
+
+  it('makes this tab forget its session before it reloads', async () => {
+    const location = fakeLocation();
+    const forget = vi.fn(async () => expect(location.reload).not.toHaveBeenCalled());
+    TestBed.configureTestingModule({
+      providers: [
+        { provide: INITIAL_CONTEXT, useValue: { identity: 'ana', organisation: 'northside' } },
+        { provide: CONTEXT_LOCATION, useValue: location },
+        { provide: Session, useValue: { forget } },
+      ],
+    });
+    const context = TestBed.inject(AppContext);
+
+    await context['channel']?.onmessage?.(new MessageEvent('message', { data: 'signed-out' }));
+
+    expect(forget).toHaveBeenCalledOnce();
+    expect(location.reload).toHaveBeenCalledOnce();
+  });
+
+  it('keeps the session when only the context was replaced', () => {
+    const forget = vi.fn();
+    const location = fakeLocation();
+    TestBed.configureTestingModule({
+      providers: [
+        { provide: INITIAL_CONTEXT, useValue: { identity: 'ana', organisation: 'northside' } },
+        { provide: CONTEXT_LOCATION, useValue: location },
+        { provide: Session, useValue: { forget } },
+      ],
+    });
+
+    TestBed.inject(AppContext)['channel']?.onmessage?.(new MessageEvent('message', { data: 'replaced' }));
+
+    expect(forget).not.toHaveBeenCalled();
+    expect(location.reload).toHaveBeenCalledOnce();
+  });
+});
+
 describe('Organisation query keys', () => {
   it('start with their scope', () => {
     expect(organisationKey('northside', 'tournaments', 3)).toEqual(['org', 'northside', 'tournaments', 3]);
@@ -98,4 +138,15 @@ describe('Organisation query keys', () => {
     client.setQueryData(organisationKey('northside', 'tournaments'), 'n');
     expect(client.getQueryData(organisationKey('southside', 'tournaments'))).toBeUndefined();
   });
+});
+
+describe('The organisation in the address', () => {
+  it.each([
+    ['/organisations/0198F000-0000-7000-8000-00000000000A', '0198f000-0000-7000-8000-00000000000a'],
+    ['/organisations/0198f000-0000-7000-8000-00000000000a/tournaments/3', '0198f000-0000-7000-8000-00000000000a'],
+    ['/organisations/new', null],
+    ['/organisations', null],
+    ['/', null],
+    ['/organisations/0198f000-0000-7000-8000-00000000000a-extra', null],
+  ])('of %s is %s', (path, organisation) => expect(organisationInPath(path)).toBe(organisation));
 });

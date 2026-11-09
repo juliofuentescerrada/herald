@@ -13,7 +13,7 @@ Herald shares an Azure subscription with the maintainer's other projects, Arcana
 
 - **Compute:** Azure Container Apps for the .NET API host, scaling to zero when idle. The Angular admin app and prerendered corporate pages are static assets; the public/participant app also needs a server runtime for SSR routes (ADR 0011). Static-only hosting is insufficient for those routes. M4 decides runtime placement (including a Node.js container on Container Apps as an option), static/dynamic route serving and cache configuration, and measures SSR/API cold starts and their effect on initial public responses.
 - **Data and messaging:** Azure Database for PostgreSQL Flexible Server and Azure Service Bus (ADRs 0007, 0009).
-- **Identity and secrets:** a managed identity per app reaching PostgreSQL, Service Bus and Key Vault without passwords; users sign in with Entra ID (workforce or external identities, decided with the sign-in change).
+- **Identity and secrets:** a managed identity per app reaching PostgreSQL, Service Bus and Key Vault without passwords; users sign in through the External ID directory shared with Arcana (ADR 0014).
 - **Telemetry:** OpenTelemetry from the start (through Aspire's service defaults locally), exported to Application Insights in Azure.
 - **Infrastructure as code:** OpenTofu, deployed by GitHub Actions with OIDC federation, never from a laptop.
 - **Local development target:** .NET Aspire runs PostgreSQL, the broker, the host and both Angular shells. `m0-messaging` adds the Service Bus emulator to PostgreSQL and the host; `m0-web-shell` adds the Angular shells.

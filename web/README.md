@@ -20,7 +20,7 @@ With the rest of Herald (PostgreSQL, Service Bus emulator, host), from the repos
 dotnet run --project src/Herald.AppHost
 ```
 
-Aspire installs the workspace once and starts admin on http://localhost:4200 and public on http://localhost:4300. Both call relative `/api` URLs: `ng serve` forwards them to the host (`proxy.conf.mjs`), and public's server rendering sends them to `HERALD_API_URL`, which Aspire sets to the host's address.
+Aspire installs the workspace once and starts admin on http://localhost:4200 and public on http://localhost:4300. Both call relative `/api` URLs: `ng serve` forwards them to the host (`proxy.conf.mjs`), and public's server rendering sends them to `HERALD_API_URL`, which Aspire sets to the host's address. Aspire also links the two apps: public's Sign in goes to `HERALD_ADMIN_URL`, and admin's runtime configuration (`projects/admin/public/runtime-config.json`, written by `start:admin`) gets `HERALD_AUTH_*` and `HERALD_PUBLIC_URL`.
 
 On its own, without the AppHost: `pnpm start:admin` or `pnpm start:public`. `/api` then goes to the host's launch address, http://localhost:5180.
 

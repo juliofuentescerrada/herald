@@ -1,0 +1,103 @@
+<div class="standalone-page">
+  <section class="panel" aria-labelledby="access-heading">
+    <h1 id="access-heading">{{ copy().heading }}</h1>
+    <p class="lead">{{ copy().lead }}</p>
+
+    @switch (access.problem()) {
+      @case ('signing-in') {
+        <p role="status">Opening your account provider…</p>
+      }
+      @case ('sign-in-failed') {
+        <p role="alert">Your account provider could not complete sign-in.</p>
+      }
+      @case ('sign-in-cancelled') {
+        <p role="status">No changes were made.</p>
+      }
+      @case ('not-assigned') {
+        <p>Contact the platform operator who invited you and ask them to check your application assignment.</p>
+        <p>Signing in with your account provider does not grant Herald access.</p>
+      }
+      @case ('session-expired') {
+        @if (access.unsavedInput()) {
+          <herald-notice tone="warning" heading="Your unsaved input is kept in this tab">
+            Sign in with the same account. Herald must check your current membership again before restoring the task.
+          </herald-notice>
+        }
+      }
+      @case ('unavailable') {
+        @if (access.unsavedInput()) {
+          <herald-notice tone="warning" heading="Your change was not saved">
+            Your unsaved input is kept below. It cannot be submitted without current access.
+          </herald-notice>
+        }
+        <p>If you expected access, contact the platform operator through your usual support channel.</p>
+      }
+      @case ('recovery') {
+        <p>If that does not work, contact the platform operator through the support contact supplied with your invitation.</p>
+        <h2>What support will verify</h2>
+        <ul class="checklist">
+          <li>That you own the account you are trying to recover.</li>
+          <li>Your existing Herald ownership, using previously recorded evidence.</li>
+          <li>The replacement account, before recording and completing an identity relink.</li>
+        </ul>
+        <p>
+          Support will explain the verification procedure. Never send a password or recovery code. Recovery does not merge identities or copy someone
+          else’s permissions.
+        </p>
+      }
+    }
+
+    @if (access.unsavedInput() && (access.problem() === 'session-expired' || access.problem() === 'unavailable')) {
+      <div class="field">
+        <label for="unsaved-input">Your unsaved input</label>
+        <textarea id="unsaved-input" readonly rows="4" aria-describedby="unsaved-help">{{ access.unsavedInput() }}</textarea>
+        <p class="help" id="unsaved-help">Only text you entered is kept, in this tab only. Copy it before leaving; it is never submitted for you.</p>
+      </div>
+    }
+
+    <div class="actions">
+      @switch (access.problem()) {
+        @case ('sign-in-failed') {
+          <button herald-button variant="primary" type="button" (click)="signIn()">Try signing in again</button>
+          <button herald-button type="button" (click)="recovery()">Get recovery help</button>
+        }
+        @case ('sign-in-cancelled') {
+          <button herald-button variant="primary" type="button" (click)="signIn()">Try signing in again</button>
+          <button herald-button type="button" (click)="recovery()">Get recovery help</button>
+        }
+        @case ('not-assigned') {
+          <button herald-button variant="primary" type="button" (click)="signIn(true)">Use another account</button>
+          <button herald-button type="button" (click)="signOut()">Sign out</button>
+        }
+        @case ('session-expired') {
+          <button herald-button variant="primary" type="button" (click)="signIn()">Sign in again</button>
+          @if (access.unsavedInput()) {
+            <button herald-button type="button" (click)="copyInput()">Copy unsaved input</button>
+          }
+          <button herald-button type="button" (click)="recovery()">Get recovery help</button>
+        }
+        @case ('unavailable') {
+          @if (access.unsavedInput()) {
+            <button herald-button variant="primary" type="button" (click)="copyInput()">Copy unsaved input</button>
+            <button herald-button type="button" (click)="chooseOrganisation()">Go to your organisations</button>
+          } @else {
+            <button herald-button variant="primary" type="button" (click)="chooseOrganisation()">Go to your organisations</button>
+          }
+          <button herald-button type="button" (click)="signIn(true)">Use another account</button>
+        }
+        @case ('recovery') {
+          <button herald-button variant="primary" type="button" (click)="signIn()">Try signing in</button>
+        }
+      }
+      @if (publicUrl && access.problem() !== 'signing-in' && access.problem() !== 'session-expired') {
+        <a herald-button [href]="publicUrl">Back to public page</a>
+      }
+    </div>
+    <p class="copy-status" role="status">{{ copyStatus() }}</p>
+  </section>
+
+  <aside class="side-note">
+    <h2>{{ copy().side[0] }}</h2>
+    <p>{{ copy().side[1] }}</p>
+  </aside>
+</div>

@@ -1,0 +1,3 @@
+:host { display: contents; }
+.checklist { padding-left: var(--herald-space-6); font-size: var(--herald-text-lg); }
+.copy-status:empty { display: none; }

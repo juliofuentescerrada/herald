@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { Button } from '@herald/ui';
-import { AppContext } from './platform';
+import { AppContext, injectWorkingOrganisation } from './platform';
 
 /** Generic on purpose: it never confirms that an address exists in another organisation. */
 @Component({
@@ -9,9 +9,9 @@ import { AppContext } from './platform';
   imports: [RouterLink, Button],
   template: `
     <section class="not-found" aria-labelledby="not-found-heading">
-      <h1 id="not-found-heading">Page not found{{ context.organisation() ? ' in ' + context.organisation() : '' }}</h1>
+      <h1 id="not-found-heading">Page not found{{ organisation.data() ? ' in ' + organisation.data()!.name : '' }}</h1>
       <p>It may have been removed, or it may belong to an organisation you are not working in.</p>
-      <a herald-button variant="primary" routerLink="/">Go to overview</a>
+      <a herald-button variant="primary" [routerLink]="context.home()">Go to overview</a>
     </section>
   `,
   styles: `
@@ -24,4 +24,5 @@ import { AppContext } from './platform';
 })
 export class NotFoundPage {
   protected readonly context = inject(AppContext);
+  protected readonly organisation = injectWorkingOrganisation();
 }
