@@ -34,4 +34,4 @@ Modules never reference each other (ADR 0004), yet every module's organisation-s
 - Negative: global filters hide data silently; cross-organisation reads need explicit, tested exceptions.
 - Follow-ups: reconsider RLS with M4's database roles; pilot API applications and their grants (D-12) in the API access slice; collaborator roles and invitations in H2; an organisation identifier in every message envelope with the first organisation-scoped integration event; ADR 0012's identity line points here.
 
-Direction confirmed by the maintainer on 9 November 2026 (provider, filters and shadow properties, RLS if it fits). Implemented by `h1-organisation-access`.
+Direction confirmed by the maintainer on 9 November 2026 (provider, filters and shadow properties, RLS if it fits). Implemented by `h1-organisation-access` and run against the real directory on 10 November 2026. Status proposal: Accepted, pending the maintainer's confirmation.

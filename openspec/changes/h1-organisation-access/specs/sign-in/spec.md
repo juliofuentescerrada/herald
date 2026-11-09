@@ -1,14 +1,18 @@
 ## ADDED Requirements
 
 ### Requirement: Only assigned people sign in
-The admin application SHALL require a session for every route. Sign-in SHALL go through the external account provider configured for Herald, and only people the platform operator has assigned to Herald's application SHALL obtain access. Herald SHALL offer no self-service registration. A person signed in with the provider but not assigned to Herald SHALL see the reviewed "access is by invitation" state, with sign-out and use-another-account actions and no organisation content or creation path.
+The admin application SHALL require a session for every route. Sign-in SHALL go through the external account provider configured for Herald, and only people the platform operator has assigned to Herald's application SHALL obtain access. Herald SHALL offer no self-service registration. The provider SHALL refuse a person not assigned to Herald's admin application on its own page. A person who signs in but whose token lacks Herald's organiser role SHALL see the reviewed "access is by invitation" state, with sign-out and use-another-account actions and no organisation content or creation path.
 
 #### Scenario: An assigned person signs in
 - **WHEN** an assigned person opens the admin application without a session and completes sign-in
 - **THEN** they return to the address they asked for, now with a session
 
 #### Scenario: An unassigned person signs in
-- **WHEN** a person the provider authenticates is not assigned to Herald's application
+- **WHEN** a person the provider authenticates is not assigned to Herald's admin application
+- **THEN** the provider refuses the sign-in on its own page and Herald receives no session
+
+#### Scenario: A signed-in person lacks the organiser role
+- **WHEN** a signed-in person's token carries no organiser role, so the API answers 403
 - **THEN** the admin application shows the not-assigned state and offers no organisation content, creation or Organise action
 
 #### Scenario: Sign-in fails or is cancelled
