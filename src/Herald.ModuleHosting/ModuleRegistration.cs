@@ -18,6 +18,7 @@ public static class ModuleRegistration
         options.Services.AddDbContextWithWolverineIntegration<TDbContext>((services, database) =>
             ModuleDatabase.Configure(database, services.GetRequiredService<NpgsqlDataSource>(), schema));
         options.Services.AddSingleton<IModuleMigration, ModuleMigration<TDbContext>>();
+        options.Services.AddOrganisationContext();
         return options;
     }
 }

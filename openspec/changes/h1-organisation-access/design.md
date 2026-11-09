@@ -121,7 +121,7 @@ New schema content for Organisations only (migration `AddOrganisationAccess`). N
 
 ## Open Questions
 
-None blocking. RLS adoption is decided by D-8's evidence.
+None blocking. RLS was rejected for H1 on D-8's evidence (implementation record).
 
 ## Implementation record
 
@@ -132,3 +132,28 @@ None blocking. RLS adoption is decided by D-8's evidence.
 - Missing configuration fails when the host **starts** (`ValidateOnStart`), not when it is built. A first version threw at registration and broke `openapi` export and `codegen write`, which build the host without sign-in configuration.
 - AppHost parameters `auth-authority`, `auth-api-audience`, `auth-api-scope` and `auth-admin-client-id` (user secrets) go to the host as `Herald__Authentication__*` and to admin as `HERALD_AUTH_*` (consumed in task 5.1). Aspire reports an unset parameter in its dashboard; not exercised yet, since the registrations (task 1.3) do not exist.
 - Tests: `TestTokens` signs directory-shaped tokens with a test RSA key and `HostFactory` gives the bearer handler that key, so nothing is fetched. `Every_admin_endpoint_requires_an_assigned_organiser` holds vacuously until the first admin endpoint (task 4.4 proves it fails); `The_host_does_not_start_without_its_sign_in_configuration` passes. Full .NET run: 56 tests pass; format, OpenAPI documents and generated Wolverine code show no drift.
+
+### Organisation context and persistence isolation (tasks 3.1–3.3, 9 November 2026)
+
+- `Herald.ModuleHosting`: `Caller` (from `tid`/`oid`), `IOrganisationAccess`, and `OrganisationContext` (scoped, entered once; entering another organisation in the same scope throws). It is registered with a factory, so Wolverine's generated code resolves the scope's instance instead of constructing its own; task 4.4 proves it through the host.
+- `MapHeraldApi` adds the membership step ahead of the endpoints: a route with `{organisationId}` needs a `Caller` and a current membership, or it answers the 404 problem `organisation-not-available`. Exercised through real endpoints in task 4.4.
+- **Deviation from D-7:** a base class, `OrganisationScopedDbContext`, instead of a model-builder extension plus a separate interceptor. EF Core only re-reads a filter's value per query when it is a member of the `DbContext`; a value captured from outside is frozen in the cached model. The base class exposes the current organisation, declares `OrganisationOwned<TEntity>()` (shadow `OrganisationId`, index, named filter `organisation`) and checks writes in `SaveChanges`: stamps added rows, rejects rows of another organisation (also those loaded past the filter) and any organisation-owned write without a context.
+- Tests: new `tests/Herald.ModuleHosting.Tests` with a probe `DbContext` against PostgreSQL 18.3: filtered query, stamping, no context → no rows, no context → save fails, another organisation's row (loaded with `IgnoreQueryFilters`) cannot be changed, a planted foreign owner is rejected, a scope cannot switch organisation (7 pass). `IsolationTests.Only_reviewed_code_bypasses_the_organisation_filter` lists the files under `src/` allowed to call `IgnoreQueryFilters` (none yet).
+
+### Row-level security experiment (task 3.4, 9 November 2026)
+
+Probe table with `ENABLE` and `FORCE ROW LEVEL SECURITY`, a policy on `nullif(current_setting('herald.organisation_id', true), '')::uuid`, a non-superuser login role, and a `DbConnectionInterceptor` that runs `set_config(..., false)` when a connection opens in an organisation context (`RowLevelSecurityExperiment`).
+
+Measured:
+- A raw SQL query that skips the EF filter sees only its organisation's row.
+- Npgsql resets session state when a connection returns to the pool: on a pool of one, the same backend process has no setting on the next open, so a scope without context sees nothing.
+- 60 concurrent scopes alternating two organisations on a pool of four: each saw only its own row.
+- An insert for another organisation is refused by the policy itself (SQLSTATE 42501).
+
+Costs found:
+- Superusers and, without `FORCE`, table owners bypass RLS. Aspire's local PostgreSQL and the test containers connect as a superuser, so the guard is invisible locally unless the host connects with a separate application role (and migrations with the owner): new AppHost setup, a second connection string and a role script.
+- `GET /api/me` reads memberships across organisations; it would need a second policy on a person setting, set the same way.
+- A message handler must enter its organisation before Wolverine's transactional middleware opens the connection, which is new plumbing for the first organisation-scoped message.
+- One extra round trip per connection opened in an organisation context.
+
+**Rejected for H1** (maintainer, 9 November 2026). The guard works, but locally it needs a separate application role and connection string to be visible at all, plus a person policy for `/api/me` and handler plumbing, while the EF filter and the save checks already cover every query and write that goes through a module's `DbContext`. Revisit before the first real deployment (M4), when database roles have to be created anyway. The experiment code was removed; this section is its record.

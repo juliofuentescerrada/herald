@@ -12,10 +12,10 @@
 
 ## 3. Organisation context and isolation
 
-- [ ] 3.1 `IOrganisationAccess` and request-scoped `OrganisationContext` in `Herald.ModuleHosting`; host middleware resolving `{organisationId}` with the generic 404 problem
-- [ ] 3.2 `OrganisationOwned<TEntity>()` (shadow property, index, global filter with no-context-no-rows) and the save interceptor (stamp, reject other organisation, require context)
-- [ ] 3.3 Probe module tests against PostgreSQL: filtered query, stamped insert, cross-organisation update rejected, no context returns nothing; architecture test listing allowed `IgnoreQueryFilters()` call sites
-- [ ] 3.4 RLS experiment on the probe table (D-8); record adopted or rejected with evidence in design.md and ADR 0014; if adopted, add the policy and a test where a raw query bypassing EF still sees only its organisation
+- [x] 3.1 `IOrganisationAccess` and request-scoped `OrganisationContext` in `Herald.ModuleHosting`; host middleware resolving `{organisationId}` with the generic 404 problem
+- [x] 3.2 `OrganisationOwned<TEntity>()` (shadow property, index, global filter with no-context-no-rows) and the save interceptor (stamp, reject other organisation, require context)
+- [x] 3.3 Probe module tests against PostgreSQL: filtered query, stamped insert, cross-organisation update rejected, no context returns nothing; architecture test listing allowed `IgnoreQueryFilters()` call sites
+- [x] 3.4 RLS experiment on the probe table (D-8); record adopted or rejected with evidence in design.md and ADR 0014; if adopted, add the policy and a test where a raw query bypassing EF still sees only its organisation
 
 ## 4. Organisations module
 
