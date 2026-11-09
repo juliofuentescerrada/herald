@@ -11,11 +11,11 @@
 
 ## 3. Suite infrastructure
 
-- [ ] 3.1 `e2e/` with `package.json`, lockfile, `tsconfig.json`, `playwright.config.ts` (Chromium, parallel, reserved ports, traces on failure); `.nvmrc` shared with `web/`
-- [ ] 3.2 `globalSetup`/`globalTeardown`: PostgreSQL and the provider with `testcontainers`, personas as provider configuration; teardown also after failures
-- [ ] 3.3 `webServer` entries for the host, the public server rendering and the admin application with readiness URLs and the provider's runtime configuration
-- [ ] 3.4 Fixtures: sign in as a fresh persona, a second tab in the same context, and the `axe` check on each state
-- [ ] 3.5 `e2e/README.md`: prerequisites, the command, ports, how to read a trace
+- [x] 3.1 `e2e/` with `package.json`, lockfile, `tsconfig.json`, `playwright.config.ts` (Chromium, parallel, reserved ports, traces on failure); `.nvmrc` shared with `web/`
+- [x] 3.2 Infrastructure as the first `webServer` (Playwright starts webServers before `globalSetup`; E-5 revised): PostgreSQL and the provider with `testcontainers`; personas as claim templates in the fixtures; teardown also after failures
+- [x] 3.3 `webServer` entries for the host, the public server rendering and the admin application with readiness URLs and the provider's runtime configuration
+- [x] 3.4 Fixtures: sign in as a fresh persona, a second tab in the same context, and the `axe` check on each state
+- [x] 3.5 `e2e/README.md`: prerequisites, the command, ports, how to read a trace
 
 ## 4. Journeys
 

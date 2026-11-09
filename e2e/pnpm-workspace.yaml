@@ -1,0 +1,7 @@
+engineStrict: true
+
+# Install scripts are reviewed (W-01): ssh2's optional native helpers are not needed for a local Docker socket.
+allowBuilds:
+  cpu-features: false
+  protobufjs: false
+  ssh2: false

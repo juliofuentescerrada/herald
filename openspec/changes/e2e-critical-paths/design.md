@@ -49,7 +49,7 @@ The host runs with `ASPNETCORE_ENVIRONMENT=E2E`:
 
 ### E-5 Starting and isolating the system
 
-- Playwright `globalSetup` starts PostgreSQL (`postgres:18.3`) and the provider with `testcontainers` (MIT) and writes their addresses for the servers; `globalTeardown` stops them, also after failures.
+- Playwright's first `webServer` (`infrastructure.ts`) starts PostgreSQL (`postgres:18.3`) and the provider with `testcontainers` (MIT) on fixed ports and reports readiness on its output; Playwright stops it with `SIGTERM`, and testcontainers' reaper removes the containers if the run dies. *Revised in task 3.2:* Playwright 1.65 starts `webServer` entries before `globalSetup`, so containers started in `globalSetup` would come up after the host. *Rejected:* `globalSetup` spawning the servers too (reimplements `webServer`); a script around `playwright test` (the plain command no longer works).
 - Playwright `webServer` starts the host (`dotnet run --project src/Herald.Host`, `E2E`), the public server rendering and the admin application, each with a readiness URL. The admin application is served by `ng serve` with its proxy, so relative `/api` calls work as in development, and its `runtime-config.json` is written for the provider.
 - Each journey creates its own personas' data (new object ids and organisation names per test), so journeys can run in parallel and in any order. The provider's personas are templates; each test gets fresh identifiers.
 - Fixed ports from a reserved range (for example 5480–5489) so a developer's Aspire run (4200, 4300, 5180) is unaffected.
@@ -115,3 +115,12 @@ Findings that shape the design:
 - Guard: E2E refuses to start when `CONTAINER_APP_NAME` or `WEBSITE_SITE_NAME` is set (Azure Container Apps and App Service set them).
 - Host tests: `The_end_to_end_environment_runs_without_a_message_broker` (empty `messaging` connection string, `/health` 200) and `The_end_to_end_environment_refuses_to_start_in_a_deployment` (each marker). Host tests: 29 pass.
 - Admin: `AuthConfig.protocolMode` (`'OIDC'`) and `knownAuthorities` are optional; absent, MSAL keeps the directory's behaviour (authority host only, Microsoft protocol). `write-runtime-config.mjs` writes them from `HERALD_AUTH_PROTOCOL_MODE` and `HERALD_AUTH_KNOWN_AUTHORITIES` (comma-separated) only when set. Vitest checks both through `getConfiguration()`. Admin tests: 96 pass; lint, admin build, Release build and generated code unchanged.
+
+### Suite infrastructure (tasks 3.1–3.5, 9 November 2026)
+
+- `e2e/`: `package.json` (pnpm 12.18.0, Node 26 via `.nvmrc` symlinked to `web/.nvmrc`), `@playwright/test` 1.65.0, `@axe-core/playwright` 4.14.0, `testcontainers` 12.2.1, and `typescript` 6.0.3 with `@types/node` 26.6.6 as in `web/`, for `pnpm typecheck`. Install scripts of `ssh2`'s optional native helpers are refused in `pnpm-workspace.yaml`.
+- Order (E-5 revised): `infrastructure.ts` → host (`/health`) → admin → public. Ports 5480–5484. Each `webServer` waits on a readiness URL; the infrastructure on its ready line (`wait.stdout`).
+- Defect found in task 2.1: `TrustTheTestProvidersCertificate` used `PostConfigure`, which runs after JwtBearer's own post-configuration has built the back channel, so discovery failed on the certificate and every token was refused as `invalid issuer` (401). It now uses `Configure`.
+- `infrastructure.ts` needs a timer to keep Node alive: after its top-level `await` nothing else does, Node exited and the reaper removed the containers mid-run.
+- Fixtures: `signIn` fills the provider's form (`username`, `claims`) with a fresh persona; `signIn({ on, as })` signs a second tab in as the same persona, because MSAL's cache is per tab (`sessionStorage`) and the provider keeps no single sign-on session (the directory renews silently). `expectAccessible` runs axe without `color-contrast`.
+- Throwaway smoke journeys (removed): a deep link returned to `/organisations/new` with `GET /api/me` 200 and no axe violation on admin or public; an unassigned persona got 403 and "Herald access is by invitation"; a second tab signed in as the same persona; a failing test still left no container behind. A run with one journey takes about 25 seconds locally, mostly start-up.
