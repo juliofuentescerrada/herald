@@ -1,6 +1,6 @@
 ## Status
 
-**Proposed, pending maintainer review.** No screens are created or modified, so mockups are not applicable (`design.md`). Implementation depends on `h1-organisation-access` being merged: its journeys are what these tests exercise.
+**Approved for implementation on 9 November 2026** (the maintainer asked to apply it). Stacked locally on `h1-organisation-access`, whose journeys it tests; its pull request follows that change's. No screens are created or modified, so mockups are not applicable (`design.md`). Implementation depends on `h1-organisation-access` being merged: its journeys are what these tests exercise.
 
 ## Why
 

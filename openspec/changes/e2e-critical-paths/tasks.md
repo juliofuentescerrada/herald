@@ -1,8 +1,8 @@
 ## 1. Gates and spike
 
-- [ ] 1.1 Review the proposal, specs, design and ADR 0015; record approval in proposal.md and design.md. Confirm `h1-organisation-access` is merged and rebase on it.
-- [ ] 1.2 Spike (throwaway, results in design.md): run `mock-oauth2-server` in a container, point the admin's MSAL and the host's JWT bearer at it, sign in as an organiser persona and call `GET /api/me`. Record the MSAL settings needed, the token shape, the memory used, and whether the provider is adopted or the hand-written fallback replaces it (E-2, E-3)
-- [ ] 1.3 Check exact versions and licences of `@playwright/test`, `@axe-core/playwright`, `testcontainers` and the provider image; pin the image by digest
+- [x] 1.1 Review the proposal, specs, design and ADR 0015; record approval in proposal.md and design.md. Confirm `h1-organisation-access` is merged and rebase on it.
+- [x] 1.2 Spike (throwaway, results in design.md): run `mock-oauth2-server` in a container, point the admin's MSAL and the host's JWT bearer at it, sign in as an organiser persona and call `GET /api/me`. Record the MSAL settings needed, the token shape, the memory used, and whether the provider is adopted or the hand-written fallback replaces it (E-2, E-3)
+- [x] 1.3 Check exact versions and licences of `@playwright/test`, `@axe-core/playwright`, `testcontainers` and the provider image; pin the image by digest
 
 ## 2. Host and admin configuration
 

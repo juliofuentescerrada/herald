@@ -78,3 +78,33 @@ New folder, new job and a new host environment; nothing existing changes behavio
 
 - The ADR number: 0014 is taken by `h1-organisation-access` (not yet merged), so this change uses 0015.
 - Whether to run the suite on every pull request or only on those touching `src/`, `web/` or `e2e/` (proposed: every pull request until its duration is measured).
+
+## Implementation record
+
+### Approval and base (task 1.1, 9 November 2026)
+
+Approved by the maintainer ("apply"). `h1-organisation-access` is not merged yet, so this branch is rebased onto it locally (one conflict, the ADR index, kept both rows); this change's pull request must follow that one.
+
+### Spike: MSAL and JWT bearer against `mock-oauth2-server` (task 1.2, 9 November 2026)
+
+Throwaway setup: the provider (6.1.4) and PostgreSQL 18.3 in containers, the host run with `dotnet run` without Aspire, the admin with `ng serve`, Chrome headless through `playwright-core`. Temporary code changes were reverted afterwards.
+
+**Adopted:** a deep link to `/organisations/new` redirected to the provider, signed in through its login form, returned to `/organisations/new` signed in as the persona, and created an organisation (`GET /api/me` 200, `POST /api/organisations` 201, the new workspace with its name in the rail). Production code paths ran unchanged except the settings below.
+
+Findings that shape the design:
+
+- **TLS is required.** MSAL refuses any authority that is not `https` (`authority_uri_insecure`, no exception for localhost). The provider serves TLS with a generated self-signed certificate (`httpServer.ssl: {}`); the browser context sets `ignoreHTTPSErrors`, and the host needs a back-channel handler that accepts that certificate, in `E2E` only (E-4).
+- **MSAL settings:** `system.protocolMode: 'OIDC'` (not under `auth`); without it MSAL appends `/v2.0` to the authority, the provider then issues tokens for another issuer and the host answers 401. `knownAuthorities` with the provider's host is accepted; MSAL's issuer check passes because the issuer has the authority's scheme, host and port.
+- **Personas come from the login form, not token callbacks.** With `interactiveLogin: false` and token callbacks, the authorisation-code access token carried none of the configured claims (no `sub`, no `aud`). With `interactiveLogin: true`, the form's username and claims JSON (`oid`, `name`, `roles`, `aud`) go into the access token. The suite's sign-in fixture fills that form; personas are claim templates in the suite, not provider configuration (E-2, E-5 adjusted).
+- **`tid` is the issuer id.** The provider overwrites `tid` with its issuer id, so the issuer id must be a tenant GUID: authority `https://localhost:<port>/<tenant-guid>`, the shape External ID also uses.
+- **Defect found in `h1-organisation-access`:** a token whose `tid` or `oid` is present but not a GUID passes the `organiser` policy and then fails with a 500 (`Caller.From(user)!`). The real directory always issues GUIDs, but the host should answer 403. To fix in `h1-organisation-access` (the policy should require a parseable caller), with a host test.
+- **Host without Service Bus:** with a dummy `messaging` connection string and no declared endpoints the host started and served requests; E-4 still disables external transports explicitly rather than relying on that.
+- **Memory:** provider 195–223 MB with `-Xmx256m`, PostgreSQL 54–68 MB.
+- **Still to solve in task 4.4:** the expiring-session journey. Token lifetime is not set per login in the form; options are a second provider issuer with a short `tokenExpiry`, or clearing MSAL's cached tokens in the page so silent renewal fails.
+
+### Versions and licences (task 1.3, 9 November 2026)
+
+- `@playwright/test` 1.65.0 (Apache-2.0, 5 November 2026; latest, as chosen for MSAL in `h1-organisation-access`).
+- `@axe-core/playwright` 4.14.0 (MPL-2.0, as `axe-core` in `web/`; depends on `axe-core` ~4.14.0, peer `playwright-core`).
+- `testcontainers` 12.2.1 (MIT).
+- `ghcr.io/navikt/mock-oauth2-server:6.1.4` (MIT, 28 October 2026), pinned as `ghcr.io/navikt/mock-oauth2-server@sha256:647dd8c78a54f0e6fcd58d79c884e612f8f998a0662276f3e1db22e464a50192`.
