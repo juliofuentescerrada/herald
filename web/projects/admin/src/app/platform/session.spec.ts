@@ -82,3 +82,24 @@ describe('The admin session', () => {
     await expect(session.token()).rejects.toBeInstanceOf(InteractionRequiredAuthError);
   });
 });
+
+describe('The MSAL client', () => {
+  afterEach(() => TestBed.resetTestingModule());
+
+  const configured = (auth: Record<string, unknown>) => {
+    TestBed.configureTestingModule({ providers: [{ provide: AUTH_CONFIG, useValue: { clientId: 'c', apiScope: 's', ...auth } }] });
+    return TestBed.inject(MSAL_CLIENT).getConfiguration();
+  };
+
+  it('treats the directory as Microsoft’s and trusts only its host by default', () => {
+    const config = configured({ authority: 'https://herald.ciamlogin.com/00000000-0000-0000-0000-00000000d1ec' });
+    expect(config.system.protocolMode).not.toBe('OIDC');
+    expect(config.auth.knownAuthorities).toEqual(['herald.ciamlogin.com']);
+  });
+
+  it('speaks plain OpenID Connect to another provider when configured', () => {
+    const config = configured({ authority: 'https://localhost:5490/tenant', protocolMode: 'OIDC', knownAuthorities: ['localhost:5490'] });
+    expect(config.system.protocolMode).toBe('OIDC');
+    expect(config.auth.knownAuthorities).toEqual(['localhost:5490']);
+  });
+});

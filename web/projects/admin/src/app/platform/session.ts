@@ -1,5 +1,5 @@
 import { DOCUMENT, Injectable, InjectionToken, inject, signal } from '@angular/core';
-import { PublicClientApplication, type AccountInfo, type IPublicClientApplication } from '@azure/msal-browser';
+import { ProtocolMode, PublicClientApplication, type AccountInfo, type IPublicClientApplication } from '@azure/msal-browser';
 import { AccessProblem, signInProblem } from './access';
 
 /** Read at start-up from /runtime-config.json: the directory's identifiers stay out of the repository (D-1). */
@@ -9,6 +9,10 @@ export interface AuthConfig {
   readonly apiScope: string;
   /** The public application, for "Back to public page"; optional in development. */
   readonly publicUrl?: string;
+  /** `OIDC` for a provider that is not Microsoft's, such as the end-to-end suite's (ADR 0015); absent for the directory. */
+  readonly protocolMode?: 'OIDC';
+  /** Hosts MSAL may trust besides the authority's own; absent, the authority's host. */
+  readonly knownAuthorities?: readonly string[];
 }
 
 export const AUTH_CONFIG = new InjectionToken<AuthConfig>('Herald admin sign-in configuration');
@@ -22,11 +26,13 @@ export const MSAL_CLIENT = new InjectionToken<IPublicClientApplication>('Herald 
       auth: {
         clientId: config.clientId,
         authority: config.authority,
-        knownAuthorities: [new URL(config.authority).host],
+        knownAuthorities: [...(config.knownAuthorities ?? [new URL(config.authority).host])],
         redirectUri: `${origin}/`,
         postLogoutRedirectUri: `${origin}/`,
       },
       cache: { cacheLocation: 'sessionStorage' },
+      // Without OIDC mode MSAL treats the authority as Microsoft's and appends /v2.0 to it.
+      ...(config.protocolMode === 'OIDC' ? { system: { protocolMode: ProtocolMode.OIDC } } : {}),
     });
   },
 });

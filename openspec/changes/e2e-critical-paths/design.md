@@ -108,3 +108,10 @@ Findings that shape the design:
 - `@axe-core/playwright` 4.14.0 (MPL-2.0, as `axe-core` in `web/`; depends on `axe-core` ~4.14.0, peer `playwright-core`).
 - `testcontainers` 12.2.1 (MIT).
 - `ghcr.io/navikt/mock-oauth2-server:6.1.4` (MIT, 28 October 2026), pinned as `ghcr.io/navikt/mock-oauth2-server@sha256:647dd8c78a54f0e6fcd58d79c884e612f8f998a0662276f3e1db22e464a50192`.
+
+### Host `E2E` environment and admin configuration (tasks 2.1–2.2, 9 November 2026)
+
+- `HostEnvironments.EndToEnd` (`E2E`): `Program` skips Azure Service Bus (local queues and the PostgreSQL outbox still run), `appsettings.E2E.json` sets up the database at start-up, and the JWT bearer back channel accepts the test provider's generated certificate (`TrustTheTestProvidersCertificate`, E2E only). Wolverine loads the committed generated code, as in production. `ServiceDefaults` maps `/health` and `/alive` in E2E too, for the suite's readiness checks.
+- Guard: E2E refuses to start when `CONTAINER_APP_NAME` or `WEBSITE_SITE_NAME` is set (Azure Container Apps and App Service set them).
+- Host tests: `The_end_to_end_environment_runs_without_a_message_broker` (empty `messaging` connection string, `/health` 200) and `The_end_to_end_environment_refuses_to_start_in_a_deployment` (each marker). Host tests: 29 pass.
+- Admin: `AuthConfig.protocolMode` (`'OIDC'`) and `knownAuthorities` are optional; absent, MSAL keeps the directory's behaviour (authority host only, Microsoft protocol). `write-runtime-config.mjs` writes them from `HERALD_AUTH_PROTOCOL_MODE` and `HERALD_AUTH_KNOWN_AUTHORITIES` (comma-separated) only when set. Vitest checks both through `getConfiguration()`. Admin tests: 96 pass; lint, admin build, Release build and generated code unchanged.
