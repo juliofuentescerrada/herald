@@ -28,6 +28,18 @@ public class OrganisationAccessTests(OrganisationApi api)
     public async Task A_token_without_the_organiser_role_is_forbidden() =>
         (await api.As(Guid.NewGuid(), organiser: false).GetAsync("/api/me", Cancellation)).StatusCode.ShouldBe(HttpStatusCode.Forbidden);
 
+    [Theory]
+    [InlineData("herald", "11111111-1111-1111-1111-111111111111")]
+    [InlineData("00000000-0000-0000-0000-00000000d1ec", "not-an-identifier")]
+    public async Task A_token_without_directory_identifiers_is_forbidden_not_an_error(string directoryId, string objectId)
+    {
+        var client = api.Anonymous();
+        client.DefaultRequestHeaders.Authorization = new("Bearer", TestTokens.WithIdentifiers(directoryId, objectId));
+
+        (await client.GetAsync("/api/me", Cancellation)).StatusCode.ShouldBe(HttpStatusCode.Forbidden);
+        (await client.CreateAsync(Guid.NewGuid(), "Northside Gaming")).StatusCode.ShouldBe(HttpStatusCode.Forbidden);
+    }
+
     [Fact]
     public async Task A_newcomer_has_no_organisations() =>
         (await MeAsync(api.As(Guid.NewGuid()))).Organisations.ShouldBeEmpty();

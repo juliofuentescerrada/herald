@@ -15,12 +15,16 @@ public static class TestTokens
 
     public static readonly SecurityKey SigningKey = new RsaSecurityKey(RSA.Create(2048)) { KeyId = "test" };
 
-    public static string For(Guid objectId, string name = "Alex Morgan", bool organiser = true, Guid? directoryId = null)
+    public static string For(Guid objectId, string name = "Alex Morgan", bool organiser = true, Guid? directoryId = null) =>
+        WithIdentifiers((directoryId ?? DirectoryId).ToString(), objectId.ToString(), name, organiser);
+
+    // Any `tid` and `oid` text, for tokens the directory would never issue.
+    public static string WithIdentifiers(string directoryId, string objectId, string name = "Alex Morgan", bool organiser = true)
     {
         var claims = new List<Claim>
         {
-            new("tid", (directoryId ?? DirectoryId).ToString()),
-            new("oid", objectId.ToString()),
+            new("tid", directoryId),
+            new("oid", objectId),
             new("name", name),
         };
         if (organiser)
