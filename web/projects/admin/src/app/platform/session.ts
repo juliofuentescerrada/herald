@@ -1,4 +1,4 @@
-import { DOCUMENT, Injectable, InjectionToken, inject, provideAppInitializer, signal } from '@angular/core';
+import { DOCUMENT, Injectable, InjectionToken, inject, signal } from '@angular/core';
 import { PublicClientApplication, type AccountInfo, type IPublicClientApplication } from '@azure/msal-browser';
 
 /** Read at start-up from /runtime-config.json: the directory's identifiers stay out of the repository (D-1). */
@@ -50,12 +50,13 @@ export class Session {
     return this.client.loginRedirect({ scopes: [this.config.apiScope], redirectStartPage: returnTo });
   }
 
+  signOut(): Promise<void> {
+    return this.client.logoutRedirect({ account: this.current() });
+  }
+
   async token(): Promise<string> {
     const account = this.current();
     if (!account) throw new Error('No signed-in person.');
     return (await this.client.acquireTokenSilent({ scopes: [this.config.apiScope], account })).accessToken;
   }
 }
-
-/** The session is settled before the first navigation, so guards see the returning person. */
-export const provideSession = () => provideAppInitializer(() => inject(Session).start());

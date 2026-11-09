@@ -2,7 +2,7 @@ import { ChangeDetectionStrategy, Component, DOCUMENT, effect, ElementRef, injec
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd, NavigationError, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { Button, NavLink, Notice } from '@herald/ui';
-import { AppContext } from './platform';
+import { AppContext, injectWorkingOrganisation } from './platform';
 
 /** The organiser shell: graphite rail with the working context and navigation, and the page. */
 @Component({
@@ -14,6 +14,7 @@ import { AppContext } from './platform';
 })
 export class App {
   protected readonly context = inject(AppContext);
+  protected readonly organisation = injectWorkingOrganisation();
   private readonly location = inject(DOCUMENT).location;
   protected readonly replacedNoticeOpen = signal(this.context.replacedElsewhere());
   /** A lazy section that failed to load, usually because a new release replaced its files. */

@@ -29,7 +29,7 @@
 ## 5. Admin and public applications
 
 - [x] 5.1 Check licences and versions of `@azure/msal-angular` and `@azure/msal-browser`; add them to the admin platform with redirect sign-in, route guard, `/api`-only token interceptor and runtime configuration
-- [ ] 5.2 Session-driven `INITIAL_CONTEXT`, `/` resolution (none/one/several) and `/organisations/:organisationId` routes; sign-out and switching through `AppContext.replace()`
+- [x] 5.2 Session-driven `INITIAL_CONTEXT`, `/` resolution (none/one/several) and `/organisations/:organisationId` routes; sign-out and switching through `AppContext.replace()`
 - [ ] 5.3 Platform access states from the mockups: redirecting/returning, failed, cancelled, not assigned, session expired, access lost (landing and rejected write), recovery, generic denial; loaded private data hidden, typed input kept for copying (A-3)
 - [ ] 5.4 `organisations` feature: creation form (validation, submitting, failed save with input kept, created) with retry-safe id; selector (one/several, switching, confirmation with unsaved input A-4); account menu in the shell
 - [ ] 5.5 Public shell Sign in link to the admin origin; update the public shell tests that asserted no sign-in

@@ -1,7 +1,7 @@
 import { createEnvironmentInjector, EnvironmentInjector, Injectable, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { QueryClient } from '@tanstack/angular-query-experimental';
-import { AppContext, CONTEXT_LOCATION, ContextSnapshot, INITIAL_CONTEXT, organisationKey } from './app-context';
+import { AppContext, CONTEXT_LOCATION, ContextSnapshot, INITIAL_CONTEXT, organisationInPath, organisationKey } from './app-context';
 import { QUERY_CLIENT } from './query-client';
 
 /** Stands in for a feature's local draft state. */
@@ -10,7 +10,7 @@ class DraftFixture {
   readonly draft = signal('');
 }
 
-const fakeLocation = () => ({ assign: vi.fn(), reload: vi.fn() });
+const fakeLocation = () => ({ assign: vi.fn(), reload: vi.fn(), replace: vi.fn() });
 
 /** A document: a root injector with its own context and location, as a full load creates. */
 function loadDocument(context: ContextSnapshot, location = fakeLocation()) {
@@ -98,4 +98,15 @@ describe('Organisation query keys', () => {
     client.setQueryData(organisationKey('northside', 'tournaments'), 'n');
     expect(client.getQueryData(organisationKey('southside', 'tournaments'))).toBeUndefined();
   });
+});
+
+describe('The organisation in the address', () => {
+  it.each([
+    ['/organisations/0198F000-0000-7000-8000-00000000000A', '0198f000-0000-7000-8000-00000000000a'],
+    ['/organisations/0198f000-0000-7000-8000-00000000000a/tournaments/3', '0198f000-0000-7000-8000-00000000000a'],
+    ['/organisations/new', null],
+    ['/organisations', null],
+    ['/', null],
+    ['/organisations/0198f000-0000-7000-8000-00000000000a-extra', null],
+  ])('of %s is %s', (path, organisation) => expect(organisationInPath(path)).toBe(organisation));
 });

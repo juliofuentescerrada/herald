@@ -2,6 +2,9 @@ import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter, Router, Routes } from '@angular/router';
 import axe from 'axe-core';
+import { HeraldHostAdminService } from '@herald/api-client/admin';
+import { provideTanStackQuery, QueryClient } from '@tanstack/angular-query-experimental';
+import { of } from 'rxjs';
 import { CONTEXT_LOCATION, INITIAL_CONTEXT, Session } from './platform';
 import { App } from './app';
 import { routes } from './app.routes';
@@ -11,8 +14,13 @@ const failingSection: Routes = [
   { path: 'tournaments', loadComponent: () => Promise.reject(new TypeError('Failed to fetch dynamically imported module')) },
 ];
 
-async function openShell(url: string, organisation: string | null = 'Northside Gaming') {
-  const location = { assign: vi.fn(), reload: vi.fn() };
+const northside = '0198f000-0000-7000-8000-00000000000a';
+const southside = '0198f000-0000-7000-8000-00000000000b';
+const names: Record<string, string> = { [northside]: 'Northside Gaming', [southside]: 'Southside Club' };
+const api = { getOrganisation: (id: string) => of({ id, name: names[id] }) };
+
+async function openShell(url: string, organisation: string | null = northside) {
+  const location = { assign: vi.fn(), reload: vi.fn(), replace: vi.fn() };
   TestBed.configureTestingModule({
     providers: [
       provideRouter([...failingSection, ...routes]),
@@ -20,6 +28,8 @@ async function openShell(url: string, organisation: string | null = 'Northside G
       { provide: CONTEXT_LOCATION, useValue: location },
       // A signed-in person: the sign-in guard is covered in platform/sign-in.spec.ts.
       { provide: Session, useValue: { account: signal({ username: 'ana' }) } },
+      { provide: HeraldHostAdminService, useValue: api },
+      provideTanStackQuery(new QueryClient()),
     ],
   });
   const fixture = TestBed.createComponent(App);
@@ -38,20 +48,20 @@ describe('The admin shell', () => {
   beforeEach(() => sessionStorage.clear());
 
   it('shows the working organisation and marks the current page', async () => {
-    const { text } = await openShell('/');
+    const { text } = await openShell(`/organisations/${northside}`);
     expect(text('.context-name')).toBe('Northside Gaming');
     expect(text('nav[aria-label="Workspace"] [aria-current="page"]')).toBe('Overview');
     expect(text('h1')).toBe('Overview');
   });
 
   it('says when no organisation is selected', async () => {
-    const { text } = await openShell('/', null);
+    const { text } = await openShell('/organisations', null);
     expect(text('.context-name')).toBe('No organisation selected');
-    expect(text('.lead')).toContain('No organisation is selected');
+    expect(text('h1')).toBe('Choose an organisation');
   });
 
   it('answers an unknown address with a generic page inside the shell', async () => {
-    const { text, element } = await openShell('/tournaments/42/secret');
+    const { text, element } = await openShell(`/organisations/${northside}/tournaments/42/secret`);
     expect(text('h1')).toBe('Page not found in Northside Gaming');
     expect(element.querySelector('nav[aria-label="Workspace"]')).not.toBeNull();
   });
@@ -63,23 +73,23 @@ describe('The admin shell', () => {
     // The reload goes through the document's location; jsdom cannot navigate, so only the button is checked.
     expect(element.querySelector('.failure button')?.textContent?.trim()).toBe('Reload page');
 
-    await navigate('/');
+    await navigate(`/organisations/${northside}`);
     expect(text('h1')).toBe('Overview');
   });
 
   it('explains once that another tab replaced the context', async () => {
     sessionStorage.setItem('herald-context-replaced', '1');
-    const { text, element, navigate } = await openShell('/', 'Southside Club');
-    expect(text('herald-notice[role="status"] strong')).toBe('You are now working in Southside Club.');
+    const { text, element, navigate } = await openShell(`/organisations/${southside}`, southside);
+    await vi.waitFor(() => expect(text('herald-notice[role="status"] strong')).toBe('You are now working in Southside Club.'));
 
     (element.querySelector('.herald-notice-dismiss') as HTMLButtonElement).click();
-    await navigate('/');
+    await navigate(`/organisations/${southside}`);
     expect(element.querySelector('herald-notice')).toBeNull();
     expect(sessionStorage.getItem('herald-context-replaced')).toBeNull();
   });
 
   it('has no automatically detectable accessibility violations', async () => {
-    const { element } = await openShell('/');
+    const { element } = await openShell(`/organisations/${northside}`);
     const { violations } = await axe.run(element, { rules: { 'color-contrast': { enabled: false } } });
     expect(violations.map((v) => v.id)).toEqual([]);
   });

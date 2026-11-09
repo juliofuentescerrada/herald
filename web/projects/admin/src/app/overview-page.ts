@@ -1,16 +1,12 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
-import { AppContext } from './platform';
+import { ChangeDetectionStrategy, Component } from '@angular/core';
+import { injectWorkingOrganisation } from './platform';
 
-/** The workspace landing page. Tournaments and next actions arrive with H1 features. */
+/** The organisation workspace's landing page. Tournaments and next actions arrive with H1 features. */
 @Component({
   selector: 'app-overview-page',
   template: `
     <h1>Overview</h1>
-    @if (context.organisation(); as organisation) {
-      <p class="lead">{{ organisation }}'s tournaments and next actions appear here.</p>
-    } @else {
-      <p class="lead">No organisation is selected. Choosing or creating one arrives with organisation set-up in H1.</p>
-    }
+    <p class="lead">{{ organisation.data()?.name }}'s tournaments and next actions appear here.</p>
   `,
   styles: `
     h1 { font-size: 32px; margin-bottom: var(--herald-space-2); }
@@ -19,5 +15,5 @@ import { AppContext } from './platform';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class OverviewPage {
-  protected readonly context = inject(AppContext);
+  protected readonly organisation = injectWorkingOrganisation();
 }

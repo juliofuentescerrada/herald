@@ -1,16 +1,26 @@
-import { DestroyRef, DOCUMENT, Injectable, InjectionToken, inject, provideAppInitializer, signal } from '@angular/core';
+import { computed, DestroyRef, DOCUMENT, EnvironmentInjector, Injectable, InjectionToken, Injector, inject, provideAppInitializer, signal } from '@angular/core';
+import { Session } from './session';
 
 export interface ContextSnapshot {
   readonly identity: string | null;
   readonly organisation: string | null;
 }
 
-/** The context this document was loaded with. From H1 it comes from the URL and the session. */
+export const organisationPath = (id: string) => `/organisations/${id}`;
+
+/** The working organisation is the one in the address: /organisations/<id>/... */
+export const organisationInPath = (path: string): string | null =>
+  /^\/organisations\/([0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12})(?=[/?#]|$)/i.exec(path)?.[1].toLowerCase() ?? null;
+
+/** The context this document was loaded with: the signed-in person and the organisation in the address. */
 export const INITIAL_CONTEXT = new InjectionToken<ContextSnapshot>('Herald initial context', {
-  factory: () => ({ identity: null, organisation: null }),
+  factory: () => ({
+    identity: inject(Session).account()?.homeAccountId ?? null,
+    organisation: organisationInPath(inject(DOCUMENT).location.pathname),
+  }),
 });
 
-export const CONTEXT_LOCATION = new InjectionToken<Pick<Location, 'assign' | 'reload'>>('Herald context location', {
+export const CONTEXT_LOCATION = new InjectionToken<Pick<Location, 'assign' | 'reload' | 'replace'>>('Herald context location', {
   factory: () => inject(DOCUMENT).location,
 });
 
@@ -37,9 +47,15 @@ export class AppContext {
   private readonly initial = inject(INITIAL_CONTEXT);
   private readonly channel = typeof BroadcastChannel === 'undefined' ? null : new BroadcastChannel(channelName);
   private readonly store = sessionStore(inject(DOCUMENT));
+  private readonly injector = inject(Injector);
 
   readonly identity = signal(this.initial.identity).asReadonly();
   readonly organisation = signal(this.initial.organisation).asReadonly();
+  /** The working organisation's overview, or `/` to resolve one. */
+  readonly home = computed(() => {
+    const id = this.organisation();
+    return id ? organisationPath(id) : '/';
+  });
   /** True once, in the document that loaded because another tab replaced the context. */
   readonly replacedElsewhere = signal(this.store?.getItem(replacedKey) === '1').asReadonly();
 
@@ -58,10 +74,34 @@ export class AppContext {
     this.channel?.postMessage('replaced');
     this.location.assign(target);
   }
+
+  /**
+   * Opens an organisation's workspace with a full load. Leaving another organisation is a replacement
+   * (other tabs reload, A-4); entering from no organisation is not, and does not stay in the history.
+   */
+  enter(target: string): void {
+    if (this.organisation() === null) this.location.replace(target);
+    else this.replace(target);
+  }
+
+  /** Other tabs reload first, then the directory ends the session and returns to the app. */
+  signOut(): Promise<void> {
+    this.channel?.postMessage('replaced');
+    return this.injector.get(Session).signOut();
+  }
 }
 
-/** Starts listening for replacements in other tabs as soon as the app boots. */
-export const provideAppContext = () => provideAppInitializer(() => void inject(AppContext));
+/**
+ * Settles the session before the first navigation, so guards see a returning person, then creates the
+ * context from it, which starts listening for replacements in other tabs.
+ */
+export const provideAppContext = () =>
+  provideAppInitializer(() => {
+    const injector = inject(EnvironmentInjector);
+    return inject(Session)
+      .start()
+      .then(() => void injector.get(AppContext));
+  });
 
 /** Query keys start with their scope, so one key never means different data in two contexts. */
 export const organisationKey = (organisation: string, ...parts: readonly unknown[]) =>
