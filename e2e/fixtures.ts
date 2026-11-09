@@ -10,8 +10,8 @@ export interface Persona {
 }
 
 export interface SignInOptions {
-  /** Where the admin application is opened; the guard sends the person to sign in first. */
-  readonly path?: string;
+  /** Where the admin application is opened; the guard sends the person to sign in first. Null: already on the way. */
+  readonly path?: string | null;
   /** False for a person the directory knows but who is not assigned to Herald: no `Organiser` role. */
   readonly assigned?: boolean;
   /** The tab to sign in; the test's page by default. */
@@ -38,7 +38,7 @@ export const test = base.extend<Fixtures>({
       const id = randomUUID();
       const persona: Persona = as ?? { oid: id, name: `Persona ${id.slice(0, 8)}`, roles: assigned ? ['Organiser'] : [] };
 
-      await on.goto(path);
+      if (path !== null) await on.goto(path);
       await on.waitForURL((url) => url.href.startsWith(authority));
       // The provider puts these claims, as the directory names them, into the access token; it sets `tid` itself.
       await on.locator('[name=username]').fill(persona.name);
@@ -60,5 +60,18 @@ export const test = base.extend<Fixtures>({
     });
   },
 });
+
+/** Creates an organisation through the creation page the person is on and returns its identifier. */
+export const createOrganisation = async (page: Page, name = uniqueName()): Promise<{ id: string; name: string }> => {
+  await page.getByLabel('Organisation name').fill(name);
+  await page.getByRole('button', { name: 'Create organisation' }).click();
+  await expect(page.getByRole('heading', { name: 'Overview' })).toBeVisible();
+  const id = /\/organisations\/([0-9a-f-]{36})/.exec(page.url())?.[1];
+  if (!id) throw new Error(`No organisation in ${page.url()}`);
+  return { id, name };
+};
+
+/** Organisation names are unique per test, so parallel journeys never see each other's data. */
+export const uniqueName = () => `Club ${randomUUID().slice(0, 8)}`;
 
 export { expect };

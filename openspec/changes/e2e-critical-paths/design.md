@@ -124,3 +124,16 @@ Findings that shape the design:
 - `infrastructure.ts` needs a timer to keep Node alive: after its top-level `await` nothing else does, Node exited and the reaper removed the containers mid-run.
 - Fixtures: `signIn` fills the provider's form (`username`, `claims`) with a fresh persona; `signIn({ on, as })` signs a second tab in as the same persona, because MSAL's cache is per tab (`sessionStorage`) and the provider keeps no single sign-on session (the directory renews silently). `expectAccessible` runs axe without `color-contrast`.
 - Throwaway smoke journeys (removed): a deep link returned to `/organisations/new` with `GET /api/me` 200 and no axe violation on admin or public; an unassigned persona got 403 and "Herald access is by invitation"; a second tab signed in as the same persona; a failing test still left no container behind. A run with one journey takes about 25 seconds locally, mostly start-up.
+
+### Journeys (tasks 4.1–4.4, 9 November 2026)
+
+Four spec files (`public`, `sign-in`, `organisations`, `access`), nine journeys, each named as a sentence. After the fixes below, all nine pass in 63 consecutive journey runs (three runs with `--repeat-each=2` and one plain run, no retries); a run of the nine takes 37–54 seconds locally, about 20 of them start-up. Notes:
+
+- A tab listens for context replacements once its workspace is up; the two-tab journeys wait for the second tab's workspace before acting, or the replacement reaches nobody (this made the switch journey flaky before the wait).
+- The expiring session: the journey removes MSAL's cached access and refresh tokens and answers the silent `prompt=none` renewal with `login_required`, as the directory does without a session.
+- The other owner's organisation is created in a separate browser context (another person); the denial page is checked for the absence of its name.
+
+**Defects found in `h1-organisation-access`, fixed there (94fe60c) and rebased onto:**
+
+1. **Sign-out left other tabs signed in.** Each tab keeps its own MSAL cache in `sessionStorage`; other tabs reloaded into the workspace with their session. Other tabs now forget their session before reloading. Journey 9 failed on it and now passes.
+2. **Silent renewal through MSAL's hidden iframe could never succeed and took 10 seconds.** MSAL 5 expects its redirect bridge at the redirect URI inside the iframe; `/` booted the application, which MSAL refused there (`block_iframe_reload`). The admin's `main.ts` now runs only the bridge in that frame. Journey 7 needed a 15-second wait before; it now uses the default and takes about 9 seconds.

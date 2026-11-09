@@ -19,10 +19,10 @@
 
 ## 4. Journeys
 
-- [ ] 4.1 Public: Sign in leads to the admin application
-- [ ] 4.2 Sign-in: a deep link returns to its address after sign-in; an unassigned persona sees "Herald access is by invitation"
-- [ ] 4.3 Organisations: a newcomer creates an organisation (created notice, name in the rail); switching between two organisations reloads the other tab into its own; leaving the creation form with input asks, declining keeps it
-- [ ] 4.4 Access: another owner's organisation shows the generic denial with nothing of it; an expiring session keeps typed input and submits nothing; sign-out reloads other tabs and asks for sign-in
+- [x] 4.1 Public: Sign in leads to the admin application
+- [x] 4.2 Sign-in: a deep link returns to its address after sign-in; an unassigned persona sees "Herald access is by invitation"
+- [x] 4.3 Organisations: a newcomer creates an organisation (created notice, name in the rail); switching between two organisations reloads the other tab into its own; leaving the creation form with input asks, declining keeps it
+- [x] 4.4 Access: another owner's organisation shows the generic denial with nothing of it; an expiring session keeps typed input and submits nothing; sign-out reloads other tabs and asks for sign-in
 
 ## 5. CI and completion
 
