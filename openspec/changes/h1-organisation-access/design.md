@@ -181,3 +181,13 @@ Costs found:
 - The `organiser` policy now also requires `tid` and `oid`, so every admin endpoint has a `Caller`.
 - **Found while generating code:** Wolverine HTTP resolved services from a new scope per request, not the request's, so handlers would not see the organisation the membership step entered. `MapHeraldApi` sets `ServiceProviderSource.FromHttpContextRequestServices`, and `AddHeraldModule` marks `OrganisationContext` for service location (`AlwaysUseServiceLocationFor`), which Wolverine requires for its factory registration. The generated handlers now take the context from `httpContext.RequestServices`; task 4.4 tests it end to end.
 - Wolverine code and the OpenAPI documents/client regenerated (task 4.6 repeats this at the end). Full .NET run: 84 pass.
+
+### Use-case and API tests (task 4.4, 9 November 2026)
+
+- `OrganisationAccessTests` (14, host in memory over its own PostgreSQL 18.3 container, one host for the collection): 401 without a token, 403 without the role, newcomer with no organisations, newcomer creates and owns (`/api/me` and the summary), `required`/`too-long` field errors, identical retry returns the original, reused id with another name or person → 409 without the name, same-name organisations, same display name different persons, changed token name keeps the person, another owner by direct id → 404 `organisation-not-available` without the name, missing organisation → the same 404, removed membership → 404 on the next call and gone from `/api/me`.
+- Organisation-scoped *writes* by direct id have no endpoint in this change; they are covered by the save checks (task 3.3) and by the 409 on a reused id. The first organisation-scoped write endpoint (H1 tournaments) adds its own 404 test.
+- `GET /api/organisations/{organisationId}` now reads the organisation from `OrganisationContext`, so its tests prove end to end that the membership step's context reaches the handler (the fix found in task 4.3).
+- **Two test defects found and fixed:**
+  - Test tokens were never accepted: with an authority configured, validation reads issuer and keys from the configuration manager, not from `JwtBearerOptions.Configuration`. `HostFactory` now installs a `StaticConfigurationManager` with the test key. No production change.
+  - `Every_admin_endpoint_requires_an_assigned_organiser` could not tell an empty endpoint list from a protected one. It now also asserts `/api/me` is among the route patterns, and `The_admin_policy_check_catches_an_admin_endpoint_that_allows_anonymous_access` runs its predicate on a synthetic anonymous admin endpoint.
+- Full .NET run: 99 pass; format clean; no Wolverine or OpenAPI drift.

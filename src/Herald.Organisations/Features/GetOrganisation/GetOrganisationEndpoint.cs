@@ -18,9 +18,11 @@ public static class GetOrganisationEndpoint
     [EndpointGroupName(HeraldApi.Admin)]
     [EndpointName("getOrganisation")]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound, "application/problem+json")]
-    public static async Task<OrganisationSummary> Get(Guid organisationId, OrganisationsDbContext db, CancellationToken cancellationToken)
+    public static async Task<OrganisationSummary> Get(Guid organisationId, OrganisationContext context, OrganisationsDbContext db, CancellationToken cancellationToken)
     {
-        var id = new OrganisationId(organisationId);
+        // The organisation this request acts for, which equals the route's: the context is the source of truth.
+        var id = new OrganisationId(context.OrganisationId
+            ?? throw new InvalidOperationException($"No organisation context for {organisationId}."));
         var organisation = await db.Organisations.AsNoTracking()
             .Where(o => o.Id == id)
             .Select(o => new { o.Id, o.Name })

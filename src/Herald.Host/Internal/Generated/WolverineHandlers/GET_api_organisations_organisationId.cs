@@ -60,7 +60,7 @@ namespace Internal.Generated.WolverineHandlers
 
                 
                 // The actual HTTP request handler execution
-                var organisationSummary_response = await Herald.Organisations.Features.GetOrganisation.GetOrganisationEndpoint.Get(organisationId, organisationsDbContext, httpContext.RequestAborted).ConfigureAwait(false);
+                var organisationSummary_response = await Herald.Organisations.Features.GetOrganisation.GetOrganisationEndpoint.Get(organisationId, organisationContext, organisationsDbContext, httpContext.RequestAborted).ConfigureAwait(false);
 
                 
                 // Added by EF Core Transaction Middleware

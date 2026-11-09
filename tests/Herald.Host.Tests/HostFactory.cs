@@ -3,6 +3,7 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Wolverine;
 
@@ -30,8 +31,13 @@ public sealed class HostFactory(string connectionString, string environment = "D
             // The test key instead of the directory's metadata: nothing is fetched.
             services.PostConfigure<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme, options =>
             {
-                options.Configuration = new OpenIdConnectConfiguration { Issuer = TestTokens.Issuer };
-                options.Configuration.SigningKeys.Add(TestTokens.SigningKey);
+                var configuration = new OpenIdConnectConfiguration { Issuer = TestTokens.Issuer };
+                configuration.SigningKeys.Add(TestTokens.SigningKey);
+                // Validation reads the issuer and keys from the configuration manager, not from Configuration.
+                var manager = new StaticConfigurationManager<OpenIdConnectConfiguration>(configuration);
+                options.Configuration = configuration;
+                options.ConfigurationManager = manager;
+                options.TokenValidationParameters.ConfigurationManager = manager;
             });
         });
     }
