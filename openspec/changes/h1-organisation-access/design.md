@@ -263,3 +263,20 @@ Checked against the task's list; most was written with tasks 5.1–5.5:
 | Boundary checks | lint and the 15 planted violations |
 
 Admin 94, public 12, catalogue 5, ui 19, api-client 9 tests pass; web lint and all builds pass.
+
+### Full validation run (task 6.1, 9 November 2026)
+
+Run locally the way CI runs it:
+
+| Check | Result |
+|---|---|
+| `dotnet format --verify-no-changes` | clean |
+| `dotnet build` (Debug and Release) | 0 warnings, 0 errors |
+| `dotnet test --solution Herald.slnx` | 103 pass (Testcontainers PostgreSQL 18.3) |
+| Wolverine code (`codegen delete` + `codegen write`, Release) | no drift |
+| OpenAPI documents and clients (`pnpm api:generate`) | no drift |
+| `pnpm install --frozen-lockfile` | lockfile current |
+| `pnpm lint`, `pnpm lint:boundaries` | clean; 15 planted violations, 15 reported |
+| `pnpm test:all` | admin 94, public 12, catalogue 5, ui 19, api-client 9 |
+| `pnpm test:ssr` | 50 concurrent requests isolated, no credentials sent to the API |
+| `pnpm build:all` | admin initial 849 kB raw / 211 kB gzip (warning budget 900 kB), public 347 kB, catalogue 260 kB |

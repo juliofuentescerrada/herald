@@ -37,6 +37,6 @@
 
 ## 6. Validation and completion
 
-- [ ] 6.1 Full run: format, build, all .NET tests, web lint/tests/boundaries/builds, codegen and API drift checks; record in design.md
+- [x] 6.1 Full run: format, build, all .NET tests, web lint/tests/boundaries/builds, codegen and API drift checks; record in design.md
 - [ ] 6.2 Manual run through Aspire with the real directory: assigned and unassigned person, create, switch between two organisations in two tabs, sign out; compare with the reviewed captures and record differences
 - [ ] 6.3 Update README status, roadmap, visual direction (UJ-01 row implemented) and ADR 0014 status proposal; acceptance review against the specs in design.md
