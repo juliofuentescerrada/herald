@@ -1,4 +1,5 @@
 import { bootstrapApplication } from '@angular/platform-browser';
+import { broadcastResponseToMainFrame } from '@azure/msal-browser/redirect-bridge';
 import { appConfig } from './app/app.config';
 import { App } from './app/app';
 
@@ -13,9 +14,15 @@ const loadAuthConfig = async (): Promise<AuthConfig> => {
   return config as AuthConfig;
 };
 
-loadAuthConfig()
-  .then((auth) => bootstrapApplication(App, appConfig(auth)))
-  .catch((err) => {
-    console.error(err);
-    document.body.textContent = 'Herald cannot start: its sign-in configuration is missing.';
-  });
+// In MSAL's hidden renewal frame the redirect URI only hands the answer to the main frame (MSAL's redirect bridge):
+// booting the application there makes MSAL refuse it, and the main frame would wait out its timeout.
+if (window.parent !== window && location.hash.includes('state=')) {
+  void broadcastResponseToMainFrame();
+} else {
+  loadAuthConfig()
+    .then((auth) => bootstrapApplication(App, appConfig(auth)))
+    .catch((err) => {
+      console.error(err);
+      document.body.textContent = 'Herald cannot start: its sign-in configuration is missing.';
+    });
+}

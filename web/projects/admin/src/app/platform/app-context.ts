@@ -26,6 +26,7 @@ export const CONTEXT_LOCATION = new InjectionToken<Pick<Location, 'assign' | 're
 
 const channelName = 'herald-admin-context';
 const replacedKey = 'herald-context-replaced';
+const signedOut = 'signed-out';
 
 /** Session storage survives the reload of this tab only; unavailable storage just loses the notice. */
 const sessionStore = (document: Document): Pick<Storage, 'getItem' | 'setItem' | 'removeItem'> | null => {
@@ -62,7 +63,9 @@ export class AppContext {
   constructor() {
     this.store?.removeItem(replacedKey);
     if (this.channel)
-      this.channel.onmessage = () => {
+      this.channel.onmessage = async ({ data }: MessageEvent) => {
+        // Each tab keeps its own session: after a sign-out elsewhere this one forgets it too, so it reloads signed out.
+        if (data === signedOut) await this.injector.get(Session).forget();
         this.store?.setItem(replacedKey, '1');
         this.location.reload();
       };
@@ -84,9 +87,9 @@ export class AppContext {
     else this.replace(target);
   }
 
-  /** Other tabs reload first, then the directory ends the session and returns to the app. */
+  /** Other tabs forget their session and reload first, then the directory ends the session and returns to the app. */
   signOut(): Promise<void> {
-    this.channel?.postMessage('replaced');
+    this.channel?.postMessage(signedOut);
     return this.injector.get(Session).signOut();
   }
 }

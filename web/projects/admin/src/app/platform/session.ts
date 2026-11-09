@@ -68,6 +68,11 @@ export class Session {
     return this.client.logoutRedirect({ account: this.current() });
   }
 
+  /** Drops this tab's tokens and account without asking the directory: the session already ended in another tab. */
+  forget(): Promise<void> {
+    return this.client.clearCache();
+  }
+
   async token(): Promise<string> {
     const account = this.current();
     if (!account) throw new Error('No signed-in person.');

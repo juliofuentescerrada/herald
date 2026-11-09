@@ -289,3 +289,12 @@ Run locally the way CI runs it:
 ### A token without directory identifiers (fix found by `e2e-critical-paths`, 9 November 2026)
 
 The end-to-end spike sent a token whose `tid` was not a GUID. The `organiser` policy only required `tid` and `oid` to exist, so the request reached the handlers and failed with a 500 at `Caller.From(user)!`. The real directory always issues GUIDs, but the host must refuse such a token, not fail. The policy now requires a parseable `Caller` (`RequireAssertion`), and `A_token_without_directory_identifiers_is_forbidden_not_an_error` (non-GUID `tid`, non-GUID `oid`; `GET /api/me` and `POST /api/organisations`) answers 403; it failed with 500 before the fix. Host tests: 26 pass.
+
+### Sign-out in other tabs and silent renewal (fixes found by `e2e-critical-paths`, 9 November 2026)
+
+The end-to-end journeys found two defects in the admin's session handling:
+
+- **Sign-out left other tabs signed in.** `AppContext.signOut` told the other tabs to reload, but each tab keeps its own MSAL cache in `sessionStorage`, so they reloaded into the workspace with their session, contrary to "the application reloads without the session and no protected data remains in the document or web storage". Sign-out now broadcasts `signed-out`; a receiving tab calls `Session.forget()` (MSAL `clearCache`, no call to the directory) before it reloads, and the guard then asks for sign-in. A replaced context still reloads without forgetting the session. Vitest covers both messages.
+- **Silent renewal through MSAL's hidden iframe could never succeed.** MSAL 5 expects the redirect URI, loaded in that iframe, to run its redirect bridge (`@azure/msal-browser/redirect-bridge`). The redirect URI `/` booted the application, MSAL refused it there (`block_iframe_reload`) and the main frame waited out its 10-second timeout. `main.ts` now runs only `broadcastResponseToMainFrame()` when it loads inside a frame with an authorisation response in the hash, so the redirect URI and the directory registration stay as they are.
+
+Checks: admin Vitest 96 pass, lint and boundaries clean, admin build; the journeys of `e2e-critical-paths` (sign-out and expiring session) pass against them.
