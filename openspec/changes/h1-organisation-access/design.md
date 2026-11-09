@@ -157,3 +157,9 @@ Costs found:
 - One extra round trip per connection opened in an organisation context.
 
 **Rejected for H1** (maintainer, 9 November 2026). The guard works, but locally it needs a separate application role and connection string to be visible at all, plus a person policy for `/api/me` and handler plumbing, while the EF filter and the save checks already cover every query and write that goes through a module's `DbContext`. Revisit before the first real deployment (M4), when database roles have to be created anyway. The experiment code was removed; this section is its record.
+
+### Organisations domain (task 4.1, 9 November 2026)
+
+- `Herald.BuildingBlocks` gets its first types (ADR 0006): `IDomainEvent`, `Entity<TId>` (identifier only; no equality override, nothing needs it yet) and `AggregateRoot<TId>` (records domain events). No value-object base: records give structural equality.
+- `Domain`: typed `PersonId`/`OrganisationId`, `IdentityKey` (`tid`+`oid`), `Person` (display name trimmed and refreshable, never identity), `OrganisationName` (`Check` returns the broken rule, `required` or `too-long`, for field errors; `Create` throws on an unchecked bad name), `Organisation` (creator becomes the single `Owner` membership, records creator and time, raises `OrganisationCreated`) and `Repeats(name, creator)`, the domain half of D-5's retry rule. `IdentityRelink` waits for task 4.5.
+- Tests: new `tests/Herald.Organisations.Tests`, 14 domain tests without mocks; architecture tests (42) still pass, including Domain depending only on the building blocks.
