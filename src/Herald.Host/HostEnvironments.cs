@@ -21,8 +21,9 @@ public static class HostEnvironments
     }
 
     // The suite's identity provider serves TLS with a certificate it generates; only E2E accepts it.
+    // Configure, not PostConfigure: JwtBearer builds its back channel from this handler in its own PostConfigure.
     public static void TrustTheTestProvidersCertificate(IServiceCollection services) =>
-        services.PostConfigure<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme, options =>
+        services.Configure<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme, options =>
             options.BackchannelHttpHandler = new HttpClientHandler
             {
                 ServerCertificateCustomValidationCallback = HttpClientHandler.DangerousAcceptAnyServerCertificateValidator,
