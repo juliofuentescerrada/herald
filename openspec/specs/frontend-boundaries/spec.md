@@ -56,10 +56,10 @@ CI SHALL enforce the dependency rules for relative imports, path aliases, barrel
 - **THEN** their builds and boundary checks pass without blanket exclusions for feature directories
 
 ### Requirement: State has an owner and an authorised scope
-Features SHALL own server queries/mutations through TanStack Query and local interaction state through signals. App platform SHALL supply context without owning business workflows. The initial integration SHALL support isolation and reset/detachment of protected client state when identity or organisation context changes, or sign-out/revocation signals occur. Public data SHALL remain separate from operational data. M0 SHALL verify these behaviours through test contexts without implementing production authentication or organisation workflows.
+Features SHALL own server queries/mutations through TanStack Query and local interaction state through signals. App platform SHALL supply context and the session without owning business workflows. Sign-out, a change of person or organisation, session expiry and lost access SHALL detach protected client state: a context change is a full load, and session expiry or lost access hide loaded private data at once. Unsaved input SHALL live only in the current tab's memory and SHALL NOT be written to web storage. Public data SHALL remain separate from operational data.
 
 #### Scenario: Operational context changes
-- **WHEN** a test changes identity or organisation context after filling a context-scoped cache and draft
+- **WHEN** the person or organisation context changes after filling a context-scoped cache and draft
 - **THEN** the old protected data and draft cannot be observed or reused under the new context
 
 #### Scenario: Another tab holds the old context
@@ -67,8 +67,12 @@ Features SHALL own server queries/mutations through TanStack Query and local int
 - **THEN** the other tabs of the same application reload and drop that context's data
 
 #### Scenario: Access is revoked or the user signs out
-- **WHEN** a test context emits sign-out or revocation
-- **THEN** the configured state lifecycle prevents further use of that context's protected data
+- **WHEN** the person signs out, or a request shows their session has expired or lost its organiser role
+- **THEN** no protected data remains on screen or in web storage: sign-out reloads without the session, and expiry or a lost role replaces the workspace with its access state
+
+#### Scenario: Access is lost during work
+- **WHEN** an organisation-scoped request for the working organisation receives the generic not-found answer
+- **THEN** the application hides that organisation's loaded data, shows the generic denial, which does not say whether the organisation exists, and keeps only the person's typed input for copying
 
 ### Requirement: Presentation does not grant authority
 Frontend context and permission presentation SHALL NOT replace API authorisation. Generated client code SHALL NOT decide workflow outcomes, own navigation/toasts/cache policy or retry non-idempotent writes automatically. Future feature contracts SHALL retain operation and revision metadata through their adapter; M0 SHALL NOT invent tournament write contracts to demonstrate the shell.

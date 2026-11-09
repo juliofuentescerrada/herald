@@ -166,7 +166,13 @@ Four spec files (`public`, `sign-in`, `organisations`, `access`), nine journeys,
 | Requirement / scenario | Evidence | Verdict |
 | --- | --- | --- |
 | Merges to `main` run the journeys; a pull request does not | `.github/workflows/e2e.yml`, `on: push: branches: [main]` only | Met by configuration |
-| A journey breaks → the workflow fails with report and trace | Artefact step on failure; locally the HTML report and traces are written under `CI=true` | Pending its first CI run (task 5.2) |
+| A journey breaks → the workflow fails with report and trace | Artefact step on failure; locally the HTML report and traces are written under `CI=true` | Met on `main` (task 5.2): the job ran and passed; its failure path is exercised locally |
 | The suite passes → no artefacts | Upload only `if: failure()` | Met by configuration |
 
-Open: task 5.2 (a full run in CI, with durations and memory) can only happen after the merge to `main`.
+Task 5.2 is recorded below.
+
+### First runs on `main` (task 5.2, 10 November 2026)
+
+- Run 42691326733 (merge of #7): the End-to-end job passed in 3 min 31 s, the suite itself in about 1.5 min; nine journeys passed with no retries.
+- Locally, after the refinements of #8: nine journeys in 58 s. Containers used about 300 MB (provider 195–223 MB, PostgreSQL 54–68 MB, measured in the spike); the runner's memory was not measured separately.
+- Run 42708073803 (merge of #8, with the refinements): passed, job 3 min 2 s. The CI workflow passed too.
