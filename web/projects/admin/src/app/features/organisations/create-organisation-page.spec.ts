@@ -1,5 +1,7 @@
 import { HttpErrorResponse, HttpHeaders } from '@angular/common/http';
+import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
+import { provideRouter } from '@angular/router';
 import { HeraldHostAdminService } from '@herald/api-client/admin';
 import axe from 'axe-core';
 import { Observable, of, Subject, throwError } from 'rxjs';
@@ -9,7 +11,7 @@ import { CreateOrganisationPage } from './create-organisation-page';
 const problem = (status: number, body: object) =>
   new HttpErrorResponse({ status, error: body, headers: new HttpHeaders({ 'content-type': 'application/problem+json' }) });
 
-function render(answers: (() => Observable<unknown>)[] = []) {
+function render(answers: (() => Observable<unknown>)[] = [], organisation: string | null = null) {
   const calls: { organisationId: string; name: string }[] = [];
   const api = {
     createOrganisation: (body: { organisationId: string; name: string }) => {
@@ -17,11 +19,12 @@ function render(answers: (() => Observable<unknown>)[] = []) {
       return (answers.shift() ?? (() => of({ id: body.organisationId, name: body.name })))();
     },
   };
-  const context = { enter: vi.fn() };
+  const context = { enter: vi.fn(), organisation: signal(organisation), home: signal(organisation ? `/organisations/${organisation}` : '/') };
   TestBed.configureTestingModule({
     providers: [
       { provide: HeraldHostAdminService, useValue: api },
       { provide: AppContext, useValue: context },
+      provideRouter([]),
       { provide: AUTH_CONFIG, useValue: { authority: 'https://d.example/', clientId: 'c', apiScope: 's', publicUrl: 'http://localhost:4300' } },
     ],
   });
@@ -146,5 +149,18 @@ describe('Creating an organisation', () => {
     await submit();
     const { violations } = await axe.run(element, { rules: { 'color-contrast': { enabled: false } } });
     expect(violations.map((v) => v.id)).toEqual([]);
+  });
+
+  it('offers no way out to a newcomer, who has nowhere to go back to', async () => {
+    const { element, fixture } = render();
+    await fixture.whenStable();
+    expect([...element.querySelectorAll('.actions a, .actions button')].map((b) => b.textContent?.trim())).toEqual(['Create organisation']);
+  });
+
+  it('lets an owner cancel back to their workspace', async () => {
+    const { element, fixture } = render([], '0198f000-0000-7000-8000-00000000000a');
+    await fixture.whenStable();
+    const cancel = [...element.querySelectorAll('a')].find((a) => a.textContent?.trim() === 'Cancel');
+    expect(cancel?.getAttribute('href')).toBe('/organisations/0198f000-0000-7000-8000-00000000000a');
   });
 });

@@ -115,15 +115,11 @@ describe('The admin shell', () => {
     expect(element.textContent).not.toContain('Northside Gaming');
   });
 
-  it('offers switching only to a person with several organisations', async () => {
-    const one = await openShell(`/organisations/${northside}`);
-    await vi.waitFor(() => expect(one.text('.context-name')).toBe('Northside Gaming'));
-    expect(one.element.querySelector('.context-switch')).toBeNull();
-    TestBed.resetTestingModule();
-
-    owned = [northside, southside];
-    const several = await openShell(`/organisations/${northside}`);
-    await vi.waitFor(() => expect(several.text('.context-switch')).toBe('Switch organisation'));
+  it('always offers the selector from a workspace, where another organisation is created', async () => {
+    const { text } = await openShell(`/organisations/${northside}`);
+    await vi.waitFor(() => expect(text('.context-name')).toBe('Northside Gaming'));
+    expect(text('.context-switch')).toBe('Switch organisation');
+    expect(text('main')).not.toContain('Create another organisation');
   });
 
   it('shows the signed-in person in the account menu with sign-out', async () => {

@@ -1,9 +1,10 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, ElementRef, inject, signal, viewChild } from '@angular/core';
 import { CreatedOrganisation, HeraldHostAdminService, HttpValidationProblemDetails, problemOf } from '@herald/api-client/admin';
+import { RouterLink } from '@angular/router';
 import { Button, Notice } from '@herald/ui';
 import { firstValueFrom } from 'rxjs';
-import { AccessState, AppContext, AUTH_CONFIG, organisationPath } from '../../platform';
+import { AccessState, AppContext, organisationPath } from '../../platform';
 
 /** A-1: the API applies the same rules; these are its rule codes. */
 export const maxNameLength = 80;
@@ -15,15 +16,15 @@ const messages: Record<string, string> = {
 /** Creates the person's organisation; they become its only owner and enter its workspace. */
 @Component({
   selector: 'app-create-organisation-page',
-  imports: [Button, Notice],
+  imports: [Button, Notice, RouterLink],
   templateUrl: './create-organisation-page.html',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class CreateOrganisationPage {
   private readonly api = inject(HeraldHostAdminService);
-  private readonly context = inject(AppContext);
+  /** With a working organisation, Cancel goes back to it; a newcomer has nowhere to go back to. */
+  protected readonly context = inject(AppContext);
   private readonly access = inject(AccessState);
-  protected readonly publicUrl = inject(AUTH_CONFIG).publicUrl;
   private readonly input = viewChild.required<ElementRef<HTMLInputElement>>('nameInput');
 
   protected readonly name = signal('');

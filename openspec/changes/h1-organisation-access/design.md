@@ -298,3 +298,48 @@ The end-to-end journeys found two defects in the admin's session handling:
 - **Silent renewal through MSAL's hidden iframe could never succeed.** MSAL 5 expects the redirect URI, loaded in that iframe, to run its redirect bridge (`@azure/msal-browser/redirect-bridge`). The redirect URI `/` booted the application, MSAL refused it there (`block_iframe_reload`) and the main frame waited out its 10-second timeout. `main.ts` now runs only `broadcastResponseToMainFrame()` when it loads inside a frame with an authorisation response in the hash, so the redirect URI and the directory registration stay as they are.
 
 Checks: admin Vitest 96 pass, lint and boundaries clean, admin build; the journeys of `e2e-critical-paths` (sign-out and expiring session) pass against them.
+
+### Manual run with the real directory (task 6.2, 9–10 November 2026)
+
+Run through Aspire with the maintainer's registrations (`docs/operations/identity.md`). Checked by the maintainer: sign-in through the directory, the return to Herald, creating organisations and switching between them. The split authority (`auth-authority` for MSAL, `/v2.0` for the host) worked against the real directory.
+
+Differences from what the design expected:
+
+- **AADSTS50105 stays on Microsoft's page.** A person invited to the directory but not assigned to `herald-admin` sees the directory's own error page; the directory does not redirect the error back, so Herald's "Herald access is by invitation" does not appear at that point. That state still covers an account assigned to `herald-admin` without the `Organiser` role on `herald-api` (the API's 403). The guide's troubleshooting row and the `signInProblem` mapping stay, as the latter is harmless.
+- **Both assignments are needed**, as the guide says; the first attempt missed them.
+
+Visual refinements decided by the maintainer during the run (branch `h1-access-visual-refinements`), departing from the reviewed captures:
+
+- **Account menu:** a quiet control (the person's name and a chevron, a token hover surface on hover and while open) instead of underlined text in a bordered box. Its accessible name keeps "· Account".
+- **Rail organisation block:** no box; the name bold at 20 px, "Organisation · Owner" muted, a small "Switch organisation" link with an icon, and a thin divider before the navigation. The link shows **with one organisation too**: the selector is where another organisation is created, so the overview no longer offers "Create another organisation" (and the shell no longer queries `/api/me`).
+- **Creation form:** no "Back to public page"; "Cancel" back to the workspace only when the person came from one. A newcomer has no secondary action (the public site is in the top bar).
+- **Brand:** the admin's "HERALD" takes the accent dot, as the public one.
+- **Selector rows:** the button reads "Switch" (accessible name "Switch to <organisation>"), secondary, so the accent stays for each screen's main action.
+
+These carry into the visual direction with task 6.3.
+
+### Completion and acceptance review (tasks 1.3, 6.2 and 6.3, 10 November 2026)
+
+- **1.3:** the maintainer created `herald-api` and `herald-admin` in the shared directory and assigned a test person to both, following `docs/operations/identity.md`. The AppHost's four `auth-*` user secrets were checked for shape and consistency (scope on the API's client id, authority without a trailing slash, discovery issuer on the tenant-id host) without printing them.
+- **6.2:** besides the run recorded above, the maintainer validated the other tab reloading on a switch and sign-out reloading the other tabs. The end-to-end suite (`e2e/`, nine journeys) passed locally after the refinements (58 s).
+- **Spec changes to match the result, made explicitly:** `organisation-access` now says a workspace always offers the selector, where another organisation is created (the maintainer's refinement), instead of "no selector with one organisation"; `sign-in` now says the provider refuses an unassigned person on its own page, and the not-assigned state is for a signed-in person whose token lacks the organiser role (403), with a scenario for each.
+
+Acceptance against the specs:
+
+| Requirement | Evidence | Result |
+|---|---|---|
+| Only assigned people sign in | Directory with assignment required (manual run); `signedIn` guard; host and admin tests; e2e unassigned journey (403 path) | Met, with the spec corrected for the provider's own refusal page |
+| The API authenticates every admin request | `AuthenticationTests` (policy on every admin endpoint, catches an anonymous one), 401/403 tests, malformed identifiers → 403 | Met |
+| Identity is directory and object identifiers | `Person` keyed by `(DirectoryId, ObjectId)`; same display name / changed name tests | Met |
+| Sign-out and expiry protect the session's data | `AccessState` clears queries and keeps only typed input; session and access tests; e2e expiry and sign-out journeys; manual sign-out | Met |
+| Recovery starts with the provider | Recovery state; `relink-person` with tests and a smoke run; operations guide | Met; a real relink has not been needed yet |
+| Creation with a single owner, validation, retries, conflicts, same names | Domain, PostgreSQL and API tests; creation component tests; e2e newcomer journey; manual run | Met |
+| Seeing and switching organisations | Selector tests, `inOrganisation`/`enter`, leave guard; e2e switch journey; manual run | Met, with the spec updated for the always-available selector |
+| Support relink | `RelinkPerson` tests (resolves, old key gone, occupied refused, recorded) | Met |
+| Membership resolved first; generic 404 | API tests (other owner, missing, removed membership); e2e denial journey | Met for reads; writes are covered by the save checks until the first organisation-scoped write endpoint adds its own 404 test |
+| Persistence scopes organisation-owned data | Probe tests (filter, stamping, no context, foreign rows), isolation architecture test | Met |
+| The database-level guard is decided by evidence | RLS experiment recorded; rejected for H1 (ADR 0014) | Met |
+| Two shells; public Sign in; admin session | Builds, public tests (transfer state), account menu tests, manual run | Met |
+| State has an owner and an authorised scope | Context replacement, other-tab reload, sign-out and lost-access tests; e2e journeys | Met |
+
+**ADR 0014:** accepted by the maintainer on 10 November 2026: its decisions are implemented and verified against the real directory, and RLS is settled (not adopted in H1, to revisit with M4's database roles).

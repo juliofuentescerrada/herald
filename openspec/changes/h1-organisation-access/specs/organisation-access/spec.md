@@ -24,7 +24,7 @@ A signed-in assigned person SHALL be able to create an organisation by giving it
 - **THEN** both exist as separate organisations
 
 ### Requirement: A person sees and switches between their organisations
-The API SHALL return the signed-in person and the organisations they own, and nothing about other organisations. The admin application SHALL keep the working organisation in its address. With one organisation it SHALL show no selector; with several it SHALL offer the reviewed selector. Switching SHALL replace the context through a full load, asking first when the current tab holds unsaved input.
+The API SHALL return the signed-in person and the organisations they own, and nothing about other organisations. The admin application SHALL keep the working organisation in its address. From a workspace it SHALL always offer the selector, which lists the person's organisations with the current one marked and is where another organisation is created. Switching SHALL replace the context through a full load, asking first when the current tab holds unsaved input.
 
 #### Scenario: A person owns several organisations
 - **WHEN** a person who owns two organisations opens the selector

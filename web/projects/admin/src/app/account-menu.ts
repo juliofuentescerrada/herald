@@ -1,16 +1,17 @@
 import { ChangeDetectionStrategy, Component, computed, ElementRef, inject, input, signal, viewChild } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { Button } from '@herald/ui';
+import { Button, Icon } from '@herald/ui';
 import { AppContext, Session } from './platform';
 
 /** The signed-in person, the way back to their workspace, and sign-out; a disclosure closed with Escape. */
 @Component({
   selector: 'app-account-menu',
-  imports: [RouterLink, Button],
+  imports: [RouterLink, Button, Icon],
   host: { class: 'account', '(keydown.escape)': 'close()' },
   template: `
     <button #toggle type="button" class="account-toggle" aria-controls="account-panel" [attr.aria-expanded]="open()" (click)="open.set(!open())">
-      {{ name() }} · Account <span aria-hidden="true">{{ open() ? '−' : '+' }}</span>
+      {{ name() }}<span class="visually-hidden"> · Account</span>
+      <herald-icon class="chevron" name="chevron-down" />
     </button>
     @if (open()) {
       <div class="account-panel" id="account-panel">

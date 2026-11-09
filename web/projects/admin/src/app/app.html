@@ -1,6 +1,6 @@
 @if (access.problem() || standalone()) {
   <header class="top" data-herald-surface="inverse">
-    <a class="brand" [routerLink]="context.home()">HERALD</a>
+    <a class="brand" [routerLink]="context.home()">HERALD<span class="brand-dot" aria-hidden="true">.</span></a>
     @if (publicUrl) {
       <a class="top-link" [href]="publicUrl">Tournaments</a>
     }
@@ -18,14 +18,13 @@
 } @else {
   <div class="shell">
     <aside class="rail" data-herald-surface="inverse">
-      <a class="brand" [routerLink]="context.home()">HERALD</a>
+      <a class="brand" [routerLink]="context.home()">HERALD<span class="brand-dot" aria-hidden="true">.</span></a>
       <div class="context">
         @if (context.organisation()) {
           <span class="context-name">{{ organisation.data()?.name }}</span>
           <span class="context-kind">Organisation · Owner</span>
-          @if (several()) {
-            <a herald-button class="context-switch" [routerLink]="[context.home(), 'switch']">Switch organisation</a>
-          }
+          <!-- Also with one organisation: the selector is where another one is created. -->
+          <a class="context-switch" [routerLink]="[context.home(), 'switch']"><herald-icon name="arrows-exchange" size="metadata" />Switch organisation</a>
         } @else {
           <span class="context-name">No organisation selected</span>
           <span class="context-kind">Organisation workspace</span>

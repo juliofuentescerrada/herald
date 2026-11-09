@@ -17,6 +17,7 @@ test('A newcomer creates an organisation and lands in its workspace', async ({ p
 test('An owner of two organisations switches, and another tab reloads into its own organisation', async ({ page, secondPage, signIn, expectAccessible }) => {
   const persona = await signIn();
   const first = await createOrganisation(page);
+  await page.getByRole('link', { name: 'Switch organisation' }).click();
   await page.getByRole('link', { name: 'Create another organisation' }).click();
   const second = await createOrganisation(page);
   await signIn({ on: secondPage, as: persona, path: `/organisations/${second.id}` });
