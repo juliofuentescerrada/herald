@@ -171,3 +171,13 @@ Costs found:
 - EF Core 10 neither indexes complex properties nor binds them to constructors: `Person` keeps its identity in two private properties behind `Identity`, and `Person`/`IdentityRelink` have private constructors for materialisation.
 - Consequence for task 4.3: inserting the owner membership needs a context, so creation enters the new organisation's context before saving.
 - Tests: 4 PostgreSQL tests in `Herald.Organisations.Tests` apply the real migration (stored organisation with owner and stamped column, identity read back, duplicate identity refused, relink stored); 2 domain tests for `Relink`. Full .NET run: 84 pass; no Wolverine code drift.
+
+### Organisations features (task 4.3, 9 November 2026)
+
+- `GET /api/me` (`getMe`): display name from the token and the organisations the person owns, oldest first; no person yet → empty list. A query: it creates nothing.
+- `POST /api/organisations` (`createOrganisation`): field errors as a validation problem (`name`: `required`/`too-long`; `organisationId`: `required` when empty); registers the person on first use, otherwise refreshes the display name; an identical retry answers **201 with the original** (one success shape for the client), different content 409 with no detail. A new organisation enters its own context before the owner membership is added; Wolverine's transactional middleware saves. *Shortcut:* two simultaneous first attempts with the same id lose to the primary key with a 500 (retries follow a lost response, so they do not overlap).
+- `GET /api/organisations/{organisationId}` (`getOrganisation`): name and id; the host's membership step has already answered 404 otherwise.
+- `IOrganisationAccess` is `Persistence/OrganisationAccess`, registered by `OrganisationsModule`. It and `GetMe` are the two reviewed `IgnoreQueryFilters` call sites in `IsolationTests`.
+- The `organiser` policy now also requires `tid` and `oid`, so every admin endpoint has a `Caller`.
+- **Found while generating code:** Wolverine HTTP resolved services from a new scope per request, not the request's, so handlers would not see the organisation the membership step entered. `MapHeraldApi` sets `ServiceProviderSource.FromHttpContextRequestServices`, and `AddHeraldModule` marks `OrganisationContext` for service location (`AlwaysUseServiceLocationFor`), which Wolverine requires for its factory registration. The generated handlers now take the context from `httpContext.RequestServices`; task 4.4 tests it end to end.
+- Wolverine code and the OpenAPI documents/client regenerated (task 4.6 repeats this at the end). Full .NET run: 84 pass.

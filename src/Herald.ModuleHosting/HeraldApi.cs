@@ -40,13 +40,18 @@ public static class HeraldApi
         // Runs after routing, authentication and authorisation, which WebApplication adds ahead of it.
         app.Use(EnterOrganisation);
         // Admin endpoints need an assigned organiser; public ones stay anonymous (ADR 0014).
-        app.MapWolverineEndpoints(options => options.ConfigureEndpoints(chain =>
+        app.MapWolverineEndpoints(options =>
         {
-            if (chain.Method.Method.GetCustomAttribute<EndpointGroupNameAttribute>()?.EndpointGroupName == Admin)
+            // The request's scope, where the membership step entered the organisation; Wolverine's default is a new scope.
+            options.ServiceProviderSource = ServiceProviderSource.FromHttpContextRequestServices;
+            options.ConfigureEndpoints(chain =>
             {
-                chain.Metadata.RequireAuthorization(HeraldAuthentication.OrganiserPolicy);
-            }
-        }));
+                if (chain.Method.Method.GetCustomAttribute<EndpointGroupNameAttribute>()?.EndpointGroupName == Admin)
+                {
+                    chain.Metadata.RequireAuthorization(HeraldAuthentication.OrganiserPolicy);
+                }
+            });
+        });
         // Development only for now, like /health: what Azure exposes is decided in M4.
         if (app.Environment.IsDevelopment())
         {

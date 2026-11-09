@@ -5,7 +5,11 @@ namespace Herald.Architecture.Tests;
 public class IsolationTests
 {
     // Each entry is a reviewed reason to read across organisations (ADR 0014); add one only with its test.
-    private static readonly string[] _allowedFilterBypasses = [];
+    private static readonly string[] _allowedFilterBypasses =
+    [
+        "Herald.Organisations/Features/GetMe/GetMeEndpoint.cs",
+        "Herald.Organisations/Persistence/OrganisationAccess.cs",
+    ];
 
     [Fact]
     public void Only_reviewed_code_bypasses_the_organisation_filter()
