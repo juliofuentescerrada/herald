@@ -13,13 +13,15 @@ var messaging = builder.AddAzureServiceBus("messaging")
 
 // Sign-in through the External ID directory shared with Arcana (ADR 0014). Not secrets, but they identify the
 // maintainer's directory, so they live in user secrets: docs/operations/identity.md lists them and how to set them.
+// auth-authority is https://<subdomain>.ciamlogin.com/<tenant-id>, with the tenant id and no trailing slash.
 var authority = builder.AddParameter("auth-authority");
 var apiAudience = builder.AddParameter("auth-api-audience");
 var apiScope = builder.AddParameter("auth-api-scope");
 var adminClientId = builder.AddParameter("auth-admin-client-id");
 
 var host = builder.AddProject<Projects.Herald_Host>("host")
-    .WithEnvironment("Herald__Authentication__Authority", authority)
+    // The API reads the v2.0 discovery document; MSAL takes the bare authority and finds it itself.
+    .WithEnvironment("Herald__Authentication__Authority", ReferenceExpression.Create($"{authority}/v2.0"))
     .WithEnvironment("Herald__Authentication__Audience", apiAudience)
     .WithReference(database)
     .WaitFor(database)

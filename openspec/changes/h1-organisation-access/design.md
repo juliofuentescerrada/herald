@@ -280,3 +280,8 @@ Run locally the way CI runs it:
 | `pnpm test:all` | admin 94, public 12, catalogue 5, ui 19, api-client 9 |
 | `pnpm test:ssr` | 50 concurrent requests isolated, no credentials sent to the API |
 | `pnpm build:all` | admin initial 849 kB raw / 211 kB gzip (warning budget 900 kB), public 347 kB, catalogue 260 kB |
+
+### Operations guide and authority fix (task 1.3, part, 9 November 2026)
+
+- `docs/operations/identity.md` written: values and where they go, the two registrations (scope, `Organiser` role, v2 tokens, assignment required on both, SPA redirect `http://localhost:4200/`, admin consent, the shared `signin` user flow), user secrets for a local run, assigning a person to both applications, removal (assignment vs membership), recovery verification and `relink-person`, troubleshooting. The registrations themselves and the first assigned person remain the maintainer's part of this task.
+- **Found while writing it** (from Arcana's guide for the same directory): MSAL takes the authority as `https://<subdomain>.ciamlogin.com/<tenant-id>` and finds the discovery document itself, while JWT bearer needs `…/<tenant-id>/v2.0`. Task 2.2 passed one `auth-authority` to both, so one of them would have failed against the real directory. The AppHost now passes `auth-authority` to admin as is and `<auth-authority>/v2.0` to the host (`ReferenceExpression`).
