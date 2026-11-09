@@ -13,7 +13,7 @@
     "test:all": "ng test admin --watch=false && ng test public --watch=false && ng test catalogue --watch=false && ng test ui --watch=false && ng test api-client --watch=false",
     "build:all": "ng build admin && ng build public && ng build catalogue",
     "test:ssr": "ng build public --configuration development --output-path dist/public-dev && node ssr-checks/isolation.mjs dist/public-dev",
-    "start:admin": "ng serve admin --port ${PORT:-4200}",
+    "start:admin": "node projects/admin/write-runtime-config.mjs && ng serve admin --port ${PORT:-4200}",
     "start:public": "ng serve public --port ${PORT:-4300}",
     "api:generate": "node projects/api-client/generate.mjs"
   },
@@ -29,6 +29,7 @@
     "@angular/platform-server": "^22.2.0",
     "@angular/router": "^22.2.0",
     "@angular/ssr": "^22.2.6",
+    "@azure/msal-browser": "5.29.0",
     "@floating-ui/dom": "1.8.0",
     "@tabler/icons": "3.50.0",
     "@tabler/icons-angular": "3.50.0",

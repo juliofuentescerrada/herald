@@ -1,7 +1,8 @@
+import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter, Router, Routes } from '@angular/router';
 import axe from 'axe-core';
-import { CONTEXT_LOCATION, INITIAL_CONTEXT } from './platform';
+import { CONTEXT_LOCATION, INITIAL_CONTEXT, Session } from './platform';
 import { App } from './app';
 import { routes } from './app.routes';
 
@@ -17,6 +18,8 @@ async function openShell(url: string, organisation: string | null = 'Northside G
       provideRouter([...failingSection, ...routes]),
       { provide: INITIAL_CONTEXT, useValue: { identity: 'ana', organisation } },
       { provide: CONTEXT_LOCATION, useValue: location },
+      // A signed-in person: the sign-in guard is covered in platform/sign-in.spec.ts.
+      { provide: Session, useValue: { account: signal({ username: 'ana' }) } },
     ],
   });
   const fixture = TestBed.createComponent(App);

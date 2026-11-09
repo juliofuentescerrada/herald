@@ -91,7 +91,7 @@ Task 3.4, on the probe table: `ENABLE` and `FORCE ROW LEVEL SECURITY`, a policy 
 
 ### D-9 Admin session and routes
 
-- `@azure/msal-angular` and `@azure/msal-browser` (Microsoft, MIT; exact versions and their Angular support checked before adding) in the admin platform: redirect sign-in, a guard on every route, an interceptor attaching tokens to `/api` only. MSAL's cache uses `sessionStorage`; it holds tokens, not business data (W-06's rule on protected data in storage is about application data, and this exception is recorded here).
+- `@azure/msal-browser` (Microsoft, MIT; the maintainer chose it without `@azure/msal-angular` in task 5.1, see the implementation record) in the admin platform: redirect sign-in, a guard on every route, an interceptor attaching tokens to `/api` only. MSAL's cache uses `sessionStorage`; it holds tokens, not business data (W-06's rule on protected data in storage is about application data, and this exception is recorded here).
 - Routes: `/` resolves the person (`GET /api/me`): no organisation → creation, one → `/organisations/<id>`, several → selector. Everything organisation-scoped lives under `/organisations/:organisationId`. `INITIAL_CONTEXT` comes from the session (person) and the URL (organisation); switching and sign-out use `AppContext.replace()`.
 - Error mapping in the platform: provider error for an unassigned user, or 403 from the API → not-assigned; provider cancel/error → cancelled/failed; silent renewal failure → session expired; generic 404 for the working organisation → access lost. Each hides loaded private data; forms keep the person's input in signals (A-3).
 - Features: `organisations` (creation, selector) in the admin app; the access states belong to the platform because they are about the session, not a feature.
@@ -202,3 +202,11 @@ Costs found:
 ### Generated code (task 4.6, 9 November 2026)
 
 `codegen write` and `pnpm api:generate` were run with each endpoint change (tasks 4.3–4.4); the final run shows no drift. With the regenerated admin client, web lint and boundary fixtures (15/15), Vitest for every project and all production builds pass.
+
+### Admin sign-in platform (task 5.1, 9 November 2026)
+
+- **Deviation from D-9 (maintainer's choice):** `@azure/msal-browser` 5.29.0 only (MIT; its one dependency `@azure/msal-common` 16.16.1 is MIT), pinned exactly; released 6 November 2026, chosen over 5.27.0 for the latest fixes. `@azure/msal-angular` 6.3.1 (MIT, supports Angular 22) was left out: Herald needs only a guard and an interceptor, its interceptor's handling of relative `/api` URLs is opaque, and task 5.3 maps each MSAL error to an access state itself.
+- `platform/session.ts`: `AUTH_CONFIG`, `MSAL_CLIENT` (a `PublicClientApplication` with `sessionStorage` cache and the authority's host as known authority) and `Session` (`start` completes a returning redirect before the first navigation; `signIn(returnTo)` uses `redirectStartPage`, so MSAL returns to the requested address, A-2; `token` acquires silently). `platform/sign-in.ts`: `signedIn` guards every route through a parent route, `apiToken` attaches the bearer token to `/api` and `/api/...` only.
+- Runtime configuration: `main.ts` reads `/runtime-config.json` before bootstrapping and shows a plain failure without it. `start:admin` writes that git-ignored file from `HERALD_AUTH_*` (`projects/admin/write-runtime-config.mjs`); hosting provides it in M4.
+- **Budget:** MSAL adds about 120 kB, so the admin's initial bundle is 620 kB; the warning budget goes from 500 kB to 700 kB (error stays at 1 MB). It is needed before the first navigation, so lazy loading would not reduce what is downloaded.
+- Tests: `sign-in.spec.ts` (signed-in person passes; a visitor signs in with the requested address; the token goes to `/api/me` and `/api`, never to `/runtime-config.json`, another origin or `/apis`); the shell tests run with a signed-in session. Web lint, boundaries (15/15), all Vitest projects and all builds pass. Error handling (expired session, unassigned person) belongs to task 5.3.
