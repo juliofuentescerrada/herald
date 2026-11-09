@@ -11,10 +11,10 @@ Features SHALL own server queries/mutations through TanStack Query and local int
 - **WHEN** one tab replaces the identity or organisation context
 - **THEN** the other tabs of the same application reload and drop that context's data
 
-#### Scenario: The person signs out
-- **WHEN** the person signs out
-- **THEN** the application reloads without the session and no protected data remains in the document or web storage
+#### Scenario: Access is revoked or the user signs out
+- **WHEN** the person signs out, or a request shows their session has expired or lost its organiser role
+- **THEN** no protected data remains on screen or in web storage: sign-out reloads without the session, and expiry or a lost role replaces the workspace with its access state
 
 #### Scenario: Access is lost during work
 - **WHEN** an organisation-scoped request for the working organisation receives the generic not-found answer
-- **THEN** the application hides that organisation's loaded data, shows the reviewed access-lost state and keeps only the person's typed input for copying
+- **THEN** the application hides that organisation's loaded data, shows the generic denial, which does not say whether the organisation exists, and keeps only the person's typed input for copying

@@ -7,7 +7,7 @@ The workspace SHALL provide an admin CSR application and a public/participant ap
 - **WHEN** a clean checkout runs the documented production build commands
 - **THEN** both applications build as distinct artifacts while sharing the same `ui` and generated-client libraries
 
-#### Scenario: A visitor opens the public page
+#### Scenario: A visitor opens the M0 public page
 - **WHEN** the representative public shell page is opened
 - **THEN** it displays the reviewed shell/page with a working Sign in action that leads to the admin application, without offering simulated tournament registration or results
 
