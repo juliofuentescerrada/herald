@@ -4,11 +4,12 @@ import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { ActivatedRouteSnapshot, RouterStateSnapshot } from '@angular/router';
 import { firstValueFrom } from 'rxjs';
+import { AccessState } from './access';
 import { Session } from './session';
 import { apiToken, signedIn } from './sign-in';
 
-function setUp(account: { username: string } | null) {
-  const session = { account: signal(account), signIn: vi.fn(async () => undefined), token: vi.fn(async () => 'token-1') };
+function setUp(account: { username: string } | null, failure: string | null = null, token = vi.fn(async () => 'token-1')) {
+  const session = { account: signal(account), failure: signal(failure), signIn: vi.fn(async () => undefined), token };
   TestBed.configureTestingModule({
     providers: [
       { provide: Session, useValue: session },
@@ -58,5 +59,24 @@ describe('Admin sign-in', () => {
     call.flush({});
     await done;
     expect(session.token).not.toHaveBeenCalled();
+  });
+
+  it('shows why a returning sign-in failed instead of going straight back to the directory', async () => {
+    const session = setUp(null, 'not-assigned');
+    expect(await visit('/')).toBe(false);
+    expect(session.signIn).not.toHaveBeenCalled();
+    expect(TestBed.inject(AccessState).problem()).toBe('not-assigned');
+  });
+
+  it('says it is taking the visitor to sign in', async () => {
+    setUp(null);
+    await visit('/');
+    expect(TestBed.inject(AccessState).problem()).toBe('signing-in');
+  });
+
+  it('treats a token that needs interaction as an expired session', async () => {
+    setUp({ username: 'ana' }, null, vi.fn(async () => Promise.reject(new Error('interaction_required'))));
+    await expect(firstValueFrom(TestBed.inject(HttpClient).get('/api/me'))).rejects.toThrow('interaction_required');
+    expect(TestBed.inject(AccessState).problem()).toBe('session-expired');
   });
 });

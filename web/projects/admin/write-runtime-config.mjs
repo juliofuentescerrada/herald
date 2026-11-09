@@ -6,5 +6,6 @@ const config = {
   authority: process.env.HERALD_AUTH_AUTHORITY ?? '',
   clientId: process.env.HERALD_AUTH_CLIENT_ID ?? '',
   apiScope: process.env.HERALD_AUTH_API_SCOPE ?? '',
+  publicUrl: process.env.HERALD_PUBLIC_URL ?? '',
 };
 writeFileSync(new URL('./public/runtime-config.json', import.meta.url), `${JSON.stringify(config, null, 2)}\n`);

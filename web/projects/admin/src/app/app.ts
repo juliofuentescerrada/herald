@@ -2,11 +2,12 @@ import { ChangeDetectionStrategy, Component, DOCUMENT, effect, ElementRef, injec
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd, NavigationError, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { Button, NavLink, Notice } from '@herald/ui';
-import { AppContext, injectWorkingOrganisation } from './platform';
+import { AccessPage } from './access-page';
+import { AccessState, AppContext, injectWorkingOrganisation } from './platform';
 
 /** The organiser shell: graphite rail with the working context and navigation, and the page. */
 @Component({
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, Button, NavLink, Notice],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, Button, NavLink, Notice, AccessPage],
   selector: 'app-root',
   templateUrl: './app.html',
   styleUrl: './app.css',
@@ -14,6 +15,7 @@ import { AppContext, injectWorkingOrganisation } from './platform';
 })
 export class App {
   protected readonly context = inject(AppContext);
+  protected readonly access = inject(AccessState);
   protected readonly organisation = injectWorkingOrganisation();
   private readonly location = inject(DOCUMENT).location;
   protected readonly replacedNoticeOpen = signal(this.context.replacedElsewhere());

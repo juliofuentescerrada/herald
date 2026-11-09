@@ -1,0 +1,31 @@
+:host { display: block; min-height: 100vh; }
+.access-top { display: flex; align-items: center; gap: var(--herald-space-6); padding: var(--herald-space-6) var(--herald-space-16); background: var(--herald-color-surface-inverse); color: var(--herald-color-text-inverse); }
+.brand { font-size: 30px; font-weight: 900; letter-spacing: -1.4px; }
+.top-link { color: inherit; font-size: var(--herald-text-lg); }
+.access-main { display: grid; grid-template-columns: minmax(0, 560px) minmax(0, 360px); gap: var(--herald-space-16); padding: var(--herald-space-16) var(--herald-space-16); }
+.panel { padding: var(--herald-space-8); background: var(--herald-color-surface-default); border: 1px solid var(--herald-color-border-default); }
+h1 { font-size: 32px; margin-bottom: var(--herald-space-4); }
+h2 { font-size: 20px; margin: var(--herald-space-6) 0 var(--herald-space-3); }
+.panel p { font-size: var(--herald-text-lg); }
+.lead { color: var(--herald-color-text-secondary); font-size: var(--herald-text-lg); margin: 0 0 var(--herald-space-6); }
+.panel herald-notice { margin-bottom: var(--herald-space-6); }
+.checklist { padding-left: var(--herald-space-6); }
+.field { display: flex; flex-direction: column; gap: var(--herald-space-2); margin-top: var(--herald-space-6); }
+label { font-weight: 700; }
+textarea { font: inherit; padding: var(--herald-space-3); border: 1px solid var(--herald-color-border-control); resize: vertical; }
+.panel .help { color: var(--herald-color-text-secondary); font-size: var(--herald-text-base); margin: 0; }
+.actions { display: flex; flex-wrap: wrap; gap: var(--herald-space-3); margin-top: var(--herald-space-6); }
+.copy-status:empty { display: none; }
+.side-note { padding-top: var(--herald-space-8); }
+.side-note h2 { margin-top: 0; }
+.side-note p { color: var(--herald-color-text-secondary); font-size: var(--herald-text-lg); }
+
+@media (max-width: 900px) {
+  .access-top { padding: var(--herald-space-4); }
+  .brand { font-size: 24px; }
+  .access-main { grid-template-columns: minmax(0, 1fr); gap: var(--herald-space-6); padding: var(--herald-space-6) var(--herald-space-4); }
+  .panel { padding: var(--herald-space-6); }
+  h1 { font-size: 28px; }
+  .actions { flex-direction: column; align-items: stretch; }
+  .side-note { padding-top: 0; }
+}

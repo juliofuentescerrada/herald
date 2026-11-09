@@ -5,7 +5,7 @@ import axe from 'axe-core';
 import { HeraldHostAdminService } from '@herald/api-client/admin';
 import { provideTanStackQuery, QueryClient } from '@tanstack/angular-query-experimental';
 import { of } from 'rxjs';
-import { CONTEXT_LOCATION, INITIAL_CONTEXT, Session } from './platform';
+import { AccessState, AUTH_CONFIG, CONTEXT_LOCATION, INITIAL_CONTEXT, Session } from './platform';
 import { App } from './app';
 import { routes } from './app.routes';
 
@@ -30,6 +30,7 @@ async function openShell(url: string, organisation: string | null = northside) {
       { provide: Session, useValue: { account: signal({ username: 'ana' }) } },
       { provide: HeraldHostAdminService, useValue: api },
       provideTanStackQuery(new QueryClient()),
+      { provide: AUTH_CONFIG, useValue: { authority: 'https://d.example/', clientId: 'c', apiScope: 's' } },
     ],
   });
   const fixture = TestBed.createComponent(App);
@@ -41,7 +42,7 @@ async function openShell(url: string, organisation: string | null = northside) {
   };
   await navigate(url);
   const element = fixture.nativeElement as HTMLElement;
-  return { element, navigate, location, text: (selector: string) => element.querySelector(selector)?.textContent?.trim() };
+  return { element, navigate, location, fixture, text: (selector: string) => element.querySelector(selector)?.textContent?.trim() };
 }
 
 describe('The admin shell', () => {
@@ -92,5 +93,17 @@ describe('The admin shell', () => {
     const { element } = await openShell(`/organisations/${northside}`);
     const { violations } = await axe.run(element, { rules: { 'color-contrast': { enabled: false } } });
     expect(violations.map((v) => v.id)).toEqual([]);
+  });
+
+  it('replaces the whole workspace while access needs attention', async () => {
+    const { element, fixture, text } = await openShell(`/organisations/${northside}`);
+    await vi.waitFor(() => expect(text('.context-name')).toBe('Northside Gaming'));
+
+    TestBed.inject(AccessState).report('session-expired');
+    await fixture.whenStable();
+
+    expect(text('h1')).toBe('Sign in again to continue');
+    expect(element.querySelector('.rail')).toBeNull();
+    expect(element.textContent).not.toContain('Northside Gaming');
   });
 });

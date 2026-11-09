@@ -40,11 +40,14 @@ var admin = builder.AddJavaScriptApp("admin", "../../web", "start:admin")
 
 // One install per workspace: two installers in the same folder race and the second app never starts.
 var installer = admin.Resource.Annotations.OfType<JavaScriptPackageInstallerAnnotation>().Single().Resource;
-builder.AddJavaScriptApp("public", "../../web", "start:public")
+var publicApp = builder.AddJavaScriptApp("public", "../../web", "start:public")
     .WithPnpm(install: false)
     .WithHttpEndpoint(port: 4300, env: "PORT")
     .WithEnvironment("HERALD_API_URL", apiUrl)
     .WaitFor(host)
     .WaitForCompletion(builder.CreateResourceBuilder(installer));
+
+// The admin's access pages link back to the public application ("Back to public page").
+admin.WithEnvironment("HERALD_PUBLIC_URL", publicApp.GetEndpoint("http"));
 
 builder.Build().Run();
