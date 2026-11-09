@@ -1,0 +1,1038 @@
+{
+  "date": "2026-11-09",
+  "status": "Proposal pending maintainer review",
+  "purpose": "H1 organisation access visual review; no production behaviour",
+  "capture": {
+    "tool": "playwright-core with installed Google Chrome, headless",
+    "deviceScaleFactor": 1,
+    "assets": "local only; system sans-serif fallback",
+    "checks": "Each capture checked for page errors, document overflow, computed text/surface contrast and 44px controls. Keyboard disclosure, Escape, required/length validation and creation simulation exercised. Screen reader and real provider/backend behaviour not verified.",
+    "screenshots": [
+      {
+        "state": "public-signed-out",
+        "label": "Public navigation · signed out",
+        "file": "access-public-signed-out-desktop.png",
+        "source": "prototypes/frontend/access-states.html?state=public-signed-out",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=public-signed-out",
+        "viewport": [
+          1440,
+          1000
+        ],
+        "fullPage": true,
+        "sha256": "3519b8df869d4743b9277234e8ee6a56dbd4c7acf6797a82ad7dd69302c8d610",
+        "checks": {
+          "pageErrors": [],
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "textContrastFailures": [],
+          "heading": "Follow the competition"
+        }
+      },
+      {
+        "state": "public-signed-out",
+        "label": "Public navigation · signed out",
+        "file": "access-public-signed-out-mobile.png",
+        "source": "prototypes/frontend/access-states.html?state=public-signed-out",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=public-signed-out",
+        "viewport": [
+          390,
+          844
+        ],
+        "fullPage": true,
+        "sha256": "6a0a6242d75d26d7c028e5830b1415b599548909fe94bc3bd86f05dc6fffe1e1",
+        "checks": {
+          "pageErrors": [],
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "textContrastFailures": [],
+          "heading": "Follow the competition"
+        }
+      },
+      {
+        "state": "public-signed-in",
+        "label": "Public navigation · signed in",
+        "file": "access-public-signed-in-desktop.png",
+        "source": "prototypes/frontend/access-states.html?state=public-signed-in",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=public-signed-in",
+        "viewport": [
+          1440,
+          1000
+        ],
+        "fullPage": true,
+        "sha256": "447e89d6575e21bbf055265dd78d19d5fde8fb298df2a956711001ba2a67bac8",
+        "checks": {
+          "pageErrors": [],
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "textContrastFailures": [],
+          "heading": "Follow the competition"
+        }
+      },
+      {
+        "state": "public-signed-in",
+        "label": "Public navigation · signed in",
+        "file": "access-public-signed-in-mobile.png",
+        "source": "prototypes/frontend/access-states.html?state=public-signed-in",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=public-signed-in",
+        "viewport": [
+          390,
+          844
+        ],
+        "fullPage": true,
+        "sha256": "1562213df6af962c5b5784929e89ca57b3b2faa073b88b5be662df6fccb546ee",
+        "checks": {
+          "pageErrors": [],
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "textContrastFailures": [],
+          "heading": "Follow the competition"
+        }
+      },
+      {
+        "state": "sign-in-redirecting",
+        "label": "Sign-in · redirecting",
+        "file": "access-sign-in-redirecting-desktop.png",
+        "source": "prototypes/frontend/access-states.html?state=sign-in-redirecting",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=sign-in-redirecting",
+        "viewport": [
+          1440,
+          1000
+        ],
+        "fullPage": true,
+        "sha256": "e68258b8d837ce67134f1c430bf9cf19d54bfbbedc11e0833a83cc751e5a6800",
+        "checks": {
+          "pageErrors": [],
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "textContrastFailures": [],
+          "heading": "Taking you to sign in"
+        }
+      },
+      {
+        "state": "sign-in-redirecting",
+        "label": "Sign-in · redirecting",
+        "file": "access-sign-in-redirecting-mobile.png",
+        "source": "prototypes/frontend/access-states.html?state=sign-in-redirecting",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=sign-in-redirecting",
+        "viewport": [
+          390,
+          844
+        ],
+        "fullPage": true,
+        "sha256": "4aeaeb7d1b78b43c33dcecb019333b97dde1eb2b3abd1cc4b3d8be775e65b1cf",
+        "checks": {
+          "pageErrors": [],
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "textContrastFailures": [],
+          "heading": "Taking you to sign in"
+        }
+      },
+      {
+        "state": "sign-in-returning",
+        "label": "Sign-in · returning",
+        "file": "access-sign-in-returning-desktop.png",
+        "source": "prototypes/frontend/access-states.html?state=sign-in-returning",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=sign-in-returning",
+        "viewport": [
+          1440,
+          1000
+        ],
+        "fullPage": true,
+        "sha256": "aa7763b3e05e6df63a0e6ba62c7e94486ca2b7cb23b2b8b69c0dd2e37f589931",
+        "checks": {
+          "pageErrors": [],
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "textContrastFailures": [],
+          "heading": "Completing sign-in"
+        }
+      },
+      {
+        "state": "sign-in-returning",
+        "label": "Sign-in · returning",
+        "file": "access-sign-in-returning-mobile.png",
+        "source": "prototypes/frontend/access-states.html?state=sign-in-returning",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=sign-in-returning",
+        "viewport": [
+          390,
+          844
+        ],
+        "fullPage": true,
+        "sha256": "359a7c61fcbf3775b4d75bf8cbc911353db4231a7a0928c685574ff37e2cf91e",
+        "checks": {
+          "pageErrors": [],
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "textContrastFailures": [],
+          "heading": "Completing sign-in"
+        }
+      },
+      {
+        "state": "sign-in-failed",
+        "label": "Sign-in · failed",
+        "file": "access-sign-in-failed-desktop.png",
+        "source": "prototypes/frontend/access-states.html?state=sign-in-failed",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=sign-in-failed",
+        "viewport": [
+          1440,
+          1000
+        ],
+        "fullPage": true,
+        "sha256": "77db823a6f1ce44efa36a2e74ac800afe36de95831d00c22e99624a39668345d",
+        "checks": {
+          "pageErrors": [],
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "textContrastFailures": [],
+          "heading": "Sign-in did not complete"
+        }
+      },
+      {
+        "state": "sign-in-failed",
+        "label": "Sign-in · failed",
+        "file": "access-sign-in-failed-mobile.png",
+        "source": "prototypes/frontend/access-states.html?state=sign-in-failed",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=sign-in-failed",
+        "viewport": [
+          390,
+          844
+        ],
+        "fullPage": true,
+        "sha256": "433aff86b3bfb6520a53e5a8535a5affbecf2736be7c02d069cea6799d8c4f94",
+        "checks": {
+          "pageErrors": [],
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "textContrastFailures": [],
+          "heading": "Sign-in did not complete"
+        }
+      },
+      {
+        "state": "sign-in-cancelled",
+        "label": "Sign-in · cancelled",
+        "file": "access-sign-in-cancelled-desktop.png",
+        "source": "prototypes/frontend/access-states.html?state=sign-in-cancelled",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=sign-in-cancelled",
+        "viewport": [
+          1440,
+          1000
+        ],
+        "fullPage": true,
+        "sha256": "1538f247160475c89d3d07f1b81b4260d64e77323a080c285a299358acbad569",
+        "checks": {
+          "pageErrors": [],
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "textContrastFailures": [],
+          "heading": "Sign-in was cancelled"
+        }
+      },
+      {
+        "state": "sign-in-cancelled",
+        "label": "Sign-in · cancelled",
+        "file": "access-sign-in-cancelled-mobile.png",
+        "source": "prototypes/frontend/access-states.html?state=sign-in-cancelled",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=sign-in-cancelled",
+        "viewport": [
+          390,
+          844
+        ],
+        "fullPage": true,
+        "sha256": "799612f2518c745d1e8bcac6a956e46b7aea8507fafbd439bd4d9d4f3d51d4c7",
+        "checks": {
+          "pageErrors": [],
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "textContrastFailures": [],
+          "heading": "Sign-in was cancelled"
+        }
+      },
+      {
+        "state": "not-assigned",
+        "label": "Account not assigned to Herald",
+        "file": "access-not-assigned-desktop.png",
+        "source": "prototypes/frontend/access-states.html?state=not-assigned",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=not-assigned",
+        "viewport": [
+          1440,
+          1000
+        ],
+        "fullPage": true,
+        "sha256": "7500fd1e52ea999af37aee9f71241f28fb148a372e9a76f7dc1e8a2349457bcc",
+        "checks": {
+          "pageErrors": [],
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "textContrastFailures": [],
+          "heading": "Herald access is by invitation"
+        }
+      },
+      {
+        "state": "not-assigned",
+        "label": "Account not assigned to Herald",
+        "file": "access-not-assigned-mobile.png",
+        "source": "prototypes/frontend/access-states.html?state=not-assigned",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=not-assigned",
+        "viewport": [
+          390,
+          844
+        ],
+        "fullPage": true,
+        "sha256": "c4c9a821640c7cf0540c97b55c896c7af92c85fa2cef4f0effd4d0ddd4a4c5c1",
+        "checks": {
+          "pageErrors": [],
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "textContrastFailures": [],
+          "heading": "Herald access is by invitation"
+        }
+      },
+      {
+        "state": "onboarding",
+        "label": "Create organisation · empty",
+        "file": "access-onboarding-desktop.png",
+        "source": "prototypes/frontend/access-states.html?state=onboarding",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=onboarding",
+        "viewport": [
+          1440,
+          1000
+        ],
+        "fullPage": true,
+        "sha256": "fd50f8aef95be02afb470b10fbd43726a6ee523ed5e7a40142a5ec3ba2aa322a",
+        "checks": {
+          "pageErrors": [],
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "textContrastFailures": [],
+          "heading": "Create an organisation"
+        }
+      },
+      {
+        "state": "onboarding",
+        "label": "Create organisation · empty",
+        "file": "access-onboarding-mobile.png",
+        "source": "prototypes/frontend/access-states.html?state=onboarding",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=onboarding",
+        "viewport": [
+          390,
+          844
+        ],
+        "fullPage": true,
+        "sha256": "acb95887b01a8e1b0bba266dae4c17e5a03aecd7305437cf73523782915bf467",
+        "checks": {
+          "pageErrors": [],
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "textContrastFailures": [],
+          "heading": "Create an organisation"
+        }
+      },
+      {
+        "state": "name-required",
+        "label": "Create organisation · name required",
+        "file": "access-name-required-desktop.png",
+        "source": "prototypes/frontend/access-states.html?state=name-required",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=name-required",
+        "viewport": [
+          1440,
+          1000
+        ],
+        "fullPage": true,
+        "sha256": "a011e145ab82701f7babbb585fd4aa4e2166299ec69fcafa4caa2b4886ceb25f",
+        "checks": {
+          "pageErrors": [],
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "textContrastFailures": [],
+          "heading": "Create an organisation"
+        }
+      },
+      {
+        "state": "name-required",
+        "label": "Create organisation · name required",
+        "file": "access-name-required-mobile.png",
+        "source": "prototypes/frontend/access-states.html?state=name-required",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=name-required",
+        "viewport": [
+          390,
+          844
+        ],
+        "fullPage": true,
+        "sha256": "df4494bb6388b5610dd126ab9065f3723c1272139ccf2f4c2227224103e1bb06",
+        "checks": {
+          "pageErrors": [],
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "textContrastFailures": [],
+          "heading": "Create an organisation"
+        }
+      },
+      {
+        "state": "name-too-long",
+        "label": "Create organisation · name too long",
+        "file": "access-name-too-long-desktop.png",
+        "source": "prototypes/frontend/access-states.html?state=name-too-long",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=name-too-long",
+        "viewport": [
+          1440,
+          1000
+        ],
+        "fullPage": true,
+        "sha256": "d462ca167c1d6dc7294331b28a2274c52f2fe5c42bfbfd588e9d6a10d5ef53f5",
+        "checks": {
+          "pageErrors": [],
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "textContrastFailures": [],
+          "heading": "Create an organisation"
+        }
+      },
+      {
+        "state": "name-too-long",
+        "label": "Create organisation · name too long",
+        "file": "access-name-too-long-mobile.png",
+        "source": "prototypes/frontend/access-states.html?state=name-too-long",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=name-too-long",
+        "viewport": [
+          390,
+          844
+        ],
+        "fullPage": true,
+        "sha256": "b914a07212ebc551ce29ef57065ac3adbd0eabb639934746510e23440091a9cf",
+        "checks": {
+          "pageErrors": [],
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "textContrastFailures": [],
+          "heading": "Create an organisation"
+        }
+      },
+      {
+        "state": "creating",
+        "label": "Create organisation · submitting",
+        "file": "access-creating-desktop.png",
+        "source": "prototypes/frontend/access-states.html?state=creating",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=creating",
+        "viewport": [
+          1440,
+          1000
+        ],
+        "fullPage": true,
+        "sha256": "c5561c0d178268b0d480b40a9bdbcccb3144433ac26d0c01754345dc0428f323",
+        "checks": {
+          "pageErrors": [],
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "textContrastFailures": [],
+          "heading": "Create an organisation"
+        }
+      },
+      {
+        "state": "creating",
+        "label": "Create organisation · submitting",
+        "file": "access-creating-mobile.png",
+        "source": "prototypes/frontend/access-states.html?state=creating",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=creating",
+        "viewport": [
+          390,
+          844
+        ],
+        "fullPage": true,
+        "sha256": "f227cddf446de49a033f8600bbd424e475fa68c5cccd518b1deb10f0657b7e87",
+        "checks": {
+          "pageErrors": [],
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "textContrastFailures": [],
+          "heading": "Create an organisation"
+        }
+      },
+      {
+        "state": "create-failed",
+        "label": "Create organisation · failed save",
+        "file": "access-create-failed-desktop.png",
+        "source": "prototypes/frontend/access-states.html?state=create-failed",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=create-failed",
+        "viewport": [
+          1440,
+          1000
+        ],
+        "fullPage": true,
+        "sha256": "66806d583b7453c0a431e2c105a08ad3ee2428d15d5908c7995eaa21e124fa48",
+        "checks": {
+          "pageErrors": [],
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "textContrastFailures": [],
+          "heading": "Create an organisation"
+        }
+      },
+      {
+        "state": "create-failed",
+        "label": "Create organisation · failed save",
+        "file": "access-create-failed-mobile.png",
+        "source": "prototypes/frontend/access-states.html?state=create-failed",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=create-failed",
+        "viewport": [
+          390,
+          844
+        ],
+        "fullPage": true,
+        "sha256": "bc910eae761e4f52927b3896317c708fd0a7f258c4c39adfc9ad15e68d6832dc",
+        "checks": {
+          "pageErrors": [],
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "textContrastFailures": [],
+          "heading": "Create an organisation"
+        }
+      },
+      {
+        "state": "created",
+        "label": "Organisation created · owner context",
+        "file": "access-created-desktop.png",
+        "source": "prototypes/frontend/access-states.html?state=created",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=created",
+        "viewport": [
+          1440,
+          1000
+        ],
+        "fullPage": true,
+        "sha256": "dc6eda687ac0f43d42e99faeb49a93e778cd33fd17962ab48925b414aa76e12f",
+        "checks": {
+          "pageErrors": [],
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "textContrastFailures": [],
+          "heading": "Northside Gaming"
+        }
+      },
+      {
+        "state": "created",
+        "label": "Organisation created · owner context",
+        "file": "access-created-mobile.png",
+        "source": "prototypes/frontend/access-states.html?state=created",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=created",
+        "viewport": [
+          390,
+          844
+        ],
+        "fullPage": true,
+        "sha256": "0c436376268d763d5cdc0d2f419df73a366e84fba56b1e4b48be2e37cd6ccb96",
+        "checks": {
+          "pageErrors": [],
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "textContrastFailures": [],
+          "heading": "Northside Gaming"
+        }
+      },
+      {
+        "state": "admin-session",
+        "label": "Admin shell · active session",
+        "file": "access-admin-session-desktop.png",
+        "source": "prototypes/frontend/access-states.html?state=admin-session",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=admin-session",
+        "viewport": [
+          1440,
+          1000
+        ],
+        "fullPage": true,
+        "sha256": "5bc46d9cb750ff1b8a9100e71f25925479017ea4ea6fb7a90c394ddee68b2634",
+        "checks": {
+          "pageErrors": [],
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "textContrastFailures": [],
+          "heading": "Overview"
+        }
+      },
+      {
+        "state": "admin-session",
+        "label": "Admin shell · active session",
+        "file": "access-admin-session-mobile.png",
+        "source": "prototypes/frontend/access-states.html?state=admin-session",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=admin-session",
+        "viewport": [
+          390,
+          844
+        ],
+        "fullPage": true,
+        "sha256": "6a5cb4b6eb637ee3c6d98f52aa1ecd576c909e99bbd47b4ec1628acf4af35e78",
+        "checks": {
+          "pageErrors": [],
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "textContrastFailures": [],
+          "heading": "Overview"
+        }
+      },
+      {
+        "state": "one-organisation",
+        "label": "One organisation · no selector",
+        "file": "access-one-organisation-desktop.png",
+        "source": "prototypes/frontend/access-states.html?state=one-organisation",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=one-organisation",
+        "viewport": [
+          1440,
+          1000
+        ],
+        "fullPage": true,
+        "sha256": "148b0af4da15fd5a5af24f5cf608878bfff46b695ebd7bdcc4c969aebc271961",
+        "checks": {
+          "pageErrors": [],
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "textContrastFailures": [],
+          "heading": "Overview"
+        }
+      },
+      {
+        "state": "one-organisation",
+        "label": "One organisation · no selector",
+        "file": "access-one-organisation-mobile.png",
+        "source": "prototypes/frontend/access-states.html?state=one-organisation",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=one-organisation",
+        "viewport": [
+          390,
+          844
+        ],
+        "fullPage": true,
+        "sha256": "27aa5d8281b7b9e2a28b0070598b13e72d9b2431ad6185db6fdce66cd8ad1211",
+        "checks": {
+          "pageErrors": [],
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "textContrastFailures": [],
+          "heading": "Overview"
+        }
+      },
+      {
+        "state": "organisation-selector",
+        "label": "Several organisations · selector",
+        "file": "access-organisation-selector-desktop.png",
+        "source": "prototypes/frontend/access-states.html?state=organisation-selector",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=organisation-selector",
+        "viewport": [
+          1440,
+          1000
+        ],
+        "fullPage": true,
+        "sha256": "f273336e4bd52c048370b5add7d722c525e8c54304df48f38c3e8e460412d7b1",
+        "checks": {
+          "pageErrors": [],
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "textContrastFailures": [],
+          "heading": "Choose an organisation"
+        }
+      },
+      {
+        "state": "organisation-selector",
+        "label": "Several organisations · selector",
+        "file": "access-organisation-selector-mobile.png",
+        "source": "prototypes/frontend/access-states.html?state=organisation-selector",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=organisation-selector",
+        "viewport": [
+          390,
+          844
+        ],
+        "fullPage": true,
+        "sha256": "debfda7081beafbe809d3de0466c948585be51f78e883e5fe33d7a7dc6483475",
+        "checks": {
+          "pageErrors": [],
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "textContrastFailures": [],
+          "heading": "Choose an organisation"
+        }
+      },
+      {
+        "state": "switching",
+        "label": "Organisation · switching",
+        "file": "access-switching-desktop.png",
+        "source": "prototypes/frontend/access-states.html?state=switching",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=switching",
+        "viewport": [
+          1440,
+          1000
+        ],
+        "fullPage": true,
+        "sha256": "220a54a4f79cf0ee9bdf9a21c72083dba94633ce704b6c7a4c48772d9c9eeb8e",
+        "checks": {
+          "pageErrors": [],
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "textContrastFailures": [],
+          "heading": "Switching organisation"
+        }
+      },
+      {
+        "state": "switching",
+        "label": "Organisation · switching",
+        "file": "access-switching-mobile.png",
+        "source": "prototypes/frontend/access-states.html?state=switching",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=switching",
+        "viewport": [
+          390,
+          844
+        ],
+        "fullPage": true,
+        "sha256": "b8021f4a821d85ddb39c97b82697ae696abae10b597bca1e8cf0eb70347eecc6",
+        "checks": {
+          "pageErrors": [],
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "textContrastFailures": [],
+          "heading": "Switching organisation"
+        }
+      },
+      {
+        "state": "switched",
+        "label": "Organisation · switched",
+        "file": "access-switched-desktop.png",
+        "source": "prototypes/frontend/access-states.html?state=switched",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=switched",
+        "viewport": [
+          1440,
+          1000
+        ],
+        "fullPage": true,
+        "sha256": "6c9761d10ea13f4c9c39e1c52e9216cc542ed78f5a5affc3674d27da96cf7249",
+        "checks": {
+          "pageErrors": [],
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "textContrastFailures": [],
+          "heading": "Overview"
+        }
+      },
+      {
+        "state": "switched",
+        "label": "Organisation · switched",
+        "file": "access-switched-mobile.png",
+        "source": "prototypes/frontend/access-states.html?state=switched",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=switched",
+        "viewport": [
+          390,
+          844
+        ],
+        "fullPage": true,
+        "sha256": "328aff1663f33207cb4404fc6e56f8da19c59b71e33b4549c9044863b4cc4840",
+        "checks": {
+          "pageErrors": [],
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "textContrastFailures": [],
+          "heading": "Overview"
+        }
+      },
+      {
+        "state": "context-replaced",
+        "label": "Organisation changed in another tab",
+        "file": "access-context-replaced-desktop.png",
+        "source": "prototypes/frontend/access-states.html?state=context-replaced",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=context-replaced",
+        "viewport": [
+          1440,
+          1000
+        ],
+        "fullPage": true,
+        "sha256": "0e7538763cae3b7cad7f208931af506ffb0072a8bf7a4f0365ce248ecf29f098",
+        "checks": {
+          "pageErrors": [],
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "textContrastFailures": [],
+          "heading": "Overview"
+        }
+      },
+      {
+        "state": "context-replaced",
+        "label": "Organisation changed in another tab",
+        "file": "access-context-replaced-mobile.png",
+        "source": "prototypes/frontend/access-states.html?state=context-replaced",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=context-replaced",
+        "viewport": [
+          390,
+          844
+        ],
+        "fullPage": true,
+        "sha256": "827b780ba6c540e0a95beac50756218dcbe6740298eccd30b4840c7c2fb25228",
+        "checks": {
+          "pageErrors": [],
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "textContrastFailures": [],
+          "heading": "Overview"
+        }
+      },
+      {
+        "state": "access-lost",
+        "label": "Membership removed · landing",
+        "file": "access-access-lost-desktop.png",
+        "source": "prototypes/frontend/access-states.html?state=access-lost",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=access-lost",
+        "viewport": [
+          1440,
+          1000
+        ],
+        "fullPage": true,
+        "sha256": "96bff1666c39b8b6b06de3bd6c2cd4b95bc8bb36c1525c10df343482eb5400f8",
+        "checks": {
+          "pageErrors": [],
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "textContrastFailures": [],
+          "heading": "Organisation access is no longer available"
+        }
+      },
+      {
+        "state": "access-lost",
+        "label": "Membership removed · landing",
+        "file": "access-access-lost-mobile.png",
+        "source": "prototypes/frontend/access-states.html?state=access-lost",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=access-lost",
+        "viewport": [
+          390,
+          844
+        ],
+        "fullPage": true,
+        "sha256": "42d4e40648ab08761ac890931ef7bdeeaaf792cf4a2337835cf2748c87f70afa",
+        "checks": {
+          "pageErrors": [],
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "textContrastFailures": [],
+          "heading": "Organisation access is no longer available"
+        }
+      },
+      {
+        "state": "write-rejected",
+        "label": "Membership removed · rejected write",
+        "file": "access-write-rejected-desktop.png",
+        "source": "prototypes/frontend/access-states.html?state=write-rejected",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=write-rejected",
+        "viewport": [
+          1440,
+          1000
+        ],
+        "fullPage": true,
+        "sha256": "8611b8fe3b41aa034e2d31f1e0e5bb1040ae839dbdd513ef7d5c15a2d49b507d",
+        "checks": {
+          "pageErrors": [],
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "textContrastFailures": [],
+          "heading": "Organisation access is no longer available"
+        }
+      },
+      {
+        "state": "write-rejected",
+        "label": "Membership removed · rejected write",
+        "file": "access-write-rejected-mobile.png",
+        "source": "prototypes/frontend/access-states.html?state=write-rejected",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=write-rejected",
+        "viewport": [
+          390,
+          844
+        ],
+        "fullPage": true,
+        "sha256": "a4ebc9c0921b4bb03d8728c2dcea567f578917ba2274ae4cb768ea6e2715c06f",
+        "checks": {
+          "pageErrors": [],
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "textContrastFailures": [],
+          "heading": "Organisation access is no longer available"
+        }
+      },
+      {
+        "state": "session-expired",
+        "label": "Session expired during work",
+        "file": "access-session-expired-desktop.png",
+        "source": "prototypes/frontend/access-states.html?state=session-expired",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=session-expired",
+        "viewport": [
+          1440,
+          1000
+        ],
+        "fullPage": true,
+        "sha256": "65d016e5ebb9575f4aac484bfe88e7f007b487535e0567dc4ed6f621d1aa69df",
+        "checks": {
+          "pageErrors": [],
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "textContrastFailures": [],
+          "heading": "Sign in again to continue"
+        }
+      },
+      {
+        "state": "session-expired",
+        "label": "Session expired during work",
+        "file": "access-session-expired-mobile.png",
+        "source": "prototypes/frontend/access-states.html?state=session-expired",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=session-expired",
+        "viewport": [
+          390,
+          844
+        ],
+        "fullPage": true,
+        "sha256": "43652c995d806d79a24367000605317c695bed24475db5af2bd3dbfac83bb2ca",
+        "checks": {
+          "pageErrors": [],
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "textContrastFailures": [],
+          "heading": "Sign in again to continue"
+        }
+      },
+      {
+        "state": "recovery",
+        "label": "Account recovery · support next action",
+        "file": "access-recovery-desktop.png",
+        "source": "prototypes/frontend/access-states.html?state=recovery",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=recovery",
+        "viewport": [
+          1440,
+          1000
+        ],
+        "fullPage": true,
+        "sha256": "4ee5d44d87dbbbb615afd8dad07b7e27b87e40666229cd00fb28663d92fc3de0",
+        "checks": {
+          "pageErrors": [],
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "textContrastFailures": [],
+          "heading": "Recover access to your account"
+        }
+      },
+      {
+        "state": "recovery",
+        "label": "Account recovery · support next action",
+        "file": "access-recovery-mobile.png",
+        "source": "prototypes/frontend/access-states.html?state=recovery",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=recovery",
+        "viewport": [
+          390,
+          844
+        ],
+        "fullPage": true,
+        "sha256": "f8bfdbb4533d5cfac94b652d5b8232138eed7ba05173d954ef1015312bf91ed8",
+        "checks": {
+          "pageErrors": [],
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "textContrastFailures": [],
+          "heading": "Recover access to your account"
+        }
+      },
+      {
+        "state": "private-denied",
+        "label": "Generic private denial",
+        "file": "access-private-denied-desktop.png",
+        "source": "prototypes/frontend/access-states.html?state=private-denied",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=private-denied",
+        "viewport": [
+          1440,
+          1000
+        ],
+        "fullPage": true,
+        "sha256": "7963ba34a97f7576fff857799d32daa8cb51f3cda2ce92d2e42c669c8ac3a7cd",
+        "checks": {
+          "pageErrors": [],
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "textContrastFailures": [],
+          "heading": "This page is unavailable"
+        }
+      },
+      {
+        "state": "private-denied",
+        "label": "Generic private denial",
+        "file": "access-private-denied-mobile.png",
+        "source": "prototypes/frontend/access-states.html?state=private-denied",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=private-denied",
+        "viewport": [
+          390,
+          844
+        ],
+        "fullPage": true,
+        "sha256": "4d874358a66bff60881d7c6dd0da8f0699ba57fee0375de94ede39dc7ec3f7e9",
+        "checks": {
+          "pageErrors": [],
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "textContrastFailures": [],
+          "heading": "This page is unavailable"
+        }
+      }
+    ]
+  },
+  "textContrastPairs": [
+    {
+      "foreground": "rgb(23, 26, 30)",
+      "background": "rgb(255, 255, 255)",
+      "ratio": 17.46,
+      "text": "Back to public page",
+      "pass": true
+    },
+    {
+      "foreground": "rgb(94, 102, 115)",
+      "background": "rgb(255, 255, 255)",
+      "ratio": 5.79,
+      "text": "Check that you are signed in to the expected account.",
+      "pass": true
+    },
+    {
+      "foreground": "rgb(23, 26, 30)",
+      "background": "rgb(243, 244, 246)",
+      "ratio": 15.86,
+      "text": "Access stays private",
+      "pass": true
+    },
+    {
+      "foreground": "rgb(255, 255, 255)",
+      "background": "rgb(23, 26, 30)",
+      "ratio": 17.46,
+      "text": "Alex Morgan · Account",
+      "pass": true
+    },
+    {
+      "foreground": "rgb(199, 242, 58)",
+      "background": "rgb(23, 26, 30)",
+      "ratio": 13.46,
+      "text": ".",
+      "pass": true
+    },
+    {
+      "foreground": "rgb(94, 102, 115)",
+      "background": "rgb(243, 244, 246)",
+      "ratio": 5.27,
+      "text": "Coverage and assumptions",
+      "pass": true
+    },
+    {
+      "foreground": "rgb(23, 26, 30)",
+      "background": "rgb(199, 242, 58)",
+      "ratio": 13.46,
+      "text": "Use another account",
+      "pass": true
+    },
+    {
+      "foreground": "rgb(174, 182, 192)",
+      "background": "rgb(23, 26, 30)",
+      "ratio": 8.52,
+      "text": "Organisation · Owner",
+      "pass": true
+    }
+  ],
+  "interactionChecks": [
+    "required name",
+    "name over 80 characters",
+    "typed name retained in creation simulation",
+    "keyboard account disclosure",
+    "Escape restores summary focus"
+  ]
+}

@@ -22,3 +22,4 @@ One significant decision per record: context, decision, alternatives and consequ
 | [0011](0011-angular-front-end-and-generated-api-contract.md) | Two Angular apps, functional features, shared UI and generated API contracts | Proposed; rendering/features direction confirmed |
 | [0012](0012-azure-hosting.md) | Host on Azure Container Apps, with managed identity and OpenTofu | Proposed |
 | [0013](0013-functional-delivery-scope.md) | Functional delivery with identity and direct teams from H1 | Accepted |
+| [0014](0014-identity-and-organisation-isolation.md) | Sign in through the shared External ID directory; Herald authorises and isolates organisations | Proposed |
