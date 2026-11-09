@@ -5,7 +5,7 @@ import axe from 'axe-core';
 import { HeraldHostAdminService } from '@herald/api-client/admin';
 import { provideTanStackQuery, QueryClient } from '@tanstack/angular-query-experimental';
 import { of } from 'rxjs';
-import { AccessState, AUTH_CONFIG, CONTEXT_LOCATION, INITIAL_CONTEXT, Session } from './platform';
+import { AccessState, AUTH_CONFIG, CONFIRM, CONTEXT_LOCATION, INITIAL_CONTEXT, Session } from './platform';
 import { App } from './app';
 import { routes } from './app.routes';
 
@@ -23,7 +23,7 @@ const api = {
   getMe: () => of({ displayName: 'Ana Ruiz', organisations: owned.map((id) => ({ id, name: names[id] })) }),
 };
 
-async function openShell(url: string, organisation: string | null = northside) {
+async function openShell(url: string, organisation: string | null = northside, confirm: (message: string) => boolean = () => true) {
   const location = { assign: vi.fn(), reload: vi.fn(), replace: vi.fn() };
   TestBed.configureTestingModule({
     providers: [
@@ -33,6 +33,7 @@ async function openShell(url: string, organisation: string | null = northside) {
       // A signed-in person: the sign-in guard is covered in platform/sign-in.spec.ts.
       { provide: Session, useValue: { account: signal({ username: 'ana', name: 'Ana Ruiz' }), signOut: vi.fn(async () => undefined) } },
       { provide: HeraldHostAdminService, useValue: api },
+      { provide: CONFIRM, useValue: confirm },
       provideTanStackQuery(new QueryClient({ defaultOptions: { queries: { retry: false } } })),
       { provide: AUTH_CONFIG, useValue: { authority: 'https://d.example/', clientId: 'c', apiScope: 's' } },
     ],
@@ -157,5 +158,30 @@ describe('The admin shell', () => {
     await vi.waitFor(() => expect(text('herald-notice strong')).toBe('Organisation created'));
     expect(text('herald-notice')).toContain('You are now the only owner of Northside Gaming.');
     await vi.waitFor(() => expect(TestBed.inject(Router).url).toBe(`/organisations/${northside}`));
+  });
+
+  it('asks before leaving a form with unsaved input, and stays if the person declines', async () => {
+    const confirm = vi.fn(() => false);
+    const { element, navigate, text } = await openShell('/organisations/new', northside, confirm);
+    const input = element.querySelector<HTMLInputElement>('#organisation-name')!;
+    input.value = 'Southside Club';
+    input.dispatchEvent(new Event('input'));
+
+    await navigate(`/organisations/${northside}/switch`);
+    expect(confirm).toHaveBeenCalledOnce();
+    expect(text('h1')).toBe('Create an organisation');
+    expect(input.value).toBe('Southside Club');
+
+    confirm.mockReturnValue(true);
+    await navigate(`/organisations/${northside}/switch`);
+    expect(text('h1')).toBe('Choose an organisation');
+  });
+
+  it('leaves a form without unsaved input without asking', async () => {
+    const confirm = vi.fn(() => false);
+    const { navigate, text } = await openShell('/organisations/new', northside, confirm);
+    await navigate(`/organisations/${northside}/switch`);
+    expect(confirm).not.toHaveBeenCalled();
+    expect(text('h1')).toBe('Choose an organisation');
   });
 });

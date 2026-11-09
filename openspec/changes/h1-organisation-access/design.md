@@ -248,3 +248,18 @@ Costs found:
 - `ORGANISER_WORKSPACE_URL`: the server reads `HERALD_ADMIN_URL` (`provideOrganiserWorkspaceUrl`) and stores it in the transfer state, so the browser keeps the same address after hydration instead of falling back; without it, `/admin/` on the same host (shortcut until hosting, M4). A prerendered page takes the value present at build time: built with `HERALD_ADMIN_URL=http://localhost:4200`, `index.html` carries that `href` and the same value in its transfer state.
 - The AppHost passes `HERALD_ADMIN_URL` (admin's endpoint) to public, next to `HERALD_PUBLIC_URL` for admin.
 - Tests: the public shell test that asserted no sign-in now asserts a Sign in link to the admin address (default and from the transfer state) and still no registration or results. Public tests 12; web lint, boundaries, all Vitest projects, builds and the SSR isolation check pass.
+
+### Front-end test review (task 5.6, 9 November 2026)
+
+Checked against the task's list; most was written with tasks 5.1–5.5:
+
+| Required | Covered by |
+|---|---|
+| Each access state | `access-page.spec.ts` (7 states), `create-organisation-page.spec.ts` (empty, required, too long, creating, failed, created), `organisation-selector-page.spec.ts`, `app.spec.ts` (shell, standalone layout, created notice) |
+| Input retention | `access.spec.ts` (live drafts only), `access-page.spec.ts` (shown read-only and copied), creation (kept after a failed save and on lost access) |
+| Switch confirmation | `access.spec.ts` (`confirmLeave`); **added** in `app.spec.ts`: leaving the creation form with input asks, declining keeps the page and the input, no input does not ask |
+| Sign-out full load | `routing.spec.ts` (other tabs told, session signed out); **added** `session.spec.ts`: `logoutRedirect` with the account, plus `start` (returning redirect, existing account, failure recorded not thrown), `signIn` (`redirectStartPage`, `select_account`) and tokens (signed-in only; interaction required propagates) |
+| `axe-core` | every access state, creation (with an error), selector, shell |
+| Boundary checks | lint and the 15 planted violations |
+
+Admin 94, public 12, catalogue 5, ui 19, api-client 9 tests pass; web lint and all builds pass.
