@@ -47,7 +47,8 @@ var publicApp = builder.AddJavaScriptApp("public", "../../web", "start:public")
     .WaitFor(host)
     .WaitForCompletion(builder.CreateResourceBuilder(installer));
 
-// The admin's access pages link back to the public application ("Back to public page").
+// Each links to the other: admin's "Back to public page", public's "Sign in" (D-10).
 admin.WithEnvironment("HERALD_PUBLIC_URL", publicApp.GetEndpoint("http"));
+publicApp.WithEnvironment("HERALD_ADMIN_URL", admin.GetEndpoint("http"));
 
 builder.Build().Run();
