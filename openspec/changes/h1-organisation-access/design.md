@@ -342,4 +342,4 @@ Acceptance against the specs:
 | Two shells; public Sign in; admin session | Builds, public tests (transfer state), account menu tests, manual run | Met |
 | State has an owner and an authorised scope | Context replacement, other-tab reload, sign-out and lost-access tests; e2e journeys | Met |
 
-**ADR 0014 status proposal:** Accepted. Its decisions are implemented and verified against the real directory, and RLS is settled (not adopted in H1, to revisit with M4's database roles). It stays Proposed until the maintainer confirms.
+**ADR 0014:** accepted by the maintainer on 10 November 2026: its decisions are implemented and verified against the real directory, and RLS is settled (not adopted in H1, to revisit with M4's database roles).

@@ -34,7 +34,8 @@ context: |
   - openspec/specs describes what is implemented. Active deltas describe target changes;
     archived changes and dated reviews remain historical. m0-solution-skeleton, m0-messaging
     and m0-web-shell are done, as are the documentation consolidation and the static journey
-    prototype. No change is active; H1 functionality has not started.
+    prototype. h1-organisation-access (ADR 0014, accepted) and e2e-critical-paths (ADR 0015) are
+    implemented and merged; archive them before the next H1 slice. No tournament functionality yet.
   - Modular monolith: one module per bounded context, with Domain at the centre and vertical slices
     (Features: one namespace per use case, one file or cohesive folder; Persistence at the edge);
     features never depend on other features. Shared business rules belong in Domain; technical
