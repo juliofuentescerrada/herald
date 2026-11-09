@@ -30,4 +30,4 @@ xUnit v3 on Microsoft.Testing.Platform, as in the maintainer's other projects, w
 
 - Positive: tests document the domain and catch what the database would catch in production.
 - Negative: Docker is required to run the suite, and container tests are slower; they share containers per collection to stay fast.
-- Follow-ups: `m0-messaging` replaced the skeleton's Application/Adapters checks with slice checks proved by fixtures; `m0-web-shell` introduces frontend checks. H1 adds domain and web/API acceptance examples from the functional baseline, including revisions, effective outcomes, privacy and team readiness.
+- Follow-ups: `m0-messaging` replaced the skeleton's Application/Adapters checks with slice checks proved by fixtures; `m0-web-shell` introduces frontend checks. H1 adds domain and web/API acceptance examples from the functional baseline, including revisions, effective outcomes, privacy and team readiness. `e2e-critical-paths` adds the Playwright journeys in `e2e/` (ADR 0015): nine critical paths against the composed system with a fake OpenID Connect provider and axe checks, run after each merge to `main`; each H1 feature adds its journeys there.

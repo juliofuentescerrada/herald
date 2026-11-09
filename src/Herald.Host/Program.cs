@@ -1,4 +1,5 @@
 using Herald.Competition;
+using Herald.Host;
 using Herald.ModuleHosting;
 using Herald.Organisations;
 using Herald.Registration;
@@ -11,6 +12,13 @@ using Wolverine;
 using Wolverine.AzureServiceBus;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// The end-to-end suite's environment (e2e-critical-paths): no Service Bus, a test identity provider.
+var endToEnd = builder.Environment.IsEnvironment(HostEnvironments.EndToEnd);
+if (endToEnd)
+{
+    HostEnvironments.RefuseEndToEndWhenHosted(builder.Configuration);
+}
 
 builder.AddServiceDefaults();
 builder.AddNpgsqlDataSource("herald");
@@ -32,9 +40,13 @@ builder.UseWolverine(options =>
     options.CodeGeneration.TypeLoadMode = builder.Environment.IsDevelopment() ? TypeLoadMode.Dynamic : TypeLoadMode.Static;
 
     // The AppHost declares the topology; Herald's host creates no topics, subscriptions or queues.
-    options.UseAzureServiceBus(builder.Configuration.GetConnectionString("messaging")
-            ?? throw new InvalidOperationException("The 'messaging' connection string is missing."))
-        .SystemQueuesAreEnabled(false);
+    // The end-to-end suite runs without a broker: local queues and the PostgreSQL outbox still work.
+    if (!endToEnd)
+    {
+        options.UseAzureServiceBus(builder.Configuration.GetConnectionString("messaging")
+                ?? throw new InvalidOperationException("The 'messaging' connection string is missing."))
+            .SystemQueuesAreEnabled(false);
+    }
 
     options
         .AddOrganisationsModule()
@@ -45,6 +57,10 @@ builder.UseWolverine(options =>
 });
 builder.Services.AddHeraldApi();
 builder.Services.AddHeraldAuthentication(builder.Configuration);
+if (endToEnd)
+{
+    HostEnvironments.TrustTheTestProvidersCertificate(builder.Services);
+}
 
 var app = builder.Build();
 
