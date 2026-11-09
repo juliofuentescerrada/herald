@@ -1,23 +1,49 @@
-@if (access.problem()) {
-  <app-access-page />
+@if (access.problem() || standalone()) {
+  <header class="top" data-herald-surface="inverse">
+    <a class="brand" [routerLink]="context.home()">HERALD</a>
+    @if (publicUrl) {
+      <a class="top-link" [href]="publicUrl">Tournaments</a>
+    }
+    @if (signedIn()) {
+      <app-account-menu class="top-account" [organise]="access.problem() !== 'not-assigned'" />
+    }
+  </header>
+  <main id="main">
+    @if (access.problem()) {
+      <app-access-page />
+    } @else {
+      <router-outlet />
+    }
+  </main>
 } @else {
   <div class="shell">
     <aside class="rail" data-herald-surface="inverse">
       <a class="brand" [routerLink]="context.home()">HERALD</a>
-      <p class="context">
+      <div class="context">
         @if (context.organisation()) {
           <span class="context-name">{{ organisation.data()?.name }}</span>
+          <span class="context-kind">Organisation · Owner</span>
+          @if (several()) {
+            <a herald-button class="context-switch" [routerLink]="[context.home(), 'switch']">Switch organisation</a>
+          }
         } @else {
           <span class="context-name">No organisation selected</span>
+          <span class="context-kind">Organisation workspace</span>
         }
-        <span class="context-kind">Organisation workspace</span>
-      </p>
-      <nav class="nav" aria-label="Workspace">
-        <a herald-nav-link [routerLink]="context.home()" routerLinkActive ariaCurrentWhenActive="page" [routerLinkActiveOptions]="{ exact: true }">Overview</a>
-      </nav>
+      </div>
+      @if (context.organisation()) {
+        <nav class="nav" aria-label="Workspace">
+          <a herald-nav-link [routerLink]="context.home()" routerLinkActive ariaCurrentWhenActive="page" [routerLinkActiveOptions]="{ exact: true }">Overview</a>
+        </nav>
+      }
     </aside>
 
-    <main class="page">
+    <main class="page" id="main">
+      <header class="page-top">
+        <span class="page-kind">Organiser workspace</span>
+        <app-account-menu />
+      </header>
+
       @if (replacedNoticeOpen()) {
         <herald-notice class="page-notice" dismissible (dismissed)="replacedNoticeOpen.set(false)"
           [heading]="organisation.data() ? 'You are now working in ' + organisation.data()!.name + '.' : 'Your working context changed.'">

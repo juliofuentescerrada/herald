@@ -4,7 +4,7 @@ import { Component, inject, signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { AuthError } from '@azure/msal-browser';
 import { firstValueFrom } from 'rxjs';
-import { accessErrors, AccessState, signInProblem } from './access';
+import { accessErrors, AccessState, CONFIRM, confirmLeave, signInProblem } from './access';
 import { QUERY_CLIENT } from './query-client';
 
 describe('A sign-in that did not complete', () => {
@@ -64,4 +64,25 @@ describe('Losing access', () => {
     expect(await answer('/api/organisations/x', 404, { type: 'organisation-not-available' })).toBe('unavailable'));
   it('leaves other not-found answers to the page', async () => expect(await answer('/api/organisations/x/tournaments/1', 404, { type: 'other' })).toBeNull());
   it('ignores answers from outside Herald API', async () => expect(await answer('/runtime-config.json', 401)).toBeNull());
+});
+
+describe('Leaving a form', () => {
+  afterEach(() => TestBed.resetTestingModule());
+
+  const leave = () => TestBed.runInInjectionContext(() => confirmLeave(null, {} as never, {} as never, {} as never));
+
+  it('does not ask without unsaved input', () => {
+    const confirm = vi.fn(() => false);
+    TestBed.configureTestingModule({ providers: [{ provide: CONFIRM, useValue: confirm }] });
+    const form = TestBed.createComponent(DraftForm);
+    form.componentInstance.text.set('   ');
+    expect(leave()).toBe(true);
+    expect(confirm).not.toHaveBeenCalled();
+  });
+
+  it.each([true, false])('asks before discarding unsaved input and respects the answer (%s)', (answer) => {
+    TestBed.configureTestingModule({ providers: [{ provide: CONFIRM, useValue: () => answer }] });
+    TestBed.createComponent(DraftForm).componentInstance.text.set('Spring league');
+    expect(leave()).toBe(answer);
+  });
 });

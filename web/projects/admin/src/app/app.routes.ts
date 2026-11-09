@@ -1,5 +1,5 @@
 import { Routes } from '@angular/router';
-import { inOrganisation, resolveHome, signedIn } from './platform';
+import { confirmLeave, inOrganisation, resolveHome, signedIn } from './platform';
 
 const notFound = {
   path: '**',
@@ -22,6 +22,8 @@ export const routes: Routes = [
       {
         path: 'organisations/new',
         title: 'Create an organisation · Herald',
+        data: { standalone: true },
+        canDeactivate: [confirmLeave],
         loadComponent: () => import('./features/organisations').then((m) => m.CreateOrganisationPage),
       },
       {
@@ -29,6 +31,11 @@ export const routes: Routes = [
         canActivate: [inOrganisation],
         children: [
           { path: '', title: 'Overview · Herald', loadComponent: () => import('./overview-page').then((m) => m.OverviewPage) },
+          {
+            path: 'switch',
+            title: 'Choose an organisation · Herald',
+            loadComponent: () => import('./features/organisations').then((m) => m.OrganisationSelectorPage),
+          },
           notFound,
         ],
       },

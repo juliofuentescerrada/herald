@@ -11,7 +11,10 @@ export const resolveHome: CanActivateFn = async () => {
   const { organisations } = await firstValueFrom(inject(HeraldHostAdminService).getMe());
   if (organisations.length === 0) return router.parseUrl('/organisations/new');
   if (organisations.length > 1) return router.parseUrl('/organisations');
-  context.enter(organisationPath(organisations[0].id));
+  const only = organisationPath(organisations[0].id);
+  // Already its workspace: an in-app navigation, not a new document.
+  if (organisations[0].id.toLowerCase() === context.organisation()) return router.parseUrl(only);
+  context.enter(only);
   return false;
 };
 

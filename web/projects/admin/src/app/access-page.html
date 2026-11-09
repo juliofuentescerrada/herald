@@ -1,11 +1,4 @@
-<header class="access-top" data-herald-surface="inverse">
-  <span class="brand">HERALD</span>
-  @if (publicUrl) {
-    <a class="top-link" [href]="publicUrl">Tournaments</a>
-  }
-</header>
-
-<main class="access-main" id="main">
+<div class="standalone-page">
   <section class="panel" aria-labelledby="access-heading">
     <h1 id="access-heading">{{ copy().heading }}</h1>
     <p class="lead">{{ copy().lead }}</p>
@@ -107,4 +100,4 @@
     <h2>{{ copy().side[0] }}</h2>
     <p>{{ copy().side[1] }}</p>
   </aside>
-</main>
+</div>

@@ -1,5 +1,6 @@
 import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
-import { DestroyRef, Injectable, inject, signal } from '@angular/core';
+import { DestroyRef, DOCUMENT, Injectable, InjectionToken, inject, signal } from '@angular/core';
+import { CanDeactivateFn } from '@angular/router';
 import { AuthError } from '@azure/msal-browser';
 import { catchError, throwError } from 'rxjs';
 import { QUERY_CLIENT } from './query-client';
@@ -43,6 +44,10 @@ export class AccessState {
     this.current.set(problem);
   }
 
+  hasUnsavedInput(): boolean {
+    return [...this.drafts].some((read) => read().trim() !== '');
+  }
+
   /** A form registers its unsaved input while it lives; call in an injection context. */
   keepDraft(read: () => string): void {
     this.drafts.add(read);
@@ -65,3 +70,15 @@ export const accessErrors: HttpInterceptorFn = (request, next) => {
     }),
   );
 };
+
+/** Asks the person; a token so tests can answer. */
+export const CONFIRM = new InjectionToken<(message: string) => boolean>('Herald confirm', {
+  factory: () => {
+    const window = inject(DOCUMENT).defaultView;
+    return (message) => window?.confirm(message) ?? true;
+  },
+});
+
+/** Leaving a form with unsaved input asks first (A-4); a switch from another tab cannot ask and discards it. */
+export const confirmLeave: CanDeactivateFn<unknown> = () =>
+  !inject(AccessState).hasUnsavedInput() || inject(CONFIRM)('Discard your unsaved input? It is not saved anywhere.');

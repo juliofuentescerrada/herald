@@ -17,7 +17,11 @@ const failingSection: Routes = [
 const northside = '0198f000-0000-7000-8000-00000000000a';
 const southside = '0198f000-0000-7000-8000-00000000000b';
 const names: Record<string, string> = { [northside]: 'Northside Gaming', [southside]: 'Southside Club' };
-const api = { getOrganisation: (id: string) => of({ id, name: names[id] }) };
+let owned = [northside];
+const api = {
+  getOrganisation: (id: string) => of({ id, name: names[id] }),
+  getMe: () => of({ displayName: 'Ana Ruiz', organisations: owned.map((id) => ({ id, name: names[id] })) }),
+};
 
 async function openShell(url: string, organisation: string | null = northside) {
   const location = { assign: vi.fn(), reload: vi.fn(), replace: vi.fn() };
@@ -27,9 +31,9 @@ async function openShell(url: string, organisation: string | null = northside) {
       { provide: INITIAL_CONTEXT, useValue: { identity: 'ana', organisation } },
       { provide: CONTEXT_LOCATION, useValue: location },
       // A signed-in person: the sign-in guard is covered in platform/sign-in.spec.ts.
-      { provide: Session, useValue: { account: signal({ username: 'ana' }) } },
+      { provide: Session, useValue: { account: signal({ username: 'ana', name: 'Ana Ruiz' }), signOut: vi.fn(async () => undefined) } },
       { provide: HeraldHostAdminService, useValue: api },
-      provideTanStackQuery(new QueryClient()),
+      provideTanStackQuery(new QueryClient({ defaultOptions: { queries: { retry: false } } })),
       { provide: AUTH_CONFIG, useValue: { authority: 'https://d.example/', clientId: 'c', apiScope: 's' } },
     ],
   });
@@ -46,7 +50,10 @@ async function openShell(url: string, organisation: string | null = northside) {
 }
 
 describe('The admin shell', () => {
-  beforeEach(() => sessionStorage.clear());
+  beforeEach(() => {
+    sessionStorage.clear();
+    owned = [northside];
+  });
 
   it('shows the working organisation and marks the current page', async () => {
     const { text } = await openShell(`/organisations/${northside}`);
@@ -105,5 +112,50 @@ describe('The admin shell', () => {
     expect(text('h1')).toBe('Sign in again to continue');
     expect(element.querySelector('.rail')).toBeNull();
     expect(element.textContent).not.toContain('Northside Gaming');
+  });
+
+  it('offers switching only to a person with several organisations', async () => {
+    const one = await openShell(`/organisations/${northside}`);
+    await vi.waitFor(() => expect(one.text('.context-name')).toBe('Northside Gaming'));
+    expect(one.element.querySelector('.context-switch')).toBeNull();
+    TestBed.resetTestingModule();
+
+    owned = [northside, southside];
+    const several = await openShell(`/organisations/${northside}`);
+    await vi.waitFor(() => expect(several.text('.context-switch')).toBe('Switch organisation'));
+  });
+
+  it('shows the signed-in person in the account menu with sign-out', async () => {
+    const { element, fixture, text } = await openShell(`/organisations/${northside}`);
+    const toggle = element.querySelector<HTMLButtonElement>('.account-toggle')!;
+    expect(toggle.textContent).toContain('Ana Ruiz · Account');
+    expect(toggle.getAttribute('aria-expanded')).toBe('false');
+
+    toggle.click();
+    await fixture.whenStable();
+    expect(toggle.getAttribute('aria-expanded')).toBe('true');
+    expect(text('.account-panel strong')).toBe('Ana Ruiz');
+    const signOut = [...element.querySelectorAll<HTMLButtonElement>('.account-panel button')].find((b) => b.textContent?.trim() === 'Sign out')!;
+    signOut.click();
+    await vi.waitFor(() => expect(TestBed.inject(Session).signOut).toHaveBeenCalledOnce());
+
+    toggle.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    await fixture.whenStable();
+    expect(element.querySelector('.account-panel')).toBeNull();
+    expect(document.activeElement).toBe(toggle);
+  });
+
+  it('uses the top bar instead of the rail to create an organisation', async () => {
+    const { element, text } = await openShell('/organisations/new', null);
+    expect(text('h1')).toBe('Create an organisation');
+    expect(element.querySelector('.rail')).toBeNull();
+    expect(element.querySelector('header.top .account-toggle')).not.toBeNull();
+  });
+
+  it('announces a new organisation once and drops the notice from the address', async () => {
+    const { text } = await openShell(`/organisations/${northside}?created`);
+    await vi.waitFor(() => expect(text('herald-notice strong')).toBe('Organisation created'));
+    expect(text('herald-notice')).toContain('You are now the only owner of Northside Gaming.');
+    await vi.waitFor(() => expect(TestBed.inject(Router).url).toBe(`/organisations/${northside}`));
   });
 });

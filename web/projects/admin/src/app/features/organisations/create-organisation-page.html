@@ -1,0 +1,47 @@
+<div class="standalone-page">
+  <section class="panel" aria-labelledby="create-heading">
+    <h1 id="create-heading">Create an organisation</h1>
+    <p class="lead">Give your organising workspace a name. You will become its only owner.</p>
+
+    @if (state() === 'failed') {
+      <herald-notice tone="danger" heading="Organisation not created">The save failed. Your name has been kept. Try again when you are ready.</herald-notice>
+    }
+
+    <form novalidate (submit)="submit($event)" [attr.aria-busy]="state() === 'creating'">
+      <div class="field">
+        <label for="organisation-name">Organisation name <small>Required</small></label>
+        <input
+          #nameInput
+          id="organisation-name"
+          name="organisation-name"
+          autocomplete="organization"
+          [value]="name()"
+          (input)="name.set(nameInput.value)"
+          [readOnly]="state() === 'creating'"
+          [attr.aria-invalid]="error() ? 'true' : null"
+          [attr.aria-describedby]="error() ? 'name-help name-error' : 'name-help'"
+        />
+        <p class="help" id="name-help">For example, Northside Gaming. Up to 80 characters.</p>
+        @if (error(); as message) {
+          <p class="field-error" id="name-error">{{ message }}</p>
+        }
+      </div>
+      @if (state() === 'creating') {
+        <p class="help" role="status">Creating your organisation. Please wait; do not submit again.</p>
+      }
+      <div class="actions">
+        <button herald-button variant="primary" type="submit" [loading]="state() === 'creating'">
+          {{ state() === 'creating' ? 'Creating organisation…' : state() === 'failed' ? 'Try again' : 'Create organisation' }}
+        </button>
+        @if (publicUrl) {
+          <a herald-button [href]="publicUrl">Back to public page</a>
+        }
+      </div>
+    </form>
+  </section>
+
+  <aside class="side-note">
+    <h2>A workspace of your own</h2>
+    <p>Organisation access is separate from sign-in. Creating this organisation gives you ownership of it, without granting access to anyone else’s private content.</p>
+  </aside>
+</div>
