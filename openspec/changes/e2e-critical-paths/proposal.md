@@ -13,7 +13,7 @@ Herald's critical paths now cross every layer: the admin application signs in th
 - The suite starts its own system: PostgreSQL and the provider in containers, the host in a new `E2E` environment, the admin application and the public server rendering.
 - A host environment `E2E` that runs without Azure Service Bus (external Wolverine transports off, as the host tests already do) and accepts the fake provider through the ordinary sign-in configuration. It is refused outside a local or CI run.
 - Nine journeys: public Sign in, deep-link sign-in returning to the requested address, a newcomer creating an organisation, selecting and switching organisations with the other tab reloading, the generic denial for another owner's organisation, an unassigned person, an expired session keeping typed input, the leave confirmation, and sign-out reloading other tabs.
-- A CI job that runs the suite on every pull request.
+- A CI workflow that runs the suite after each merge to `main` (the maintainer's choice on 9 November 2026: not on pull requests).
 - A new ADR recording the fake provider and the suite's place in the repository.
 
 Out of scope: tests against the real directory (sign-in there uses e-mail one-time passcodes and stays a manual check), other browsers, visual comparison with the mockups, load or performance testing, and journeys of features that do not exist yet.
@@ -26,7 +26,7 @@ Out of scope: tests against the real directory (sign-in there uses e-mail one-ti
 
 ### Modified Capabilities
 
-- `continuous-integration`: pull requests also run the end-to-end suite.
+- `continuous-integration`: merges to `main` also run the end-to-end suite.
 
 ## Impact
 

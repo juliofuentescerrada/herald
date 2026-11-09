@@ -26,6 +26,6 @@
 
 ## 5. CI and completion
 
-- [ ] 5.1 Job `e2e` in the workflow: .NET, Node, pnpm, Chromium with dependencies, the suite, report and traces as artifacts on failure, one retry
+- [x] 5.1 Workflow `e2e.yml` on pushes to `main` only (maintainer's choice): .NET, Node, pnpm, Chromium with dependencies, the suite, report and traces as artifacts on failure, one retry
 - [ ] 5.2 Full run locally and in CI; record durations, memory and any retried test in design.md
 - [ ] 5.3 Update ADR 0010's follow-up, README and roadmap; acceptance review against the specs in design.md

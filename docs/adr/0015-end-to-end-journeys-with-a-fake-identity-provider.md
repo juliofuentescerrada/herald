@@ -14,6 +14,7 @@ Sign-in is the obstacle. The real External ID directory signs people in with e-m
 - **A fake OpenID Connect provider:** the end-to-end suite signs people in through `navikt/mock-oauth2-server`, a test provider that speaks the real protocol (discovery, JWKS, authorisation code with PKCE, signed tokens) and issues the suite's personas with the directory's claim names. MSAL and JWT bearer run unchanged; only configuration points them at the provider. If MSAL cannot work with it, a minimal provider written for the suite replaces it, with the same contract.
 - **A root `e2e/` folder:** the suite tests the whole system, so it sits at the repository root with its own toolchain (Playwright, TypeScript, Chromium), not inside the Angular workspace.
 - **Its own environment:** the host runs the suite in an `E2E` environment without Azure Service Bus, guarded against production.
+- **After each merge:** CI runs the suite on pushes to `main`, not on pull requests.
 - **The real directory stays a manual check** before a release.
 
 ## Alternatives considered
@@ -26,8 +27,8 @@ Sign-in is the obstacle. The real External ID directory signs people in with e-m
 
 ## Consequences
 
-- Positive: the production sign-in code runs in every pull request; cross-layer defects show up before review; journeys document the critical paths as executable sentences.
-- Negative: a fake provider can differ from External ID (claims, issuer shape, error codes), so the real directory still needs a manual pass; the suite adds minutes and a container image to every pull request; the host gains an environment that must never reach production.
-- Follow-ups: revisit the provider if External ID adds a testable sign-in method; add journeys with each H1 feature; reconsider running only on relevant paths once the suite's duration is known.
+- Positive: the production sign-in code runs after every merge to `main`; cross-layer defects show up without a manual run; journeys document the critical paths as executable sentences.
+- Negative: a fake provider can differ from External ID (claims, issuer shape, error codes), so the real directory still needs a manual pass; a cross-layer defect is found after its merge, not before review; the suite adds minutes and a container image to each merge's checks; the host gains an environment that must never reach production.
+- Follow-ups: revisit the provider if External ID adds a testable sign-in method; add journeys with each H1 feature; reconsider running on pull requests once the suite's duration in CI is known.
 
 Direction proposed by `e2e-critical-paths`; nothing is confirmed or implemented yet.

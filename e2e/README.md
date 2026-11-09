@@ -4,6 +4,9 @@ Playwright journeys against the composed system: the host in its `E2E` environme
 applications and a test OpenID Connect provider (`mock-oauth2-server`), so MSAL and JWT bearer run their
 production code paths (ADR 0015, change `e2e-critical-paths`).
 
+CI runs the suite after each merge to `main` (`.github/workflows/e2e.yml`), not on pull requests: run it locally
+before asking for review when a change touches sign-in, the host's API or the admin application.
+
 ## Prerequisites
 
 - Docker (PostgreSQL and the provider run in containers; about 300 MB together).
@@ -46,7 +49,7 @@ tab and the provider has no single sign-on session. `expectAccessible()` runs ax
 
 ## When a journey fails
 
-The trace of each failed test is kept under `test-results/` (in CI, an artefact of the `e2e` job):
+The trace of each failed test is kept under `test-results/` (in CI, the `e2e-report` artefact of the End-to-end workflow, with the HTML report):
 
 ```sh
 pnpm exec playwright show-trace test-results/<test>/trace.zip

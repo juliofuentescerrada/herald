@@ -10,7 +10,7 @@ Constraints:
 
 ## Goals / Non-Goals
 
-**Goals:** prove the nine critical journeys end to end on every pull request; run the production MSAL and JWT bearer code paths; fail on accessibility violations in visited states; keep the suite fast enough for every pull request (target under ten minutes in CI).
+**Goals:** prove the nine critical journeys end to end after every merge to `main`; run the production MSAL and JWT bearer code paths; fail on accessibility violations in visited states; keep the suite fast enough to run after every merge (target under ten minutes in CI).
 
 **Non-Goals:** the real directory (manual check, as `h1-organisation-access` task 6.2); browsers other than Chromium; screenshot comparison with the mockups (they stay a manual review); load testing; journeys for features that do not exist yet; replacing component or API tests.
 
@@ -60,7 +60,7 @@ One spec file per area (`public`, `sign-in`, `organisations`, `access`), test na
 
 ### E-7 CI
 
-A new job `e2e` in the existing workflow, on pull requests and pushes to `main`: checkout, .NET (from `global.json`), Node and pnpm, `pnpm install --frozen-lockfile` in `web/` and `e2e/`, Playwright's Chromium with its system dependencies, and the suite. Docker is available on GitHub-hosted runners. On failure, upload the HTML report and traces (`trace: 'retain-on-failure'`). No retries locally; one retry in CI, and a retried pass is reported so flakiness is visible.
+A workflow of its own, `e2e.yml`, on pushes to `main` only, that is after each merge (*revised in task 5.1 by the maintainer:* not on pull requests, which keep the existing CI jobs; a defect between layers is then found after the merge, not before review): checkout, .NET (from `global.json`), Node and pnpm, `pnpm install --frozen-lockfile` in `web/` and `e2e/`, Playwright's Chromium with its system dependencies, and the suite. Docker is available on GitHub-hosted runners. On failure, upload the HTML report and traces (`trace: 'retain-on-failure'`). No retries locally; one retry in CI, and a retried pass is reported so flakiness is visible.
 
 ## Risks / Trade-offs
 
@@ -77,7 +77,7 @@ New folder, new job and a new host environment; nothing existing changes behavio
 ## Open Questions
 
 - The ADR number: 0014 is taken by `h1-organisation-access` (not yet merged), so this change uses 0015.
-- Whether to run the suite on every pull request or only on those touching `src/`, `web/` or `e2e/` (proposed: every pull request until its duration is measured).
+- ~~Whether to run the suite on every pull request or only on those touching `src/`, `web/` or `e2e/`.~~ Decided in task 5.1: after merges to `main` only.
 
 ## Implementation record
 
@@ -137,3 +137,9 @@ Four spec files (`public`, `sign-in`, `organisations`, `access`), nine journeys,
 
 1. **Sign-out left other tabs signed in.** Each tab keeps its own MSAL cache in `sessionStorage`; other tabs reloaded into the workspace with their session. Other tabs now forget their session before reloading. Journey 9 failed on it and now passes.
 2. **Silent renewal through MSAL's hidden iframe could never succeed and took 10 seconds.** MSAL 5 expects its redirect bridge at the redirect URI inside the iframe; `/` booted the application, which MSAL refused there (`block_iframe_reload`). The admin's `main.ts` now runs only the bridge in that frame. Journey 7 needed a 15-second wait before; it now uses the default and takes about 9 seconds.
+
+### CI workflow (task 5.1, 9 November 2026)
+
+- `.github/workflows/e2e.yml`, on pushes to `main` only (E-7 revised): actions pinned by commit as in `ci.yml`, plus `actions/upload-artifact` v7.0.2 (7 October 2026). Installs `web/` and `e2e/` with frozen lockfiles, Chromium with its system dependencies, builds the host first so its start stays within the readiness timeout, and runs `pnpm test`; on failure it keeps `playwright-report/` and `test-results/` as `e2e-report` for 14 days. Twenty-minute job timeout.
+- A local run with `CI=true` (one retry, no server reuse, HTML report): nine pass in 39 seconds, report written.
+- Because the workflow runs only on `main`, its first CI run (task 5.2) happens after this change is merged.
