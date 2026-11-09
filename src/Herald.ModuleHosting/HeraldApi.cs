@@ -1,5 +1,7 @@
+using System.Reflection;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Wolverine.Http;
@@ -30,7 +32,14 @@ public static class HeraldApi
 
     public static WebApplication MapHeraldApi(this WebApplication app)
     {
-        app.MapWolverineEndpoints();
+        // Admin endpoints need an assigned organiser; public ones stay anonymous (ADR 0014).
+        app.MapWolverineEndpoints(options => options.ConfigureEndpoints(chain =>
+        {
+            if (chain.Method.Method.GetCustomAttribute<EndpointGroupNameAttribute>()?.EndpointGroupName == Admin)
+            {
+                chain.Metadata.RequireAuthorization(HeraldAuthentication.OrganiserPolicy);
+            }
+        }));
         // Development only for now, like /health: what Azure exposes is decided in M4.
         if (app.Environment.IsDevelopment())
         {

@@ -1,6 +1,9 @@
 using JasperFx.CommandLine;
+using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Wolverine;
 
 namespace Herald.Host.Tests;
@@ -19,6 +22,17 @@ public sealed class HostFactory(string connectionString, string environment = "D
         // Outside Development the tables are a deployment step; the test sets them up like Development does.
         builder.UseSetting("Herald:Database:SetUpOnStartup", "true");
         builder.UseSetting("ConnectionStrings:messaging", UnusedServiceBus);
-        builder.ConfigureServices(services => services.DisableAllExternalWolverineTransports());
+        builder.UseSetting("Herald:Authentication:Authority", TestTokens.Issuer);
+        builder.UseSetting("Herald:Authentication:Audience", TestTokens.Audience);
+        builder.ConfigureServices(services =>
+        {
+            services.DisableAllExternalWolverineTransports();
+            // The test key instead of the directory's metadata: nothing is fetched.
+            services.PostConfigure<JwtBearerOptions>(JwtBearerDefaults.AuthenticationScheme, options =>
+            {
+                options.Configuration = new OpenIdConnectConfiguration { Issuer = TestTokens.Issuer };
+                options.Configuration.SigningKeys.Add(TestTokens.SigningKey);
+            });
+        });
     }
 }

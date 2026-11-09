@@ -125,4 +125,10 @@ None blocking. RLS adoption is decided by D-8's evidence.
 
 ## Implementation record
 
-(Filled during `/opsx:apply`.)
+### Authentication in the host (tasks 2.1–2.3, 9 November 2026)
+
+- `Microsoft.AspNetCore.Authentication.JwtBearer` 10.0.14 (MIT; its dependency `Microsoft.IdentityModel.Protocols.OpenIdConnect` 8.19.2 is MIT), matching the other ASP.NET Core 10.0.14 packages.
+- `HeraldAuthentication.AddHeraldAuthentication` in `Herald.ModuleHosting`: JWT bearer from `Herald:Authentication:Authority`/`Audience`, inbound claim mapping off (Herald reads `tid`, `oid`, `name` and `roles` as issued) and the `organiser` policy (authenticated + `Organiser` role). `MapHeraldApi` attaches the policy to every Wolverine endpoint whose `[EndpointGroupName]` is admin, so no endpoint opts in by hand.
+- Missing configuration fails when the host **starts** (`ValidateOnStart`), not when it is built. A first version threw at registration and broke `openapi` export and `codegen write`, which build the host without sign-in configuration.
+- AppHost parameters `auth-authority`, `auth-api-audience`, `auth-api-scope` and `auth-admin-client-id` (user secrets) go to the host as `Herald__Authentication__*` and to admin as `HERALD_AUTH_*` (consumed in task 5.1). Aspire reports an unset parameter in its dashboard; not exercised yet, since the registrations (task 1.3) do not exist.
+- Tests: `TestTokens` signs directory-shaped tokens with a test RSA key and `HostFactory` gives the bearer handler that key, so nothing is fetched. `Every_admin_endpoint_requires_an_assigned_organiser` holds vacuously until the first admin endpoint (task 4.4 proves it fails); `The_host_does_not_start_without_its_sign_in_configuration` passes. Full .NET run: 56 tests pass; format, OpenAPI documents and generated Wolverine code show no drift.

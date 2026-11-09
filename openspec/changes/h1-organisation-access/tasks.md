@@ -6,9 +6,9 @@
 
 ## 2. Authentication in the host
 
-- [ ] 2.1 Check the licence and version of `Microsoft.AspNetCore.Authentication.JwtBearer`; add JWT bearer validation and the `Organiser` policy as the admin-group default; public group anonymous
-- [ ] 2.2 AppHost parameters for directory, API and admin identifiers passed to host and admin; a clear start-up failure when missing
-- [ ] 2.3 Test token issuer for host tests; tests: 401 without a token, 403 without the role, every admin endpoint requires the policy (failing test names the endpoint)
+- [x] 2.1 Check the licence and version of `Microsoft.AspNetCore.Authentication.JwtBearer`; add JWT bearer validation and the `Organiser` policy as the admin-group default; public group anonymous
+- [x] 2.2 AppHost parameters for directory, API and admin identifiers passed to host and admin; a clear start-up failure when missing
+- [x] 2.3 Test token issuer for host tests; tests: every admin endpoint requires the policy (failing test names the endpoint), the host does not start without its sign-in configuration. The 401/403 cases need an admin endpoint and move to 4.4
 
 ## 3. Organisation context and isolation
 
@@ -22,7 +22,7 @@
 - [ ] 4.1 Domain: `Person`, `Organisation` with its single-owner membership and `OrganisationCreated`, name rules (A-1); domain tests without mocks
 - [ ] 4.2 Persistence and migration `AddOrganisationAccess`: unique `(DirectoryId, ObjectId)`, `Membership` organisation-owned, `IdentityRelink`
 - [ ] 4.3 Features: `GET /api/me`, `POST /api/organisations` (D-5 retry semantics), `GET /api/organisations/{organisationId}`; `IOrganisationAccess` implementation registered by the module entry point
-- [ ] 4.4 Use-case/API tests: newcomer creates and owns; validation errors; identical retry returns the original; reused id conflicts without detail; same-name organisations; same display name, different persons; email change keeps the person; other owner reads/writes by direct id → 404 without private content; removed membership → 404 next call
+- [ ] 4.4 Use-case/API tests: 401 without a token and 403 without the role on `GET /api/me`; the admin-policy test fails when an admin endpoint allows anonymous access; newcomer creates and owns; validation errors; identical retry returns the original; reused id conflicts without detail; same-name organisations; same display name, different persons; email change keeps the person; other owner reads/writes by direct id → 404 without private content; removed membership → 404 next call
 - [ ] 4.5 `relink-person` host command (D-6) with tests: relinked identity resolves, old one does not, occupied key refused, relink recorded
 - [ ] 4.6 Regenerate Wolverine code (`codegen write`) and the OpenAPI documents and client (`pnpm api:generate`)
 

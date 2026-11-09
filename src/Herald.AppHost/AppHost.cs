@@ -11,7 +11,16 @@ var database = builder.AddPostgres("postgres")
 var messaging = builder.AddAzureServiceBus("messaging")
     .RunAsEmulator();
 
+// Sign-in through the External ID directory shared with Arcana (ADR 0014). Not secrets, but they identify the
+// maintainer's directory, so they live in user secrets: docs/operations/identity.md lists them and how to set them.
+var authority = builder.AddParameter("auth-authority");
+var apiAudience = builder.AddParameter("auth-api-audience");
+var apiScope = builder.AddParameter("auth-api-scope");
+var adminClientId = builder.AddParameter("auth-admin-client-id");
+
 var host = builder.AddProject<Projects.Herald_Host>("host")
+    .WithEnvironment("Herald__Authentication__Authority", authority)
+    .WithEnvironment("Herald__Authentication__Audience", apiAudience)
     .WithReference(database)
     .WaitFor(database)
     .WithReference(messaging)
@@ -24,6 +33,9 @@ var admin = builder.AddJavaScriptApp("admin", "../../web", "start:admin")
     .WithPnpm()
     .WithHttpEndpoint(port: 4200, env: "PORT")
     .WithEnvironment("HERALD_API_URL", apiUrl)
+    .WithEnvironment("HERALD_AUTH_AUTHORITY", authority)
+    .WithEnvironment("HERALD_AUTH_CLIENT_ID", adminClientId)
+    .WithEnvironment("HERALD_AUTH_API_SCOPE", apiScope)
     .WaitFor(host);
 
 // One install per workspace: two installers in the same folder race and the second app never starts.
