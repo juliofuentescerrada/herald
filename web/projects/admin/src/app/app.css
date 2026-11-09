@@ -1,10 +1,13 @@
 .shell { display: grid; grid-template-columns: 256px minmax(0, 1fr); min-height: 100vh; }
 .rail { background: var(--herald-color-surface-inverse); color: var(--herald-color-text-inverse); padding: var(--herald-space-8) var(--herald-space-4); }
+.brand-dot { color: var(--herald-color-brand-accent); }
 .brand { display: inline-block; color: inherit; font-size: 30px; font-weight: 900; letter-spacing: -1.4px; text-decoration: none; }
-.context { display: flex; flex-direction: column; gap: var(--herald-space-2); margin: var(--herald-space-8) 0 var(--herald-space-6); padding: var(--herald-space-3); border: 1px solid var(--herald-color-border-control-inverse); font-size: var(--herald-text-lg); }
+.context { display: flex; flex-direction: column; gap: var(--herald-space-1); margin: var(--herald-space-8) 0 var(--herald-space-6); padding-bottom: var(--herald-space-6); border-bottom: 1px solid var(--herald-color-surface-inverse-raised); }
+.context-name { font-size: 20px; font-weight: 700; line-height: 1.25; overflow-wrap: anywhere; }
 .context-kind { color: var(--herald-color-text-inverse-secondary); font-size: var(--herald-text-base); }
 .nav { display: flex; flex-direction: column; gap: var(--herald-space-1); }
-.context-switch { margin-top: var(--herald-space-2); }
+.context-switch { display: inline-flex; align-items: center; gap: var(--herald-space-2); align-self: flex-start; min-height: var(--herald-target-min); margin-top: var(--herald-space-2); color: var(--herald-color-text-inverse-secondary); font-size: var(--herald-text-base); text-decoration: none; }
+.context-switch:hover { color: var(--herald-color-text-inverse); text-decoration: underline; }
 .page { padding: var(--herald-space-8); min-width: 0; }
 .page-top { display: flex; align-items: center; justify-content: space-between; gap: var(--herald-space-4); margin-bottom: var(--herald-space-8); }
 .page-kind { color: var(--herald-color-text-secondary); font-size: var(--herald-text-lg); }
@@ -21,7 +24,9 @@
   .shell { display: block; min-height: 0; }
   .rail { display: flex; flex-wrap: wrap; align-items: center; gap: var(--herald-space-4); padding: var(--herald-space-4); }
   .brand { font-size: 24px; }
-  .context { margin: 0 0 0 auto; padding: 0; border: 0; gap: var(--herald-space-1); text-align: right; font-size: var(--herald-text-base); }
+  .context { margin: 0 0 0 auto; padding: 0; border: 0; gap: var(--herald-space-1); text-align: right; }
+  .context-name { font-size: var(--herald-text-lg); }
+  .context-switch { align-self: flex-end; }
   .nav { flex-basis: 100%; flex-direction: row; overflow-x: auto; }
   .nav a { flex: none; }
   .page { padding: var(--herald-space-6) var(--herald-space-4); }

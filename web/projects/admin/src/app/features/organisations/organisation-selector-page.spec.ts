@@ -39,7 +39,8 @@ describe('Choosing an organisation', () => {
     const [first, second] = element.querySelectorAll('li');
     expect(first.textContent).toContain('Owner · Current organisation');
     expect(first.textContent).toContain('Selected');
-    expect(second.querySelector('button')?.textContent?.trim()).toBe('Switch to Southside Club');
+    expect(second.querySelector('button')?.textContent?.trim()).toBe('Switch');
+    expect(second.querySelector('button')?.getAttribute('aria-label')).toBe('Switch to Southside Club');
     expect([...element.querySelectorAll('a')].map((a) => a.textContent?.trim())).toEqual(['Create another organisation', 'Keep current organisation']);
   });
 

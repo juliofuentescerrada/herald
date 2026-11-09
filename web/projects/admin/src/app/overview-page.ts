@@ -1,12 +1,12 @@
 import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
-import { ActivatedRoute, Router, RouterLink } from '@angular/router';
-import { Button, Notice } from '@herald/ui';
+import { ActivatedRoute, Router } from '@angular/router';
+import { Notice } from '@herald/ui';
 import { injectWorkingOrganisation } from './platform';
 
 /** The organisation workspace's landing page. Tournaments and next actions arrive with H1 features. */
 @Component({
   selector: 'app-overview-page',
-  imports: [Button, Notice, RouterLink],
+  imports: [Notice],
   template: `
     @if (created() && organisation.data(); as summary) {
       <herald-notice class="created" tone="success" heading="Organisation created" dismissible (dismissed)="created.set(false)">
@@ -15,9 +15,6 @@ import { injectWorkingOrganisation } from './platform';
     }
     <h1>Overview</h1>
     <p class="lead">{{ organisation.data()?.name }} · your organisation</p>
-    <div class="actions">
-      <a herald-button routerLink="/organisations/new">Create another organisation</a>
-    </div>
   `,
   styles: `
     h1 { font-size: 32px; margin-bottom: var(--herald-space-2); }

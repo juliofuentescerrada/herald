@@ -25,7 +25,8 @@ import { AppContext, injectMe, organisationPath } from '../../platform';
               @if (organisation.current) {
                 <span>Selected</span>
               } @else {
-                <button herald-button variant="primary" type="button" (click)="switchTo(organisation.id)">Switch to {{ organisation.name }}</button>
+                <!-- The row names the organisation; the accessible name keeps it for screen readers. -->
+                <button herald-button type="button" [attr.aria-label]="'Switch to ' + organisation.name" (click)="switchTo(organisation.id)">Switch</button>
               }
             </li>
           }

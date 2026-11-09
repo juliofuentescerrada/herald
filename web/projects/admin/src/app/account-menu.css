@@ -1,10 +1,17 @@
 :host { position: relative; display: inline-block; }
-.account-toggle { min-height: var(--herald-target-min); padding: var(--herald-space-2) var(--herald-space-4); color: inherit; background: none; border: 1px solid currentColor; font-size: var(--herald-text-lg); text-decoration: underline; cursor: pointer; }
+.account-toggle { display: inline-flex; align-items: center; gap: var(--herald-space-2); min-height: var(--herald-target-min); padding: var(--herald-space-2) var(--herald-space-3); color: inherit; background: none; border: 0; font-size: var(--herald-text-lg); font-weight: 600; cursor: pointer; transition: background-color var(--herald-motion-fast); }
+/* A quiet control: the surface appears on hover and while the menu is open. */
+.account-toggle:hover, .account-toggle[aria-expanded='true'] { background: var(--herald-color-action-neutral-hover); }
+:host-context([data-herald-surface='inverse']) .account-toggle:hover,
+:host-context([data-herald-surface='inverse']) .account-toggle[aria-expanded='true'] { background: var(--herald-color-action-inverse-hover); }
+.chevron { transition: transform var(--herald-motion-fast); }
+.account-toggle[aria-expanded='true'] .chevron { transform: rotate(180deg); }
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
 .account-panel { position: absolute; right: 0; top: calc(100% + var(--herald-space-2)); z-index: 10; display: flex; flex-direction: column; gap: var(--herald-space-2); min-width: 248px; padding: var(--herald-space-4); color: var(--herald-color-text-primary); background: var(--herald-color-surface-default); border: 1px solid var(--herald-color-border-default); box-shadow: 0 8px 24px rgb(23 26 30 / 16%); }
 .account-panel strong { font-size: var(--herald-text-lg); }
 .account-panel small { color: var(--herald-color-text-secondary); font-size: var(--herald-text-base); margin-bottom: var(--herald-space-2); }
 @media (max-width: 700px) {
   :host { display: block; width: 100%; }
-  .account-toggle { width: 100%; text-align: left; }
+  .account-toggle { width: 100%; justify-content: space-between; }
   .account-panel { position: static; margin-top: var(--herald-space-2); box-shadow: none; }
 }

@@ -33,8 +33,8 @@
         <button herald-button variant="primary" type="submit" [loading]="state() === 'creating'">
           {{ state() === 'creating' ? 'Creating organisation…' : state() === 'failed' ? 'Try again' : 'Create organisation' }}
         </button>
-        @if (publicUrl) {
-          <a herald-button [href]="publicUrl">Back to public page</a>
+        @if (context.organisation()) {
+          <a herald-button [routerLink]="context.home()">Cancel</a>
         }
       </div>
     </form>

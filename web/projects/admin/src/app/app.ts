@@ -1,16 +1,16 @@
 import { ChangeDetectionStrategy, Component, computed, DOCUMENT, effect, ElementRef, inject, signal, viewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRouteSnapshot, NavigationEnd, NavigationError, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { Button, NavLink, Notice } from '@herald/ui';
+import { Button, Icon, NavLink, Notice } from '@herald/ui';
 import { AccessPage } from './access-page';
 import { AccountMenu } from './account-menu';
-import { AccessState, AppContext, AUTH_CONFIG, injectMe, injectWorkingOrganisation, Session } from './platform';
+import { AccessState, AppContext, AUTH_CONFIG, injectWorkingOrganisation, Session } from './platform';
 
 const deepest = (route: ActivatedRouteSnapshot): ActivatedRouteSnapshot => (route.firstChild ? deepest(route.firstChild) : route);
 
 /** The organiser shell: graphite rail with the working context and navigation, and the page. */
 @Component({
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, Button, NavLink, Notice, AccessPage, AccountMenu],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, Button, Icon, NavLink, Notice, AccessPage, AccountMenu],
   selector: 'app-root',
   templateUrl: './app.html',
   styleUrl: './app.css',
@@ -20,8 +20,6 @@ export class App {
   protected readonly context = inject(AppContext);
   protected readonly access = inject(AccessState);
   protected readonly organisation = injectWorkingOrganisation();
-  private readonly me = injectMe();
-  protected readonly several = computed(() => (this.me.data()?.organisations.length ?? 0) > 1);
   protected readonly publicUrl = inject(AUTH_CONFIG).publicUrl;
   private readonly session = inject(Session);
   protected readonly signedIn = computed(() => this.session.account() !== null);
