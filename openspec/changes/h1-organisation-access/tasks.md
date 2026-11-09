@@ -20,7 +20,7 @@
 ## 4. Organisations module
 
 - [x] 4.1 Domain: `Person`, `Organisation` with its single-owner membership and `OrganisationCreated`, name rules (A-1); domain tests without mocks
-- [ ] 4.2 Persistence and migration `AddOrganisationAccess`: unique `(DirectoryId, ObjectId)`, `Membership` organisation-owned, `IdentityRelink`
+- [x] 4.2 Persistence and migration `AddOrganisationAccess`: unique `(DirectoryId, ObjectId)`, `Membership` organisation-owned, `IdentityRelink`
 - [ ] 4.3 Features: `GET /api/me`, `POST /api/organisations` (D-5 retry semantics), `GET /api/organisations/{organisationId}`; `IOrganisationAccess` implementation registered by the module entry point
 - [ ] 4.4 Use-case/API tests: 401 without a token and 403 without the role on `GET /api/me`; the admin-policy test fails when an admin endpoint allows anonymous access; newcomer creates and owns; validation errors; identical retry returns the original; reused id conflicts without detail; same-name organisations; same display name, different persons; email change keeps the person; other owner reads/writes by direct id → 404 without private content; removed membership → 404 next call
 - [ ] 4.5 `relink-person` host command (D-6) with tests: relinked identity resolves, old one does not, occupied key refused, relink recorded

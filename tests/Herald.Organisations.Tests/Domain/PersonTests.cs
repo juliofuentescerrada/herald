@@ -28,4 +28,30 @@ public class PersonTests
         person.Identity.ShouldBe(_identity);
         person.DisplayName.ShouldBe("Alex Smith");
     }
+
+    [Fact]
+    public void A_relink_moves_the_identity_and_records_both_keys()
+    {
+        var person = Person.Register(_identity, "Alex");
+        var replacement = new IdentityKey(_identity.DirectoryId, Guid.NewGuid());
+        var at = new DateTimeOffset(2026, 11, 9, 12, 0, 0, TimeSpan.Zero);
+
+        var relink = person.Relink(replacement, "operator", "lost account, verified by email thread", at);
+
+        person.Identity.ShouldBe(replacement);
+        relink.ShouldSatisfyAllConditions(
+            r => r.PersonId.ShouldBe(person.Id),
+            r => r.Previous.ShouldBe(_identity),
+            r => r.Current.ShouldBe(replacement),
+            r => r.At.ShouldBe(at));
+    }
+
+    [Fact]
+    public void A_relink_without_a_reason_is_refused()
+    {
+        var person = Person.Register(_identity, "Alex");
+
+        Should.Throw<ArgumentException>(() => person.Relink(new IdentityKey(Guid.NewGuid(), Guid.NewGuid()), "operator", " ", DateTimeOffset.UtcNow));
+        person.Identity.ShouldBe(_identity);
+    }
 }
