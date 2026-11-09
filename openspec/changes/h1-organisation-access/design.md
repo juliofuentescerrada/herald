@@ -191,3 +191,10 @@ Costs found:
   - Test tokens were never accepted: with an authority configured, validation reads issuer and keys from the configuration manager, not from `JwtBearerOptions.Configuration`. `HostFactory` now installs a `StaticConfigurationManager` with the test key. No production change.
   - `Every_admin_endpoint_requires_an_assigned_organiser` could not tell an empty endpoint list from a protected one. It now also asserts `/api/me` is among the route patterns, and `The_admin_policy_check_catches_an_admin_endpoint_that_allows_anonymous_access` runs its predicate on a synthetic anonymous admin endpoint.
 - Full .NET run: 99 pass; format clean; no Wolverine or OpenAPI drift.
+
+### Support relink (task 4.5, 9 November 2026)
+
+- Use case `Features/RelinkPerson` in the Organisations module: refuses a missing operator or reason, an unknown person, the person's current identity and an identity that belongs to another person (the unique index also refuses a concurrent claim); otherwise `Person.Relink` and the `IdentityRelink` record are saved in one transaction. Returns why nothing changed, or null.
+- Command `relink-person <personId> <directoryId> <objectId> --reason … --operator …` lives in the host (JasperFx discovers commands in the entry assembly; the host already composes modules) and only builds the host, opens a scope and calls the use case; exit code 1 with the reason on refusal.
+- Tests: 4 against PostgreSQL in `Herald.Organisations.Tests` (new identity resolves to the same person and memberships, old one resolves to none; record with both keys, operator, reason and time; occupied identity refused with nothing changed; unknown person or blank reason refused). Smoke run of the real command against a migrated temporary database: unknown person → message and exit code 1. Full .NET run: 103 pass; no Wolverine code drift.
+- `docs/operations/identity.md` (task 1.3) documents when and how to run it.
