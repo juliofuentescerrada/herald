@@ -198,3 +198,7 @@ Costs found:
 - Command `relink-person <personId> <directoryId> <objectId> --reason … --operator …` lives in the host (JasperFx discovers commands in the entry assembly; the host already composes modules) and only builds the host, opens a scope and calls the use case; exit code 1 with the reason on refusal.
 - Tests: 4 against PostgreSQL in `Herald.Organisations.Tests` (new identity resolves to the same person and memberships, old one resolves to none; record with both keys, operator, reason and time; occupied identity refused with nothing changed; unknown person or blank reason refused). Smoke run of the real command against a migrated temporary database: unknown person → message and exit code 1. Full .NET run: 103 pass; no Wolverine code drift.
 - `docs/operations/identity.md` (task 1.3) documents when and how to run it.
+
+### Generated code (task 4.6, 9 November 2026)
+
+`codegen write` and `pnpm api:generate` were run with each endpoint change (tasks 4.3–4.4); the final run shows no drift. With the regenerated admin client, web lint and boundary fixtures (15/15), Vitest for every project and all production builds pass.
