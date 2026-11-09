@@ -143,3 +143,30 @@ Four spec files (`public`, `sign-in`, `organisations`, `access`), nine journeys,
 - `.github/workflows/e2e.yml`, on pushes to `main` only (E-7 revised): actions pinned by commit as in `ci.yml`, plus `actions/upload-artifact` v7.0.2 (7 October 2026). Installs `web/` and `e2e/` with frozen lockfiles, Chromium with its system dependencies, builds the host first so its start stays within the readiness timeout, and runs `pnpm test`; on failure it keeps `playwright-report/` and `test-results/` as `e2e-report` for 14 days. Twenty-minute job timeout.
 - A local run with `CI=true` (one retry, no server reuse, HTML report): nine pass in 39 seconds, report written.
 - Because the workflow runs only on `main`, its first CI run (task 5.2) happens after this change is merged.
+
+### Acceptance review against the specs (task 5.3, 9 November 2026)
+
+`end-to-end-journeys`:
+
+| Requirement / scenario | Evidence | Verdict |
+| --- | --- | --- |
+| The suite tests the running system; one command | `pnpm test` in `e2e/` starts PostgreSQL and the provider (`infrastructure.ts`), the host, admin and public; prerequisites in `e2e/README.md` (`web/` installed, Chromium once) | Met |
+| Leaves nothing running, pass or fail | Containers stopped on `SIGTERM`; checked after a deliberately failing run; the reaper covers a killed run | Met |
+| Journeys do not share data | Fresh persona and organisation names per call; 63 parallel runs without interference | Met |
+| Sign-in through real protocol code; a persona signs in | MSAL redirect with PKCE against `mock-oauth2-server`, JWT bearer unchanged (`GET /api/me` 200) | Met |
+| Personas with identifiers, name and the organiser role | Claim templates in `fixtures.ts` (`oid`, `name`, `roles`; `tid` is the issuer id) | Met |
+| The provider can issue a session that expires during a journey | **Deviation:** journey 7 ends the session in the browser (MSAL's cached tokens removed) and the silent renewal is answered with `login_required`, the directory's answer without a session; the provider does not issue a short-lived token, because token lifetime cannot be set per login in its form (spike) | Met in behaviour, not in mechanism |
+| The fake provider stays out of production | Only `e2e/` names it; the host's `E2E` environment refuses Azure hosting markers (host test) | Met |
+| The nine critical journeys, named as sentences | `public` 1, `sign-in` 2, `organisations` 3, `access` 3 spec files' tests | Met |
+| Each journey checks what the person sees | Locators by role, label and text; journey 7 inspects requests only to prove nothing was submitted, and prepares the expiry through storage (setup, not an assertion) | Met |
+| Visited pages are accessible | `expectAccessible` on each distinct Herald state reached (public page, creation, workspace with the created notice, selector, replaced-context notice, invitation, denial, session expired); the provider's own pages are not Herald's | Met |
+
+`continuous-integration`:
+
+| Requirement / scenario | Evidence | Verdict |
+| --- | --- | --- |
+| Merges to `main` run the journeys; a pull request does not | `.github/workflows/e2e.yml`, `on: push: branches: [main]` only | Met by configuration |
+| A journey breaks → the workflow fails with report and trace | Artefact step on failure; locally the HTML report and traces are written under `CI=true` | Pending its first CI run (task 5.2) |
+| The suite passes → no artefacts | Upload only `if: failure()` | Met by configuration |
+
+Open: task 5.2 (a full run in CI, with durations and memory) can only happen after the merge to `main`.
