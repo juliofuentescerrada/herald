@@ -1,12 +1,12 @@
 ## 1. Review gates
 
 - [x] 1.1 Maintainer reviews the proposal, specs and design (A-1 to A-4 and Q-1 accepted on 10 November 2026); record implementation approval in proposal.md and design.md (10 November 2026: approved by the maintainer)
-- [ ] 1.2 Record the 10 November 2026 decisions in `docs/herald-functional-discovery.md`: D-27 partially confirmed (first row of §5.1), D-08 note (no integration event until Registration consumes it), F-02 rules R-1 to R-5 and the answers from 1.1
+- [x] 1.2 Record the 10 November 2026 decisions in `docs/herald-functional-discovery.md`: D-27 partially confirmed (first row of §5.1), D-08 note (no integration event until Registration consumes it), F-02 rules R-1 to R-5 and the answers from 1.1
 
 ## 2. Acting person in the organisation context
 
-- [ ] 2.1 `IOrganisationAccess.FindMemberAsync` returns the member's person identifier; the host's membership step and `CreateOrganisation` enter it into `OrganisationContext.ActorId`
-- [ ] 2.2 Tests: the membership step enters the actor; existing isolation tests still pass
+- [x] 2.1 `IOrganisationAccess.FindMemberAsync` returns the member's person identifier; the host's membership step and `CreateOrganisation` enter it into `OrganisationContext.ActorId`
+- [x] 2.2 Tests: the membership step enters the actor; existing isolation tests still pass
 
 ## 3. Tournaments domain
 

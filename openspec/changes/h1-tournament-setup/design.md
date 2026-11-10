@@ -155,3 +155,13 @@ One additive migration creating `tournaments.tournaments`; no existing data. Rol
 ## Open Questions
 
 None. A-1 to A-4 and Q-1 were answered on 10 November 2026.
+
+## Implementation record
+
+### Decisions in the functional baseline (task 1.2, 10 November 2026)
+
+`docs/herald-functional-discovery.md`: §5.1 status and the D-27 row say the first row is confirmed (Partial), the D-08 row carries the publication note, and F-02 has the confirmed rules of this slice (R-1 to R-5, A-1 to A-4, Q-1).
+
+### Acting person in the organisation context (tasks 2.1–2.2, 10 November 2026)
+
+`IOrganisationAccess.FindMemberAsync` returns the member's person identifier and the membership step enters it as `OrganisationContext.ActorId`; `CreateOrganisation` enters the creator. `Enter` keeps an actor already set when called again without one. Test: `A_scope_keeps_the_person_who_entered_it`. That the membership step passes the actor through a real request is asserted by the tournaments API tests (4.3), the first endpoint that stores it; until then the existing access tests (member reads, another owner gets 404) cover `FindMemberAsync`. ModuleHosting 8, Organisations 24, Host 29 and Architecture 42 tests pass; format check clean.

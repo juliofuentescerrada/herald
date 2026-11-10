@@ -69,14 +69,14 @@ public static class HeraldApi
             var caller = Caller.From(http.User);
             var access = http.RequestServices.GetRequiredService<IOrganisationAccess>();
             if (!Guid.TryParse(value, out var organisationId) || caller is null
-                || !await access.IsMemberAsync(organisationId, caller, http.RequestAborted))
+                || await access.FindMemberAsync(organisationId, caller, http.RequestAborted) is not { } actorId)
             {
                 await Results.Problem(statusCode: StatusCodes.Status404NotFound, title: "Not found", type: OrganisationNotAvailable)
                     .ExecuteAsync(http);
                 return;
             }
 
-            http.RequestServices.GetRequiredService<OrganisationContext>().Enter(organisationId);
+            http.RequestServices.GetRequiredService<OrganisationContext>().Enter(organisationId, actorId);
         }
 
         await next(http);

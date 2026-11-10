@@ -66,7 +66,7 @@ public static class CreateOrganisationEndpoint
         }
 
         // The owner membership is organisation-owned: creation acts for the new organisation.
-        context.Enter(id.Value);
+        context.Enter(id.Value, person.Id.Value);
         var created = Organisation.Create(id, name, person.Id, DateTimeOffset.UtcNow);
         db.Organisations.Add(created);
         return Created(created);
