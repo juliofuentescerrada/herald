@@ -1,0 +1,946 @@
+{
+  "date": "2026-11-10",
+  "status": "Proposal pending maintainer review",
+  "purpose": "H1 tournament setup visual review; approves no product default",
+  "capture": {
+    "tool": "playwright-core with installed Google Chrome, headless",
+    "deviceScaleFactor": 1,
+    "locale": "en-GB",
+    "timezoneId": "Europe/Madrid",
+    "assets": "local only; system sans-serif fallback",
+    "checks": "Every capture checked for page errors, HTTP requests, horizontal document overflow, computed text/surface contrast, 44px targets, associated control labels and duplicate IDs. Keyboard focus/disclosures and fixture interactions checked. No production behaviour verified.",
+    "screenshots": [
+      {
+        "state": "list-empty",
+        "label": "Tournament list · empty",
+        "file": "tournament-setup-list-empty-desktop.png",
+        "source": "prototypes/frontend/tournament-setup-states.html?state=list-empty",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/tournament-setup-states.html?state=list-empty",
+        "viewport": [
+          1440,
+          1000
+        ],
+        "fullPage": true,
+        "sha256": "4b0f1110131a6860ebbdf14dc59fb1462ebeee12549d27e2515909a8942165c4",
+        "checks": {
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "unlabelledControls": [],
+          "duplicateIds": [],
+          "contrastFailures": [],
+          "heading": "Tournaments",
+          "railVisible": true,
+          "pageErrors": [],
+          "networkRequests": []
+        }
+      },
+      {
+        "state": "list-empty",
+        "label": "Tournament list · empty",
+        "file": "tournament-setup-list-empty-mobile.png",
+        "source": "prototypes/frontend/tournament-setup-states.html?state=list-empty",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/tournament-setup-states.html?state=list-empty",
+        "viewport": [
+          390,
+          844
+        ],
+        "fullPage": true,
+        "sha256": "7532e167d7e5f84a460e1ef2680d652ad43ed9b6c162c29dcfcac7437e66a11e",
+        "checks": {
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "unlabelledControls": [],
+          "duplicateIds": [],
+          "contrastFailures": [],
+          "heading": "Tournaments",
+          "railVisible": true,
+          "pageErrors": [],
+          "networkRequests": []
+        }
+      },
+      {
+        "state": "list-populated",
+        "label": "Tournament list · populated",
+        "file": "tournament-setup-list-populated-desktop.png",
+        "source": "prototypes/frontend/tournament-setup-states.html?state=list-populated",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/tournament-setup-states.html?state=list-populated",
+        "viewport": [
+          1440,
+          1000
+        ],
+        "fullPage": true,
+        "sha256": "198398d99fa66746a2b50b14ecdb4c342b59e76dc9d1daf2ea5fb71a351cc529",
+        "checks": {
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "unlabelledControls": [],
+          "duplicateIds": [],
+          "contrastFailures": [],
+          "heading": "Tournaments",
+          "railVisible": true,
+          "pageErrors": [],
+          "networkRequests": []
+        }
+      },
+      {
+        "state": "list-populated",
+        "label": "Tournament list · populated",
+        "file": "tournament-setup-list-populated-mobile.png",
+        "source": "prototypes/frontend/tournament-setup-states.html?state=list-populated",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/tournament-setup-states.html?state=list-populated",
+        "viewport": [
+          390,
+          844
+        ],
+        "fullPage": true,
+        "sha256": "ade6d97df2f517f3a205ea59d6f6eafe5c350adcdf93047630ccf0c07e9f476d",
+        "checks": {
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "unlabelledControls": [],
+          "duplicateIds": [],
+          "contrastFailures": [],
+          "heading": "Tournaments",
+          "railVisible": true,
+          "pageErrors": [],
+          "networkRequests": []
+        }
+      },
+      {
+        "state": "list-loading",
+        "label": "Tournament list · loading",
+        "file": "tournament-setup-list-loading-desktop.png",
+        "source": "prototypes/frontend/tournament-setup-states.html?state=list-loading",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/tournament-setup-states.html?state=list-loading",
+        "viewport": [
+          1440,
+          1000
+        ],
+        "fullPage": true,
+        "sha256": "f13db83f1f1ad73b333655738174196446f5aceaea5d3d57aa641df1ff3aa527",
+        "checks": {
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "unlabelledControls": [],
+          "duplicateIds": [],
+          "contrastFailures": [],
+          "heading": "Tournaments",
+          "railVisible": true,
+          "pageErrors": [],
+          "networkRequests": []
+        }
+      },
+      {
+        "state": "list-loading",
+        "label": "Tournament list · loading",
+        "file": "tournament-setup-list-loading-mobile.png",
+        "source": "prototypes/frontend/tournament-setup-states.html?state=list-loading",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/tournament-setup-states.html?state=list-loading",
+        "viewport": [
+          390,
+          844
+        ],
+        "fullPage": true,
+        "sha256": "89a8086807066fa67f6335145113dffda9ca50ffb760ed0e4ab611b0cec3eb3c",
+        "checks": {
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "unlabelledControls": [],
+          "duplicateIds": [],
+          "contrastFailures": [],
+          "heading": "Tournaments",
+          "railVisible": true,
+          "pageErrors": [],
+          "networkRequests": []
+        }
+      },
+      {
+        "state": "list-failed",
+        "label": "Tournament list · failed",
+        "file": "tournament-setup-list-failed-desktop.png",
+        "source": "prototypes/frontend/tournament-setup-states.html?state=list-failed",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/tournament-setup-states.html?state=list-failed",
+        "viewport": [
+          1440,
+          1000
+        ],
+        "fullPage": true,
+        "sha256": "17eb459b35c176fa165d6341414293754395e65fa47427a3e61d1463273995ed",
+        "checks": {
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "unlabelledControls": [],
+          "duplicateIds": [],
+          "contrastFailures": [],
+          "heading": "Tournaments",
+          "railVisible": true,
+          "pageErrors": [],
+          "networkRequests": []
+        }
+      },
+      {
+        "state": "list-failed",
+        "label": "Tournament list · failed",
+        "file": "tournament-setup-list-failed-mobile.png",
+        "source": "prototypes/frontend/tournament-setup-states.html?state=list-failed",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/tournament-setup-states.html?state=list-failed",
+        "viewport": [
+          390,
+          844
+        ],
+        "fullPage": true,
+        "sha256": "2ba02f4a5f6809aeaef61a8b7730b64d015f09c9caa410ca0a779faa5bd844d9",
+        "checks": {
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "unlabelledControls": [],
+          "duplicateIds": [],
+          "contrastFailures": [],
+          "heading": "Tournaments",
+          "railVisible": true,
+          "pageErrors": [],
+          "networkRequests": []
+        }
+      },
+      {
+        "state": "create-individual",
+        "label": "New individual draft · empty",
+        "file": "tournament-setup-create-individual-desktop.png",
+        "source": "prototypes/frontend/tournament-setup-states.html?state=create-individual",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/tournament-setup-states.html?state=create-individual",
+        "viewport": [
+          1440,
+          1000
+        ],
+        "fullPage": true,
+        "sha256": "bd79fcde46472f5f98c0143f53785c56aead5efd26ca9d88ef0c961df65beb46",
+        "checks": {
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "unlabelledControls": [],
+          "duplicateIds": [],
+          "contrastFailures": [],
+          "heading": "Create tournament",
+          "railVisible": true,
+          "pageErrors": [],
+          "networkRequests": []
+        }
+      },
+      {
+        "state": "create-individual",
+        "label": "New individual draft · empty",
+        "file": "tournament-setup-create-individual-mobile.png",
+        "source": "prototypes/frontend/tournament-setup-states.html?state=create-individual",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/tournament-setup-states.html?state=create-individual",
+        "viewport": [
+          390,
+          844
+        ],
+        "fullPage": true,
+        "sha256": "5273666d8bc6f4f616a8dec9f7b4e342f271fc88c5b6704dacc698a50067d708",
+        "checks": {
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "unlabelledControls": [],
+          "duplicateIds": [],
+          "contrastFailures": [],
+          "heading": "Create tournament",
+          "railVisible": true,
+          "pageErrors": [],
+          "networkRequests": []
+        }
+      },
+      {
+        "state": "edit-individual-draft",
+        "label": "Individual draft · saved",
+        "file": "tournament-setup-edit-individual-draft-desktop.png",
+        "source": "prototypes/frontend/tournament-setup-states.html?state=edit-individual-draft",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/tournament-setup-states.html?state=edit-individual-draft",
+        "viewport": [
+          1440,
+          1000
+        ],
+        "fullPage": true,
+        "sha256": "c00141a2ab127a4992f0a9e87407b2d9c7bc635287c1fd2edd6a973307a84bc6",
+        "checks": {
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "unlabelledControls": [],
+          "duplicateIds": [],
+          "contrastFailures": [],
+          "heading": "Configure Saturday Open",
+          "railVisible": true,
+          "pageErrors": [],
+          "networkRequests": []
+        }
+      },
+      {
+        "state": "edit-individual-draft",
+        "label": "Individual draft · saved",
+        "file": "tournament-setup-edit-individual-draft-mobile.png",
+        "source": "prototypes/frontend/tournament-setup-states.html?state=edit-individual-draft",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/tournament-setup-states.html?state=edit-individual-draft",
+        "viewport": [
+          390,
+          844
+        ],
+        "fullPage": true,
+        "sha256": "ba9f8eff722b6e3945a5be713b4bcfab7fbdb037999c140ac3c2d00380d3fe3c",
+        "checks": {
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "unlabelledControls": [],
+          "duplicateIds": [],
+          "contrastFailures": [],
+          "heading": "Configure Saturday Open",
+          "railVisible": true,
+          "pageErrors": [],
+          "networkRequests": []
+        }
+      },
+      {
+        "state": "edit-team-draft",
+        "label": "Team draft · saved",
+        "file": "tournament-setup-edit-team-draft-desktop.png",
+        "source": "prototypes/frontend/tournament-setup-states.html?state=edit-team-draft",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/tournament-setup-states.html?state=edit-team-draft",
+        "viewport": [
+          1440,
+          1000
+        ],
+        "fullPage": true,
+        "sha256": "7c0326e4934bef36eb918e5ffe2ebc642413bb9589cc23639f60717055d2c03b",
+        "checks": {
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "unlabelledControls": [],
+          "duplicateIds": [],
+          "contrastFailures": [],
+          "heading": "Configure Saturday Team League",
+          "railVisible": true,
+          "pageErrors": [],
+          "networkRequests": []
+        }
+      },
+      {
+        "state": "edit-team-draft",
+        "label": "Team draft · saved",
+        "file": "tournament-setup-edit-team-draft-mobile.png",
+        "source": "prototypes/frontend/tournament-setup-states.html?state=edit-team-draft",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/tournament-setup-states.html?state=edit-team-draft",
+        "viewport": [
+          390,
+          844
+        ],
+        "fullPage": true,
+        "sha256": "370486eabbb59fdea09e1a866c59b3a4bc5dac44fb2877e0ba53a78f0fd068df",
+        "checks": {
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "unlabelledControls": [],
+          "duplicateIds": [],
+          "contrastFailures": [],
+          "heading": "Configure Saturday Team League",
+          "railVisible": true,
+          "pageErrors": [],
+          "networkRequests": []
+        }
+      },
+      {
+        "state": "draft-incomplete",
+        "label": "Draft · publication blocked",
+        "file": "tournament-setup-draft-incomplete-desktop.png",
+        "source": "prototypes/frontend/tournament-setup-states.html?state=draft-incomplete",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/tournament-setup-states.html?state=draft-incomplete",
+        "viewport": [
+          1440,
+          1000
+        ],
+        "fullPage": true,
+        "sha256": "908bae67372d5bf91dc1869abc04f888b51be10e7d679ef258aa516bb9a67e60",
+        "checks": {
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "unlabelledControls": [],
+          "duplicateIds": [],
+          "contrastFailures": [],
+          "heading": "Configure Saturday Open",
+          "railVisible": true,
+          "pageErrors": [],
+          "networkRequests": []
+        }
+      },
+      {
+        "state": "draft-incomplete",
+        "label": "Draft · publication blocked",
+        "file": "tournament-setup-draft-incomplete-mobile.png",
+        "source": "prototypes/frontend/tournament-setup-states.html?state=draft-incomplete",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/tournament-setup-states.html?state=draft-incomplete",
+        "viewport": [
+          390,
+          844
+        ],
+        "fullPage": true,
+        "sha256": "bb46fc15cbb1244fe8136db92124b10241fb6d8ab1725b809e35fc05dcca8251",
+        "checks": {
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "unlabelledControls": [],
+          "duplicateIds": [],
+          "contrastFailures": [],
+          "heading": "Configure Saturday Open",
+          "railVisible": true,
+          "pageErrors": [],
+          "networkRequests": []
+        }
+      },
+      {
+        "state": "validation-errors",
+        "label": "Team draft · validation errors",
+        "file": "tournament-setup-validation-errors-desktop.png",
+        "source": "prototypes/frontend/tournament-setup-states.html?state=validation-errors",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/tournament-setup-states.html?state=validation-errors",
+        "viewport": [
+          1440,
+          1000
+        ],
+        "fullPage": true,
+        "sha256": "ea73dc09b0f2b83c861cc4e897a19ffc1f32b626a7cdb3b7de4c1698f45078e0",
+        "checks": {
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "unlabelledControls": [],
+          "duplicateIds": [],
+          "contrastFailures": [],
+          "heading": "Configure Saturday Team League",
+          "railVisible": true,
+          "pageErrors": [],
+          "networkRequests": []
+        }
+      },
+      {
+        "state": "validation-errors",
+        "label": "Team draft · validation errors",
+        "file": "tournament-setup-validation-errors-mobile.png",
+        "source": "prototypes/frontend/tournament-setup-states.html?state=validation-errors",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/tournament-setup-states.html?state=validation-errors",
+        "viewport": [
+          390,
+          844
+        ],
+        "fullPage": true,
+        "sha256": "cd3846d35e416bd11a1adeed6c727b6a2a4a3d68b3993883c7ec34150e408fd5",
+        "checks": {
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "unlabelledControls": [],
+          "duplicateIds": [],
+          "contrastFailures": [],
+          "heading": "Configure Saturday Team League",
+          "railVisible": true,
+          "pageErrors": [],
+          "networkRequests": []
+        }
+      },
+      {
+        "state": "saving",
+        "label": "Draft · saving",
+        "file": "tournament-setup-saving-desktop.png",
+        "source": "prototypes/frontend/tournament-setup-states.html?state=saving",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/tournament-setup-states.html?state=saving",
+        "viewport": [
+          1440,
+          1000
+        ],
+        "fullPage": true,
+        "sha256": "2c845b52b188cb42854f946e4ab45dfb7fe913bac66712b8371dd9e3d2e412bf",
+        "checks": {
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "unlabelledControls": [],
+          "duplicateIds": [],
+          "contrastFailures": [],
+          "heading": "Configure Saturday Open",
+          "railVisible": true,
+          "pageErrors": [],
+          "networkRequests": []
+        }
+      },
+      {
+        "state": "saving",
+        "label": "Draft · saving",
+        "file": "tournament-setup-saving-mobile.png",
+        "source": "prototypes/frontend/tournament-setup-states.html?state=saving",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/tournament-setup-states.html?state=saving",
+        "viewport": [
+          390,
+          844
+        ],
+        "fullPage": true,
+        "sha256": "e1ee6de6b0f44ca34d1398ba61ba1ae014dc5c5945d3886f71adfdc31a88dc5b",
+        "checks": {
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "unlabelledControls": [],
+          "duplicateIds": [],
+          "contrastFailures": [],
+          "heading": "Configure Saturday Open",
+          "railVisible": true,
+          "pageErrors": [],
+          "networkRequests": []
+        }
+      },
+      {
+        "state": "save-failed",
+        "label": "Draft · save failed",
+        "file": "tournament-setup-save-failed-desktop.png",
+        "source": "prototypes/frontend/tournament-setup-states.html?state=save-failed",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/tournament-setup-states.html?state=save-failed",
+        "viewport": [
+          1440,
+          1000
+        ],
+        "fullPage": true,
+        "sha256": "4428af78d4a1d40b99900fdb6840687e1b7d7551acdf0c54a51c9678de309f07",
+        "checks": {
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "unlabelledControls": [],
+          "duplicateIds": [],
+          "contrastFailures": [],
+          "heading": "Configure Saturday Open",
+          "railVisible": true,
+          "pageErrors": [],
+          "networkRequests": []
+        }
+      },
+      {
+        "state": "save-failed",
+        "label": "Draft · save failed",
+        "file": "tournament-setup-save-failed-mobile.png",
+        "source": "prototypes/frontend/tournament-setup-states.html?state=save-failed",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/tournament-setup-states.html?state=save-failed",
+        "viewport": [
+          390,
+          844
+        ],
+        "fullPage": true,
+        "sha256": "c21ae0b2b86fea9dfd08bdf5e802d0a5e4c160266191aa4f4cbff0a6e30db404",
+        "checks": {
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "unlabelledControls": [],
+          "duplicateIds": [],
+          "contrastFailures": [],
+          "heading": "Configure Saturday Open",
+          "railVisible": true,
+          "pageErrors": [],
+          "networkRequests": []
+        }
+      },
+      {
+        "state": "revision-conflict",
+        "label": "Draft · revision conflict",
+        "file": "tournament-setup-revision-conflict-desktop.png",
+        "source": "prototypes/frontend/tournament-setup-states.html?state=revision-conflict",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/tournament-setup-states.html?state=revision-conflict",
+        "viewport": [
+          1440,
+          1000
+        ],
+        "fullPage": true,
+        "sha256": "ac474e35b5a4b5eeb942482d1331aafd31a273de4a931fa6169f80c20fa3c8e5",
+        "checks": {
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "unlabelledControls": [],
+          "duplicateIds": [],
+          "contrastFailures": [],
+          "heading": "Configure Saturday Open",
+          "railVisible": true,
+          "pageErrors": [],
+          "networkRequests": []
+        }
+      },
+      {
+        "state": "revision-conflict",
+        "label": "Draft · revision conflict",
+        "file": "tournament-setup-revision-conflict-mobile.png",
+        "source": "prototypes/frontend/tournament-setup-states.html?state=revision-conflict",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/tournament-setup-states.html?state=revision-conflict",
+        "viewport": [
+          390,
+          844
+        ],
+        "fullPage": true,
+        "sha256": "4aa05a3182be163d5556d3e283cec515656e924db6930ba9813479e63988bd9a",
+        "checks": {
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "unlabelledControls": [],
+          "duplicateIds": [],
+          "contrastFailures": [],
+          "heading": "Configure Saturday Open",
+          "railVisible": true,
+          "pageErrors": [],
+          "networkRequests": []
+        }
+      },
+      {
+        "state": "preview-individual",
+        "label": "Individual · publication preview",
+        "file": "tournament-setup-preview-individual-desktop.png",
+        "source": "prototypes/frontend/tournament-setup-states.html?state=preview-individual",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/tournament-setup-states.html?state=preview-individual",
+        "viewport": [
+          1440,
+          1000
+        ],
+        "fullPage": true,
+        "sha256": "de77943412d44c014edefe55b73d0592c853833d5304969acf8eeb8371182395",
+        "checks": {
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "unlabelledControls": [],
+          "duplicateIds": [],
+          "contrastFailures": [],
+          "heading": "Review before publishing",
+          "railVisible": true,
+          "pageErrors": [],
+          "networkRequests": []
+        }
+      },
+      {
+        "state": "preview-individual",
+        "label": "Individual · publication preview",
+        "file": "tournament-setup-preview-individual-mobile.png",
+        "source": "prototypes/frontend/tournament-setup-states.html?state=preview-individual",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/tournament-setup-states.html?state=preview-individual",
+        "viewport": [
+          390,
+          844
+        ],
+        "fullPage": true,
+        "sha256": "0d2e0613f343ee916bd3ff61d8b102496536c535d2877275a0799f4588e9b0f1",
+        "checks": {
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "unlabelledControls": [],
+          "duplicateIds": [],
+          "contrastFailures": [],
+          "heading": "Review before publishing",
+          "railVisible": true,
+          "pageErrors": [],
+          "networkRequests": []
+        }
+      },
+      {
+        "state": "preview-team",
+        "label": "Team · publication preview",
+        "file": "tournament-setup-preview-team-desktop.png",
+        "source": "prototypes/frontend/tournament-setup-states.html?state=preview-team",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/tournament-setup-states.html?state=preview-team",
+        "viewport": [
+          1440,
+          1000
+        ],
+        "fullPage": true,
+        "sha256": "133e098aa9a694f5878a477fd47aba940bdbcb2c4a83f8e63fc761f90f6376ef",
+        "checks": {
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "unlabelledControls": [],
+          "duplicateIds": [],
+          "contrastFailures": [],
+          "heading": "Review before publishing",
+          "railVisible": true,
+          "pageErrors": [],
+          "networkRequests": []
+        }
+      },
+      {
+        "state": "preview-team",
+        "label": "Team · publication preview",
+        "file": "tournament-setup-preview-team-mobile.png",
+        "source": "prototypes/frontend/tournament-setup-states.html?state=preview-team",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/tournament-setup-states.html?state=preview-team",
+        "viewport": [
+          390,
+          844
+        ],
+        "fullPage": true,
+        "sha256": "91a158825be364ed861a082d3d93175348abf9a836133f7963abfab8f52a515f",
+        "checks": {
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "unlabelledControls": [],
+          "duplicateIds": [],
+          "contrastFailures": [],
+          "heading": "Review before publishing",
+          "railVisible": true,
+          "pageErrors": [],
+          "networkRequests": []
+        }
+      },
+      {
+        "state": "publishing",
+        "label": "Draft · publishing",
+        "file": "tournament-setup-publishing-desktop.png",
+        "source": "prototypes/frontend/tournament-setup-states.html?state=publishing",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/tournament-setup-states.html?state=publishing",
+        "viewport": [
+          1440,
+          1000
+        ],
+        "fullPage": true,
+        "sha256": "315a92c2932c1c63aea8125206881b017c8645943c124a6a11f076f9613174c0",
+        "checks": {
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "unlabelledControls": [],
+          "duplicateIds": [],
+          "contrastFailures": [],
+          "heading": "Review before publishing",
+          "railVisible": true,
+          "pageErrors": [],
+          "networkRequests": []
+        }
+      },
+      {
+        "state": "publishing",
+        "label": "Draft · publishing",
+        "file": "tournament-setup-publishing-mobile.png",
+        "source": "prototypes/frontend/tournament-setup-states.html?state=publishing",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/tournament-setup-states.html?state=publishing",
+        "viewport": [
+          390,
+          844
+        ],
+        "fullPage": true,
+        "sha256": "bd8020b2cb6d9a917a5b68f45aa4f7ea8295a4ad84e8f7d96986f53b521b9eaa",
+        "checks": {
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "unlabelledControls": [],
+          "duplicateIds": [],
+          "contrastFailures": [],
+          "heading": "Review before publishing",
+          "railVisible": true,
+          "pageErrors": [],
+          "networkRequests": []
+        }
+      },
+      {
+        "state": "publish-failed",
+        "label": "Draft · publication failed",
+        "file": "tournament-setup-publish-failed-desktop.png",
+        "source": "prototypes/frontend/tournament-setup-states.html?state=publish-failed",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/tournament-setup-states.html?state=publish-failed",
+        "viewport": [
+          1440,
+          1000
+        ],
+        "fullPage": true,
+        "sha256": "0fffc55d032640541d67950209d010cba8d131b6ceee96bee258eb7176343ca4",
+        "checks": {
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "unlabelledControls": [],
+          "duplicateIds": [],
+          "contrastFailures": [],
+          "heading": "Review before publishing",
+          "railVisible": true,
+          "pageErrors": [],
+          "networkRequests": []
+        }
+      },
+      {
+        "state": "publish-failed",
+        "label": "Draft · publication failed",
+        "file": "tournament-setup-publish-failed-mobile.png",
+        "source": "prototypes/frontend/tournament-setup-states.html?state=publish-failed",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/tournament-setup-states.html?state=publish-failed",
+        "viewport": [
+          390,
+          844
+        ],
+        "fullPage": true,
+        "sha256": "a5f1a62de92ea05b6ad1f8f903c26e26097ed61e6840b2de3668e05e827118b6",
+        "checks": {
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "unlabelledControls": [],
+          "duplicateIds": [],
+          "contrastFailures": [],
+          "heading": "Review before publishing",
+          "railVisible": true,
+          "pageErrors": [],
+          "networkRequests": []
+        }
+      },
+      {
+        "state": "published-individual",
+        "label": "Published individual · configuration",
+        "file": "tournament-setup-published-individual-desktop.png",
+        "source": "prototypes/frontend/tournament-setup-states.html?state=published-individual",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/tournament-setup-states.html?state=published-individual",
+        "viewport": [
+          1440,
+          1000
+        ],
+        "fullPage": true,
+        "sha256": "26fb343da1dcce8c758e31473fe4e00acc11c57536e6992b542e72b8d1d052ba",
+        "checks": {
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "unlabelledControls": [],
+          "duplicateIds": [],
+          "contrastFailures": [],
+          "heading": "Saturday Open",
+          "railVisible": true,
+          "pageErrors": [],
+          "networkRequests": []
+        }
+      },
+      {
+        "state": "published-individual",
+        "label": "Published individual · configuration",
+        "file": "tournament-setup-published-individual-mobile.png",
+        "source": "prototypes/frontend/tournament-setup-states.html?state=published-individual",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/tournament-setup-states.html?state=published-individual",
+        "viewport": [
+          390,
+          844
+        ],
+        "fullPage": true,
+        "sha256": "16ecfeba5de24ce0fe387d1e099d114810d1c9d8400760b5bcc208db14ea6822",
+        "checks": {
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "unlabelledControls": [],
+          "duplicateIds": [],
+          "contrastFailures": [],
+          "heading": "Saturday Open",
+          "railVisible": true,
+          "pageErrors": [],
+          "networkRequests": []
+        }
+      },
+      {
+        "state": "published-team",
+        "label": "Published team · configuration",
+        "file": "tournament-setup-published-team-desktop.png",
+        "source": "prototypes/frontend/tournament-setup-states.html?state=published-team",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/tournament-setup-states.html?state=published-team",
+        "viewport": [
+          1440,
+          1000
+        ],
+        "fullPage": true,
+        "sha256": "0af43cfa081a61fb640e9c169075db420a5bf09ffadec17d3ab0805fb9afe678",
+        "checks": {
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "unlabelledControls": [],
+          "duplicateIds": [],
+          "contrastFailures": [],
+          "heading": "Saturday Team League",
+          "railVisible": true,
+          "pageErrors": [],
+          "networkRequests": []
+        }
+      },
+      {
+        "state": "published-team",
+        "label": "Published team · configuration",
+        "file": "tournament-setup-published-team-mobile.png",
+        "source": "prototypes/frontend/tournament-setup-states.html?state=published-team",
+        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/tournament-setup-states.html?state=published-team",
+        "viewport": [
+          390,
+          844
+        ],
+        "fullPage": true,
+        "sha256": "4c4ed97c56b6725a0848a677e0dde1a64e5d4694905a50b04fb798cad9fb36d2",
+        "checks": {
+          "horizontalOverflow": false,
+          "targetsUnder44px": [],
+          "unlabelledControls": [],
+          "duplicateIds": [],
+          "contrastFailures": [],
+          "heading": "Saturday Team League",
+          "railVisible": true,
+          "pageErrors": [],
+          "networkRequests": []
+        }
+      }
+    ]
+  },
+  "textContrastPairs": [
+    {
+      "foreground": "rgb(23, 26, 30)",
+      "background": "rgb(255, 255, 255)",
+      "ratio": 17.46,
+      "text": "Back to tournaments",
+      "pass": true
+    },
+    {
+      "foreground": "rgb(94, 102, 115)",
+      "background": "rgb(255, 255, 255)",
+      "ratio": 5.79,
+      "text": "Public: listed. Unlisted: readable by link. Private: owner-only access",
+      "pass": true
+    },
+    {
+      "foreground": "rgb(255, 255, 255)",
+      "background": "rgb(23, 26, 30)",
+      "ratio": 17.46,
+      "text": "Organisation",
+      "pass": true
+    },
+    {
+      "foreground": "rgb(199, 242, 58)",
+      "background": "rgb(23, 26, 30)",
+      "ratio": 13.46,
+      "text": ".",
+      "pass": true
+    },
+    {
+      "foreground": "rgb(174, 182, 192)",
+      "background": "rgb(23, 26, 30)",
+      "ratio": 8.52,
+      "text": "Switch organisation",
+      "pass": true
+    },
+    {
+      "foreground": "rgb(23, 26, 30)",
+      "background": "rgb(199, 242, 58)",
+      "ratio": 13.46,
+      "text": "Save changes",
+      "pass": true
+    },
+    {
+      "foreground": "rgb(94, 102, 115)",
+      "background": "rgb(243, 244, 246)",
+      "ratio": 5.27,
+      "text": "Coverage and visual decisions",
+      "pass": true
+    },
+    {
+      "foreground": "rgb(23, 26, 30)",
+      "background": "rgb(243, 244, 246)",
+      "ratio": 15.86,
+      "text": "Single round-robin · 3 / 1 / 0",
+      "pass": true
+    }
+  ],
+  "interactionChecks": [
+    "Entry-kind toggle changes fields and capacity unit; title retained",
+    "Online choice hides venue field",
+    "Missing-field link focuses associated control",
+    "Retry explanation keeps input",
+    "Reload latest explains explicit reconciliation; no silent replacement",
+    "Keyboard focus uses visible 3px outline",
+    "Account disclosure works with keyboard and Escape returns focus"
+  ]
+}
