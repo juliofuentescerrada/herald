@@ -173,3 +173,17 @@ None. A-1 to A-4 and Q-1 were answered on 10 November 2026.
 Refinements of the spec's rule list, same behaviour: team structure values are `not-applicable` unless the entry kind is team; a venue is `not-applicable` only when the location is online (the form shows the venue while no mode is chosen); an on-site tournament needs its venue for publication; the time zone must have an IANA identifier, so a Windows name is `unknown`. Rule codes: `required`, `too-long`, `out-of-range`, `not-applicable`, `below-active-players`, `below-minimum`, `not-after-opening`, `after-planned-start`, `unknown`, `skipped-hour`.
 
 `tests/Herald.Tournaments.Tests`: 45 domain tests pass, without mocks.
+
+### Tournaments persistence and features (tasks 4.1–4.4, 10 November 2026)
+
+`TournamentsDbContext` is organisation-scoped; the configuration is an EF Core complex property, so the record is stored as nullable columns of `tournaments."Tournaments"`; migration `AddTournamentSetup`. The five features are one file each; the response shape `TournamentDetails` and the result mapping live in the `Features` root namespace because four features answer with it and a feature cannot use another.
+
+Decisions taken while implementing:
+
+- The request and response carry the domain's `TournamentConfiguration` record directly: it is already primitives and enumerations, and a parallel contract type would repeat sixteen properties four times.
+- Enumerations travel as camel-case names for every Herald endpoint (`JsonStringEnumConverter` in `HeraldApi`); the OpenAPI documents describe them as string enumerations. No earlier endpoint had one.
+- Writes call `SaveChangesAsync` themselves, so a lost race (concurrency token) or a taken identifier (primary key) answers 409 instead of failing in the transaction's own save. A rejected insert is detached, or that later save would retry it.
+- A tournament that is missing or another organisation's answers a plain 404 problem; the organisation-level denial keeps its `organisation-not-available` type.
+- `registration`, `competition` and `profile` are string constants in the read model (`notOpen`, `preparation`, `singleRoundRobin-3-1-0`).
+
+`TournamentSetupTests` (20 tests against PostgreSQL through the host) cover the scenarios of task 4.3, including that the stored `CreatedBy` is a person of the Organisations module (the actor of D-5 through a real request). Host 49, Architecture 42, Organisations 24, ModuleHosting 8, Messaging 6 and Tournaments 45 tests pass; format check clean. Wolverine's code, the admin OpenAPI document and the admin client were regenerated; the public document did not change.

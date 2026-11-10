@@ -15,10 +15,10 @@
 
 ## 4. Tournaments persistence and features
 
-- [ ] 4.1 `TournamentsDbContext` as `OrganisationScopedDbContext`, `Tournament` organisation-owned, revision as concurrency token; migration `AddTournamentSetup`
-- [ ] 4.2 Features `CreateTournament`, `SaveTournament`, `PublishTournament`, `GetTournament`, `ListTournaments` with their endpoints (Admin group, operation names as in design D-4), validation problems by field and 409 problems with `currentRevision`
-- [ ] 4.3 API tests against PostgreSQL: the spec scenarios for creation and its retry/conflict, partial draft, each rejection, publication (complete, incomplete, without registration dates, team without structure, repeat), published edits, stale save, repeated save, stale publication, empty list, list per organisation, another owner's read and write (generic 404), public document without tournament operations
-- [ ] 4.4 Regenerate Wolverine code (`codegen write`) and the OpenAPI documents and client (`pnpm api:generate`)
+- [x] 4.1 `TournamentsDbContext` as `OrganisationScopedDbContext`, `Tournament` organisation-owned, revision as concurrency token; migration `AddTournamentSetup`
+- [x] 4.2 Features `CreateTournament`, `SaveTournament`, `PublishTournament`, `GetTournament`, `ListTournaments` with their endpoints (Admin group, operation names as in design D-4), validation problems by field and 409 problems with `currentRevision`
+- [x] 4.3 API tests against PostgreSQL: the spec scenarios for creation and its retry/conflict, partial draft, each rejection, publication (complete, incomplete, without registration dates, team without structure, repeat), published edits, stale save, repeated save, stale publication, empty list, list per organisation, another owner's read and write (generic 404), public document without tournament operations
+- [x] 4.4 Regenerate Wolverine code (`codegen write`) and the OpenAPI documents and client (`pnpm api:generate`)
 
 ## 5. Admin application
 

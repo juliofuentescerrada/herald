@@ -1,4 +1,5 @@
 using System.Reflection;
+using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
@@ -26,6 +27,8 @@ public static class HeraldApi
         services.AddOrganisationContext();
         // Numbers are numbers: the web default also reads them from strings and describes them as `integer | string`.
         services.ConfigureHttpJsonOptions(options => options.SerializerOptions.NumberHandling = JsonNumberHandling.Strict);
+        // Enumerations travel as their names, which is also how the OpenAPI documents describe them.
+        services.ConfigureHttpJsonOptions(options => options.SerializerOptions.Converters.Add(new JsonStringEnumConverter(JsonNamingPolicy.CamelCase)));
         foreach (var document in Documents)
         {
             // By default .NET adds ungrouped endpoints to every document; here each holds only its group.

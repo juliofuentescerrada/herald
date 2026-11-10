@@ -9,7 +9,7 @@ namespace Internal.Generated.WolverineHandlers
     {
         public override System.Type[] EndpointTypes()
         {
-            return new System.Type[] { typeof(Herald.Organisations.Features.CreateOrganisation.CreateOrganisationEndpoint), typeof(Herald.Organisations.Features.GetMe.GetMeEndpoint), typeof(Herald.Organisations.Features.GetOrganisation.GetOrganisationEndpoint) };
+            return new System.Type[] { typeof(Herald.Organisations.Features.CreateOrganisation.CreateOrganisationEndpoint), typeof(Herald.Organisations.Features.GetMe.GetMeEndpoint), typeof(Herald.Organisations.Features.GetOrganisation.GetOrganisationEndpoint), typeof(Herald.Tournaments.Features.CreateTournament.CreateTournamentEndpoint), typeof(Herald.Tournaments.Features.GetTournament.GetTournamentEndpoint), typeof(Herald.Tournaments.Features.ListTournaments.ListTournamentsEndpoint), typeof(Herald.Tournaments.Features.PublishTournament.PublishTournamentEndpoint), typeof(Herald.Tournaments.Features.SaveTournament.SaveTournamentEndpoint) };
         }
     }
 
@@ -25,10 +25,20 @@ namespace Internal.Generated.WolverineHandlers
         [global::System.Diagnostics.CodeAnalysis.DynamicDependency(global::System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.All, typeof(global::Internal.Generated.WolverineHandlers.GeneratedHttpEndpointRegistry))]
         [global::System.Diagnostics.CodeAnalysis.DynamicDependency(global::System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.All, typeof(global::Internal.Generated.WolverineHandlers.GET_api_me))]
         [global::System.Diagnostics.CodeAnalysis.DynamicDependency(global::System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.All, typeof(global::Internal.Generated.WolverineHandlers.GET_api_organisations_organisationId))]
+        [global::System.Diagnostics.CodeAnalysis.DynamicDependency(global::System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.All, typeof(global::Internal.Generated.WolverineHandlers.GET_api_organisations_organisationId_tournaments))]
+        [global::System.Diagnostics.CodeAnalysis.DynamicDependency(global::System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.All, typeof(global::Internal.Generated.WolverineHandlers.GET_api_organisations_organisationId_tournaments_tournamentId))]
         [global::System.Diagnostics.CodeAnalysis.DynamicDependency(global::System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.All, typeof(global::Internal.Generated.WolverineHandlers.POST_api_organisations))]
+        [global::System.Diagnostics.CodeAnalysis.DynamicDependency(global::System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.All, typeof(global::Internal.Generated.WolverineHandlers.POST_api_organisations_organisationId_tournaments))]
+        [global::System.Diagnostics.CodeAnalysis.DynamicDependency(global::System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.All, typeof(global::Internal.Generated.WolverineHandlers.POST_api_organisations_organisationId_tournaments_tournamentId_publication))]
+        [global::System.Diagnostics.CodeAnalysis.DynamicDependency(global::System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.All, typeof(global::Internal.Generated.WolverineHandlers.PUT_api_organisations_organisationId_tournaments_tournamentId))]
         [global::System.Diagnostics.CodeAnalysis.DynamicDependency(global::System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.All, typeof(global::Herald.Organisations.Features.CreateOrganisation.CreateOrganisationEndpoint))]
         [global::System.Diagnostics.CodeAnalysis.DynamicDependency(global::System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.All, typeof(global::Herald.Organisations.Features.GetMe.GetMeEndpoint))]
         [global::System.Diagnostics.CodeAnalysis.DynamicDependency(global::System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.All, typeof(global::Herald.Organisations.Features.GetOrganisation.GetOrganisationEndpoint))]
+        [global::System.Diagnostics.CodeAnalysis.DynamicDependency(global::System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.All, typeof(global::Herald.Tournaments.Features.CreateTournament.CreateTournamentEndpoint))]
+        [global::System.Diagnostics.CodeAnalysis.DynamicDependency(global::System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.All, typeof(global::Herald.Tournaments.Features.GetTournament.GetTournamentEndpoint))]
+        [global::System.Diagnostics.CodeAnalysis.DynamicDependency(global::System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.All, typeof(global::Herald.Tournaments.Features.ListTournaments.ListTournamentsEndpoint))]
+        [global::System.Diagnostics.CodeAnalysis.DynamicDependency(global::System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.All, typeof(global::Herald.Tournaments.Features.PublishTournament.PublishTournamentEndpoint))]
+        [global::System.Diagnostics.CodeAnalysis.DynamicDependency(global::System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.All, typeof(global::Herald.Tournaments.Features.SaveTournament.SaveTournamentEndpoint))]
         public static void Pin()
         {
             // Intentionally empty. The [DynamicDependency] attributes above are the payload: they root the generated types for Native AOT, and [ModuleInitializer] guarantees this method is itself an ILC root.

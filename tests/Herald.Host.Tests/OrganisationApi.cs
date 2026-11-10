@@ -44,6 +44,14 @@ public sealed class OrganisationApi : IAsyncLifetime
         await using var command = new NpgsqlCommand(sql, connection) { Parameters = { new NpgsqlParameter { Value = parameter } } };
         await command.ExecuteNonQueryAsync();
     }
+
+    public async Task<long> CountAsync(string sql, Guid parameter)
+    {
+        await using var connection = new NpgsqlConnection(_container.GetConnectionString());
+        await connection.OpenAsync();
+        await using var command = new NpgsqlCommand(sql, connection) { Parameters = { new NpgsqlParameter { Value = parameter } } };
+        return (long)(await command.ExecuteScalarAsync())!;
+    }
 }
 
 [CollectionDefinition(Name)]
