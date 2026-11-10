@@ -1,0 +1,150 @@
+using Herald.BuildingBlocks;
+
+namespace Herald.Tournaments.Domain;
+
+public readonly record struct TournamentId(Guid Value);
+
+public enum Publication
+{
+    Draft,
+    Published,
+}
+
+public enum WriteOutcome
+{
+    Applied,
+
+    // The write is already in effect: a retry, answered with the current tournament.
+    Repeated,
+
+    // Based on an older revision: nothing changes.
+    Stale,
+
+    Rejected,
+}
+
+public readonly record struct WriteResult(WriteOutcome Outcome, IReadOnlyList<BrokenRule> Broken)
+{
+    public static implicit operator WriteResult(WriteOutcome outcome) => new(outcome, []);
+}
+
+// Actors are person identifiers of the Organisations module, opaque here.
+public sealed record TournamentDrafted(TournamentId TournamentId, Guid CreatedBy, DateTimeOffset CreatedAt) : IDomainEvent;
+
+public sealed record TournamentPublished(TournamentId TournamentId, Guid PublishedBy, DateTimeOffset PublishedAt) : IDomainEvent;
+
+public sealed class Tournament : AggregateRoot<TournamentId>
+{
+    // For EF Core, which sets the configuration after constructing.
+    private Tournament(TournamentId id)
+        : base(id) => Configuration = null!;
+
+    private Tournament(TournamentId id, TournamentConfiguration configuration, Guid actor, DateTimeOffset at)
+        : base(id)
+    {
+        Configuration = configuration;
+        CreatedBy = ChangedBy = actor;
+        CreatedAt = ChangedAt = at;
+    }
+
+    public TournamentConfiguration Configuration { get; private set; }
+
+    public Publication Publication { get; private set; }
+
+    // Starts at 1 and grows by one with each effective change; writes state the one they were based on.
+    public int Revision { get; private set; } = 1;
+
+    public Guid CreatedBy { get; private set; }
+
+    public DateTimeOffset CreatedAt { get; private set; }
+
+    public Guid ChangedBy { get; private set; }
+
+    public DateTimeOffset ChangedAt { get; private set; }
+
+    public Guid? PublishedBy { get; private set; }
+
+    public DateTimeOffset? PublishedAt { get; private set; }
+
+    public static Tournament Draft(TournamentId id, TournamentConfiguration configuration, Guid actor, DateTimeOffset at)
+    {
+        configuration = configuration.Normalised();
+        if (configuration.Check() is { Count: > 0 } broken)
+        {
+            throw new ArgumentException($"The configuration breaks {broken[0].Field}: {broken[0].Rule}.", nameof(configuration));
+        }
+
+        var tournament = new Tournament(id, configuration, actor, at);
+        tournament.Raise(new TournamentDrafted(id, actor, at));
+        return tournament;
+    }
+
+    // A creation with the same identifier is a retry only when its content matches.
+    public bool Repeats(TournamentConfiguration configuration) => Configuration == configuration.Normalised();
+
+    public WriteResult Change(TournamentConfiguration configuration, int expectedRevision, Guid actor, DateTimeOffset at)
+    {
+        configuration = configuration.Normalised();
+        if (configuration == Configuration)
+        {
+            return WriteOutcome.Repeated;
+        }
+
+        if (expectedRevision != Revision)
+        {
+            return WriteOutcome.Stale;
+        }
+
+        var broken = configuration.Check();
+        if (broken.Count == 0 && Publication == Publication.Published)
+        {
+            // A published tournament stays complete (R-5).
+            broken = Required(configuration);
+        }
+
+        if (broken.Count > 0)
+        {
+            return new(WriteOutcome.Rejected, broken);
+        }
+
+        Configuration = configuration;
+        Touch(actor, at);
+        return WriteOutcome.Applied;
+    }
+
+    // Published and nothing else: registration and competition are untouched, and there is no way back (§5.1).
+    public WriteResult Publish(int expectedRevision, Guid actor, DateTimeOffset at)
+    {
+        if (Publication == Publication.Published)
+        {
+            return WriteOutcome.Repeated;
+        }
+
+        if (expectedRevision != Revision)
+        {
+            return WriteOutcome.Stale;
+        }
+
+        if (Required(Configuration) is { Count: > 0 } missing)
+        {
+            return new(WriteOutcome.Rejected, missing);
+        }
+
+        Publication = Publication.Published;
+        PublishedBy = actor;
+        PublishedAt = at;
+        Touch(actor, at);
+        Raise(new TournamentPublished(Id, actor, at));
+        return WriteOutcome.Applied;
+    }
+
+    private static List<BrokenRule> Required(TournamentConfiguration configuration) =>
+        [.. configuration.MissingForPublication().Select(field => new BrokenRule(field, "required"))];
+
+    private void Touch(Guid actor, DateTimeOffset at)
+    {
+        Revision++;
+        ChangedBy = actor;
+        ChangedAt = at;
+    }
+}

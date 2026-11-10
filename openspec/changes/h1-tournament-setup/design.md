@@ -165,3 +165,11 @@ None. A-1 to A-4 and Q-1 were answered on 10 November 2026.
 ### Acting person in the organisation context (tasks 2.1–2.2, 10 November 2026)
 
 `IOrganisationAccess.FindMemberAsync` returns the member's person identifier and the membership step enters it as `OrganisationContext.ActorId`; `CreateOrganisation` enters the creator. `Enter` keeps an actor already set when called again without one. Test: `A_scope_keeps_the_person_who_entered_it`. That the membership step passes the actor through a real request is asserted by the tournaments API tests (4.3), the first endpoint that stores it; until then the existing access tests (member reads, another owner gets 404) cover `FindMemberAsync`. ModuleHosting 8, Organisations 24, Host 29 and Architecture 42 tests pass; format check clean.
+
+### Tournaments domain (tasks 3.1–3.2, 10 November 2026)
+
+`Domain/TournamentConfiguration.cs` (a record: `Normalised`, `Check`, `MissingForPublication`) and `Domain/Tournament.cs` (`Draft`, `Repeats`, `Change`, `Publish`). `Change` and `Publish` return a `WriteResult` (`Applied`, `Repeated`, `Stale`, `Rejected` with the broken rules) instead of throwing, so an endpoint maps one value to 200, 409 or 400. Record equality of the normalised configuration is the "same content" test of D-3.
+
+Refinements of the spec's rule list, same behaviour: team structure values are `not-applicable` unless the entry kind is team; a venue is `not-applicable` only when the location is online (the form shows the venue while no mode is chosen); an on-site tournament needs its venue for publication; the time zone must have an IANA identifier, so a Windows name is `unknown`. Rule codes: `required`, `too-long`, `out-of-range`, `not-applicable`, `below-active-players`, `below-minimum`, `not-after-opening`, `after-planned-start`, `unknown`, `skipped-hour`.
+
+`tests/Herald.Tournaments.Tests`: 45 domain tests pass, without mocks.

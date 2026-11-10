@@ -10,8 +10,8 @@
 
 ## 3. Tournaments domain
 
-- [ ] 3.1 `Tournament`, `TournamentConfiguration` (`Check`, `MissingForPublication`), publication state, revision, created/changed/published by and at; domain events `TournamentDrafted` and `TournamentPublished`
-- [ ] 3.2 New project `tests/Herald.Tournaments.Tests` in `Herald.slnx`; domain tests without mocks for every validation and publication rule, revision increments, no-change saves, published-stays-complete, team-to-individual clearing, skipped-hour rejection
+- [x] 3.1 `Tournament`, `TournamentConfiguration` (`Check`, `MissingForPublication`), publication state, revision, created/changed/published by and at; domain events `TournamentDrafted` and `TournamentPublished`
+- [x] 3.2 New project `tests/Herald.Tournaments.Tests` in `Herald.slnx`; domain tests without mocks for every validation and publication rule, revision increments, no-change saves, published-stays-complete, team-to-individual clearing, skipped-hour rejection
 
 ## 4. Tournaments persistence and features
 

@@ -19,5 +19,6 @@
     <Project Path="tests/Herald.Messaging.Tests/Herald.Messaging.Tests.csproj" />
     <Project Path="tests/Herald.ModuleHosting.Tests/Herald.ModuleHosting.Tests.csproj" />
     <Project Path="tests/Herald.Organisations.Tests/Herald.Organisations.Tests.csproj" />
+    <Project Path="tests/Herald.Tournaments.Tests/Herald.Tournaments.Tests.csproj" />
   </Folder>
 </Solution>
