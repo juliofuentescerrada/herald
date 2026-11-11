@@ -1,0 +1,18 @@
+/* Reuse setup composition and existing contract colours/spacing only. */
+.registration-page .registration-area{max-width:960px;background:var(--surface);border:1px solid var(--line);padding:var(--s8);margin-top:var(--s6)}
+.registration-page .registration-state{font-weight:600;margin:var(--s3) 0 var(--s6)}
+.registration-page .registration-area>.help,.registration-page .audit{margin-top:var(--s4)}
+.registration-page .registration-area>button{margin-top:var(--s4)}
+.registration-page .registration-area li a{min-height:44px;display:inline-flex;align-items:center;text-decoration:underline}
+.registration-page .registration-area ul{padding-left:var(--s6);margin:var(--s3) 0}
+.registration-page .status{max-width:960px;border-color:var(--teal)}
+.registration-page .status strong{display:flex;align-items:center;gap:var(--s2);color:var(--teal)}
+.registration-page svg{width:20px;height:20px;flex:none;fill:none;stroke:currentColor;stroke-width:1.75;stroke-linecap:round;stroke-linejoin:round}
+.registration-page .danger{border-color:#a12632}
+.registration-page .danger strong,.registration-page .error{color:#a12632}
+.registration-page .error{display:flex;align-items:center;gap:var(--s2)}
+.registration-page .error::before{content:none}
+.registration-page input[aria-invalid=true]{border:2px solid #a12632}
+.registration-page button:disabled{background:var(--canvas);border-color:var(--control);color:var(--muted)}
+.registration-page .form-frame{margin-top:var(--s6)}
+@media(max-width:700px){.registration-page .registration-area{padding:var(--s6)}.registration-page .registration-area>button{width:100%}}

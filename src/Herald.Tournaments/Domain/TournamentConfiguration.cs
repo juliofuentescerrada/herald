@@ -174,6 +174,12 @@ public sealed record TournamentConfiguration(
         return broken;
     }
 
+    // What opening registration needs beyond publication: its announced window (R-3).
+    public IReadOnlyList<string> MissingForRegistration() =>
+        [.. new[] { ("registrationOpensAt", RegistrationOpensAt), ("registrationClosesAt", RegistrationClosesAt) }
+            .Where(date => date.Item2 is null)
+            .Select(date => date.Item1)];
+
     // CP-01: what publication still needs. Registration dates are required when registration opens, not here.
     public IReadOnlyList<string> MissingForPublication()
     {

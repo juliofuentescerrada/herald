@@ -10,6 +10,14 @@ public enum Publication
     Published,
 }
 
+// §5: not open and closed are different facts; closed means it was open.
+public enum RegistrationWindow
+{
+    NotOpen,
+    Open,
+    Closed,
+}
+
 public enum WriteOutcome
 {
     Applied,
@@ -32,6 +40,10 @@ public readonly record struct WriteResult(WriteOutcome Outcome, IReadOnlyList<Br
 public sealed record TournamentDrafted(TournamentId TournamentId, Guid CreatedBy, DateTimeOffset CreatedAt) : IDomainEvent;
 
 public sealed record TournamentPublished(TournamentId TournamentId, Guid PublishedBy, DateTimeOffset PublishedAt) : IDomainEvent;
+
+public sealed record TournamentRegistrationOpened(TournamentId TournamentId, Guid OpenedBy, DateTimeOffset OpenedAt) : IDomainEvent;
+
+public sealed record TournamentRegistrationClosed(TournamentId TournamentId, Guid ClosedBy, DateTimeOffset ClosedAt) : IDomainEvent;
 
 public sealed class Tournament : AggregateRoot<TournamentId>
 {
@@ -66,6 +78,13 @@ public sealed class Tournament : AggregateRoot<TournamentId>
 
     public DateTimeOffset? PublishedAt { get; private set; }
 
+    public RegistrationWindow Registration { get; private set; }
+
+    // The last opening or closing only: no entrant exists yet whom a history would serve (design A-1).
+    public Guid? RegistrationChangedBy { get; private set; }
+
+    public DateTimeOffset? RegistrationChangedAt { get; private set; }
+
     public static Tournament Draft(TournamentId id, TournamentConfiguration configuration, Guid actor, DateTimeOffset at)
     {
         configuration = configuration.Normalised();
@@ -98,8 +117,8 @@ public sealed class Tournament : AggregateRoot<TournamentId>
         var broken = configuration.Check();
         if (broken.Count == 0 && Publication == Publication.Published)
         {
-            // A published tournament stays complete (R-5).
-            broken = Required(configuration);
+            // A published tournament stays complete (R-5), and keeps its announced window while registration is open (RW-5).
+            broken = Required(configuration, withRegistrationDates: Registration == RegistrationWindow.Open);
         }
 
         if (broken.Count > 0)
@@ -125,7 +144,7 @@ public sealed class Tournament : AggregateRoot<TournamentId>
             return WriteOutcome.Stale;
         }
 
-        if (Required(Configuration) is { Count: > 0 } missing)
+        if (Required(Configuration, withRegistrationDates: false) is { Count: > 0 } missing)
         {
             return new(WriteOutcome.Rejected, missing);
         }
@@ -138,8 +157,69 @@ public sealed class Tournament : AggregateRoot<TournamentId>
         return WriteOutcome.Applied;
     }
 
-    private static List<BrokenRule> Required(TournamentConfiguration configuration) =>
-        [.. configuration.MissingForPublication().Select(field => new BrokenRule(field, "required"))];
+    // Opens, or reopens, by the owner's action only: the announced dates are required but no clock is read (RW-1, RW-2, RW-4).
+    public WriteResult OpenRegistration(int expectedRevision, Guid actor, DateTimeOffset at)
+    {
+        if (Registration == RegistrationWindow.Open)
+        {
+            return WriteOutcome.Repeated;
+        }
+
+        if (expectedRevision != Revision)
+        {
+            return WriteOutcome.Stale;
+        }
+
+        if (Publication != Publication.Published)
+        {
+            return new(WriteOutcome.Rejected, [new("registration", "not-published")]);
+        }
+
+        if (Configuration.MissingForRegistration() is { Count: > 0 } missing)
+        {
+            return new(WriteOutcome.Rejected, [.. missing.Select(field => new BrokenRule(field, "required"))]);
+        }
+
+        ChangeRegistration(RegistrationWindow.Open, actor, at);
+        Raise(new TournamentRegistrationOpened(Id, actor, at));
+        return WriteOutcome.Applied;
+    }
+
+    // Closed and nothing else: no freeze, no pairing, no start (§5.1, RW-3).
+    public WriteResult CloseRegistration(int expectedRevision, Guid actor, DateTimeOffset at)
+    {
+        if (Registration == RegistrationWindow.Closed)
+        {
+            return WriteOutcome.Repeated;
+        }
+
+        if (expectedRevision != Revision)
+        {
+            return WriteOutcome.Stale;
+        }
+
+        if (Registration != RegistrationWindow.Open)
+        {
+            return new(WriteOutcome.Rejected, [new("registration", "not-open")]);
+        }
+
+        ChangeRegistration(RegistrationWindow.Closed, actor, at);
+        Raise(new TournamentRegistrationClosed(Id, actor, at));
+        return WriteOutcome.Applied;
+    }
+
+    private static List<BrokenRule> Required(TournamentConfiguration configuration, bool withRegistrationDates) =>
+        [.. configuration.MissingForPublication()
+            .Concat(withRegistrationDates ? configuration.MissingForRegistration() : [])
+            .Select(field => new BrokenRule(field, "required"))];
+
+    private void ChangeRegistration(RegistrationWindow registration, Guid actor, DateTimeOffset at)
+    {
+        Registration = registration;
+        RegistrationChangedBy = actor;
+        RegistrationChangedAt = at;
+        Touch(actor, at);
+    }
 
     private void Touch(Guid actor, DateTimeOffset at)
     {

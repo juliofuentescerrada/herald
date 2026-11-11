@@ -56,6 +56,17 @@ namespace Herald.Tournaments.Persistence.Migrations
                     b.Property<Guid?>("PublishedBy")
                         .HasColumnType("uuid");
 
+                    b.Property<string>("Registration")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
+                    b.Property<DateTimeOffset?>("RegistrationChangedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("RegistrationChangedBy")
+                        .HasColumnType("uuid");
+
                     b.Property<int>("Revision")
                         .IsConcurrencyToken()
                         .HasColumnType("integer");

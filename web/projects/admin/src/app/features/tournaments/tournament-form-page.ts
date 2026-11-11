@@ -17,6 +17,7 @@ import {
   tournamentsKey,
   tournamentsPath,
 } from './tournaments';
+import { RegistrationArea } from './registration-area';
 
 const names = [
   'title', 'gameVariant', 'entryKind', 'capacity', 'minimumRosterSize', 'maximumRosterSize', 'activePlayersPerSide',
@@ -75,7 +76,10 @@ const toConfiguration = (d: Draft): TournamentConfiguration => {
 const ruleText = (field: string, rule: string): string => {
   const roster = field !== 'capacity';
   switch (rule) {
-    case 'required': return field === 'title' ? 'Enter a title.' : 'This value is required.';
+    case 'required':
+      if (field === 'title') return 'Enter a title.';
+      // Publication never requires these: only an open registration does.
+      return field.startsWith('registration') ? 'Required while registration is open.' : 'This value is required.';
     case 'too-long': return 'Use fewer characters.';
     case 'out-of-range': return roster ? 'Use a number between 1 and 50.' : 'Capacity must be between 2 and 256.';
     case 'not-applicable': return 'This value does not apply to this tournament.';
@@ -100,7 +104,7 @@ const zones = (): string[] => {
 /** Creates a draft, edits it, and edits a published tournament: one form, three moments. */
 @Component({
   selector: 'app-tournament-form-page',
-  imports: [Button, Icon, Notice, RouterLink, StatusLabel],
+  imports: [Button, Icon, Notice, RegistrationArea, RouterLink, StatusLabel],
   templateUrl: './tournament-form-page.html',
   styleUrl: './tournament-form-page.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -113,7 +117,7 @@ export class TournamentFormPage {
   private readonly access = inject(AccessState);
   private readonly confirm = inject(CONFIRM);
   private readonly document = inject(DOCUMENT);
-  private readonly organisation = injectOrganisation();
+  protected readonly organisation = injectOrganisation();
   private readonly summary = viewChild<ElementRef<HTMLElement>>('summary');
 
   protected readonly listPath = tournamentsPath(this.organisation);
@@ -308,6 +312,13 @@ export class TournamentFormPage {
       this.state.set('editing');
     }
   }
+
+  /** A registration change answers with the tournament; the configuration typed meanwhile cannot differ (the action needs no unsaved changes). */
+  protected registrationChanged(details: TournamentDetails): void {
+    this.accept(details);
+    this.state.set('editing');
+  }
+
 
   private accept(details: TournamentDetails): void {
     this.queries.setQueryData(tournamentKey(this.organisation, details.id), details);

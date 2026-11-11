@@ -11,14 +11,15 @@ public sealed record TournamentDetails(
     Guid Id,
     int Revision,
     Publication Publication,
-    string Registration,
+    RegistrationWindow Registration,
     string Competition,
     string Profile,
     TournamentConfiguration Configuration,
-    IReadOnlyList<string> MissingForPublication)
+    IReadOnlyList<string> MissingForPublication,
+    IReadOnlyList<string> MissingForRegistration,
+    DateTimeOffset? RegistrationChangedAt)
 {
-    // Constants until their slices exist: nothing can open registration or start competition yet (design D-1).
-    public const string RegistrationNotOpen = "notOpen";
+    // A constant until its slice exists: nothing can start competition yet.
     public const string CompetitionPreparation = "preparation";
 
     // The only H1 profile (D-04): single round-robin, 3 / 1 / 0.
@@ -28,11 +29,14 @@ public sealed record TournamentDetails(
         tournament.Id.Value,
         tournament.Revision,
         tournament.Publication,
-        RegistrationNotOpen,
+        tournament.Registration,
         CompetitionPreparation,
         RoundRobinProfile,
         tournament.Configuration,
-        tournament.Configuration.MissingForPublication());
+        tournament.Configuration.MissingForPublication(),
+        tournament.Configuration.MissingForRegistration(),
+        // The person is stored but not returned: Tournaments cannot name them (design W-1).
+        tournament.RegistrationChangedAt);
 }
 
 internal static class TournamentResults

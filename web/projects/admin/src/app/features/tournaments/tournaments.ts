@@ -48,10 +48,22 @@ export const capacityText = (configuration: Pick<TournamentConfiguration, 'capac
 export const locationText = (configuration: Pick<TournamentConfiguration, 'location' | 'venue'>): string =>
   configuration.location === 'online' ? 'Online' : (configuration.venue ?? (configuration.location === 'onSite' ? 'On-site' : ''));
 
+/** An instant written in the tournament's reference time zone, in the same form as `dateTimeText`. */
+export const instantText = (instant: string, zone: string): string => {
+  const at = new Date(instant);
+  const options = { timeZone: zone } as const;
+  const date = new Intl.DateTimeFormat('en-GB', { ...options, day: 'numeric', month: 'long', year: 'numeric' }).format(at);
+  const clock = new Intl.DateTimeFormat('en-GB', { ...options, hour: '2-digit', minute: '2-digit', hourCycle: 'h23' }).format(at);
+  return `${date}, ${clock}`;
+};
+
+const registrationWords: Record<string, string> = { notOpen: 'Registration not open', open: 'Registration open', closed: 'Registration closed' };
+export const registrationText = (registration: string): string => registrationWords[registration] ?? registration;
+
 /** Publication, registration and competition are three facts, never one "Active" label. */
 export const lifecycleLabels = (tournament: { publication: string; registration: string; competition: string }): string[] => [
   tournament.publication === 'published' ? 'Published' : 'Draft',
-  tournament.registration === 'notOpen' ? 'Registration not open' : tournament.registration,
+  registrationText(tournament.registration),
   tournament.competition === 'preparation' ? 'Preparing' : tournament.competition,
 ];
 

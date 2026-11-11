@@ -27,8 +27,15 @@
 
   <div class="column">
     @if (published()) {
+      <app-registration-area
+        [organisation]="organisation"
+        [tournament]="stored()!"
+        [unsaved]="dirty()"
+        (changed)="registrationChanged($event)"
+        (reload)="reloadLatest()"
+      />
       <herald-notice heading="Published · configuration remains editable">
-        Registration is still not open and competition is preparing. Saving configuration does not open registration.
+        Competition is preparing. Saving configuration does not change registration.
       </herald-notice>
     }
     @if (state() === 'saved') {

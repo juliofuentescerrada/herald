@@ -20,7 +20,7 @@ public sealed record TournamentSummary(
     LocationMode? Location,
     string? Venue,
     Publication Publication,
-    string Registration,
+    RegistrationWindow Registration,
     string Competition);
 
 public static class ListTournamentsEndpoint
@@ -34,7 +34,7 @@ public static class ListTournamentsEndpoint
         // shortcut: no paging, an organisation's list is short in H1; add it when tournaments can be archived.
         var tournaments = await db.Tournaments.AsNoTracking()
             .OrderByDescending(tournament => tournament.CreatedAt)
-            .Select(tournament => new { tournament.Id, tournament.Configuration, tournament.Publication })
+            .Select(tournament => new { tournament.Id, tournament.Configuration, tournament.Publication, tournament.Registration })
             .ToListAsync(cancellationToken);
 
         return [.. tournaments.Select(tournament => new TournamentSummary(
@@ -48,7 +48,7 @@ public static class ListTournamentsEndpoint
             tournament.Configuration.Location,
             tournament.Configuration.Venue,
             tournament.Publication,
-            TournamentDetails.RegistrationNotOpen,
+            tournament.Registration,
             TournamentDetails.CompetitionPreparation))];
     }
 }

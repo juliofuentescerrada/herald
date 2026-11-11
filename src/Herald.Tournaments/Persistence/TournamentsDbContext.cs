@@ -24,6 +24,7 @@ public sealed class TournamentsDbContext(DbContextOptions<TournamentsDbContext> 
             tournament.Ignore(t => t.DomainEvents);
             tournament.Property(t => t.Id).HasConversion(id => id.Value, value => new TournamentId(value));
             tournament.Property(t => t.Publication).HasConversion<string>().HasMaxLength(20);
+            tournament.Property(t => t.Registration).HasConversion<string>().HasMaxLength(20);
             // Two writes based on the same revision cannot both succeed.
             tournament.Property(t => t.Revision).IsConcurrencyToken();
             tournament.HasIndex(OrganisationProperty, nameof(Tournament.CreatedAt));
