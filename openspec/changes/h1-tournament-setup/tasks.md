@@ -38,5 +38,5 @@
 ## 7. Validation and completion
 
 - [x] 7.1 Full run: format, build, all .NET tests, web lint/tests/boundaries/builds, codegen and API drift checks, e2e suite; record in design.md
-- [ ] 7.2 Manual run through Aspire: individual and team tournaments from draft to published on desktop and narrow widths; compare with the captures and record differences in design.md
+- [x] 7.2 Manual run through Aspire: individual and team tournaments from draft to published on desktop and narrow widths; compare with the captures and record differences in design.md
 - [x] 7.3 Update `docs/herald-visual-direction.md` §9.3 (UJ-02 setup row), `docs/roadmap.md`, `README.md`, `CLAUDE.md` status and `openspec/config.yaml`; acceptance review against the specs in design.md
