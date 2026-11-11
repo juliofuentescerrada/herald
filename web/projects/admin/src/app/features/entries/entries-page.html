@@ -97,10 +97,19 @@
             @for (entry of admitted(); track entry.id) {
               <li>
                 <div>
-                  <h3>{{ entry.guestName }}</h3>
+                  <div class="name-line">
+                    <h3>{{ entry.guestName }}</h3>
+                    @if (teams()) {
+                      <span class="readiness" [class.readiness-warning]="entry.rosterReadiness !== 'complete'">{{ readiness(entry) }}</span>
+                    }
+                  </div>
                   <p class="help">Admitted</p>
                 </div>
                 <div class="row-actions">
+                  @if (teams()) {
+                    <button herald-button type="button" [disabled]="state() !== 'ready'" (click)="openRoster(entry, $any($event.currentTarget))"
+                      [attr.aria-label]="'Roster: ' + entry.guestName">Roster</button>
+                  }
                   <button herald-button type="button" [disabled]="state() !== 'ready'" (click)="askCancel(entry, $any($event.currentTarget))"
                     [attr.aria-label]="'Cancel entry: ' + entry.guestName">Cancel entry</button>
                 </div>
@@ -119,13 +128,22 @@
             @for (entry of waiting(); track entry.id) {
               <li>
                 <div>
-                  <h3>{{ entry.position }}. {{ entry.guestName }}</h3>
+                  <div class="name-line">
+                    <h3>{{ entry.position }}. {{ entry.guestName }}</h3>
+                    @if (teams()) {
+                      <span class="readiness" [class.readiness-warning]="entry.rosterReadiness !== 'complete'">{{ readiness(entry) }}</span>
+                    }
+                  </div>
                   <p class="help">{{ waitingReason(entry) }} · Waiting since {{ zoned(entry.waitingSince) }}</p>
                   @if (admitBlocked(); as why) {
                     <p class="help" [id]="'admit-why-' + entry.id">{{ why }}</p>
                   }
                 </div>
                 <div class="row-actions">
+                  @if (teams()) {
+                    <button herald-button type="button" [disabled]="state() !== 'ready'" (click)="openRoster(entry, $any($event.currentTarget))"
+                      [attr.aria-label]="'Roster: ' + entry.guestName">Roster</button>
+                  }
                   <button herald-button type="button" [disabled]="!!admitBlocked() || state() !== 'ready'"
                     [attr.aria-describedby]="admitBlocked() ? 'admit-why-' + entry.id : null" [attr.aria-label]="'Admit: ' + entry.guestName"
                     (click)="admit(entry, $any($event.currentTarget))">Admit</button>
@@ -145,7 +163,12 @@
           <summary>Cancelled · {{ cancelled().length }}</summary>
           <ul aria-label="Cancelled entries">
             @for (entry of cancelled(); track entry.id) {
-              <li><span class="name">{{ entry.guestName }}</span><span class="help">{{ ' · Cancelled ' + zoned(entry.cancelledAt) }}</span></li>
+              <li>
+                <span><span class="name">{{ entry.guestName }}</span><span class="help">{{ ' · Cancelled ' + zoned(entry.cancelledAt) }}</span></span>
+                @if (teams()) {
+                  <button herald-button type="button" (click)="openRoster(entry, $any($event.currentTarget))" [attr.aria-label]="'Roster: ' + entry.guestName">Roster</button>
+                }
+              </li>
             }
           </ul>
         </details>
@@ -240,6 +263,19 @@
       </div>
     </form>
   </herald-drawer>
+</ng-template>
+
+<ng-template #rosterDrawer let-close="close">
+  @let entry = $any(panel())?.entry;
+  <app-roster-drawer
+    [tournamentId]="tournamentIdentifier"
+    [entryId]="entry.id"
+    [teamName]="entry.guestName"
+    [tournamentTitle]="tournament.data()!.configuration.title"
+    [zone]="zone()"
+    [organisationName]="workingOrganisation.data()?.name ?? 'this organisation'"
+    (leave)="close()"
+  />
 </ng-template>
 
 <ng-template #cancelDialog>

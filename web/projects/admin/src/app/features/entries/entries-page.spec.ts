@@ -3,7 +3,7 @@ import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
-import { EntryDetails, FieldDetails, HeraldHostAdminService, TournamentDetails } from '@herald/api-client/admin';
+import { EntryDetails, FieldDetails, HeraldHostAdminService, RosterDetails, RosterMemberDetails, RosterReadiness, TournamentDetails } from '@herald/api-client/admin';
 import { provideTanStackQuery, QueryClient } from '@tanstack/angular-query-experimental';
 import axe from 'axe-core';
 import { Observable, of, Subject, throwError } from 'rxjs';
@@ -173,7 +173,7 @@ describe('The entries page', () => {
 
     expect(button('Add team')).toBeTruthy();
     expect(text('ol li .help')).toContain('Admission pending');
-    page().querySelector<HTMLButtonElement>('ol button')!.click();
+    page().querySelector<HTMLButtonElement>('[aria-label="Admit: Cedar Owls"]')!.click();
     await vi.waitFor(() => expect(text('#summary-heading')).toBe('2 of 4 teams'));
     expect(admitEntry).toHaveBeenCalledWith(organisation, tournamentId, 'e-Cedar-Owls', { expectedRevision: 1, reason: null });
     // In order: no confirmation, and the outcome is a toast.
@@ -459,5 +459,343 @@ describe('The entries page', () => {
     const { text } = await open({ getField }, tournament({ publication: 'draft', registration: 'notOpen' }));
     await vi.waitFor(() => expect(text('herald-notice strong')).toBe('Entries not available'));
     expect(getField).not.toHaveBeenCalled();
+  });
+});
+
+describe('The roster of a team entry', () => {
+  afterEach(() => {
+    TestBed.resetTestingModule();
+    document.querySelectorAll('herald-dialog, herald-drawer').forEach((element) => element.remove());
+  });
+
+  const bounds = { entryKind: 'team' as const, capacity: 4, minimumRosterSize: 3, maximumRosterSize: 5 };
+  const team = (name: string, size: number, rosterReadiness: RosterReadiness, over: Partial<EntryDetails> = {}) =>
+    entry(name, { rosterSize: size, rosterRevision: size, rosterReadiness, ...over });
+  const teams = (entries: EntryDetails[], terms: Partial<FieldDetails['terms']> = {}) => field(entries, { ...bounds, ...terms });
+
+  const member = (name: string, minute: number, over: Partial<RosterMemberDetails> = {}): RosterMemberDetails => ({
+    guestId: `p-${name}`,
+    name,
+    addedAt: `2026-11-11T17:${String(minute).padStart(2, '0')}:00Z`,
+    possibleDuplicateOf: null,
+    ...over,
+  });
+  const players = ['Robin Vale', 'Sam Reed', 'Jamie Brook', 'Taylor Finch', 'Casey Wood', 'Parker Snow'];
+  const roster = (size: number, over: Partial<RosterDetails> = {}): RosterDetails => {
+    const members = players.slice(0, size).map((name, index) => member(name, 20 + index * 2));
+    const readiness: RosterReadiness = size < 3 ? 'incomplete' : size > 5 ? 'aboveMaximum' : 'complete';
+    return {
+      entryId: 'e-River-Falcons',
+      teamName: 'River Falcons',
+      entryState: 'admitted',
+      revision: size,
+      minimumRosterSize: 3,
+      maximumRosterSize: 5,
+      readiness,
+      members,
+      history: members.map((m, index) => ({ rosterRevision: index + 1, guestId: m.guestId, name: m.name, kind: 'added' as const, changedBy: 'p-owner', changedAt: m.addedAt })),
+      ...over,
+    };
+  };
+
+  const page = (getRoster: unknown, more: Record<string, unknown> = {}, entries = [team('Team A', 4, 'complete'), team('River Falcons', 2, 'incomplete')]) =>
+    open(
+      { getField: () => of(teams(entries)), getRoster, getMe: () => of({ displayName: 'Alex Morgan', organisations: [] }), ...more },
+      tournament({ configuration: { ...tournament().configuration, title: 'Saturday Team League', entryKind: 'team', capacity: 4 } }),
+    );
+
+  /** Opens the roster of the named team from its row. */
+  const openRoster = async (harness: Awaited<ReturnType<typeof open>>, name = 'River Falcons') => {
+    await vi.waitFor(() => expect(document.querySelector(`[aria-label="Roster: ${name}"]`)).not.toBeNull());
+    document.querySelector<HTMLButtonElement>(`[aria-label="Roster: ${name}"]`)!.click();
+    await harness.settle();
+  };
+
+  it('shows each team’s roster readiness in words beside its name, waiting and cancelled teams included', async () => {
+    const entries = [
+      team('Team A', 4, 'complete'),
+      team('River Falcons', 2, 'incomplete'),
+      team('Cedar Owls', 6, 'aboveMaximum'),
+      team('Meadow Foxes', 4, 'complete', { state: 'waiting', waitingReason: 'admissionPending', position: 1, waitingSince: '2026-11-11T17:00:00Z', admittedAt: null }),
+      team('Pine Hawks', 1, 'incomplete', { state: 'cancelled', cancelledAt: '2026-11-11T16:00:00Z', admittedAt: null }),
+    ];
+    const harness = await page(() => of(roster(2)), {}, entries);
+    await vi.waitFor(() => expect(harness.texts('.readiness')).toHaveLength(4));
+
+    expect(harness.texts('.readiness')).toEqual(['4 of 3–5 players', '2 of 3–5 players · incomplete', '6 of 3–5 players · above maximum', '4 of 3–5 players']);
+    expect(document.querySelectorAll('.readiness.readiness-warning')).toHaveLength(2);
+    expect(document.querySelectorAll('[aria-label^="Roster: "]')).toHaveLength(5);
+    expect(await violations(harness.page())).toEqual([]);
+  });
+
+  it('shows no roster in an individual tournament', async () => {
+    const { text, page: root } = await open({ getField: () => of(full()) });
+    await vi.waitFor(() => expect(text('#summary-heading')).toBe('2 of 2 individual entries'));
+    expect(root().querySelector('.readiness')).toBeNull();
+    expect(root().querySelector('[aria-label^="Roster: "]')).toBeNull();
+  });
+
+  it('lists the members in the order added, with the bounds and the readiness', async () => {
+    const harness = await page(() => of(roster(2)));
+    await openRoster(harness);
+    await vi.waitFor(() => expect(harness.texts('.members .member-name')).toEqual(['Robin Vale', 'Sam Reed']));
+
+    expect(harness.heading()).toBe('Roster · River Falcons');
+    expect(harness.texts('.roster-facts p')).toEqual(['3 to 5 players', '2 of 3–5 players · incomplete']);
+    expect(harness.texts('.members .small')).toEqual(['Added 11 November 2026, 18:20', 'Added 11 November 2026, 18:22']);
+    expect(harness.text('.history summary')).toBe('History · 2');
+    expect(document.querySelector('details.history')!.hasAttribute('open')).toBe(false);
+    expect(harness.button('Add player')?.disabled).toBe(false);
+    await vi.waitFor(() => expect(harness.dialog()!.contains(document.activeElement)).toBe(true));
+    expect(await violations(document.querySelector('herald-drawer')!)).toEqual([]);
+  });
+
+  it('shows an empty roster with adding available', async () => {
+    const harness = await page(() => of(roster(0, { history: [] })));
+    await openRoster(harness);
+    await vi.waitFor(() => expect(harness.text('.members-heading')).toBe('Members · 0'));
+    expect(harness.texts('[role=dialog] .help')).toContain('No players yet.');
+    expect(harness.button('Add player')?.disabled).toBe(false);
+  });
+
+  it('shows a complete roster in neutral words with adding still available', async () => {
+    const harness = await page(() => of(roster(4)));
+    await openRoster(harness);
+    await vi.waitFor(() => expect(harness.texts('.roster-facts p')).toEqual(['3 to 5 players', '4 of 3–5 players']));
+    expect(document.querySelector('.roster-facts .readiness-warning')).toBeNull();
+    expect(harness.button('Add player')?.disabled).toBe(false);
+  });
+
+  it('says a full roster takes no one else until a member is removed', async () => {
+    const harness = await page(() => of(roster(5)));
+    await openRoster(harness);
+    await vi.waitFor(() => expect(harness.button('Add player')?.disabled).toBe(true));
+    expect(harness.text('#roster-add-reason')).toBe('The roster has 5 players, the maximum. Remove a member before adding another player.');
+  });
+
+  it('keeps every member above a lowered maximum and says how many to remove', async () => {
+    const harness = await page(() => of(roster(6, { maximumRosterSize: 5 })));
+    await openRoster(harness);
+    await vi.waitFor(() => expect(harness.texts('.members .member-name')).toHaveLength(6));
+    expect(harness.text('.roster-facts .readiness-warning')).toBe('6 of 3–5 players · above maximum');
+    expect(harness.text('#roster-add-reason')).toBe('The roster has 6 players, above the maximum of 5. Remove 2 members before adding another player.');
+  });
+
+  it('finds players, marks one on another team as unavailable, and adds another without a toast', async () => {
+    const findGuests = vi.fn(() =>
+      of([
+        { id: 'p-reese', kind: 'player', name: 'Reese Moss', createdAt: '2026-11-10T09:00:00Z', team: null },
+        { id: 'p-rowan', kind: 'player', name: 'Rowan Lake', createdAt: '2026-11-10T09:00:00Z', team: { entryId: 'e-Team-A', name: 'Team A' } },
+      ]),
+    );
+    const added = roster(2);
+    const addRosterMember = vi.fn(() => of({ ...added, revision: 3, members: [...added.members, member('Reese Moss', 30, { guestId: 'p-reese' })] }));
+    const getField = vi.fn(() => of(teams([team('Team A', 4, 'complete'), team('River Falcons', 2, 'incomplete')])));
+    const harness = await page(() => of(roster(2)), { findGuests, addRosterMember, getField });
+    await openRoster(harness);
+    await vi.waitFor(() => expect(harness.button('Add player')).toBeTruthy());
+
+    harness.button('Add player')!.click();
+    await harness.settle();
+    harness.type('#player-name', 'R');
+    await vi.waitFor(() => expect(harness.texts('.guests h3')).toEqual(['Reese Moss', 'Rowan Lake']));
+    expect(findGuests).toHaveBeenCalledWith(organisation, { kind: 'player', name: 'R', tournamentId });
+    expect(harness.texts('.guests li')[1]).toContain('On Team A');
+    expect(document.querySelector('[aria-label="Add player: Rowan Lake"]')).toBeNull();
+    expect(await violations(document.querySelector('herald-drawer')!)).toEqual([]);
+
+    document.querySelector<HTMLButtonElement>('[aria-label="Add player: Reese Moss"]')!.click();
+    await vi.waitFor(() => expect(harness.texts('.members .member-name')).toEqual(['Robin Vale', 'Sam Reed', 'Reese Moss']));
+    expect(addRosterMember).toHaveBeenCalledWith(organisation, tournamentId, 'e-River-Falcons', 'p-reese', { expectedRevision: 2 });
+    expect(harness.toasts()).toEqual([]);
+    expect(harness.dialog()).not.toBeNull();
+    await vi.waitFor(() => expect(getField).toHaveBeenCalledTimes(2));
+  });
+
+  it('creates a new player, warns of a possible duplicate, and adds one anyway', async () => {
+    const match = { id: 'p-ana', kind: 'player', name: 'Ana Ruiz', createdAt: '2026-11-10T09:00:00Z' };
+    const createGuest = answers(
+      () => throwError(() => problem(409, { type: 'possible-duplicate', title: 'Conflict', status: 409, matches: [match] })),
+      () => of({ ...match, id: 'p-ana-2' }),
+    );
+    const addRosterMember = vi.fn(() => of(roster(3)));
+    const harness = await page(() => of(roster(2)), { createGuest, addRosterMember });
+    await openRoster(harness);
+    await vi.waitFor(() => expect(harness.button('Add player')).toBeTruthy());
+    harness.button('Add player')!.click();
+    await harness.settle();
+    harness.button('Create new')!.click();
+    await harness.settle();
+    harness.type('#player-name', 'ana ruiz');
+    harness.button('Create and add player')!.click();
+
+    await vi.waitFor(() => expect(harness.texts('herald-notice strong')).toContain('Possible duplicate'));
+    expect(harness.text('.guests h3')).toBe('Ana Ruiz');
+    expect(await violations(document.querySelector('herald-drawer')!)).toEqual([]);
+    harness.button('Create a new player anyway')!.click();
+    await vi.waitFor(() => expect(addRosterMember).toHaveBeenCalledWith(organisation, tournamentId, 'e-River-Falcons', 'p-ana-2', { expectedRevision: 2 }));
+    const calls = createGuest.mock.calls as unknown as [string, string, { kind: string; confirmNew: boolean }][];
+    expect(calls[1][1]).toBe(calls[0][1]);
+    expect(calls[1][2]).toEqual({ kind: 'player', name: 'ana ruiz', confirmNew: true });
+  });
+
+  it('prevents a repeated addition while one is in progress', async () => {
+    const pending = new Subject<never>();
+    const createGuest = vi.fn(() => pending);
+    const harness = await page(() => of(roster(2)), { createGuest });
+    await openRoster(harness);
+    await vi.waitFor(() => expect(harness.button('Add player')).toBeTruthy());
+    harness.button('Add player')!.click();
+    await harness.settle();
+    harness.button('Create new')!.click();
+    await harness.settle();
+    harness.type('#player-name', 'Reese Moss');
+    harness.button('Create and add player')!.click();
+
+    await vi.waitFor(() => expect(harness.text('[role=dialog] form [role="status"]')).toBe('Adding the player. Please wait; do not submit again.'));
+    expect(harness.dialog()!.getAttribute('aria-busy')).toBe('true');
+    expect(harness.button('Back to entries')?.disabled).toBe(true);
+    harness.button('Adding…')!.click();
+    expect(createGuest).toHaveBeenCalledTimes(1);
+  });
+
+  it('says a failed addition added nothing, keeps the input, and retries', async () => {
+    const createGuest = vi.fn(() => of({ id: 'p-new', kind: 'player', name: 'Reese Moss', createdAt: '2026-11-11T09:00:00Z' }));
+    const addRosterMember = answers(() => throwError(() => problem(500)), () => of(roster(3)));
+    const harness = await page(() => of(roster(2)), { createGuest, addRosterMember });
+    await openRoster(harness);
+    await vi.waitFor(() => expect(harness.button('Add player')).toBeTruthy());
+    harness.button('Add player')!.click();
+    await harness.settle();
+    harness.button('Create new')!.click();
+    await harness.settle();
+    harness.type('#player-name', 'Reese Moss');
+    harness.button('Create and add player')!.click();
+
+    await vi.waitFor(() => expect(harness.text('form herald-notice')).toContain('The request failed. Nothing was added. Your input is kept; try again.'));
+    expect(document.querySelector<HTMLInputElement>('#player-name')!.value).toBe('Reese Moss');
+    harness.button('Retry add')!.click();
+    await vi.waitFor(() => expect(addRosterMember).toHaveBeenCalledTimes(2));
+    const calls = createGuest.mock.calls as unknown as [string, string][];
+    expect(calls[1][1]).toBe(calls[0][1]);
+  });
+
+  it('says which team holds a player the API refused', async () => {
+    const match = { id: 'p-ana', kind: 'player', name: 'Ana Ruiz', createdAt: '2026-11-10T09:00:00Z', team: null };
+    const addRosterMember = vi.fn(() =>
+      throwError(() => problem(400, { errors: { guestId: ['on-another-team'] }, team: { entryId: 'e-Team-A', name: 'Team A' } })),
+    );
+    const harness = await page(() => of(roster(2)), { findGuests: () => of([match]), addRosterMember });
+    await openRoster(harness);
+    await vi.waitFor(() => expect(harness.button('Add player')).toBeTruthy());
+    harness.button('Add player')!.click();
+    await harness.settle();
+    harness.type('#player-name', 'Ana');
+    await vi.waitFor(() => expect(document.querySelector('[aria-label="Add player: Ana Ruiz"]')).not.toBeNull());
+    document.querySelector<HTMLButtonElement>('[aria-label="Add player: Ana Ruiz"]')!.click();
+    await vi.waitFor(() => expect(harness.text('form herald-notice')).toContain('This player is on Team A’s roster in this tournament. Nothing changed.'));
+  });
+
+  it('removes a member with no confirmation, unrepeatable while in progress', async () => {
+    const pending = new Subject<RosterDetails>();
+    const removeRosterMember = vi.fn(() => pending);
+    const harness = await page(() => of(roster(3)), { removeRosterMember });
+    await openRoster(harness);
+    await vi.waitFor(() => expect(document.querySelector('[aria-label="Remove: Robin Vale"]')).not.toBeNull());
+
+    document.querySelector<HTMLButtonElement>('[aria-label="Remove: Robin Vale"]')!.click();
+    await vi.waitFor(() => expect(harness.text('[aria-label="Remove: Robin Vale"]')).toBe('Removing…'));
+    expect(harness.text('[role=dialog] [role="status"]')).toBe('Removing the player. Please wait; do not submit again.');
+    expect(document.querySelector<HTMLButtonElement>('[aria-label="Remove: Sam Reed"]')!.disabled).toBe(true);
+    expect(harness.button('Back to entries')?.disabled).toBe(true);
+    expect(removeRosterMember).toHaveBeenCalledWith(organisation, tournamentId, 'e-River-Falcons', 'p-Robin Vale', { expectedRevision: 3 });
+
+    const after = roster(3);
+    pending.next({ ...after, revision: 4, readiness: 'incomplete', members: after.members.slice(1) });
+    pending.complete();
+    await vi.waitFor(() => expect(harness.texts('.members .member-name')).toEqual(['Sam Reed', 'Jamie Brook']));
+    expect(harness.toasts()).toEqual([]);
+  });
+
+  it('flags a member who may be the same person as a player on another team', async () => {
+    const flagged = roster(2);
+    flagged.members[1] = { ...flagged.members[1], possibleDuplicateOf: { entryId: 'e-Team-A', name: 'Team A' } };
+    const harness = await page(() => of(flagged));
+    await openRoster(harness);
+    await vi.waitFor(() => expect(harness.text('.member-flag')).toContain('Possible duplicate of a player on Team A.'));
+    expect(document.querySelector('[aria-label="Remove: Sam Reed"]')).not.toBeNull();
+  });
+
+  it('lists additions and removals in the history with who and when', async () => {
+    const history = roster(1, {
+      history: [
+        { rosterRevision: 1, guestId: 'p-parker', name: 'Parker Snow', kind: 'added', changedBy: 'p-owner', changedAt: '2026-11-11T17:10:00Z' },
+        { rosterRevision: 2, guestId: 'p-parker', name: 'Parker Snow', kind: 'removed', changedBy: 'p-owner', changedAt: '2026-11-11T17:15:00Z' },
+        { rosterRevision: 3, guestId: 'p-Robin Vale', name: 'Robin Vale', kind: 'added', changedBy: 'p-owner', changedAt: '2026-11-11T17:20:00Z' },
+      ],
+    });
+    const harness = await page(() => of(history));
+    await openRoster(harness);
+    await vi.waitFor(() => expect(harness.text('.history summary')).toBe('History · 3'));
+    document.querySelector<HTMLElement>('.history summary')!.click();
+
+    expect(harness.texts('.history li')).toEqual([
+      'Added Parker Snow Alex Morgan · 11 November 2026, 18:10 · Europe/Madrid',
+      'Removed Parker Snow Alex Morgan · 11 November 2026, 18:15 · Europe/Madrid',
+      'Added Robin Vale Alex Morgan · 11 November 2026, 18:20 · Europe/Madrid',
+    ]);
+  });
+
+  it('shows a cancelled team’s roster read only', async () => {
+    const harness = await page(() => of(roster(2, { entryState: 'cancelled' })));
+    await openRoster(harness);
+    await vi.waitFor(() => expect(harness.texts('herald-notice strong')).toContain('Read only'));
+    expect(harness.texts('.help')).toContain('Cancelled team · Saturday Team League');
+    expect(document.querySelector('[aria-label^="Remove: "]')).toBeNull();
+    expect(harness.button('Add player')).toBeUndefined();
+    expect(harness.text('.history summary')).toBe('History · 2');
+  });
+
+  it('waits for the tournament’s roster sizes before any roster change', async () => {
+    const harness = await page(() => of(roster(2, { minimumRosterSize: null, maximumRosterSize: null, readiness: 'awaitingTerms' })));
+    await openRoster(harness);
+    await vi.waitFor(() => expect(harness.texts('.roster-facts p')).toEqual(['Waiting for the tournament’s roster sizes', '2 players · waiting for the tournament’s roster sizes']));
+    expect(harness.button('Add player')?.disabled).toBe(true);
+    expect(harness.text('#roster-add-reason')).toBe('The tournament’s roster sizes are not known yet. Saving the tournament’s configuration sends them.');
+    expect(document.querySelector<HTMLButtonElement>('[aria-label="Remove: Robin Vale"]')!.disabled).toBe(true);
+  });
+
+  it('says the roster changed elsewhere, keeps the last list and reloads the latest', async () => {
+    const getRoster = answers(() => of(roster(3)), () => of(roster(2, { revision: 4 })));
+    const removeRosterMember = vi.fn(() => throwError(() => problem(409, { type: 'roster-revision-conflict', currentRevision: 4 })));
+    const harness = await page(getRoster, { removeRosterMember });
+    await openRoster(harness);
+    await vi.waitFor(() => expect(document.querySelector('[aria-label="Remove: Robin Vale"]')).not.toBeNull());
+    document.querySelector<HTMLButtonElement>('[aria-label="Remove: Robin Vale"]')!.click();
+
+    await vi.waitFor(() => expect(harness.texts('herald-notice strong')).toContain('This roster changed elsewhere'));
+    expect(harness.texts('.members .member-name')).toHaveLength(3);
+    expect(harness.text('#roster-add-reason')).toBe('Reload the latest roster first.');
+    harness.button('Reload latest')!.click();
+    await vi.waitFor(() => expect(harness.texts('.members .member-name')).toHaveLength(2));
+    expect(harness.button('Add player')?.disabled).toBe(false);
+  });
+
+  it('says it is loading the roster without members', async () => {
+    const harness = await page(() => new Subject<RosterDetails>());
+    await openRoster(harness);
+    await vi.waitFor(() => expect(harness.text('[role=dialog] [role="status"]')).toBe('Loading roster…'));
+    expect(document.querySelector('.members')).toBeNull();
+    expect(harness.heading()).toBe('Roster · River Falcons');
+  });
+
+  it('explains a failed load without members and loads on retry', async () => {
+    const getRoster = answers(() => throwError(() => problem(500)), () => of(roster(2)));
+    const harness = await page(getRoster);
+    await openRoster(harness);
+    await vi.waitFor(() => expect(harness.texts('herald-notice strong')).toContain('Roster could not be loaded'));
+    expect(document.querySelector('.members')).toBeNull();
+    harness.button('Try again')!.click();
+    await vi.waitFor(() => expect(harness.texts('.members .member-name')).toEqual(['Robin Vale', 'Sam Reed']));
   });
 });

@@ -21,8 +21,8 @@
 
 ## 5. Admin application
 
-- [ ] 5.1 `entries` feature: readiness on team rows, `Roster` action, roster drawer with members, add (search with unavailable players, create, possible duplicate), remove, history, and every state of design.md's Visual input
-- [ ] 5.2 Vitest for each Visual input state and `axe-core`; lint and boundary checks pass
+- [x] 5.1 `entries` feature: readiness on team rows, `Roster` action, roster drawer with members, add (search with unavailable players, create, possible duplicate), remove, history, and every state of design.md's Visual input
+- [x] 5.2 Vitest for each Visual input state and `axe-core`; lint and boundary checks pass
 
 ## 6. End-to-end journey
 
