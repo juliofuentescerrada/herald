@@ -17,9 +17,9 @@
 
 ## 4. Admin application
 
-- [ ] 4.1 Registration area on the published tournament page: state in words, announced window, the last change (W-1), one action per state, mutations with the stored revision, list invalidated; three registration labels on the page and the list
-- [ ] 4.2 States: unavailable with missing dates (focus links) and with unsaved changes, opening and closing in progress, failed with retry, conflict with "Reload latest", a save rejected while open; no area on a draft
-- [ ] 4.3 Vitest for each state of design.md's Visual input and `axe-core`; lint and boundary checks pass
+- [x] 4.1 Registration area on the published tournament page: state in words, announced window, the last change (W-1), one action per state, mutations with the stored revision, list invalidated; three registration labels on the page and the list
+- [x] 4.2 States: unavailable with missing dates (focus links) and with unsaved changes, opening and closing in progress, failed with retry, conflict with "Reload latest", a save rejected while open; no area on a draft
+- [x] 4.3 Vitest for each state of design.md's Visual input and `axe-core`; lint and boundary checks pass
 
 ## 5. End-to-end journey
 

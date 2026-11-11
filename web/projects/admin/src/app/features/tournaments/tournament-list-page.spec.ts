@@ -55,6 +55,17 @@ describe('The tournament list', () => {
     expect(violations.map((v) => v.id)).toEqual([]);
   });
 
+  it('labels each registration state separately from publication and competition', async () => {
+    const rows = ['notOpen', 'open', 'closed'].map((registration, i) => row({ id: `t${i}`, publication: 'published', registration }));
+    const { page } = await render(() => of(rows));
+    await vi.waitFor(() => expect(page().querySelectorAll('li')).toHaveLength(3));
+    expect([...page().querySelectorAll('li')].map((li) => [...li.querySelectorAll('herald-status-label')].map((l) => l.textContent?.trim()))).toEqual([
+      ['Published', 'Registration not open', 'Preparing'],
+      ['Published', 'Registration open', 'Preparing'],
+      ['Published', 'Registration closed', 'Preparing'],
+    ]);
+  });
+
   it('says it is loading', async () => {
     const { text, page } = await render(() => new Subject());
     expect(text('[role="status"]')).toBe('Loading tournaments…');
