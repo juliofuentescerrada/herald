@@ -203,7 +203,7 @@ Every admin page uses the full width and one column.
 | Organisation selector, not found | The list or message across the width |
 | Organisation creation | One panel: the form, then "A workspace of your own" |
 
-New admin pages fill the width and stack secondary content with the main content, putting what a person acts on first. The captures in `docs/assets/mockups/feedback-layout/` show the earlier named widths and asides; for composition the rules above supersede them.
+New admin pages fill the width and stack secondary content with the main content, putting what a person acts on first. The captures in `docs/assets/mockups/feedback-layout/` show the earlier named widths and asides; for composition the rules above supersede them. Captures are kept as delivered and not regenerated; a prompt for new mockups states the rules of §4 and this section.
 
 ### 7.3 First admin mockup: round operations
 
