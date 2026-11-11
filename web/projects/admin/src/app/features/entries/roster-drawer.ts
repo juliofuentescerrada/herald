@@ -90,7 +90,7 @@ export class RosterDrawer {
   protected readonly bounds = computed(() => {
     const roster = this.roster.data()!;
     return roster.minimumRosterSize == null || roster.maximumRosterSize == null
-      ? 'Waiting for the tournament’s roster sizes'
+      ? 'Roster sizes not available'
       : `${roster.minimumRosterSize} to ${roster.maximumRosterSize} players`;
   });
   protected readonly readiness = computed(() => {
@@ -102,7 +102,6 @@ export class RosterDrawer {
   /** Why adding is unavailable, or null when it is. */
   protected readonly addBlocked = computed(() => {
     const roster = this.roster.data();
-    if (this.state() === 'busy') return 'Request in progress. Please wait; do not submit again.';
     if (this.state() === 'conflict') return 'Reload the latest roster first.';
     if (!roster) return null;
     const size = roster.members.length;

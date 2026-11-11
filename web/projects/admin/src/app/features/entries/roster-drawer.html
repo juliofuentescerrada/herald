@@ -69,7 +69,10 @@
 
       @if (!readOnly()) {
         <div class="roster-add">
-          @if (addBlocked(); as why) {
+          @if (state() === 'busy') {
+            <!-- The removal's own status says why; a second reason would repeat it. -->
+            <button herald-button type="button" disabled>Add player</button>
+          } @else if (addBlocked(); as why) {
             <button herald-button type="button" disabled aria-describedby="roster-add-reason">Add player</button>
             <p class="help" id="roster-add-reason">{{ why }}</p>
           } @else {

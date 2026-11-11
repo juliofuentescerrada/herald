@@ -708,6 +708,9 @@ describe('The roster of a team entry', () => {
     expect(harness.text('[role=dialog] [role="status"]')).toBe('Removing the player. Please wait; do not submit again.');
     expect(document.querySelector<HTMLButtonElement>('[aria-label="Remove: Sam Reed"]')!.disabled).toBe(true);
     expect(harness.button('Back to entries')?.disabled).toBe(true);
+    // One status says why: adding is unavailable without a second, repeated reason.
+    expect(harness.button('Add player')?.disabled).toBe(true);
+    expect(document.querySelector('#roster-add-reason')).toBeNull();
     expect(removeRosterMember).toHaveBeenCalledWith(organisation, tournamentId, 'e-River-Falcons', 'p-Robin Vale', { expectedRevision: 3 });
 
     const after = roster(3);
@@ -759,7 +762,7 @@ describe('The roster of a team entry', () => {
   it('waits for the tournament’s roster sizes before any roster change', async () => {
     const harness = await page(() => of(roster(2, { minimumRosterSize: null, maximumRosterSize: null, readiness: 'awaitingTerms' })));
     await openRoster(harness);
-    await vi.waitFor(() => expect(harness.texts('.roster-facts p')).toEqual(['Waiting for the tournament’s roster sizes', '2 players · waiting for the tournament’s roster sizes']));
+    await vi.waitFor(() => expect(harness.texts('.roster-facts p')).toEqual(['Roster sizes not available', '2 players · waiting for the tournament’s roster sizes']));
     expect(harness.button('Add player')?.disabled).toBe(true);
     expect(harness.text('#roster-add-reason')).toBe('The tournament’s roster sizes are not known yet. Saving the tournament’s configuration sends them.');
     expect(document.querySelector<HTMLButtonElement>('[aria-label="Remove: Robin Vale"]')!.disabled).toBe(true);
