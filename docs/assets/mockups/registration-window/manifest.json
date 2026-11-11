@@ -1,0 +1,520 @@
+{
+  "description": "Deterministic registration-window documentation captures; review material approves no product default.",
+  "captureMethod": "Playwright with installed Google Chrome, headless, direct file://, device scale 1, en-GB, Europe/Madrid, local assets and system sans-serif fallback.",
+  "captures": [
+    {
+      "state": "not-open-ready",
+      "label": "not open ready",
+      "file": "registration-window-not-open-ready-desktop.png",
+      "source": "prototypes/frontend/registration-window-states.html?state=not-open-ready",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/registration-window-states.html?state=not-open-ready",
+      "viewport": [
+        1440,
+        1000
+      ],
+      "fullPage": true,
+      "sha256": "78add26b6eb39cf4fae0d099fa3415c6fb665c769e30e5185e9d84f9c392ded5",
+      "checks": {
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "heading": "Saturday Open",
+        "railVisible": true,
+        "targetsUnder44px": [],
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "not-open-ready",
+      "label": "not open ready",
+      "file": "registration-window-not-open-ready-mobile.png",
+      "source": "prototypes/frontend/registration-window-states.html?state=not-open-ready",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/registration-window-states.html?state=not-open-ready",
+      "viewport": [
+        390,
+        844
+      ],
+      "fullPage": true,
+      "sha256": "80a27c12eca8a5ec098919a752a0313bc274b356417ae1acf43be49bdc09ba6c",
+      "checks": {
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "heading": "Saturday Open",
+        "railVisible": true,
+        "targetsUnder44px": [],
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "not-open-missing-dates",
+      "label": "not open missing dates",
+      "file": "registration-window-not-open-missing-dates-desktop.png",
+      "source": "prototypes/frontend/registration-window-states.html?state=not-open-missing-dates",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/registration-window-states.html?state=not-open-missing-dates",
+      "viewport": [
+        1440,
+        1000
+      ],
+      "fullPage": true,
+      "sha256": "c0aa62bb499016db0d084e89bdcb01f9e190719bf1981d68de7b3d833ab76137",
+      "checks": {
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "heading": "Saturday Open",
+        "railVisible": true,
+        "targetsUnder44px": [],
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "not-open-missing-dates",
+      "label": "not open missing dates",
+      "file": "registration-window-not-open-missing-dates-mobile.png",
+      "source": "prototypes/frontend/registration-window-states.html?state=not-open-missing-dates",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/registration-window-states.html?state=not-open-missing-dates",
+      "viewport": [
+        390,
+        844
+      ],
+      "fullPage": true,
+      "sha256": "93ae85c54ca2463beead1b9c63d14ec58573b339b4054222709dde1dcc9ac0c0",
+      "checks": {
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "heading": "Saturday Open",
+        "railVisible": true,
+        "targetsUnder44px": [],
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "unsaved-changes",
+      "label": "unsaved changes",
+      "file": "registration-window-unsaved-changes-desktop.png",
+      "source": "prototypes/frontend/registration-window-states.html?state=unsaved-changes",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/registration-window-states.html?state=unsaved-changes",
+      "viewport": [
+        1440,
+        1000
+      ],
+      "fullPage": true,
+      "sha256": "36fe74e043c9137aaf3dbe5bdebfd590055d544c6240d970544ca80b6931a708",
+      "checks": {
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "heading": "Saturday Open",
+        "railVisible": true,
+        "targetsUnder44px": [],
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "unsaved-changes",
+      "label": "unsaved changes",
+      "file": "registration-window-unsaved-changes-mobile.png",
+      "source": "prototypes/frontend/registration-window-states.html?state=unsaved-changes",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/registration-window-states.html?state=unsaved-changes",
+      "viewport": [
+        390,
+        844
+      ],
+      "fullPage": true,
+      "sha256": "de60e4a00521aa4ba53fe09345c7e89a0f133b82862f091df5533f78ed446cee",
+      "checks": {
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "heading": "Saturday Open",
+        "railVisible": true,
+        "targetsUnder44px": [],
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "opening",
+      "label": "opening",
+      "file": "registration-window-opening-desktop.png",
+      "source": "prototypes/frontend/registration-window-states.html?state=opening",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/registration-window-states.html?state=opening",
+      "viewport": [
+        1440,
+        1000
+      ],
+      "fullPage": true,
+      "sha256": "a536383e37439b1c49461738e671a21d9459f8c444ddea92e6ae0af060f43d1f",
+      "checks": {
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "heading": "Saturday Open",
+        "railVisible": true,
+        "targetsUnder44px": [],
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "opening",
+      "label": "opening",
+      "file": "registration-window-opening-mobile.png",
+      "source": "prototypes/frontend/registration-window-states.html?state=opening",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/registration-window-states.html?state=opening",
+      "viewport": [
+        390,
+        844
+      ],
+      "fullPage": true,
+      "sha256": "83d255af459f6a4cd01f71337034a987a38c4e055390dacda2af962364bccf92",
+      "checks": {
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "heading": "Saturday Open",
+        "railVisible": true,
+        "targetsUnder44px": [],
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "open",
+      "label": "open",
+      "file": "registration-window-open-desktop.png",
+      "source": "prototypes/frontend/registration-window-states.html?state=open",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/registration-window-states.html?state=open",
+      "viewport": [
+        1440,
+        1000
+      ],
+      "fullPage": true,
+      "sha256": "4a7eba6b9596b7b203f5b4f14f828ed115c4cf5e4e88c6785ff569409106c19e",
+      "checks": {
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "heading": "Saturday Open",
+        "railVisible": true,
+        "targetsUnder44px": [],
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "open",
+      "label": "open",
+      "file": "registration-window-open-mobile.png",
+      "source": "prototypes/frontend/registration-window-states.html?state=open",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/registration-window-states.html?state=open",
+      "viewport": [
+        390,
+        844
+      ],
+      "fullPage": true,
+      "sha256": "17f8d01c0d5c2d6f7efb02e2761ea55b657fffd93994a8c77f70376eda17923d",
+      "checks": {
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "heading": "Saturday Open",
+        "railVisible": true,
+        "targetsUnder44px": [],
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "open-failed",
+      "label": "open failed",
+      "file": "registration-window-open-failed-desktop.png",
+      "source": "prototypes/frontend/registration-window-states.html?state=open-failed",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/registration-window-states.html?state=open-failed",
+      "viewport": [
+        1440,
+        1000
+      ],
+      "fullPage": true,
+      "sha256": "73bf8390344bddc8da82ee6be56738ddd9f27c28619d02775931762c1e94fb83",
+      "checks": {
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "heading": "Saturday Open",
+        "railVisible": true,
+        "targetsUnder44px": [],
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "open-failed",
+      "label": "open failed",
+      "file": "registration-window-open-failed-mobile.png",
+      "source": "prototypes/frontend/registration-window-states.html?state=open-failed",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/registration-window-states.html?state=open-failed",
+      "viewport": [
+        390,
+        844
+      ],
+      "fullPage": true,
+      "sha256": "e3b7502f7e5f77fc47bee19b6c3e9b9cee87c4ef1080944dd65a320f1751fd15",
+      "checks": {
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "heading": "Saturday Open",
+        "railVisible": true,
+        "targetsUnder44px": [],
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "closing",
+      "label": "closing",
+      "file": "registration-window-closing-desktop.png",
+      "source": "prototypes/frontend/registration-window-states.html?state=closing",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/registration-window-states.html?state=closing",
+      "viewport": [
+        1440,
+        1000
+      ],
+      "fullPage": true,
+      "sha256": "b232d4b49780712c3efea33cb28a2f14959d9b9421394e7634ae697b05be6bed",
+      "checks": {
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "heading": "Saturday Open",
+        "railVisible": true,
+        "targetsUnder44px": [],
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "closing",
+      "label": "closing",
+      "file": "registration-window-closing-mobile.png",
+      "source": "prototypes/frontend/registration-window-states.html?state=closing",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/registration-window-states.html?state=closing",
+      "viewport": [
+        390,
+        844
+      ],
+      "fullPage": true,
+      "sha256": "7df32d5080f1edb29ec3eed50240acd08b317f0904bb219299e757c7845c4112",
+      "checks": {
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "heading": "Saturday Open",
+        "railVisible": true,
+        "targetsUnder44px": [],
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "closed",
+      "label": "closed",
+      "file": "registration-window-closed-desktop.png",
+      "source": "prototypes/frontend/registration-window-states.html?state=closed",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/registration-window-states.html?state=closed",
+      "viewport": [
+        1440,
+        1000
+      ],
+      "fullPage": true,
+      "sha256": "55e893c78e219d5ef1c6c265234f9b4b5d4dd9bac6d441d6cdb242dd149948e3",
+      "checks": {
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "heading": "Saturday Open",
+        "railVisible": true,
+        "targetsUnder44px": [],
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "closed",
+      "label": "closed",
+      "file": "registration-window-closed-mobile.png",
+      "source": "prototypes/frontend/registration-window-states.html?state=closed",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/registration-window-states.html?state=closed",
+      "viewport": [
+        390,
+        844
+      ],
+      "fullPage": true,
+      "sha256": "ce65115097560f7c7f6c8f204cab09351b255e373048f51f9eff9d11278ffa22",
+      "checks": {
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "heading": "Saturday Open",
+        "railVisible": true,
+        "targetsUnder44px": [],
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "conflict",
+      "label": "conflict",
+      "file": "registration-window-conflict-desktop.png",
+      "source": "prototypes/frontend/registration-window-states.html?state=conflict",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/registration-window-states.html?state=conflict",
+      "viewport": [
+        1440,
+        1000
+      ],
+      "fullPage": true,
+      "sha256": "7d1ff38c73c7b45ac49e946d276bf08105f7d49683ab01428f6bda7283026ddd",
+      "checks": {
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "heading": "Saturday Open",
+        "railVisible": true,
+        "targetsUnder44px": [],
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "conflict",
+      "label": "conflict",
+      "file": "registration-window-conflict-mobile.png",
+      "source": "prototypes/frontend/registration-window-states.html?state=conflict",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/registration-window-states.html?state=conflict",
+      "viewport": [
+        390,
+        844
+      ],
+      "fullPage": true,
+      "sha256": "e95cbb88605efccf36c076bf4c33fe29515c2ae1d4dfc7f471e29b883082535c",
+      "checks": {
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "heading": "Saturday Open",
+        "railVisible": true,
+        "targetsUnder44px": [],
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "open-date-removed",
+      "label": "open date removed",
+      "file": "registration-window-open-date-removed-desktop.png",
+      "source": "prototypes/frontend/registration-window-states.html?state=open-date-removed",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/registration-window-states.html?state=open-date-removed",
+      "viewport": [
+        1440,
+        1000
+      ],
+      "fullPage": true,
+      "sha256": "efc7109b475d5a0b64393b32459ed00678cd17feca7f30c34298ce589d606540",
+      "checks": {
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "heading": "Saturday Open",
+        "railVisible": true,
+        "targetsUnder44px": [],
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "open-date-removed",
+      "label": "open date removed",
+      "file": "registration-window-open-date-removed-mobile.png",
+      "source": "prototypes/frontend/registration-window-states.html?state=open-date-removed",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/registration-window-states.html?state=open-date-removed",
+      "viewport": [
+        390,
+        844
+      ],
+      "fullPage": true,
+      "sha256": "d789579685fc33c0bc2fade37090ff101bbb657dd18a135401351711ec7550d6",
+      "checks": {
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "heading": "Saturday Open",
+        "railVisible": true,
+        "targetsUnder44px": [],
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "list-registration-states",
+      "label": "list registration states",
+      "file": "registration-window-list-registration-states-desktop.png",
+      "source": "prototypes/frontend/registration-window-states.html?state=list-registration-states",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/registration-window-states.html?state=list-registration-states",
+      "viewport": [
+        1440,
+        1000
+      ],
+      "fullPage": true,
+      "sha256": "05c088126395fa4d8331d4e1b2218ab30d234b14b25fead346a300718507ae4e",
+      "checks": {
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "heading": "Tournaments",
+        "railVisible": true,
+        "targetsUnder44px": [],
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "list-registration-states",
+      "label": "list registration states",
+      "file": "registration-window-list-registration-states-mobile.png",
+      "source": "prototypes/frontend/registration-window-states.html?state=list-registration-states",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/registration-window-states.html?state=list-registration-states",
+      "viewport": [
+        390,
+        844
+      ],
+      "fullPage": true,
+      "sha256": "80c3b2bd1c4c8098150bbf01e223a50fc56b70dc518edd403fdb105d88072c71",
+      "checks": {
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "heading": "Tournaments",
+        "railVisible": true,
+        "targetsUnder44px": [],
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    }
+  ],
+  "interactionChecks": [
+    "Missing-date link focuses its field",
+    "Editing configuration disables the registration action",
+    "Reload explanation retains typed input",
+    "Keyboard focus has a visible 3px solid outline",
+    "Team header uses the same registration-area structure"
+  ],
+  "limitations": "Static snapshots: no backend, persistence, automatic transitions or real revision reconciliation."
+}
