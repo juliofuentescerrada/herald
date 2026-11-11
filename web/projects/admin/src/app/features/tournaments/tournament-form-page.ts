@@ -2,7 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, computed, DOCUMENT, effect, ElementRef, inject, signal, untracked, viewChild } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { HeraldHostAdminService, HttpValidationProblemDetails, problemOf, TournamentConfiguration, TournamentDetails } from '@herald/api-client/admin';
-import { Button, Icon, Notice, StatusLabel } from '@herald/ui';
+import { Button, Icon, Notice, StatusLabel, Toasts } from '@herald/ui';
 import { firstValueFrom } from 'rxjs';
 import { AccessState, CONFIRM, injectWorkingOrganisation, QUERY_CLIENT } from '../../platform';
 import {
@@ -121,6 +121,7 @@ export class TournamentFormPage {
   private readonly route = inject(ActivatedRoute);
   private readonly access = inject(AccessState);
   private readonly confirm = inject(CONFIRM);
+  private readonly toasts = inject(Toasts);
   private readonly document = inject(DOCUMENT);
   protected readonly organisation = injectOrganisation();
   private readonly summary = viewChild<ElementRef<HTMLElement>>('summary');
@@ -132,9 +133,7 @@ export class TournamentFormPage {
   protected readonly stored = signal<TournamentDetails | null>(null);
   protected readonly draft = signal<Draft>(this.initial());
   private readonly baseline = signal(JSON.stringify(this.draft()));
-  protected readonly state = signal<'editing' | 'saving' | 'saved' | 'failed' | 'conflict'>(
-    this.router.currentNavigation()?.extras.state?.['saved'] ? 'saved' : 'editing',
-  );
+  protected readonly state = signal<'editing' | 'saving' | 'failed' | 'conflict'>('editing');
   protected readonly errors = signal<Record<string, string[]>>({});
   /** One identifier per content of a creation, reused when the same content is sent again after a lost answer. */
   private attempt: { readonly id: string; readonly content: string } | null = null;
@@ -298,7 +297,8 @@ export class TournamentFormPage {
     try {
       if (stored) {
         this.accept(await firstValueFrom(this.api.saveTournament(this.organisation, stored.id, { expectedRevision: stored.revision, configuration })));
-        this.state.set('saved');
+        this.state.set('editing');
+        this.announceSaved();
         return;
       }
 
@@ -306,8 +306,9 @@ export class TournamentFormPage {
       if (this.attempt?.content !== content) this.attempt = { id: crypto.randomUUID(), content };
       const created = await firstValueFrom(this.api.createTournament<TournamentDetails>(this.organisation, { tournamentId: this.attempt.id, configuration }));
       this.accept(created);
+      this.announceSaved();
       // The address becomes the tournament's; the page that opens there finds it already loaded.
-      await this.router.navigate(['..', created.id], { relativeTo: this.route, replaceUrl: true, state: { saved: true } });
+      await this.router.navigate(['..', created.id], { relativeTo: this.route, replaceUrl: true });
     } catch (error) {
       // Lost access shows its own state; nothing to add here.
       if (this.access.problem()) return;
@@ -327,9 +328,22 @@ export class TournamentFormPage {
     }
   }
 
+  /** A save is announced as a toast, with what publication still lacks; the summary on the page lists it. */
+  private announceSaved(): void {
+    if (this.published()) this.toasts.show('Changes saved.');
+    else this.toasts.show(this.missing().length ? 'Draft saved. It is not ready to publish yet.' : 'Draft saved. It has everything publication needs.');
+  }
+
   /** Replaces what was typed with the stored tournament, only after the person agrees to lose it. */
   protected async reloadLatest(): Promise<void> {
-    if (!this.confirm('Discard your unsaved input? It is not saved anywhere.')) return;
+    const discard = await this.confirm({
+      heading: 'Discard your unsaved input?',
+      body: 'Reloading replaces everything you typed with the latest saved configuration. Your unsaved changes will be lost.',
+      confirmLabel: 'Reload latest',
+      leaveLabel: 'Back',
+      destructive: true,
+    });
+    if (!discard) return;
     const latest = (await this.tournament.refetch()).data;
     if (latest) {
       this.accept(latest);

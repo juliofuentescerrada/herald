@@ -13,31 +13,38 @@
     </div>
   </section>
 } @else {
-  <h1>Entries · {{ tournament.data()!.configuration.title }}</h1>
-  <p class="lead">{{ facts() }}</p>
-  @if (starts()) {
-    <p class="lead">{{ starts() }}</p>
-  }
-  <p class="labels">
-    @for (label of labels(); track label) {
-      <herald-status-label>{{ label }}</herald-status-label>
+  <header class="page-header">
+    <div class="title">
+      <h1>Entries · {{ tournament.data()!.configuration.title }}</h1>
+      <p class="labels">
+        @for (label of labels(); track label) {
+          <herald-status-label>{{ label }}</herald-status-label>
+        }
+      </p>
+    </div>
+    <p class="lead">{{ facts() }}</p>
+    @if (starts()) {
+      <p class="lead">{{ starts() }}</p>
     }
-  </p>
+  </header>
 
-  <div class="column">
-    @if (field.isPending()) {
-      <section class="operation" role="status" aria-busy="true">
-        <h2>Loading entries…</h2>
-        <p>Please wait while the tournament field is loaded.</p>
-      </section>
-    } @else if (field.isError()) {
+  @if (field.isPending()) {
+    <section class="operation" role="status" aria-busy="true">
+      <h2>Loading entries…</h2>
+      <p>Please wait while the tournament field is loaded.</p>
+    </section>
+  } @else if (field.isError()) {
+    <div>
       <herald-notice tone="danger" heading="Entries could not be loaded">
         No entries are shown. Try loading the field again.
         <span class="notice-action">
           <button herald-button variant="primary" type="button" [loading]="field.isFetching()" (click)="field.refetch()">Try again</button>
         </span>
       </herald-notice>
-    } @else {
+    </div>
+  } @else {
+    <!-- Stacked at every width: the summary, the groups, then the cancelled history. -->
+    <div class="column">
       <section class="summary" aria-labelledby="summary-heading">
         <div>
           <h2 id="summary-heading" tabindex="-1" #summaryHeading>{{ summary() }}</h2>
@@ -46,15 +53,13 @@
         </div>
         <div class="summary-action">
           @if (addBlocked(); as why) {
-            <button herald-button type="button" disabled aria-describedby="add-reason" #addButton>{{ addLabel() }}</button>
+            <button herald-button type="button" disabled aria-describedby="add-reason">{{ addLabel() }}</button>
             <p class="help" id="add-reason">{{ why }}</p>
           } @else {
-            <button herald-button variant="primary" type="button" #addButton (click)="openAdd()">{{ addLabel() }}</button>
+            <button herald-button variant="primary" type="button" (click)="openAdd($any($event.currentTarget))">{{ addLabel() }}</button>
           }
         </div>
       </section>
-
-      <p class="help announcement" role="status">{{ announcement() }}</p>
 
       @if (state() === 'conflict') {
         <herald-notice tone="danger" heading="This entry changed elsewhere">
@@ -79,162 +84,12 @@
         <herald-notice tone="danger" [heading]="failed.heading">{{ failed.text }}</herald-notice>
       }
 
-      @switch (panel()?.kind) {
-        @case ('add') {
-          <section class="operation" aria-labelledby="add-heading" [attr.aria-busy]="state() === 'busy'">
-            <h2 id="add-heading" tabindex="-1" #panelHeading>{{ addLabel() }}</h2>
-            <p class="help">Choose a guest of {{ workingOrganisation.data()?.name ?? 'this organisation' }} or create a new {{ kind() }}.</p>
-            <div class="actions choices">
-              <button herald-button type="button" [attr.aria-pressed]="mode() === 'existing'" (click)="choose('existing')">Choose existing</button>
-              <button herald-button type="button" [attr.aria-pressed]="mode() === 'new'" (click)="choose('new')">Create new</button>
-            </div>
-            <form novalidate (submit)="$event.preventDefault(); mode() === 'new' && !matches() && createAndEnter()">
-              <div class="field">
-                <label for="guest-name">{{ mode() === 'existing' ? 'Search by name' : 'Name (alias)' }}</label>
-                <input
-                  id="guest-name"
-                  #nameInput
-                  autocomplete="off"
-                  maxlength="80"
-                  [value]="name()"
-                  (input)="typed(nameInput.value)"
-                  [readOnly]="state() === 'busy'"
-                  [attr.aria-invalid]="nameError() ? 'true' : null"
-                  [attr.aria-describedby]="nameError() ? 'name-help name-error' : 'name-help'"
-                />
-                <p class="help" id="name-help">
-                  {{ mode() === 'existing' ? 'Only ' + kind() + ' guests in ' + (workingOrganisation.data()?.name ?? 'this organisation') + '.' : '1–80 characters after trimming. Review the name before creating the guest.' }}
-                </p>
-                @if (nameError(); as message) {
-                  <p class="field-error" id="name-error"><herald-icon name="alert-circle" size="metadata" />Error: {{ message }}</p>
-                }
-              </div>
-
-              @if (failure(); as failed) {
-                <herald-notice tone="danger" [heading]="failed.heading">{{ failed.text }}</herald-notice>
-              }
-              @if (matches(); as found) {
-                <herald-notice heading="Possible duplicate">
-                  These {{ kind() }} guests have the same name ignoring case, accents and spaces. Choose one or create a separate guest. Nothing will be
-                  merged.
-                </herald-notice>
-              }
-
-              @let results = matches() ?? (mode() === 'existing' && name().trim() ? (guests.data() ?? []) : []);
-              @if (mode() === 'existing' && name().trim() && !matches()) {
-                @if (guests.isPending()) {
-                  <p class="help" role="status">Searching…</p>
-                } @else if (guests.isError()) {
-                  <p class="help" role="status">The search failed. Change the name to try again.</p>
-                } @else if (!results.length) {
-                  <p class="help" role="status">No {{ kind() }} guest starts with “{{ name().trim() }}”. Choose “Create new” to add one.</p>
-                }
-              }
-              @if (results.length) {
-                <ul class="rows guests" [attr.aria-label]="'Existing ' + kind() + ' guests'">
-                  @for (guest of results; track guest.id) {
-                    <li>
-                      <div>
-                        <h3>{{ guest.name }}</h3>
-                        <p class="help">{{ created(guest) }}</p>
-                      </div>
-                      @if (activeGuests().has(guest.id)) {
-                        <p class="help">Already entered in this tournament</p>
-                      } @else {
-                        <button herald-button variant="primary" type="button" [disabled]="state() === 'busy'" (click)="enterExisting(guest)">
-                          Enter this {{ kind() }}
-                        </button>
-                      }
-                    </li>
-                  }
-                </ul>
-              }
-
-              @if (state() === 'busy') {
-                <p class="help" role="status">Adding entry. Please wait; do not submit again.</p>
-              }
-              <div class="actions">
-                @if (mode() === 'new') {
-                  @if (matches()) {
-                    <button herald-button type="button" [loading]="state() === 'busy'" (click)="createAndEnter(true)">Create a new {{ kind() }} anyway</button>
-                  } @else {
-                    <button herald-button variant="primary" type="submit" [loading]="state() === 'busy'">
-                      {{ state() === 'busy' ? 'Adding…' : failure() ? 'Retry add' : 'Create and enter ' + kind() }}
-                    </button>
-                  }
-                }
-                <button herald-button type="button" (click)="close()">Back to entries</button>
-              </div>
-            </form>
-          </section>
-        }
-        @case ('cancel') {
-          @let entry = $any(panel()).entry;
-          <section class="operation" aria-labelledby="cancel-heading" [attr.aria-busy]="state() === 'busy'">
-            <h2 id="cancel-heading" tabindex="-1" #panelHeading>Cancel {{ entry.guestName }}’s entry?</h2>
-            <p>This cancellation is final for this entry. Entering {{ entry.guestName }} again creates a new entry at the back of the queue.</p>
-            <herald-notice heading="Effect on the waiting list">{{ effect() }}</herald-notice>
-            @if (failure(); as failed) {
-              <herald-notice tone="danger" [heading]="failed.heading">{{ failed.text }}</herald-notice>
-            }
-            <div class="actions">
-              <button herald-button variant="primary" type="button" [loading]="state() === 'busy'" (click)="confirmCancel()">
-                {{ state() === 'busy' ? 'Cancelling…' : 'Confirm cancellation' }}
-              </button>
-              <button herald-button type="button" (click)="close()">Keep entry</button>
-            </div>
-          </section>
-        }
-        @case ('admit') {
-          @let entry = $any(panel()).entry;
-          <section class="operation" aria-labelledby="admit-heading" [attr.aria-busy]="state() === 'busy'">
-            <h2 id="admit-heading" tabindex="-1" #panelHeading>Admit {{ entry.guestName }} ahead of {{ first()?.guestName }}?</h2>
-            <p>
-              One slot is free. {{ first()?.guestName }} is earlier in the capacity queue.
-              @if (field.data()!.terms.registration !== 'open') {
-                Registration is {{ field.data()!.terms.registration === 'closed' ? 'closed' : 'not open' }}, so no entry is admitted automatically.
-              }
-            </p>
-            <form novalidate (submit)="$event.preventDefault(); confirmAdmit()">
-              <div class="field">
-                <label for="admit-reason">Private reason (required)</label>
-                <textarea
-                  id="admit-reason"
-                  #reasonInput
-                  rows="3"
-                  maxlength="500"
-                  [value]="reason()"
-                  (input)="reason.set(reasonInput.value); reasonError.set(null)"
-                  [readOnly]="state() === 'busy'"
-                  [attr.aria-invalid]="reasonError() ? 'true' : null"
-                  [attr.aria-describedby]="reasonError() ? 'admit-reason-help admit-reason-error' : 'admit-reason-help'"
-                ></textarea>
-                <p class="help" id="admit-reason-help">Record why you are departing from queue order. This reason is private.</p>
-                @if (reasonError(); as message) {
-                  <p class="field-error" id="admit-reason-error"><herald-icon name="alert-circle" size="metadata" />Error: {{ message }}</p>
-                }
-              </div>
-              @if (failure(); as failed) {
-                <herald-notice tone="danger" [heading]="failed.heading">{{ failed.text }}</herald-notice>
-              }
-              <div class="actions">
-                <button herald-button variant="primary" type="submit" [disabled]="!reason().trim()" [loading]="state() === 'busy'">
-                  {{ state() === 'busy' ? 'Admitting…' : 'Admit ' + entry.guestName }}
-                </button>
-                <button herald-button type="button" (click)="close()">Back to entries</button>
-              </div>
-            </form>
-          </section>
-        }
-      }
-
-      @if (!field.data()!.entries.length) {
+      @if (!admitted().length && !waiting().length) {
         <section class="operation" aria-labelledby="empty-heading">
           <h2 id="empty-heading">No entries yet</h2>
           <p>Admitted and waiting entries will appear here. Each {{ kind() === 'team' ? 'team' : 'individual entry' }} takes one slot.</p>
         </section>
       }
-
       <section class="group" aria-labelledby="admitted-heading">
         <h2 id="admitted-heading">Admitted · {{ admitted().length }}</h2>
         @if (admitted().length) {
@@ -285,23 +140,162 @@
         }
       </section>
 
-      <section class="group" aria-labelledby="cancelled-heading">
-        <h2 id="cancelled-heading">Cancelled · {{ cancelled().length }}</h2>
-        @if (cancelled().length) {
-          <ul class="rows" aria-labelledby="cancelled-heading">
+      @if (cancelled().length) {
+        <details class="cancelled">
+          <summary>Cancelled · {{ cancelled().length }}</summary>
+          <ul aria-label="Cancelled entries">
             @for (entry of cancelled(); track entry.id) {
-              <li>
-                <div>
-                  <h3>{{ entry.guestName }}</h3>
-                  <p class="help">Cancelled · {{ zoned(entry.cancelledAt) }}</p>
-                </div>
-              </li>
+              <li><span class="name">{{ entry.guestName }}</span><span class="help">{{ ' · Cancelled ' + zoned(entry.cancelledAt) }}</span></li>
             }
           </ul>
-        } @else {
-          <p class="help">No cancelled entries.</p>
-        }
-      </section>
-    }
-  </div>
+        </details>
+      }
+    </div>
+  }
 }
+
+<ng-template #addDrawer>
+  <herald-drawer [heading]="addLabel()" [busy]="state() === 'busy'">
+    <p class="help">Choose a guest of {{ workingOrganisation.data()?.name ?? 'this organisation' }} or create a new {{ kind() }}.</p>
+    <div class="actions choices">
+      <button herald-button type="button" [attr.aria-pressed]="mode() === 'existing'" (click)="choose('existing')">Choose existing</button>
+      <button herald-button type="button" [attr.aria-pressed]="mode() === 'new'" (click)="choose('new')">Create new</button>
+    </div>
+    <form novalidate (submit)="$event.preventDefault(); mode() === 'new' && !matches() && createAndEnter()">
+      <div class="field">
+        <label for="guest-name">{{ mode() === 'existing' ? 'Search by name' : 'Name (alias)' }}</label>
+        <input
+          id="guest-name"
+          #nameInput
+          autocomplete="off"
+          maxlength="80"
+          [value]="name()"
+          (input)="typed(nameInput.value)"
+          [readOnly]="state() === 'busy'"
+          [attr.aria-invalid]="nameError() ? 'true' : null"
+          [attr.aria-describedby]="nameError() ? 'name-help name-error' : 'name-help'"
+        />
+        <p class="help" id="name-help">
+          {{ mode() === 'existing' ? 'Only ' + kind() + ' guests in ' + (workingOrganisation.data()?.name ?? 'this organisation') + '.' : '1–80 characters after trimming. Review the name before creating the guest.' }}
+        </p>
+        @if (nameError(); as message) {
+          <p class="field-error" id="name-error"><herald-icon name="alert-circle" size="metadata" />Error: {{ message }}</p>
+        }
+      </div>
+
+      @if (failure(); as failed) {
+        <herald-notice tone="danger" [heading]="failed.heading">{{ failed.text }}</herald-notice>
+      }
+      @if (matches(); as found) {
+        <herald-notice heading="Possible duplicate">
+          These {{ kind() }} guests have the same name ignoring case, accents and spaces. Choose one or create a separate guest. Nothing will be
+          merged.
+        </herald-notice>
+      }
+
+      @let results = matches() ?? (mode() === 'existing' && name().trim() ? (guests.data() ?? []) : []);
+      @if (mode() === 'existing' && name().trim() && !matches()) {
+        @if (guests.isPending()) {
+          <p class="help" role="status">Searching…</p>
+        } @else if (guests.isError()) {
+          <p class="help" role="status">The search failed. Change the name to try again.</p>
+        } @else if (!results.length) {
+          <p class="help" role="status">No {{ kind() }} guest starts with “{{ name().trim() }}”. Choose “Create new” to add one.</p>
+        }
+      }
+      @if (results.length) {
+        <ul class="rows guests" [attr.aria-label]="'Existing ' + kind() + ' guests'">
+          @for (guest of results; track guest.id) {
+            <li>
+              <div>
+                <h3>{{ guest.name }}</h3>
+                <p class="help">{{ created(guest) }}</p>
+              </div>
+              @if (activeGuests().has(guest.id)) {
+                <p class="help">Already entered in this tournament</p>
+              } @else {
+                <button herald-button variant="primary" type="button" [disabled]="state() === 'busy'" (click)="enterExisting(guest)">
+                  Enter this {{ kind() }}
+                </button>
+              }
+            </li>
+          }
+        </ul>
+      }
+
+      @if (state() === 'busy') {
+        <p class="help" role="status">Adding entry. Please wait; do not submit again.</p>
+      }
+      <div class="actions">
+        @if (mode() === 'new') {
+          @if (matches()) {
+            <button herald-button type="button" [loading]="state() === 'busy'" (click)="createAndEnter(true)">Create a new {{ kind() }} anyway</button>
+          } @else {
+            <button herald-button variant="primary" type="submit" [loading]="state() === 'busy'">
+              {{ state() === 'busy' ? 'Adding…' : failure() ? 'Retry add' : 'Create and enter ' + kind() }}
+            </button>
+          }
+        }
+        <button herald-button type="button" [disabled]="state() === 'busy'" (click)="close()">Back to entries</button>
+      </div>
+    </form>
+  </herald-drawer>
+</ng-template>
+
+<ng-template #cancelDialog>
+  @let entry = $any(panel())?.entry;
+  <herald-dialog [heading]="'Cancel ' + entry?.guestName + '’s entry?'" [busy]="state() === 'busy'">
+    <p>This cancellation is final for this entry. Entering {{ entry.guestName }} again creates a new entry at the back of the queue.</p>
+    <herald-notice heading="Effect on the waiting list">{{ effect() }}</herald-notice>
+    @if (failure(); as failed) {
+      <herald-notice tone="danger" [heading]="failed.heading">{{ failed.text }}</herald-notice>
+    }
+    <div heraldDialogActions>
+      <button herald-button variant="destructive" type="button" [loading]="state() === 'busy'" (click)="confirmCancel()">
+        {{ state() === 'busy' ? 'Cancelling…' : failure() ? 'Try again' : 'Confirm cancellation' }}
+      </button>
+      <button herald-button type="button" data-herald-initial-focus [disabled]="state() === 'busy'" (click)="close()">Keep entry</button>
+    </div>
+  </herald-dialog>
+</ng-template>
+
+<ng-template #admitDialog>
+  @let entry = $any(panel())?.entry;
+  <herald-dialog [heading]="'Admit ' + entry.guestName + ' ahead of ' + first()?.guestName + '?'" [busy]="state() === 'busy'">
+    <p>
+      One slot is free. {{ first()?.guestName }} is earlier in the capacity queue.
+      @if (field.data()!.terms.registration !== 'open') {
+        Registration is {{ field.data()!.terms.registration === 'closed' ? 'closed' : 'not open' }}, so no entry is admitted automatically.
+      }
+    </p>
+    <form novalidate (submit)="$event.preventDefault(); confirmAdmit()">
+      <div class="field">
+        <label for="admit-reason">Private reason (required)</label>
+        <textarea
+          id="admit-reason"
+          #reasonInput
+          rows="3"
+          maxlength="500"
+          [value]="reason()"
+          (input)="reason.set(reasonInput.value); reasonError.set(null)"
+          [readOnly]="state() === 'busy'"
+          [attr.aria-invalid]="reasonError() ? 'true' : null"
+          [attr.aria-describedby]="reasonError() ? 'admit-reason-help admit-reason-error' : 'admit-reason-help'"
+        ></textarea>
+        <p class="help" id="admit-reason-help">Record why you are departing from queue order. This reason is private.</p>
+        @if (reasonError(); as message) {
+          <p class="field-error" id="admit-reason-error"><herald-icon name="alert-circle" size="metadata" />Error: {{ message }}</p>
+        }
+      </div>
+      @if (failure(); as failed) {
+        <herald-notice tone="danger" [heading]="failed.heading">{{ failed.text }}</herald-notice>
+      }
+      <div class="actions">
+        <button herald-button variant="primary" type="submit" [disabled]="!reason().trim()" [loading]="state() === 'busy'">
+          {{ state() === 'busy' ? 'Admitting…' : failure() ? 'Try again' : 'Admit ' + entry.guestName }}
+        </button>
+        <button herald-button type="button" [disabled]="state() === 'busy'" (click)="close()">Back</button>
+      </div>
+    </form>
+  </herald-dialog>
+</ng-template>

@@ -1,15 +1,18 @@
 body { background: var(--herald-color-canvas-admin); }
 
+/* Pages use the whole width; only running text keeps a readable line length (visual direction §4). */
+main p:not(.panel) { max-inline-size: 75ch; }
+
 /* Standalone pages (access states, organisation creation): a panel and a side note under the top bar. */
-.standalone-page { display: grid; grid-template-columns: minmax(0, 560px) minmax(0, 360px); gap: var(--herald-space-16); padding: var(--herald-space-16); }
+.standalone-page { display: grid; gap: var(--herald-space-6); padding: var(--herald-space-16); }
 .panel { padding: var(--herald-space-8); background: var(--herald-color-surface-default); border: 1px solid var(--herald-color-border-default); }
 .panel h1 { font-size: 32px; margin-bottom: var(--herald-space-4); }
 .panel h2 { font-size: 20px; margin: var(--herald-space-6) 0 var(--herald-space-3); }
 .panel p { font-size: var(--herald-text-lg); }
 .panel herald-notice { margin-bottom: var(--herald-space-6); }
 .lead { color: var(--herald-color-text-secondary); font-size: var(--herald-text-lg); }
-.side-note { padding-top: var(--herald-space-8); }
 .side-note h2 { font-size: 20px; }
+.panel .side-note { margin-top: var(--herald-space-8); }
 .side-note p { color: var(--herald-color-text-secondary); font-size: var(--herald-text-lg); }
 
 .field { display: flex; flex-direction: column; gap: var(--herald-space-2); margin-top: var(--herald-space-6); }
@@ -23,10 +26,9 @@ body { background: var(--herald-color-canvas-admin); }
 .panel .field-error { color: var(--herald-color-feedback-danger); font-size: var(--herald-text-base); font-weight: 700; margin: 0; }
 .actions { display: flex; flex-wrap: wrap; gap: var(--herald-space-3); margin-top: var(--herald-space-6); }
 
-@media (max-width: 900px) {
-  .standalone-page { grid-template-columns: minmax(0, 1fr); gap: var(--herald-space-6); padding: var(--herald-space-6) var(--herald-space-4); }
+@media (max-width: 699px) {
+  .standalone-page { padding: var(--herald-space-6) var(--herald-space-4); }
   .panel { padding: var(--herald-space-6); }
   .panel h1 { font-size: 28px; }
   .actions { flex-direction: column; align-items: stretch; }
-  .side-note { padding-top: 0; }
 }

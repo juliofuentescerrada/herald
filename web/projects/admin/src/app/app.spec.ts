@@ -3,6 +3,7 @@ import { TestBed } from '@angular/core/testing';
 import { provideRouter, Router, Routes } from '@angular/router';
 import axe from 'axe-core';
 import { HeraldHostAdminService } from '@herald/api-client/admin';
+import { Toasts } from '@herald/ui';
 import { provideTanStackQuery, QueryClient } from '@tanstack/angular-query-experimental';
 import { of } from 'rxjs';
 import { AccessState, AUTH_CONFIG, CONFIRM, CONTEXT_LOCATION, INITIAL_CONTEXT, Session } from './platform';
@@ -23,7 +24,7 @@ const api = {
   getMe: () => of({ displayName: 'Ana Ruiz', organisations: owned.map((id) => ({ id, name: names[id] })) }),
 };
 
-async function openShell(url: string, organisation: string | null = northside, confirm: (message: string) => boolean = () => true) {
+async function openShell(url: string, organisation: string | null = northside, confirm: () => boolean = () => true) {
   const location = { assign: vi.fn(), reload: vi.fn(), replace: vi.fn() };
   TestBed.configureTestingModule({
     providers: [
@@ -179,5 +180,16 @@ describe('The admin shell', () => {
     await navigate(`/organisations/${northside}/switch`);
     expect(confirm).not.toHaveBeenCalled();
     expect(text('h1')).toBe('Choose an organisation');
+  });
+
+  it('shows one toast stack and removes its toasts when access stops', async () => {
+    const { element, fixture } = await openShell(`/organisations/${northside}`);
+    const toasts = TestBed.inject(Toasts);
+    toasts.show('Changes saved.');
+    await fixture.whenStable();
+    expect(element.querySelectorAll('herald-toast-outlet .herald-toast')).toHaveLength(1);
+    TestBed.inject(AccessState).report('session-expired');
+    await fixture.whenStable();
+    expect(toasts.toasts()).toEqual([]);
   });
 });

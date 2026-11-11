@@ -7,3 +7,7 @@ export { Notice } from './lib/notice';
 export type { NoticeTone } from './lib/notice';
 export { StatusLabel } from './lib/status-label';
 export type { StatusTone } from './lib/status-label';
+export { Dialog, Dialogs, Drawer } from './lib/dialog';
+export type { ConfirmOptions, DialogContext, DialogRef } from './lib/dialog';
+export { ToastOutlet, Toasts, toastDuration } from './lib/toast';
+export type { Toast, ToastTone } from './lib/toast';

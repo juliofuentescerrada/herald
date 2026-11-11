@@ -6,7 +6,7 @@ import { RouterTestingHarness } from '@angular/router/testing';
 import { HeraldHostAdminService, TournamentConfiguration, TournamentDetails } from '@herald/api-client/admin';
 import { provideTanStackQuery, QueryClient } from '@tanstack/angular-query-experimental';
 import { of } from 'rxjs';
-import { AppContext, CONFIRM, confirmLeave, QUERY_CLIENT, Session } from '../../platform';
+import { AppContext, CONFIRM, Confirmation, confirmLeave, QUERY_CLIENT, Session } from '../../platform';
 import { TournamentFormPage } from './tournament-form-page';
 import { TournamentListPage } from './tournament-list-page';
 import { TournamentReviewPage } from './tournament-review-page';
@@ -57,7 +57,7 @@ export const details = (over: Partial<TournamentDetails> = {}, config: Partial<T
 export const problem = (status: number, body: object = {}) =>
   new HttpErrorResponse({ status, error: body, headers: new HttpHeaders({ 'content-type': 'application/problem+json' }) });
 
-export async function open(path: string, api: object, confirm: (message: string) => boolean = () => true) {
+export async function open(path: string, api: object, confirm: (options: Confirmation) => boolean | Promise<boolean> = () => true) {
   const client = new QueryClient();
   const routed = [
     { path: 'tournaments', component: TournamentListPage },

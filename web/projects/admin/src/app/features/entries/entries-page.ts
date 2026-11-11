@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { ChangeDetectionStrategy, Component, computed, ElementRef, inject, signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, ElementRef, inject, signal, TemplateRef, viewChild, ViewContainerRef } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import {
   EntryDetails,
@@ -11,7 +11,7 @@ import {
   problemOf,
   TournamentDetails,
 } from '@herald/api-client/admin';
-import { Button, Icon, Notice, StatusLabel } from '@herald/ui';
+import { Button, Dialog, DialogContext, DialogRef, Dialogs, Drawer, Icon, Notice, StatusLabel, Toasts } from '@herald/ui';
 import { injectQuery } from '@tanstack/angular-query-experimental';
 import { firstValueFrom } from 'rxjs';
 import { AccessState, AppContext, injectWorkingOrganisation, QUERY_CLIENT } from '../../platform';
@@ -29,10 +29,7 @@ import {
   waitingReasonText,
 } from './entries';
 
-type Panel =
-  | { readonly kind: 'add' }
-  | { readonly kind: 'cancel' | 'admit'; readonly entry: EntryDetails; readonly trigger: HTMLElement | null }
-  | null;
+type Panel = { readonly kind: 'add' } | { readonly kind: 'cancel' | 'admit'; readonly entry: EntryDetails } | null;
 
 interface Failure {
   readonly heading: string;
@@ -42,7 +39,7 @@ interface Failure {
 /** A published tournament's entries: added as guests, admitted and cancelled by the owner (EN-1 to EN-12). */
 @Component({
   selector: 'app-entries-page',
-  imports: [Button, Icon, Notice, RouterLink, StatusLabel],
+  imports: [Button, Dialog, Drawer, Icon, Notice, RouterLink, StatusLabel],
   templateUrl: './entries-page.html',
   styleUrl: './entries-page.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -53,8 +50,14 @@ export class EntriesPage {
   private readonly access = inject(AccessState);
   private readonly organisation = inject(AppContext).organisation()!;
   private readonly tournamentId = inject(ActivatedRoute).snapshot.paramMap.get('tournamentId')!;
-  private readonly panelHeading = viewChild<ElementRef<HTMLElement>>('panelHeading');
-  private readonly addButton = viewChild('addButton', { read: ElementRef<HTMLElement> });
+  private readonly dialogs = inject(Dialogs);
+  private readonly toasts = inject(Toasts);
+  private readonly viewContainerRef = inject(ViewContainerRef);
+  private readonly addDrawer = viewChild.required<TemplateRef<DialogContext>>('addDrawer');
+  private readonly cancelDialog = viewChild.required<TemplateRef<DialogContext>>('cancelDialog');
+  private readonly admitDialog = viewChild.required<TemplateRef<DialogContext>>('admitDialog');
+  /** The open dialog or drawer, which shows `panel`. */
+  private open: DialogRef | null = null;
   private readonly summaryHeading = viewChild<ElementRef<HTMLElement>>('summaryHeading');
 
   protected readonly workingOrganisation = injectWorkingOrganisation();
@@ -74,8 +77,6 @@ export class EntriesPage {
   protected readonly panel = signal<Panel>(null);
   protected readonly state = signal<'ready' | 'busy' | 'conflict'>('ready');
   protected readonly failure = signal<Failure | null>(null);
-  /** The last outcome, for everyone and for screen readers. */
-  protected readonly announcement = signal('');
 
   // The add panel: choosing an existing guest or creating one, and the possible duplicates of a creation.
   protected readonly mode = signal<'existing' | 'new'>('existing');
@@ -122,9 +123,12 @@ export class EntriesPage {
     const field = this.field.data()!;
     return admittedText(field.admitted, { capacity: field.terms.capacity, entryKind: field.terms.entryKind });
   });
+  /** What waits for the owner: decisions under manual admission, slots under automatic (design D-6). */
   protected readonly policy = computed(() => {
-    const field = this.field.data()!;
-    return `${field.terms.admission === 'manual' ? 'Manual' : 'Automatic'} admission · ${field.waiting} waiting`;
+    const manual = this.field.data()!.terms.admission === 'manual';
+    const reason = manual ? 'admissionPending' : 'capacityFull';
+    const count = this.waiting().filter((entry) => entry.waitingReason === reason).length;
+    return manual ? `Manual admission · ${count} pending your decision` : `Automatic admission · ${count} waiting for a slot`;
   });
   protected readonly termsUpdated = computed(() => `Entry terms updated ${instantText(this.field.data()!.termsReceivedAt, this.zone())} · ${this.zone()}`);
 
@@ -159,11 +163,11 @@ export class EntriesPage {
   protected readonly waitingReason = waitingReasonText;
   protected readonly created = (guest: GuestDetails) => `Existing ${this.kind()} · created ${instantText(guest.createdAt, this.zone()).split(',')[0]}`;
 
-  protected openAdd(): void {
+  protected openAdd(trigger: HTMLElement): void {
     if (this.addBlocked()) return;
     this.mode.set('existing');
     this.resetAdd();
-    this.show({ kind: 'add' });
+    this.show({ kind: 'add' }, trigger);
   }
 
   protected choose(mode: 'existing' | 'new'): void {
@@ -180,7 +184,7 @@ export class EntriesPage {
   }
 
   protected askCancel(entry: EntryDetails, trigger: HTMLElement): void {
-    this.show({ kind: 'cancel', entry, trigger });
+    this.show({ kind: 'cancel', entry }, trigger);
   }
 
   /** In queue order, or a pending entry, admits at once; skipping the capacity queue asks for the reason first (EN-7). */
@@ -188,7 +192,7 @@ export class EntriesPage {
     if (entry.waitingReason === 'capacityFull' && this.first()?.id !== entry.id) {
       this.reason.set('');
       this.reasonError.set(null);
-      this.show({ kind: 'admit', entry, trigger });
+      this.show({ kind: 'admit', entry }, trigger);
       return;
     }
     void this.run('Entry was not admitted', () => this.send('admit', entry), `${entry.guestName} admitted.`);
@@ -234,27 +238,30 @@ export class EntriesPage {
     }, '');
   }
 
-  /** Closes a panel and gives focus back to what opened it. */
+  /** Closes the dialog or drawer without a change; focus goes back to what opened it. */
   protected close(): void {
-    const panel = this.panel();
-    this.panel.set(null);
-    this.failure.set(null);
-    const trigger = panel && panel.kind !== 'add' ? panel.trigger : this.addButton()?.nativeElement;
-    setTimeout(() => trigger?.focus());
+    this.open?.close();
   }
 
   protected async reload(): Promise<void> {
     await Promise.all([this.field.refetch(), this.tournament.refetch()]);
     this.state.set('ready');
     this.failure.set(null);
-    this.panel.set(null);
+    this.close();
   }
 
-  private show(panel: Panel): void {
+  private show(panel: Exclude<Panel, null>, trigger: HTMLElement): void {
     this.panel.set(panel);
     this.failure.set(null);
-    this.announcement.set('');
-    setTimeout(() => this.panelHeading()?.nativeElement.focus());
+    const open = this.dialogs.open({ add: this.addDrawer, cancel: this.cancelDialog, admit: this.admitDialog }[panel.kind](), { trigger, viewContainerRef: this.viewContainerRef });
+    this.open = open;
+    // Escape, the leaving action and a completed write all end here.
+    void open.closed.then(() => {
+      if (this.open !== open) return;
+      this.open = null;
+      this.panel.set(null);
+      this.failure.set(null);
+    });
   }
 
   private resetAdd(): void {
@@ -282,7 +289,6 @@ export class EntriesPage {
     if (this.state() !== 'ready') return;
     this.state.set('busy');
     this.failure.set(null);
-    this.announcement.set('');
     try {
       const field = await write();
       this.state.set('ready');
@@ -300,15 +306,19 @@ export class EntriesPage {
     void this.queries.invalidateQueries({ queryKey: tournamentsKey(this.organisation) });
     void this.queries.invalidateQueries({ queryKey: guestsKey(this.organisation) });
     const entered = this.entryAttempt && field.entries.find((entry) => entry.id === this.entryAttempt!.id);
-    this.announcement.set(
-      entered ? `${entered.guestName} added · ${entered.state === 'admitted' ? 'Admitted' : `Waiting: ${waitingReasonText(entered)}`}.` : done,
-    );
+    const outcome = entered ? `${entered.guestName} added · ${entered.state === 'admitted' ? 'Admitted' : `Waiting: ${waitingReasonText(entered)}`}.` : done;
+    if (outcome) this.toasts.show(outcome);
     this.guestAttempt = null;
     this.entryAttempt = null;
     this.resetAdd();
-    this.panel.set(null);
     // The row that opened the write may have moved or lost its action: focus goes to the counts, which changed.
-    setTimeout(() => this.summaryHeading()?.nativeElement.focus());
+    const open = this.open;
+    if (open) {
+      this.close();
+      void open.closed.then(() => this.summaryHeading()?.nativeElement.focus());
+    } else {
+      setTimeout(() => this.summaryHeading()?.nativeElement.focus());
+    }
   }
 
   private fail(heading: string, error: unknown): void {
@@ -316,7 +326,9 @@ export class EntriesPage {
     if (this.access.problem()) return;
     const status = error instanceof HttpErrorResponse ? error.status : 0;
     if (status === 409 && problemOf<{ type?: string }>(error)?.type === 'entry-revision-conflict') {
+      // A conflict is explained on the page, which the dialog would cover.
       this.state.set('conflict');
+      this.close();
       return;
     }
 

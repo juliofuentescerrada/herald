@@ -19,7 +19,7 @@ import { Button } from '@herald/ui';
     .eyebrow { margin-bottom: var(--herald-space-2); color: var(--herald-color-text-secondary); font-size: var(--herald-text-sm); font-weight: 800; letter-spacing: 2px; text-transform: uppercase; }
     h1 { font-size: 40px; }
     p { font-size: var(--herald-text-lg); margin-bottom: var(--herald-space-6); }
-    @media (max-width: 700px) { .not-found { padding: var(--herald-space-12) var(--herald-space-4); } h1 { font-size: 32px; } }
+    @media (max-width: 699px) { .not-found { padding: var(--herald-space-12) var(--herald-space-4); } h1 { font-size: 32px; } }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

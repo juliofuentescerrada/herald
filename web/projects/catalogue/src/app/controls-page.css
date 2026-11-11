@@ -13,6 +13,8 @@ tbody th { text-transform: capitalize; }
 .row { display: flex; flex-wrap: wrap; align-items: center; gap: var(--herald-space-4); }
 .sample { display: inline-flex; align-items: center; gap: var(--herald-space-2); }
 .stack { display: grid; gap: var(--herald-space-4); }
+.field { display: grid; gap: var(--herald-space-1); margin-bottom: var(--herald-space-4); }
+.field input { min-height: var(--herald-target-min); padding: 0 var(--herald-space-3); border: 1px solid var(--herald-color-border-control); border-radius: var(--herald-radius-default); }
 .rail { width: 224px; padding: var(--herald-space-4); background: var(--herald-color-surface-inverse); }
 @media (max-width: 700px) {
   main { padding: var(--herald-space-6) var(--herald-space-4); }

@@ -72,7 +72,7 @@ import { dateTimeText, fieldLabels, instantText, registrationText } from './tour
     ul { margin: 0 0 var(--herald-space-4); padding-left: var(--herald-space-6); }
     li { padding: var(--herald-space-1) 0; }
     a { color: inherit; }
-    @media (max-width: 700px) { dl { grid-template-columns: 1fr; } }
+    @media (max-width: 699px) { dl { grid-template-columns: 1fr; } }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

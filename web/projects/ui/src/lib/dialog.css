@@ -1,0 +1,38 @@
+/* Modal surfaces (visual direction §5): a dimmed backdrop, a square bordered panel. */
+.herald-dialog {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: grid;
+  place-items: center;
+  padding: var(--herald-space-4);
+  background: color-mix(in srgb, var(--herald-color-text-primary) 60%, transparent);
+}
+.herald-dialog-panel {
+  width: 560px;
+  max-width: 100%;
+  max-height: 100%;
+  overflow: auto;
+  padding: var(--herald-space-6);
+  border: 1px solid var(--herald-color-border-control);
+  border-radius: var(--herald-radius-default);
+  background: var(--herald-color-surface-default);
+  color: var(--herald-color-text-primary);
+}
+.herald-dialog-panel:focus { outline: none; }
+.herald-dialog-heading { margin-bottom: var(--herald-space-4); font-size: 20px; }
+.herald-dialog-body > * { max-width: 75ch; }
+.herald-dialog-body > herald-notice,
+.herald-dialog-body > .herald-notice { margin-bottom: var(--herald-space-4); }
+.herald-dialog [heralddialogactions] { display: flex; flex-wrap: wrap; gap: var(--herald-space-3); margin-top: var(--herald-space-2); }
+
+.herald-dialog[data-placement='side'] { place-items: stretch end; padding: 0; }
+.herald-dialog[data-placement='side'] .herald-dialog-panel { width: 480px; height: 100%; border-width: 0 0 0 1px; }
+
+@media (max-width: 699px) {
+  .herald-dialog { place-items: end stretch; padding: 0; }
+  .herald-dialog-panel { width: 100%; padding: var(--herald-space-6) var(--herald-space-4); }
+  .herald-dialog[data-placement='side'] { place-items: stretch; }
+  .herald-dialog[data-placement='side'] .herald-dialog-panel { width: 100%; border: 0; }
+  .herald-dialog [heralddialogactions] { flex-direction: column; align-items: stretch; }
+}

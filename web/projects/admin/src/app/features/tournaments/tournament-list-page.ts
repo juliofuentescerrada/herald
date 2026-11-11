@@ -69,11 +69,10 @@ import { admittedText, capacityText, dateTimeText, injectOrganisation, lifecycle
     }
   `,
   styles: `
-    .heading { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--herald-space-4); margin-bottom: var(--herald-space-6); max-width: 1040px; }
+    .heading { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--herald-space-4); margin-bottom: var(--herald-space-6); }
     h1 { font-size: 32px; margin-bottom: var(--herald-space-2); }
-    .panel { max-width: 1040px; }
     .panel h2 { margin-top: 0; }
-    .tournaments { list-style: none; margin: 0; padding: 0; max-width: 1040px; background: var(--herald-color-surface-default); border: 1px solid var(--herald-color-border-default); }
+    .tournaments { list-style: none; margin: 0; padding: 0; background: var(--herald-color-surface-default); border: 1px solid var(--herald-color-border-default); }
     li { display: flex; align-items: center; justify-content: space-between; gap: var(--herald-space-4); padding: var(--herald-space-6); }
     li + li { border-top: 1px solid var(--herald-color-border-default); }
     li h2 { font-size: 20px; margin: 0 0 var(--herald-space-2); }
@@ -81,7 +80,7 @@ import { admittedText, capacityText, dateTimeText, injectOrganisation, lifecycle
     .capacity { font-weight: 700; font-size: var(--herald-text-lg); margin: 0 0 var(--herald-space-3); }
     .labels { display: flex; flex-wrap: wrap; gap: var(--herald-space-2); margin: 0; }
     .row-actions { display: flex; flex: none; gap: var(--herald-space-3); }
-    @media (max-width: 700px) {
+    @media (max-width: 699px) {
       h1 { font-size: 28px; }
       .heading, li, .row-actions { flex-direction: column; align-items: stretch; }
     }

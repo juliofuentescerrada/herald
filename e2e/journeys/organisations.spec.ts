@@ -40,14 +40,12 @@ test('Leaving the creation form with typed input asks first, and declining keeps
   const name = uniqueName();
   await page.getByLabel('Organisation name').fill(name);
 
-  let asked = '';
-  page.once('dialog', (dialog) => {
-    asked = dialog.message();
-    void dialog.dismiss();
-  });
   await page.getByRole('link', { name: 'HERALD' }).click();
 
-  expect(asked).toBe('Discard your unsaved input? It is not saved anywhere.');
+  const dialog = page.getByRole('dialog', { name: 'Leave without saving your changes?' });
+  await expect(dialog.getByRole('button', { name: 'Stay on this page' })).toBeFocused();
+  await dialog.getByRole('button', { name: 'Stay on this page' }).click();
+  await expect(dialog).toBeHidden();
   await expect(page).toHaveURL(`${urls.admin}/organisations/new`);
   await expect(page.getByLabel('Organisation name')).toHaveValue(name);
 });

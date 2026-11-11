@@ -102,8 +102,11 @@ State backgrounds use a pale tint of the relevant semantic hue, with explicit te
 | Table row | 48 px compact desktop; 56–64 px comfortable |
 | Radius | 0 px throughout: square corners for controls, cards, dialogs, notices, status labels and avatar containers |
 | Elevation | Borders first; restrained shadow for overlays and menus |
-| Content width | Public max 1200 px; admin fluid with protected table readability |
+| Content width | Admin: every page fills the available width, with no maximum. Public: content capped at 1200 px. Running text about 75 characters per line in any width |
+| Breakpoints | 700 px (below: one column, narrower gutters); no others |
 | Motion | Short 120–180 ms feedback; reduced-motion alternative; no ornamental looping animation |
+
+Admin pages set no maximum width: content, panels and notices fill the area beside the rail (or under the top bar on standalone pages). A summary or secondary section is stacked with the main content at every width, in the order the page states; there is no aside. A summary's action sits to the right of its text and moves under it when there is no room; a page title's status labels sit beside the title and wrap below it. Below 700 px everything stacks in one column with no horizontal scrolling. Paragraphs keep `max-inline-size: 75ch` whatever their container's width. The public width is the `ui` token `--herald-width-public`; the breakpoint is written in stylesheets because media queries cannot read custom properties.
 
 Spacing uses the declared scale, including 12 px. Border and focus strokes (1 and 3 px), 44 px interaction targets, column/content widths, icon sizes and breakpoints are dimensions rather than spacing steps. The public shell retains a fluid `max(5vw, 24px)` outer gutter; this is an explicit responsive exception. Negative 8 px navigation alignment remains on the spacing scale.
 
@@ -126,12 +129,29 @@ Implementation boundary (ADR 0011): an internal Angular `ui` library supplies sh
 | Entrant identity | Name, individual/team kind and stable context | Eligibility and readiness detail | Public identity and relevant participation information |
 | Score | Outcome, score unit and cause; pending/effective distinction | Edit/correct with authority | Read and report with permission |
 | Alert | Severity, explanation and next action | Persistent blockers near the affected operation | Explain failed or unavailable user actions |
-| Dialog | Scope, consequences, clear cancel/confirm | Finalisation, correction and cancellation | Registration confirmation or withdrawal |
-| Drawer | Secondary details while preserving context | Match report, entrant or roster detail | Optional on wide screens; full-screen flow on mobile |
+| Dialog | Modal; title is the question; consequence and effect on other records; confirming action (destructive when it destroys) and a leaving action; Escape leaves; focus trapped and returned; busy state that cannot close or repeat; errors inside with a retry; full width at the bottom on narrow screens | Cancelling an entry, out-of-order admission with a reason, discarding typed input, leaving a form with unsaved input, finalisation and correction | Registration confirmation or withdrawal |
+| Drawer | The dialog's rules with a side placement: about 480 px from the right on wide screens, the page visible behind its backdrop; full screen below 700 px; keeps typed input when a request fails | Adding a player or team; match report, entrant or roster detail | Optional on wide screens; full-screen flow on mobile |
+| Toast | Outcome of the person's own completed action; success and info tones only; one stack, bottom right on wide screens and along the bottom on narrow ones without covering the primary action; at most three, older ones leave first; at least 5 seconds, paused on hover and focus; dismissible; polite announcement; never rendered on the server | Entry added, admitted or cancelled; changes saved | Reserved for later personal actions |
 | Notice | State change linked to current record | Operational action or acknowledgement | Own/team next action |
 | Pagination | Visible range, next/previous and current filters | Large entry/match lists | Discovery and history |
 
-A toast confirms a completed action, but never replaces a persistent validation error or critical state. Loading buttons prevent accidental repeats without pretending that the operation has already succeeded.
+Loading buttons prevent accidental repeats without pretending that the operation has already succeeded.
+
+**Feedback placement.** Every message goes where its cause is:
+
+| Message | Where | Stays until |
+| --- | --- | --- |
+| Outcome of the person's own completed action | Toast | It times out or is dismissed; cleared on a change of organisation or person |
+| Field error | At the field and in the form's error summary | The value is corrected |
+| Failed action started in a dialog or drawer | Danger notice inside it; it stays open with what was typed and offers a retry | Retry succeeds or the person leaves |
+| Failed page load | The page's failed state with a retry, no stale or partial records | Retry succeeds |
+| Conflict, or a state that blocks actions (over capacity) | Persistent notice on the page with its next action ("Reload latest") | Resolved or the page is reloaded |
+
+An error is never only a toast, and a toast never holds the only copy of information needed later or the only path to an action: the page also shows the outcome (the entry moves group, the form shows the saved values).
+
+**Confirmation pattern.** An action with consequences that can be decided with one question and at most a short input confirms in a modal dialog. A flow of several steps that benefits from keeping the page in view opens in a drawer. A review of many values before a consequential action is its own page (review before publishing). An action that is reversible and changes nothing else acts at once with no confirmation (admitting in order, opening or closing registration). Browser `confirm` prompts are not used inside the applications; only closing or reloading the tab keeps the browser's own prompt.
+
+**Visual weight follows actionability.** Records a person can act on come first at full weight. Read-only history follows them compactly, collapsed by default when it would compete with them, with its count visible while collapsed (“Cancelled · 5”), one line per record and no row actions, and it is omitted when empty. A summary states what waits for the person's decision when there is something (“Manual admission · 2 pending your decision”, “Automatic admission · 2 waiting for a slot”).
 
 ### 5.1 Required component states
 
@@ -169,7 +189,23 @@ A persistent graphite rail identifies Herald, organisation context and major des
 
 The header includes tournament name, game/variant, individual/team mode, venue/date and separate lifecycle facts. The primary action reflects the current phase, such as close registration, publish round or finalise. It is not a permanently enabled “Start tournament” button.
 
-### 7.2 First admin mockup: round operations
+### 7.2 Page compositions
+
+Every admin page uses the full width and one column.
+
+| Page | Order |
+| --- | --- |
+| Tournament list | Title and "Create tournament", then the list |
+| Tournament entries | Title with its labels beside it; summary (counts, what waits, terms update) with "Add player"/"Add team" on its right and the reason under it when unavailable; admitted and waiting groups; the collapsed cancelled group |
+| Configuration of a published tournament | Title with its labels; "Published · configuration remains editable"; registration area; entries summary with "View entries" on its right; the form |
+| Configuration of a draft, and creating a tournament | Title with its labels; the missing-for-publication summary above the form, next to the fields its links lead to; the form |
+| Review before publishing | Title, lead and labels; the summary and its actions |
+| Organisation selector, not found | The list or message across the width |
+| Organisation creation | One panel: the form, then "A workspace of your own" |
+
+New admin pages fill the width and stack secondary content with the main content, putting what a person acts on first. The captures in `docs/assets/mockups/feedback-layout/` show the earlier named widths and asides; for composition the rules above supersede them.
+
+### 7.3 First admin mockup: round operations
 
 Illustrative scenario: an individual eight-entry round-robin league. Registration is closed, competition is running, the first round has four matches. The view prioritises unresolved matches, accepts operator results, and provides standings as a secondary surface. As individual 1v1, it contains no roster/lineup tab.
 
@@ -183,7 +219,7 @@ Suggested layout:
 
 Do not imply that resolving round one is required before any later round can be played in every league. The particular schedule and operational policy determine availability.
 
-### 7.3 Team variation
+### 7.4 Team variation
 
 The same match table uses team names as its opposing entries. Rows can expose `Lineup ready` or `4 of 5 eligible` and open a team detail drawer. Roster management appears in Entries or an applicable team section. Only team profiles introduce these controls. A seven-member roster selects five starters without changing capacity or entrant identity.
 
@@ -191,7 +227,7 @@ The same match table uses team names as its opposing entries. Rows can expose `L
 
 ### 8.1 Shell
 
-A compact top navigation contains Herald, tournaments and an account or sign-in action. Organising is a secondary route for authorised users or an invitation to create an organisation. The public experience is not a marketing site requiring a large hero on every page.
+A compact top navigation contains Herald, tournaments and an account or sign-in action. Organising is a secondary route for authorised users or an invitation to create an organisation. The public experience is not a marketing site requiring a large hero on every page. Public content is capped at 1200 px and centred, with the fluid `max(5vw, 24px)` outer gutter; toasts follow §5 and appear only in the browser, never in server-rendered output.
 
 ### 8.2 First visitor mockup: discovery
 
@@ -237,6 +273,7 @@ The prototypes are documentation assets. They do not create an Angular workspace
 | UJ-02 setup (individual and team) | [Tournament setup state review](../prototypes/frontend/tournament-setup-states.html) and [18-state desktop/mobile capture table](assets/mockups/tournament-setup/README.md): list empty/populated/loading/failed; new, saved individual and team drafts; publication blocked; validation errors; saving, save failed, revision conflict; individual and team review; publishing, publication failed; published individual and team. Replaces journeys `step=setup` and state `configuration` for these screens | Implemented by `h1-tournament-setup` (11 November 2026) with corrections V-1 to V-6 and deviation Q-1 of its design, which supersede the captures: no draft sentence on a published tournament; the error summary is as wide as the form and reads "Correct N fields to save"; each date-time is also written as "14 November 2026, 10:00"; a field in error has a danger border, an icon and "Error:"; the rail has no Organisation destination; the time zone is proposed from the browser. Also differing: the action reads "Review and publish"; the review names the tournament, not the organisation; the published notice uses the information tone. Still required: visibility effects and the public page; cancellation/archival and deadline-change states under D-27 |
 | UJ-02 registration window | [Registration window state review](../prototypes/frontend/registration-window-states.html) and [11-state desktop/mobile capture table](assets/mockups/registration-window/README.md): not open ready and with missing dates, unsaved changes, opening, open, open failed, closing, closed, conflict, a date removed while open; list with the three registration labels | Implemented by `h1-registration-window` (11 November 2026) with corrections W-1 to W-3 of its design, which supersede the captures: the last change names no person; the shell and help texts are the implemented ones; list rows keep their capacity line. Also differing: notices use `herald-notice`; the action keeps its own width on narrow screens. Still required: entries and their effect on capacity and entry kind |
 | UJ-02 guest entries | [Entries state review](../prototypes/frontend/entries-states.html) and [22-state desktop/mobile capture table](assets/mockups/entries/README.md): empty, not open, automatic full, manual team, closed; add existing/new/possible duplicate/adding/failed; admission unavailable and out of order; cancellation open and closed; conflict, over capacity, loading, failed; entries link, locked fields, capacity rejected; list with entries | Implemented by `h1-entries` (11 November 2026) with corrections V-1 and V-2 of its design, which supersede the captures: a guest has no human reference and same-name guests are told apart by creation date; the shell is the implemented one. Also differing: "Entry terms updated" instead of "Counts and entry terms updated"; an already-entered guest is marked in search results; notices keep the `ui` width; the entries link sits beside its summary on desktop. Still required: rosters, check-in, guest editing and aliases |
+| Feedback and layout (all admin screens, public home, `ui` catalogue) | [Feedback and layout state review](../prototypes/frontend/feedback-layout-states.html) and [38-state desktop/mobile capture table](assets/mockups/feedback-layout/README.md): entries wide with aside (superseded), cancelled collapsed and expanded, pending decisions; cancellation and out-of-order admission dialogs (open, closed, busy, failed, reason empty and typed); add drawer (search, create, duplicate, adding, failed); toasts (one, stacked and focused); conflict, over capacity, loading, failed; configuration published, saved, rejected, conflict, reload and leave dialogs, draft; list wide and empty; review; organisation selector, creation, not found; public home at 1920 px; catalogue dialog, drawer and toast | Implemented by `ui-feedback-and-layout` (11 November 2026), with the rules in §4, §5, §7.2 and §8.1; differences recorded in its design, which supersede the captures: after the maintainer's run (design D-9) admin pages fill the width with no aside, labels beside the title, summary actions on the right and notices filling their container; the public hero band stays full width with its content capped; the catalogue opens the real overlays instead of inline specimens; a toast can briefly sit over content near the bottom of the screen. Earlier captures of the entries, setup and registration slices remain valid for content and states only |
 | UJ-02 entries/check-in | Journeys `step=entries`; state `entries`: admitted/confirmed, pending check-in, waiting after final-slot conflict, explicit review action | Guest creation/duplicate review and alias editor under D-22; confirmation of the admission/promotion policy |
 | UJ-03 team preparation | Journeys `kind=team&step=setup` and `step=readiness`; states `team-blocked`/`team-ready`: one team slot, roster seven, five starters/two reserves, freeze, 4-of-5 blocker and both valid locks | Identity conflict and competitive sanction/departure variants under D-23; valid lock is not evidence of play |
 | UJ-02/03 rounds and results | Journeys `step=rounds`/`step=result`; individual demo; state `administrative-result`: played versus pre-play no-show, no fabricated score or appearances | Draft/published pairing revision changes and remaining D-25 terminal outcomes, including double absence/no contest |
