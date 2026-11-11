@@ -44,6 +44,7 @@ The suite SHALL cover these journeys, each as one test named as a sentence:
 12. An owner opens the registration of a published tournament, sees it open in the list, closes it and reopens it.
 13. An owner enters players in an individual tournament with automatic admission until it is full, sees the next one wait, cancels an admitted entry and sees the waiting one admitted.
 14. An owner enters teams in a team tournament with manual admission, is warned of a possible duplicate team and enters the existing one, and admits a pending team.
+15. An owner builds a team's roster to its minimum, is stopped from adding a player who is on another team's roster, and sees the team's roster complete.
 
 #### Scenario: Each journey checks what the person sees
 - **WHEN** a journey runs

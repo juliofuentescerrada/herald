@@ -1,6 +1,6 @@
 ## Status
 
-**Approved for implementation on 11 November 2026** (gate 1.1). The maintainer chose the scope and the rules R-1 to R-10 of `design.md` after the exploration of the same day, supplied the mockups ([team roster states](../../../docs/assets/mockups/team-rosters/README.md)) and approved the proposal, the specs, the design and the assumptions A-1 to A-5, all the same day.
+**Approved for implementation on 11 November 2026** (gate 1.1). The maintainer chose the scope and the rules R-1 to R-10 of `design.md` after the exploration of the same day, supplied the mockups ([team roster states](../../../../docs/assets/mockups/team-rosters/README.md)) and approved the proposal, the specs, the design and the assumptions A-1 to A-5, all the same day.
 
 ## Why
 
