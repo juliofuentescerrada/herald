@@ -44,6 +44,15 @@ public sealed class OrganisationApi : IAsyncLifetime
     public async Task PublishAndWaitAsync(object message) =>
         await _host!.Services.GetRequiredService<IHost>().TrackActivity().PublishMessageAndWaitAsync(message);
 
+    // Runs a request and waits until every message it causes has been handled, in every module.
+    public async Task<T> SettledAsync<T>(Func<Task<T>> request)
+    {
+        T result = default!;
+        await _host!.Services.GetRequiredService<IHost>().TrackActivity()
+            .ExecuteAndWaitAsync((Func<Wolverine.IMessageContext, Task>)(async _ => result = await request()));
+        return result;
+    }
+
     public async Task ExecuteAsync(string sql, Guid parameter)
     {
         await using var connection = new NpgsqlConnection(_container.GetConnectionString());

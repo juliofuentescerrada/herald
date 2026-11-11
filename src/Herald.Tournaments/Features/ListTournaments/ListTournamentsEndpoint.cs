@@ -21,7 +21,9 @@ public sealed record TournamentSummary(
     string? Venue,
     Publication Publication,
     RegistrationWindow Registration,
-    string Competition);
+    string Competition,
+    int AdmittedEntries,
+    int WaitingEntries);
 
 public static class ListTournamentsEndpoint
 {
@@ -36,6 +38,10 @@ public static class ListTournamentsEndpoint
             .OrderByDescending(tournament => tournament.CreatedAt)
             .Select(tournament => new { tournament.Id, tournament.Configuration, tournament.Publication, tournament.Registration })
             .ToListAsync(cancellationToken);
+        var ids = tournaments.Select(tournament => tournament.Id).ToList();
+        var counts = await db.FieldCounts.AsNoTracking()
+            .Where(field => ids.Contains(field.TournamentId))
+            .ToDictionaryAsync(field => field.TournamentId, field => field.Counts, cancellationToken);
 
         return [.. tournaments.Select(tournament => new TournamentSummary(
             tournament.Id.Value,
@@ -49,6 +55,8 @@ public static class ListTournamentsEndpoint
             tournament.Configuration.Venue,
             tournament.Publication,
             tournament.Registration,
-            TournamentDetails.CompetitionPreparation))];
+            TournamentDetails.CompetitionPreparation,
+            counts.GetValueOrDefault(tournament.Id).Admitted,
+            counts.GetValueOrDefault(tournament.Id).Waiting))];
     }
 }

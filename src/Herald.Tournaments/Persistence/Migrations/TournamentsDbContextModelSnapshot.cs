@@ -143,6 +143,25 @@ namespace Herald.Tournaments.Persistence.Migrations
                     b.ToTable("Tournaments", "tournaments");
                 });
 
+            modelBuilder.Entity("Herald.Tournaments.Persistence.FieldCounts", b =>
+                {
+                    b.Property<Guid>("TournamentId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Admitted")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Revision")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Waiting")
+                        .HasColumnType("integer");
+
+                    b.HasKey("TournamentId");
+
+                    b.ToTable("FieldCounts", "tournaments");
+                });
+
             modelBuilder.Entity("Wolverine.EntityFrameworkCore.Internals.IncomingMessage", b =>
                 {
                     b.Property<Guid>("Id")

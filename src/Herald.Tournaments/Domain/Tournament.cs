@@ -31,6 +31,14 @@ public enum WriteOutcome
     Rejected,
 }
 
+// The tournament's entries as Registration last reported them (design D-3); none before the first report.
+public readonly record struct EntryCounts(int Admitted, int Waiting)
+{
+    public static readonly EntryCounts None = new(0, 0);
+
+    public int Active => Admitted + Waiting;
+}
+
 public readonly record struct WriteResult(WriteOutcome Outcome, IReadOnlyList<BrokenRule> Broken)
 {
     public static implicit operator WriteResult(WriteOutcome outcome) => new(outcome, []);
@@ -101,7 +109,7 @@ public sealed class Tournament : AggregateRoot<TournamentId>
     // A creation with the same identifier is a retry only when its content matches.
     public bool Repeats(TournamentConfiguration configuration) => Configuration == configuration.Normalised();
 
-    public WriteResult Change(TournamentConfiguration configuration, int expectedRevision, Guid actor, DateTimeOffset at)
+    public WriteResult Change(TournamentConfiguration configuration, int expectedRevision, Guid actor, DateTimeOffset at, EntryCounts entries = default)
     {
         configuration = configuration.Normalised();
         if (configuration == Configuration)
@@ -119,6 +127,11 @@ public sealed class Tournament : AggregateRoot<TournamentId>
         {
             // A published tournament stays complete (R-5), and keeps its announced window while registration is open (RW-5).
             broken = Required(configuration, withRegistrationDates: Registration == RegistrationWindow.Open);
+        }
+
+        if (broken.Count == 0)
+        {
+            broken = LockedByEntries(configuration, entries);
         }
 
         if (broken.Count > 0)
@@ -206,6 +219,28 @@ public sealed class Tournament : AggregateRoot<TournamentId>
         ChangeRegistration(RegistrationWindow.Closed, actor, at);
         Raise(new TournamentRegistrationClosed(Id, actor, at));
         return WriteOutcome.Applied;
+    }
+
+    // Entries keep their slots and their kind: capacity cannot fall below the admitted, and kind and admission wait until none is active (EN-10).
+    private List<BrokenRule> LockedByEntries(TournamentConfiguration configuration, EntryCounts entries)
+    {
+        var broken = new List<BrokenRule>();
+        if (configuration.Capacity < entries.Admitted)
+        {
+            broken.Add(new("capacity", "below-admitted"));
+        }
+
+        if (entries.Active > 0 && configuration.EntryKind != Configuration.EntryKind)
+        {
+            broken.Add(new("entryKind", "locked-by-entries"));
+        }
+
+        if (entries.Active > 0 && configuration.Admission != Configuration.Admission)
+        {
+            broken.Add(new("admission", "locked-by-entries"));
+        }
+
+        return broken;
     }
 
     private static List<BrokenRule> Required(TournamentConfiguration configuration, bool withRegistrationDates) =>

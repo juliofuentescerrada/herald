@@ -22,10 +22,10 @@
 
 ## 5. Tournaments
 
-- [ ] 5.1 Publish `TournamentEntryTermsChanged` with every effective change of a published tournament; `FieldCounts` projection with its handler and migration `AddFieldCounts`
-- [ ] 5.2 EN-10 in saves (`below-admitted`, `locked-by-entries`); `TournamentDetails`/`TournamentSummary` gain the entry counts
-- [ ] 5.3 Tests: domain tests for EN-10; API tests for the modified `tournament-setup` and `registration-window` scenarios, end to end across both modules (reopening fills free slots, closing keeps entries, counts in the list)
-- [ ] 5.4 Regenerate Wolverine code (`codegen write`) and the OpenAPI documents and client (`pnpm api:generate`)
+- [x] 5.1 Publish `TournamentEntryTermsChanged` with every effective change of a published tournament; `FieldCounts` projection with its handler and migration `AddFieldCounts`
+- [x] 5.2 EN-10 in saves (`below-admitted`, `locked-by-entries`); `TournamentDetails`/`TournamentSummary` gain the entry counts
+- [x] 5.3 Tests: domain tests for EN-10; API tests for the modified `tournament-setup` and `registration-window` scenarios, end to end across both modules (reopening fills free slots, closing keeps entries, counts in the list)
+- [x] 5.4 Regenerate Wolverine code (`codegen write`) and the OpenAPI documents and client (`pnpm api:generate`)
 
 ## 6. Admin application
 

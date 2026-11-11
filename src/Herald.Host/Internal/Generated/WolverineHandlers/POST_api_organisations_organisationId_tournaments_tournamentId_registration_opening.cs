@@ -34,6 +34,7 @@ namespace Internal.Generated.WolverineHandlers
             await using var tournamentsDbContext = new Herald.Tournaments.Persistence.TournamentsDbContext(_dbContextOptionsOfTournamentsDbContext, organisationContext);
             var messageContext = new Wolverine.Runtime.MessageContext(_wolverineRuntime);
             Wolverine.Http.HttpHandler.RequestActivity(httpContext)?.SetTag("handler.type", "Herald.Tournaments.Features.OpenRegistration.OpenRegistrationEndpoint").SetTag("http.route", "/api/organisations/{organisationId}/tournaments/{tournamentId}/registration/opening").SetTag("http.request.method", "POST");
+            Wolverine.Http.Runtime.RequestIdMiddleware.Apply(httpContext, messageContext);
             
             // Enroll the DbContext & IMessagingContext in the outgoing Wolverine outbox transaction
             var efCoreEnvelopeTransaction = new Wolverine.EntityFrameworkCore.Internals.EfCoreEnvelopeTransaction(tournamentsDbContext, messageContext, _domainEventScraperIEnumerable);
@@ -75,7 +76,7 @@ namespace Internal.Generated.WolverineHandlers
                 if (jsonContinue == Wolverine.HandlerContinuation.Stop) return;
                 
                 // The actual HTTP request handler execution
-                var result = await Herald.Tournaments.Features.OpenRegistration.OpenRegistrationEndpoint.Post(organisationId, tournamentId, command, organisationContext, tournamentsDbContext, httpContext.RequestAborted).ConfigureAwait(false);
+                var result = await Herald.Tournaments.Features.OpenRegistration.OpenRegistrationEndpoint.Post(organisationId, tournamentId, command, organisationContext, tournamentsDbContext, messageContext, httpContext.RequestAborted).ConfigureAwait(false);
 
                 
                 // Added by EF Core Transaction Middleware

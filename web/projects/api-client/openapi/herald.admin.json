@@ -1823,7 +1823,9 @@
           "configuration",
           "missingForPublication",
           "missingForRegistration",
-          "registrationChangedAt"
+          "registrationChangedAt",
+          "admittedEntries",
+          "waitingEntries"
         ],
         "type": "object",
         "properties": {
@@ -1868,6 +1870,14 @@
               "string"
             ],
             "format": "date-time"
+          },
+          "admittedEntries": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "waitingEntries": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       },
@@ -1884,7 +1894,9 @@
           "venue",
           "publication",
           "registration",
-          "competition"
+          "competition",
+          "admittedEntries",
+          "waitingEntries"
         ],
         "type": "object",
         "properties": {
@@ -1955,6 +1967,14 @@
           },
           "competition": {
             "type": "string"
+          },
+          "admittedEntries": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "waitingEntries": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       },

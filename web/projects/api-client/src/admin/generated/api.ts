@@ -320,6 +320,8 @@ export interface TournamentDetails {
   missingForRegistration: string[];
   /** @nullable */
   registrationChangedAt: string | null;
+  admittedEntries: number;
+  waitingEntries: number;
 }
 
 export interface TournamentSummary {
@@ -340,6 +342,8 @@ export interface TournamentSummary {
   publication: Publication;
   registration: RegistrationWindow;
   competition: string;
+  admittedEntries: number;
+  waitingEntries: number;
 }
 
 export type FindGuestsParams = {
