@@ -1,0 +1,72 @@
+import { TestBed } from '@angular/core/testing';
+import axe from 'axe-core';
+import { Observable, of, Subject, throwError } from 'rxjs';
+import { base, open, problem } from './tournaments.testing';
+
+const row = (over: object) => ({
+  id: 't1',
+  title: 'Autumn Open',
+  gameVariant: 'Card game · Constructed',
+  entryKind: 'individual',
+  capacity: 16,
+  plannedStartAt: '2026-11-14T10:00:00',
+  timeZone: 'Europe/Madrid',
+  location: 'onSite',
+  venue: 'Northside Hall',
+  publication: 'draft',
+  registration: 'notOpen',
+  competition: 'preparation',
+  ...over,
+});
+
+const render = (...answers: (() => Observable<unknown>)[]) => open('', { listTournaments: () => answers.shift()!() });
+
+describe('The tournament list', () => {
+  afterEach(() => TestBed.resetTestingModule());
+
+  it('says there are no tournaments yet and offers creating one as its only action', async () => {
+    const { page, text, texts } = await render(() => of([]));
+    await vi.waitFor(() => expect(text('h2')).toBe('No tournaments yet'));
+    expect(texts('a[herald-button], button')).toEqual(['Create tournament']);
+    expect(page().querySelector('a[herald-button]')?.getAttribute('href')).toBe(`${base}/new`);
+  });
+
+  it('shows each tournament with its capacity unit, three separate labels and its action', async () => {
+    const published = row({ id: 't2', title: 'Winter Teams', entryKind: 'team', location: 'online', venue: null, publication: 'published' });
+    const { page, texts } = await render(() => of([published, row({})]));
+    await vi.waitFor(() => expect(page().querySelectorAll('li')).toHaveLength(2));
+    const [first, second] = page().querySelectorAll('li');
+
+    expect(first.textContent).toContain('Card game · Constructed · Team · Online');
+    expect(first.textContent).toContain('14 November 2026, 10:00 · Europe/Madrid');
+    expect(first.querySelector('.capacity')?.textContent).toContain('16 teams');
+    expect([...first.querySelectorAll('herald-status-label')].map((l) => l.textContent?.trim())).toEqual(['Published', 'Registration not open', 'Preparing']);
+    expect(first.querySelector('a')?.textContent?.trim()).toBe('Edit configuration');
+    expect(first.querySelector('a')?.getAttribute('aria-label')).toBe('Edit configuration: Winter Teams');
+
+    expect(second.textContent).toContain('Individual · Northside Hall');
+    expect(second.querySelector('.capacity')?.textContent).toContain('16 individual entries');
+    expect(second.querySelector('herald-status-label')?.textContent?.trim()).toBe('Draft');
+    expect(second.querySelector('a')?.textContent?.trim()).toBe('Continue draft');
+    expect(second.querySelector('a')?.getAttribute('href')).toBe(`${base}/t1`);
+    expect(texts('.heading a')).toEqual(['Create tournament']);
+
+    const { violations } = await axe.run(page(), { rules: { 'color-contrast': { enabled: false } } });
+    expect(violations.map((v) => v.id)).toEqual([]);
+  });
+
+  it('says it is loading', async () => {
+    const { text, page } = await render(() => new Subject());
+    expect(text('[role="status"]')).toBe('Loading tournaments…');
+    expect(page().querySelectorAll('li')).toHaveLength(0);
+  });
+
+  it('explains a failed load without rows and loads on retry', async () => {
+    const { page, text } = await render(() => throwError(() => problem(500)), () => of([row({})]));
+    await vi.waitFor(() => expect(text('herald-notice strong')).toBe('Tournaments did not load'));
+    expect(page().querySelectorAll('li')).toHaveLength(0);
+
+    page().querySelector<HTMLButtonElement>('button')!.click();
+    await vi.waitFor(() => expect(page().querySelectorAll('li')).toHaveLength(1));
+  });
+});

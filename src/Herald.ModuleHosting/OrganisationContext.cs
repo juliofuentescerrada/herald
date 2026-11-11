@@ -17,7 +17,8 @@ public sealed record Caller(Guid DirectoryId, Guid ObjectId)
 // Implemented by the Organisations module; other modules see only the OrganisationContext it produces.
 public interface IOrganisationAccess
 {
-    Task<bool> IsMemberAsync(Guid organisationId, Caller caller, CancellationToken cancellationToken);
+    // The member's person identifier, opaque to other modules, or null when the caller is not a member.
+    Task<Guid?> FindMemberAsync(Guid organisationId, Caller caller, CancellationToken cancellationToken);
 }
 
 // The organisation the current request or message acts for; one per scope, entered once.
@@ -25,7 +26,10 @@ public sealed class OrganisationContext
 {
     public Guid? OrganisationId { get; private set; }
 
-    public void Enter(Guid organisationId)
+    // The person acting in this scope, for modules that record who made a change; null outside a member's request.
+    public Guid? ActorId { get; private set; }
+
+    public void Enter(Guid organisationId, Guid? actorId = null)
     {
         if (OrganisationId is { } current && current != organisationId)
         {
@@ -33,6 +37,7 @@ public sealed class OrganisationContext
         }
 
         OrganisationId = organisationId;
+        ActorId = actorId ?? ActorId;
     }
 }
 

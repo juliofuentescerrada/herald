@@ -137,10 +137,365 @@
           }
         }
       }
+    },
+    "/api/organisations/{organisationId}/tournaments/{tournamentId}": {
+      "put": {
+        "tags": [
+          "Herald.Tournaments.Features.SaveTournament.SaveTournamentEndpoint"
+        ],
+        "summary": "PUT_api_organisations_organisationId_tournaments_tournamentId",
+        "description": "PUT_api_organisations_organisationId_tournaments_tournamentId",
+        "operationId": "saveTournament",
+        "parameters": [
+          {
+            "name": "organisationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "tournamentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SaveTournament"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TournamentDetails"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "get": {
+        "tags": [
+          "Herald.Tournaments.Features.GetTournament.GetTournamentEndpoint"
+        ],
+        "summary": "GET_api_organisations_organisationId_tournaments_tournamentId",
+        "description": "GET_api_organisations_organisationId_tournaments_tournamentId",
+        "operationId": "getTournament",
+        "parameters": [
+          {
+            "name": "organisationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "tournamentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TournamentDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/organisations/{organisationId}/tournaments/{tournamentId}/publication": {
+      "post": {
+        "tags": [
+          "Herald.Tournaments.Features.PublishTournament.PublishTournamentEndpoint"
+        ],
+        "summary": "POST_api_organisations_organisationId_tournaments_tournamentId_publication",
+        "description": "POST_api_organisations_organisationId_tournaments_tournamentId_publication",
+        "operationId": "publishTournament",
+        "parameters": [
+          {
+            "name": "organisationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "tournamentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PublishTournament"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TournamentDetails"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/organisations/{organisationId}/tournaments": {
+      "get": {
+        "tags": [
+          "Herald.Tournaments.Features.ListTournaments.ListTournamentsEndpoint"
+        ],
+        "summary": "GET_api_organisations_organisationId_tournaments",
+        "description": "GET_api_organisations_organisationId_tournaments",
+        "operationId": "listTournaments",
+        "parameters": [
+          {
+            "name": "organisationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/TournamentSummary"
+                  }
+                }
+              }
+            }
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Herald.Tournaments.Features.CreateTournament.CreateTournamentEndpoint"
+        ],
+        "summary": "POST_api_organisations_organisationId_tournaments",
+        "description": "POST_api_organisations_organisationId_tournaments",
+        "operationId": "createTournament",
+        "parameters": [
+          {
+            "name": "organisationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateTournament"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "201": {
+            "description": "Created",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TournamentDetails"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/IResult"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
     "schemas": {
+      "Admission": {
+        "enum": [
+          "automatic",
+          "manual",
+          null
+        ]
+      },
+      "CheckIn": {
+        "enum": [
+          "optional",
+          "mandatory",
+          null
+        ]
+      },
       "CreatedOrganisation": {
         "required": [
           "id",
@@ -172,6 +527,29 @@
             "type": "string"
           }
         }
+      },
+      "CreateTournament": {
+        "required": [
+          "tournamentId",
+          "configuration"
+        ],
+        "type": "object",
+        "properties": {
+          "tournamentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "configuration": {
+            "$ref": "#/components/schemas/TournamentConfiguration"
+          }
+        }
+      },
+      "EntryKind": {
+        "enum": [
+          "individual",
+          "team",
+          null
+        ]
       },
       "HttpValidationProblemDetails": {
         "type": "object",
@@ -220,6 +598,13 @@
       },
       "IResult": {
         "type": "object"
+      },
+      "LocationMode": {
+        "enum": [
+          "onSite",
+          "online",
+          null
+        ]
       },
       "OrganisationSummary": {
         "required": [
@@ -289,6 +674,40 @@
           }
         }
       },
+      "Publication": {
+        "enum": [
+          "draft",
+          "published"
+        ]
+      },
+      "PublishTournament": {
+        "required": [
+          "expectedRevision"
+        ],
+        "type": "object",
+        "properties": {
+          "expectedRevision": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "SaveTournament": {
+        "required": [
+          "expectedRevision",
+          "configuration"
+        ],
+        "type": "object",
+        "properties": {
+          "expectedRevision": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "configuration": {
+            "$ref": "#/components/schemas/TournamentConfiguration"
+          }
+        }
+      },
       "SignedInPerson": {
         "required": [
           "displayName",
@@ -306,6 +725,273 @@
             }
           }
         }
+      },
+      "TournamentConfiguration": {
+        "required": [
+          "title"
+        ],
+        "type": "object",
+        "properties": {
+          "title": {
+            "type": "string"
+          },
+          "gameVariant": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "entryKind": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/EntryKind"
+              }
+            ]
+          },
+          "capacity": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "minimumRosterSize": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "maximumRosterSize": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "activePlayersPerSide": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "registrationOpensAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "registrationClosesAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "plannedStartAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "timeZone": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "location": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/LocationMode"
+              }
+            ]
+          },
+          "venue": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "admission": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Admission"
+              }
+            ]
+          },
+          "checkIn": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/CheckIn"
+              }
+            ]
+          },
+          "visibility": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Visibility"
+              }
+            ]
+          }
+        }
+      },
+      "TournamentDetails": {
+        "required": [
+          "id",
+          "revision",
+          "publication",
+          "registration",
+          "competition",
+          "profile",
+          "configuration",
+          "missingForPublication"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "revision": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "publication": {
+            "$ref": "#/components/schemas/Publication"
+          },
+          "registration": {
+            "type": "string"
+          },
+          "competition": {
+            "type": "string"
+          },
+          "profile": {
+            "type": "string"
+          },
+          "configuration": {
+            "$ref": "#/components/schemas/TournamentConfiguration"
+          },
+          "missingForPublication": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "TournamentSummary": {
+        "required": [
+          "id",
+          "title",
+          "gameVariant",
+          "entryKind",
+          "capacity",
+          "plannedStartAt",
+          "timeZone",
+          "location",
+          "venue",
+          "publication",
+          "registration",
+          "competition"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string"
+          },
+          "gameVariant": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "entryKind": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/EntryKind"
+              }
+            ]
+          },
+          "capacity": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "plannedStartAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "timeZone": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "location": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/LocationMode"
+              }
+            ]
+          },
+          "venue": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "publication": {
+            "$ref": "#/components/schemas/Publication"
+          },
+          "registration": {
+            "type": "string"
+          },
+          "competition": {
+            "type": "string"
+          }
+        }
+      },
+      "Visibility": {
+        "enum": [
+          "public",
+          "unlisted",
+          "private",
+          null
+        ]
       }
     }
   },
@@ -318,6 +1004,21 @@
     },
     {
       "name": "Herald.Organisations.Features.CreateOrganisation.CreateOrganisationEndpoint"
+    },
+    {
+      "name": "Herald.Tournaments.Features.SaveTournament.SaveTournamentEndpoint"
+    },
+    {
+      "name": "Herald.Tournaments.Features.GetTournament.GetTournamentEndpoint"
+    },
+    {
+      "name": "Herald.Tournaments.Features.PublishTournament.PublishTournamentEndpoint"
+    },
+    {
+      "name": "Herald.Tournaments.Features.ListTournaments.ListTournamentsEndpoint"
+    },
+    {
+      "name": "Herald.Tournaments.Features.CreateTournament.CreateTournamentEndpoint"
     }
   ]
 }

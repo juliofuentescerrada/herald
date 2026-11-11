@@ -27,6 +27,22 @@ import type {
   Observable
 } from 'rxjs';
 
+export type Admission = typeof Admission[keyof typeof Admission] | null;
+
+
+export const Admission = {
+  automatic: 'automatic',
+  manual: 'manual',
+} as const;
+
+export type CheckIn = typeof CheckIn[keyof typeof CheckIn] | null;
+
+
+export const CheckIn = {
+  optional: 'optional',
+  mandatory: 'mandatory',
+} as const;
+
 export interface CreatedOrganisation {
   id: string;
   name: string;
@@ -35,6 +51,65 @@ export interface CreatedOrganisation {
 export interface CreateOrganisation {
   organisationId: string;
   name: string;
+}
+
+export type EntryKind = typeof EntryKind[keyof typeof EntryKind] | null;
+
+
+export const EntryKind = {
+  individual: 'individual',
+  team: 'team',
+} as const;
+
+export type LocationMode = typeof LocationMode[keyof typeof LocationMode] | null;
+
+
+export const LocationMode = {
+  onSite: 'onSite',
+  online: 'online',
+} as const;
+
+export type Visibility = typeof Visibility[keyof typeof Visibility] | null;
+
+
+export const Visibility = {
+  public: 'public',
+  unlisted: 'unlisted',
+  private: 'private',
+} as const;
+
+export interface TournamentConfiguration {
+  title: string;
+  /** @nullable */
+  gameVariant?: string | null;
+  entryKind?: null | EntryKind;
+  /** @nullable */
+  capacity?: number | null;
+  /** @nullable */
+  minimumRosterSize?: number | null;
+  /** @nullable */
+  maximumRosterSize?: number | null;
+  /** @nullable */
+  activePlayersPerSide?: number | null;
+  /** @nullable */
+  registrationOpensAt?: string | null;
+  /** @nullable */
+  registrationClosesAt?: string | null;
+  /** @nullable */
+  plannedStartAt?: string | null;
+  /** @nullable */
+  timeZone?: string | null;
+  location?: null | LocationMode;
+  /** @nullable */
+  venue?: string | null;
+  admission?: null | Admission;
+  checkIn?: null | CheckIn;
+  visibility?: null | Visibility;
+}
+
+export interface CreateTournament {
+  tournamentId: string;
+  configuration: TournamentConfiguration;
 }
 
 export type HttpValidationProblemDetailsErrors = {[key: string]: string[]};
@@ -78,9 +153,57 @@ export interface ProblemDetails {
   instance?: string | null;
 }
 
+export type Publication = typeof Publication[keyof typeof Publication];
+
+
+export const Publication = {
+  draft: 'draft',
+  published: 'published',
+} as const;
+
+export interface PublishTournament {
+  expectedRevision: number;
+}
+
+export interface SaveTournament {
+  expectedRevision: number;
+  configuration: TournamentConfiguration;
+}
+
 export interface SignedInPerson {
   displayName: string;
   organisations: OwnedOrganisation[];
+}
+
+export interface TournamentDetails {
+  id: string;
+  revision: number;
+  publication: Publication;
+  registration: string;
+  competition: string;
+  profile: string;
+  configuration: TournamentConfiguration;
+  missingForPublication: string[];
+}
+
+export interface TournamentSummary {
+  id: string;
+  title: string;
+  /** @nullable */
+  gameVariant: string | null;
+  entryKind: null | EntryKind;
+  /** @nullable */
+  capacity: number | null;
+  /** @nullable */
+  plannedStartAt: string | null;
+  /** @nullable */
+  timeZone: string | null;
+  location: null | LocationMode;
+  /** @nullable */
+  venue: string | null;
+  publication: Publication;
+  registration: string;
+  competition: string;
 }
 
 interface HttpClientOptions {
@@ -237,8 +360,221 @@ export class HeraldHostAdminService {
     );
   }
 
+/**
+ * PUT_api_organisations_organisationId_tournaments_tournamentId
+ * @summary PUT_api_organisations_organisationId_tournaments_tournamentId
+ */
+ saveTournament<TData = TournamentDetails>(organisationId: string,
+    tournamentId: string,
+    saveTournamentBody: SaveTournament, options?: HttpClientBodyOptions): Observable<TData>;
+ saveTournament<TData = TournamentDetails>(organisationId: string,
+    tournamentId: string,
+    saveTournamentBody: SaveTournament, options?: HttpClientEventOptions): Observable<HttpEvent<TData>>;
+ saveTournament<TData = TournamentDetails>(organisationId: string,
+    tournamentId: string,
+    saveTournamentBody: SaveTournament, options?: HttpClientResponseOptions): Observable<AngularHttpResponse<TData>>;
+  saveTournament<TData = TournamentDetails>(
+    organisationId: string,
+    tournamentId: string,
+    saveTournamentBody: SaveTournament, options?: HttpClientObserveOptions): Observable<TData | HttpEvent<TData> | AngularHttpResponse<TData>> {
+    if (options?.observe === 'events') {
+      return this.http.put<TData>(
+      `/api/organisations/${organisationId}/tournaments/${tournamentId}`,
+      saveTournamentBody,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'events',
+      }
+    );
+    }
+
+    if (options?.observe === 'response') {
+      return this.http.put<TData>(
+      `/api/organisations/${organisationId}/tournaments/${tournamentId}`,
+      saveTournamentBody,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'response',
+      }
+    );
+    }
+
+    return this.http.put<TData>(
+      `/api/organisations/${organisationId}/tournaments/${tournamentId}`,
+      saveTournamentBody,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'body',
+      }
+    );
+  }
+
+/**
+ * GET_api_organisations_organisationId_tournaments_tournamentId
+ * @summary GET_api_organisations_organisationId_tournaments_tournamentId
+ */
+ getTournament<TData = TournamentDetails>(organisationId: string,
+    tournamentId: string, options?: HttpClientBodyOptions): Observable<TData>;
+ getTournament<TData = TournamentDetails>(organisationId: string,
+    tournamentId: string, options?: HttpClientEventOptions): Observable<HttpEvent<TData>>;
+ getTournament<TData = TournamentDetails>(organisationId: string,
+    tournamentId: string, options?: HttpClientResponseOptions): Observable<AngularHttpResponse<TData>>;
+  getTournament<TData = TournamentDetails>(
+    organisationId: string,
+    tournamentId: string, options?: HttpClientObserveOptions): Observable<TData | HttpEvent<TData> | AngularHttpResponse<TData>> {
+    if (options?.observe === 'events') {
+      return this.http.get<TData>(
+      `/api/organisations/${organisationId}/tournaments/${tournamentId}`,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'events',
+      }
+    );
+    }
+
+    if (options?.observe === 'response') {
+      return this.http.get<TData>(
+      `/api/organisations/${organisationId}/tournaments/${tournamentId}`,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'response',
+      }
+    );
+    }
+
+    return this.http.get<TData>(
+      `/api/organisations/${organisationId}/tournaments/${tournamentId}`,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'body',
+      }
+    );
+  }
+
+/**
+ * POST_api_organisations_organisationId_tournaments_tournamentId_publication
+ * @summary POST_api_organisations_organisationId_tournaments_tournamentId_publication
+ */
+ publishTournament<TData = TournamentDetails>(organisationId: string,
+    tournamentId: string,
+    publishTournamentBody: PublishTournament, options?: HttpClientBodyOptions): Observable<TData>;
+ publishTournament<TData = TournamentDetails>(organisationId: string,
+    tournamentId: string,
+    publishTournamentBody: PublishTournament, options?: HttpClientEventOptions): Observable<HttpEvent<TData>>;
+ publishTournament<TData = TournamentDetails>(organisationId: string,
+    tournamentId: string,
+    publishTournamentBody: PublishTournament, options?: HttpClientResponseOptions): Observable<AngularHttpResponse<TData>>;
+  publishTournament<TData = TournamentDetails>(
+    organisationId: string,
+    tournamentId: string,
+    publishTournamentBody: PublishTournament, options?: HttpClientObserveOptions): Observable<TData | HttpEvent<TData> | AngularHttpResponse<TData>> {
+    if (options?.observe === 'events') {
+      return this.http.post<TData>(
+      `/api/organisations/${organisationId}/tournaments/${tournamentId}/publication`,
+      publishTournamentBody,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'events',
+      }
+    );
+    }
+
+    if (options?.observe === 'response') {
+      return this.http.post<TData>(
+      `/api/organisations/${organisationId}/tournaments/${tournamentId}/publication`,
+      publishTournamentBody,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'response',
+      }
+    );
+    }
+
+    return this.http.post<TData>(
+      `/api/organisations/${organisationId}/tournaments/${tournamentId}/publication`,
+      publishTournamentBody,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'body',
+      }
+    );
+  }
+
+/**
+ * GET_api_organisations_organisationId_tournaments
+ * @summary GET_api_organisations_organisationId_tournaments
+ */
+ listTournaments<TData = TournamentSummary[]>(organisationId: string, options?: HttpClientBodyOptions): Observable<TData>;
+ listTournaments<TData = TournamentSummary[]>(organisationId: string, options?: HttpClientEventOptions): Observable<HttpEvent<TData>>;
+ listTournaments<TData = TournamentSummary[]>(organisationId: string, options?: HttpClientResponseOptions): Observable<AngularHttpResponse<TData>>;
+  listTournaments<TData = TournamentSummary[]>(
+    organisationId: string, options?: HttpClientObserveOptions): Observable<TData | HttpEvent<TData> | AngularHttpResponse<TData>> {
+    if (options?.observe === 'events') {
+      return this.http.get<TData>(
+      `/api/organisations/${organisationId}/tournaments`,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'events',
+      }
+    );
+    }
+
+    if (options?.observe === 'response') {
+      return this.http.get<TData>(
+      `/api/organisations/${organisationId}/tournaments`,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'response',
+      }
+    );
+    }
+
+    return this.http.get<TData>(
+      `/api/organisations/${organisationId}/tournaments`,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'body',
+      }
+    );
+  }
+
+/**
+ * POST_api_organisations_organisationId_tournaments
+ * @summary POST_api_organisations_organisationId_tournaments
+ */
+ createTournament<TData = IResult | TournamentDetails>(organisationId: string,
+    createTournamentBody: CreateTournament, options?: HttpClientBodyOptions): Observable<TData>;
+ createTournament<TData = IResult | TournamentDetails>(organisationId: string,
+    createTournamentBody: CreateTournament, options?: HttpClientEventOptions): Observable<HttpEvent<TData>>;
+ createTournament<TData = IResult | TournamentDetails>(organisationId: string,
+    createTournamentBody: CreateTournament, options?: HttpClientResponseOptions): Observable<AngularHttpResponse<TData>>;
+  createTournament<TData = IResult | TournamentDetails>(
+    organisationId: string,
+    createTournamentBody: CreateTournament, options?: HttpClientObserveOptions): Observable<TData | HttpEvent<TData> | AngularHttpResponse<TData>> {
+    if (options?.observe === 'events') {
+      return this.http.post<TData>(
+      `/api/organisations/${organisationId}/tournaments`,
+      createTournamentBody,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'events',
+      }
+    );
+    }
+
+    if (options?.observe === 'response') {
+      return this.http.post<TData>(
+      `/api/organisations/${organisationId}/tournaments`,
+      createTournamentBody,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'response',
+      }
+    );
+    }
+
+    return this.http.post<TData>(
+      `/api/organisations/${organisationId}/tournaments`,
+      createTournamentBody,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'body',
+      }
+    );
+  }
+
 };
 
 export type GetOrganisationClientResult = NonNullable<OrganisationSummary>
 export type GetMeClientResult = NonNullable<SignedInPerson>
 export type CreateOrganisationClientResult = NonNullable<IResult | CreatedOrganisation>
+export type SaveTournamentClientResult = NonNullable<TournamentDetails>
+export type GetTournamentClientResult = NonNullable<TournamentDetails>
+export type PublishTournamentClientResult = NonNullable<TournamentDetails>
+export type ListTournamentsClientResult = NonNullable<TournamentSummary[]>
+export type CreateTournamentClientResult = NonNullable<IResult | TournamentDetails>

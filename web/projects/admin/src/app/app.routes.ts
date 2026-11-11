@@ -36,6 +36,28 @@ export const routes: Routes = [
             title: 'Choose an organisation · Herald',
             loadComponent: () => import('./features/organisations').then((m) => m.OrganisationSelectorPage),
           },
+          {
+            path: 'tournaments',
+            title: 'Tournaments · Herald',
+            loadComponent: () => import('./features/tournaments').then((m) => m.TournamentListPage),
+          },
+          {
+            path: 'tournaments/new',
+            title: 'Create tournament · Herald',
+            canDeactivate: [confirmLeave],
+            loadComponent: () => import('./features/tournaments').then((m) => m.TournamentFormPage),
+          },
+          {
+            path: 'tournaments/:tournamentId',
+            title: 'Tournament · Herald',
+            canDeactivate: [confirmLeave],
+            loadComponent: () => import('./features/tournaments').then((m) => m.TournamentFormPage),
+          },
+          {
+            path: 'tournaments/:tournamentId/review',
+            title: 'Review before publishing · Herald',
+            loadComponent: () => import('./features/tournaments').then((m) => m.TournamentReviewPage),
+          },
           notFound,
         ],
       },

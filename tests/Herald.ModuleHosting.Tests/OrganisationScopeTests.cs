@@ -89,6 +89,17 @@ public class OrganisationScopeTests(PostgresFixture postgres)
         Should.Throw<InvalidOperationException>(() => context.Enter(_southside));
     }
 
+    [Fact]
+    public void A_scope_keeps_the_person_who_entered_it()
+    {
+        var actor = Guid.NewGuid();
+        var context = new OrganisationContext();
+        context.Enter(_northside, actor);
+        context.Enter(_northside);
+
+        context.ActorId.ShouldBe(actor);
+    }
+
     private async Task<ProbeNote> AddNote(Guid organisationId, string text)
     {
         await using var database = postgres.Scope(organisationId);

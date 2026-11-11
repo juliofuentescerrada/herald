@@ -33,6 +33,7 @@
       @if (context.organisation()) {
         <nav class="nav" aria-label="Workspace">
           <a herald-nav-link [routerLink]="context.home()" routerLinkActive ariaCurrentWhenActive="page" [routerLinkActiveOptions]="{ exact: true }">Overview</a>
+          <a herald-nav-link [routerLink]="[context.home(), 'tournaments']" routerLinkActive ariaCurrentWhenActive="page">Tournaments</a>
         </nav>
       }
     </aside>

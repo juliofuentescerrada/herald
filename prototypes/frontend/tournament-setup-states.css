@@ -1,0 +1,95 @@
+/* A scoped extension of style.css tokens and the access admin composition.
+   Shell refinements follow visual-direction §9.3, 10 November 2026. */
+.setup-page{color:var(--ink);background:var(--canvas)}
+.setup-page .org{border:0;padding:0;margin:var(--s8) 0 var(--s6)}
+.setup-page .org small{margin-top:var(--s1)}
+.setup-page .org a{display:inline-flex;align-items:center;min-height:44px;font-size:14px;color:var(--inverse-control);text-decoration:underline}
+.setup-page .rail nav{border-top:1px solid var(--inverse-control);padding-top:var(--s4)}
+.setup-page .rail nav a{margin:0}
+.setup-page .admin-main{padding:var(--s8);max-width:none}
+.setup-page .admin-content{max-width:1040px}
+.setup-page .admin-top .account summary{border:0;padding:var(--s2) 0;text-decoration:none;font-size:14px;color:var(--muted)}
+.setup-page .account summary::after{content:none}
+.setup-page .account summary svg{width:20px;height:20px;fill:none;stroke:currentColor;stroke-width:1.75}
+.setup-page .admin-top .account summary:hover{color:var(--ink);text-decoration:underline}
+.setup-page .account-panel a{margin-top:var(--s2)}
+.setup-page h1{margin:0;font-size:32px;letter-spacing:-.02em}
+.setup-page h2{margin:0;font-size:20px;letter-spacing:0}
+.setup-page h3{margin:0;font-size:16px;letter-spacing:0}
+.setup-page .page-heading{display:flex;justify-content:space-between;gap:var(--s6);align-items:flex-start;margin-bottom:var(--s6)}
+.setup-page .page-heading p{margin-top:var(--s2)}
+.setup-page .page-heading>.button{flex:none}
+.setup-page .back{display:inline-flex;align-items:center;min-height:44px;color:var(--muted);font-size:14px;margin-bottom:var(--s3);text-decoration:underline}
+.setup-page .lifecycle{display:flex;flex-wrap:wrap;gap:var(--s2);margin:var(--s4) 0 0}
+.setup-page .lifecycle span{padding:var(--s1) var(--s2);background:var(--canvas);border:1px solid var(--line);font-size:14px;color:var(--ink)}
+.setup-page .tournament-meta{margin-top:var(--s2);color:var(--muted);font-size:14px}
+.setup-page .status{margin:var(--s6) 0;background:var(--surface)}
+.setup-page .status p{margin:var(--s2) 0 0}
+.setup-page .status ul{margin:var(--s3) 0 0;padding-left:var(--s6)}
+.setup-page .status li a{display:inline-flex;align-items:center;min-height:44px;text-decoration:underline}
+.setup-page .status .actions{margin-top:var(--s4)}
+.setup-page .empty-state{padding:var(--s16) var(--s8);background:var(--surface);border:1px solid var(--line);max-width:800px}
+.setup-page .empty-state p{margin-top:var(--s3);color:var(--muted)}
+.setup-page .empty-state .actions{justify-content:flex-start;margin-top:var(--s6)}
+.setup-page .list{padding:0;margin:0;list-style:none;background:var(--surface);border:1px solid var(--line)}
+.setup-page .list>li{padding:var(--s6);border-bottom:1px solid var(--line);display:grid;grid-template-columns:minmax(0,1fr) auto;gap:var(--s6);align-items:center}
+.setup-page .list>li:last-child{border-bottom:0}
+.setup-page .list .capacity{display:block;margin-top:var(--s3);font-weight:600}
+.setup-page .list .lifecycle{margin-top:var(--s3)}
+.setup-page .form-section{border:0;border-top:1px solid var(--line);padding:var(--s8) 0;margin:0;min-width:0}
+.setup-page .form-section:first-child{border-top:0;padding-top:0}
+.setup-page .form-section h2{margin-bottom:var(--s2)}
+.setup-page .form-section>p{margin-bottom:var(--s6);color:var(--muted);font-size:14px}
+.setup-page .form-grid{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s6)}
+.setup-page .form-grid>.full{grid-column:1/-1}
+.setup-page .field{margin:0;min-width:0}
+.setup-page label{font-size:14px;font-weight:500;color:var(--muted);margin-bottom:var(--s2)}
+.setup-page input,.setup-page select{min-height:48px;width:100%;padding:var(--s3);border:1px solid var(--control);color:var(--ink);background:var(--surface);border-radius:0;font-size:16px;min-width:0}
+.setup-page input::placeholder{color:var(--muted);opacity:1}
+.setup-page input[readonly]{background:var(--canvas)}
+.setup-page input[type=datetime-local]{font-variant-numeric:tabular-nums}
+.setup-page .form-frame{background:var(--surface);border:1px solid var(--line);padding:var(--s8);max-width:960px;margin-top:var(--s6)}
+.setup-page .form-frame>.fields{border:0;padding:0;margin:0;min-width:0}
+.setup-page .form-frame>.fields:disabled{opacity:1}
+.setup-page :disabled{opacity:1;cursor:default;color:var(--muted)}
+.setup-page .button[aria-disabled=true],.setup-page button[aria-disabled=true]{background:var(--canvas);color:var(--muted);border-color:var(--control);cursor:default}
+.setup-page [aria-invalid=true]{border:2px solid var(--ink)}
+.setup-page .error{color:var(--ink);font-weight:600;line-height:1.5}
+.setup-page .help{margin:var(--s2) 0 0;line-height:1.5;font-size:14px}
+.setup-page .form-actions{display:flex;gap:var(--s3);flex-wrap:wrap;border-top:1px solid var(--line);padding-top:var(--s6);margin-top:0;justify-content:flex-start}
+.setup-page .summary-section{border-bottom:1px solid var(--line);padding-bottom:var(--s6);margin-bottom:var(--s6)}
+.setup-page .summary-section:last-of-type{border-bottom:0;padding-bottom:0}
+.setup-page .summary-section h2{margin-bottom:var(--s4)}
+.setup-page .facts{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--s6);margin:0}
+.setup-page .facts dt{color:var(--muted);font-size:14px;margin-bottom:var(--s1)}
+.setup-page .facts dd{margin:0;font-weight:500;overflow-wrap:anywhere}
+.setup-page .facts .full{grid-column:1/-1}
+.setup-page .preview-intent{margin:var(--s6) 0}
+.setup-page .profile-note{margin-top:var(--s3);font-size:14px;color:var(--muted)}
+.setup-page .progress{margin:var(--s6) 0}
+.setup-page #feedback{max-width:960px}
+@media(max-width:700px){
+ .setup-page .admin-main{padding:var(--s6) var(--s4)}
+ .setup-page .org{margin:var(--s4) 0}
+ .setup-page .org a{font-size:14px}
+ .setup-page .rail nav{padding-top:var(--s3)}
+ .setup-page .admin-top{flex-direction:row;align-items:center;flex-wrap:wrap}
+ .setup-page .admin-top .account{width:auto;margin-left:auto}
+ .setup-page .admin-top .account-panel{position:absolute;right:0;width:248px;box-shadow:0 8px 24px #171a1e1a}
+ .setup-page .page-heading{flex-direction:column}
+ .setup-page .page-heading>.button{width:100%}
+ .setup-page h1{font-size:28px}
+ .setup-page .list>li{grid-template-columns:1fr;gap:var(--s4)}
+ .setup-page .list>li>.button{width:100%}
+ .setup-page .form-frame{padding:var(--s6)}
+ .setup-page .form-grid,.setup-page .facts{grid-template-columns:1fr}
+ .setup-page .form-grid>.full,.setup-page .facts .full{grid-column:auto}
+ .setup-page .form-section{padding:var(--s8) 0}
+ .setup-page .form-actions{flex-direction:column;align-items:stretch}
+ .setup-page .form-actions>*{width:100%}
+ .setup-page .empty-state{padding:var(--s8) var(--s6)}
+}
+/* Isolate the access rail from the older demo's mobile .rail hiding rule. */
+.setup-page .rail{display:flex;flex-direction:column;align-items:stretch;justify-content:flex-start;gap:0;margin:0;color:var(--surface)}
+.setup-page .org{text-align:left;font-size:16px}
+.setup-page .org small{font-size:14px}
