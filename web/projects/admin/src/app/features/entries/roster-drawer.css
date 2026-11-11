@@ -1,0 +1,15 @@
+/* The roster drawer; it also uses the entries page styles for rows, fields and history. */
+.roster-facts { margin: var(--herald-space-4) 0; }
+.roster-facts p { margin: 0 0 var(--herald-space-2); }
+.drawer-notice { display: flex; margin-bottom: var(--herald-space-4); }
+.drawer-notice herald-notice { flex: 1; }
+.members-heading { margin: var(--herald-space-4) 0 var(--herald-space-3); }
+.members-heading:focus { outline: none; } /* a focus target, not a control */
+.members li { padding: var(--herald-space-3) var(--herald-space-4); }
+.member-name { font-weight: 700; margin: 0 0 var(--herald-space-1); }
+.small { font-size: var(--herald-text-sm); }
+.member-flag { display: flex; margin-top: var(--herald-space-2); }
+.roster-add { display: flex; flex-direction: column; align-items: flex-start; gap: var(--herald-space-2); margin-top: var(--herald-space-4); }
+.history { margin-top: var(--herald-space-6); }
+.history li { flex-direction: column; align-items: flex-start; gap: var(--herald-space-1); }
+.leave { margin-top: var(--herald-space-6); }

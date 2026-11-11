@@ -30,7 +30,7 @@ interface Failure {
   selector: 'app-roster-drawer',
   imports: [Button, Drawer, Icon, Notice],
   templateUrl: './roster-drawer.html',
-  styleUrl: './entries-page.css',
+  styleUrls: ['./entries-page.css', './roster-drawer.css'],
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class RosterDrawer {
