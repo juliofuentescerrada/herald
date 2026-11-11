@@ -38,7 +38,7 @@ context: |
     h1-tournament-setup (first F-02 slice: draft, configuration, review, publication, list) is
     done too, as is h1-registration-window (open, close and reopen registration by hand).
     h1-entries (guest entries, admission, waiting queue, cancellation, first integration events)
-    is implemented and awaits archival; rosters, check-in, competition and public reads do not exist.
+    is done too; rosters, check-in, competition and public reads do not exist.
   - Modular monolith: one module per bounded context, with Domain at the centre and vertical slices
     (Features: one namespace per use case, one file or cohesive folder; Persistence at the edge);
     features never depend on other features. Shared business rules belong in Domain; technical

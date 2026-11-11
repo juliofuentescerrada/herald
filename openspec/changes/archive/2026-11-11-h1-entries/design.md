@@ -47,7 +47,7 @@ Confirmed rules:
 
 Screens: the tournament entries page (new), the published tournament page and the tournament list (modified).
 
-References: [entries state review](../../../prototypes/frontend/entries-states.html) and its [22 states in 44 desktop/mobile captures](../../../docs/assets/mockups/entries/README.md), produced on 11 November 2026 from `.prompts/h1-entries-mockups.md` and supplied by the maintainer the same day. The visual input is complete; what they settle was adopted at gate 1.1.
+References: [entries state review](../../../../prototypes/frontend/entries-states.html) and its [22 states in 44 desktop/mobile captures](../../../../docs/assets/mockups/entries/README.md), produced on 11 November 2026 from `.prompts/h1-entries-mockups.md` and supplied by the maintainer the same day. The visual input is complete; what they settle was adopted at gate 1.1.
 
 States covered (each desktop and mobile):
 
@@ -103,7 +103,7 @@ Each write uses its own module's projection only; neither module calls the other
 
 Wolverine routes a message to local handlers of the same application when one exists; with `UseDurableLocalQueues` those queues go through the shared store's outbox and inbox, so the state change and the event commit together and the receiver handles it once. The integration events are routed explicitly to named durable local queues (`tournaments`, `registration`) in each consuming module's entry point, and the Service Bus transport is not used for them. Tests and the end-to-end suite need no broker, which they lack.
 
-[ADR 0016](../../../docs/adr/0016-integration-events-between-modules-through-durable-local-queues.md) records: durable local queues for integration events between modules of the host; Service Bus (ADR 0009) when a publisher or consumer leaves the process or an external consumer appears; the contract and idempotency rules of D-2 apply to both. ADR 0009 gains a note pointing to it (it is still Proposed, so it is refined rather than superseded).
+[ADR 0016](../../../../docs/adr/0016-integration-events-between-modules-through-durable-local-queues.md) records: durable local queues for integration events between modules of the host; Service Bus (ADR 0009) when a publisher or consumer leaves the process or an external consumer appears; the contract and idempotency rules of D-2 apply to both. ADR 0009 gains a note pointing to it (it is still Proposed, so it is refined rather than superseded).
 
 *Alternative considered:* Service Bus as ADR 0009 states. Rejected by the maintainer: the end-to-end suite and the host's tests have no broker and the emulator needs a SQL Server container, too heavy for the local machine.
 
