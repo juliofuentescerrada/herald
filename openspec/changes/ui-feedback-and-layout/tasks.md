@@ -30,6 +30,6 @@
 
 ## 6. Validation and completion
 
-- [ ] 6.1 Full run: format, build, all .NET tests, web lint/tests/boundaries/builds, SSR check, codegen and API drift checks, e2e suite; record in design.md
+- [x] 6.1 Full run: format, build, all .NET tests, web lint/tests/boundaries/builds, SSR check, codegen and API drift checks, e2e suite; record in design.md
 - [ ] 6.2 Capture the Visual input states at 1440 and 390 px and compare with the mockups; maintainer run through Aspire; record differences in design.md
-- [ ] 6.3 Update `docs/herald-visual-direction.md` §9.3, `docs/roadmap.md`, `README.md`, `CLAUDE.md` status and `openspec/config.yaml`; acceptance review against the specs in design.md
+- [x] 6.3 Update `docs/herald-visual-direction.md` §9.3, `docs/roadmap.md`, `README.md`, `CLAUDE.md` status and `openspec/config.yaml`; acceptance review against the specs in design.md

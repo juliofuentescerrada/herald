@@ -39,6 +39,8 @@ context: |
     done too, as is h1-registration-window (open, close and reopen registration by hand).
     h1-entries (guest entries, admission, waiting queue, cancellation, first integration events)
     is done too; rosters, check-in, competition and public reads do not exist.
+    ui-feedback-and-layout (dialogs, drawer, toasts, named widths; visual direction §4, §5,
+    §7.2, §8.1) is implemented and awaiting merge; later screens follow those rules.
   - Modular monolith: one module per bounded context, with Domain at the centre and vertical slices
     (Features: one namespace per use case, one file or cohesive folder; Persistence at the edge);
     features never depend on other features. Shared business rules belong in Domain; technical

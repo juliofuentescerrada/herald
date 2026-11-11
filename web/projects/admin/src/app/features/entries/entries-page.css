@@ -43,3 +43,8 @@ h3 { font-size: var(--herald-text-lg); margin: 0 0 var(--herald-space-1); }
   .row-actions { flex-direction: column; }
 }
 form herald-notice { display: flex; margin-top: var(--herald-space-4); }
+/* The disclosure keeps a visible open/closed marker, as the native one is lost with inline-flex. */
+.cancelled summary::after { content: '+' / ''; margin-left: var(--herald-space-2); }
+.cancelled[open] summary::after { content: '−' / ''; }
+/* In the narrow drawer a result's action goes under its name. */
+.guests li { flex-direction: column; align-items: flex-start; gap: var(--herald-space-3); }

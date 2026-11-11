@@ -92,3 +92,29 @@ The cancellation and out-of-order admission panels become dialogs with the same 
 ## Migration Plan
 
 Frontend only; no data or API migration. Rollback is reverting the change.
+
+## Validation record
+
+**Full run (6.1), 11 November 2026.** `dotnet format --verify-no-changes` clean; `dotnet build` with no warnings; 273 .NET tests pass; Wolverine codegen and the OpenAPI documents and web client regenerate with no drift; web lint and the boundary fixtures (15 planted violations, 15 reported) pass; Vitest passes in every project (admin 167, public 13, catalogue 7, `ui` 31, api-client 9) with `axe-core` checks; the three applications build, admin with its initial-bundle warning (see Risks); the SSR isolation check passes (50 concurrent requests); the 14 Playwright journeys pass, with journeys 8 (leaving with unsaved input) and 13–14 (entries) updated for the dialogs, toasts and the collapsed cancelled group.
+
+**Visual comparison (6.2).** A temporary Playwright spec (not committed) built the states against the composed system, a real organisation with an individual automatic tournament (three admitted, two waiting, three cancelled) and a team manual one, forcing the rarer states with `page.route` (a held or failed cancellation and addition, a 409, a 400, a free slot, over capacity, a slow or failed field), and captured 34 states at 1440 × 1000 and 390 × 844, full page, plus `entries-wide`, `list-wide` and `public-home` at 1920 × 1080; the catalogue states were captured from the built catalogue in block 2. Each was compared with its mockup. Corrected after the comparison: the cancelled disclosure keeps a visible "+"/"−" marker, which the native one lost with its inline layout; result rows in the add drawer put "Enter this player" under the name, as in the mockup, instead of squeezing it beside it. Kept: the public hero band stays full width, with its content capped at 1200 px (the mockup insets the band); the catalogue opens each dialog, drawer and toast state as the real overlay (see D-1). Observed, as in the mockups: on a wide screen a toast can sit over the bottom of the aside, for example over "View entries" for the few seconds after a save; it can be dismissed and pauses on hover. Not captured in the real system: `cancel-dialog-closed`, which differs from `cancel-dialog` only by its effect sentence and is covered by Vitest.
+
+## Acceptance review
+
+| Requirement | Evidence |
+| --- | --- |
+| Outcomes are announced as toasts | `ui/toast.spec.ts` (polite region, leaves by itself, nothing on the server); entries spec (admission, cancellation, addition toasts); form spec ("Changes saved.", draft saves); journeys 13 and 14 |
+| Toasts can be read and leave with their context | `ui/toast.spec.ts` (at least five seconds, paused while focused, dismissible, at most three); `app.spec.ts` (cleared when access stops); a change of organisation or person is a full load (W-06) |
+| Errors stay where they arose | Entries spec (failed cancellation and addition inside the dialog or drawer with retry and kept input; conflict on the page, dialog closed); form spec (field errors and summary, conflict notice, no success notice) |
+| Consequential actions are confirmed in a modal dialog | Entries spec (cancellation with its effect and destructive action; out-of-order admission unavailable until a reason); `ui/dialog.spec.ts` (`confirm`); journeys 8 and 13 |
+| Dialogs keep focus and requests under control | `ui/dialog.spec.ts` (Escape, focus kept and returned, busy ignores Escape and repeats nothing); entries spec (busy cancellation); journey 13 (focus on "Keep entry") |
+| Multi-step flows that keep their context open in a drawer | Entries spec (drawer, search, duplicate, failed addition keeps the name); journey 14; captures `add-drawer-*` |
+| Long reviews are pages and reversible actions act at once | Review page unchanged; entries spec (in-order admission without a dialog); registration journey unchanged |
+| Admin pages use one of three named widths | List and selector specs (`width-wide`, `width-focused`); form spec (`width-form`); captures `list-wide` at 1920 px and every state at 390 px with no horizontal scroll |
+| Secondary content goes in an aside on wide screens | Form spec (aside for a published tournament, none for a draft); entries page aside; captures `config-published`, `entries-wide` |
+| Public content is capped at 1200 px | Measured on the built home: content starts at x = 360 at 1920 px; capture `public-home` |
+| Visual weight follows what a person can act on | Entries spec (collapsed compact cancelled group with its count, omitted when empty; "pending your decision" and "waiting for a slot"); journey 13 |
+| Guest entries (modified) | Entries spec and journeys 13–14 cover every scenario, including the dialog naming the waiting entry and the drawer's duplicate |
+| Tournament setup (modified) | Form spec: a successful save is a toast and leaves no persistent success notice; the other scenarios keep their tests |
+
+Pending: the maintainer's run through Aspire (task 6.2).
