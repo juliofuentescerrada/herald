@@ -208,3 +208,39 @@ Vitest: 29 tests in three specs (list 4, form 18, review 7) cover every reviewed
 `e2e/journeys/tournaments.spec.ts` has journeys 10 and 11. Journey 10 creates a team tournament (title only, then the missing values, review, publication, the list) and runs axe on the empty list, the incomplete draft, the review and the published page. Journey 11 signs the same person into a second tab, saves a capacity there, and checks that the first tab's save reports the conflict with its input kept and that the second tab's reload still shows its own change and not the first tab's. The journey sets the reference time zone explicitly: the headless browser's zone is not a fixed fact of the suite.
 
 The whole suite passes locally: 11 journeys, typecheck clean.
+
+### Validation and completion (tasks 7.1–7.3, 11 November 2026)
+
+**Full run (7.1), all passing:** `dotnet format --verify-no-changes`; Release build with no errors; Wolverine's code deleted, rewritten and unchanged; 174 .NET tests (Tournaments 45, Host 49, Architecture 42, Organisations 24, ModuleHosting 8, Messaging 6); `pnpm api:generate` with no drift; lint for the five web projects; 15 of 15 boundary fixtures; Vitest admin 129, public 12, catalogue 5, ui 19, api-client 9; the SSR isolation check; production builds of admin, public and catalogue; the end-to-end suite, 11 journeys.
+
+**Comparison with the captures (7.2, partly done):** eight states (`list-empty`, `create-individual`, `draft-incomplete`, `validation-errors`, `edit-team-draft`, `preview-team`, `published-team`, `list-populated`) were captured from the running application at 1440 and 390 px, through the end-to-end composition with its test identity provider, and compared with the reviewed captures. The run through Aspire against the real directory, and the individual journey by hand, remain for the maintainer; the task stays open until then.
+
+Corrected from that comparison: the list's heading row is as wide as the list, so "Create tournament" ends where the rows end; a draft's subtitle names the organisation, as the captures do; the review-unavailable explanation has space above it.
+
+Differences kept, beyond V-1 to V-6 and Q-1:
+
+- The shell is the one `h1-organisation-access` refined (rail, account menu), not the captures' earlier shell.
+- The action reads "Review and publish" where the captures read "Preview publication": the page it opens is titled "Review before publishing" and is where publication happens.
+- The review's subtitle names the tournament and its summary has no Organisation row: the rail already names the organisation on every page.
+- The second publication statement reads "A published tournament cannot be unpublished" (the spec's wording) where the captures read "There is no unpublish action".
+- The published notice and the saved/failed/conflict notices use `herald-notice` with its tones and icons, where the captures draw plain panels.
+- The missing-for-publication list links to each field, and review is disabled with its reason written under the actions.
+- `saving`, `save-failed`, `revision-conflict`, `publishing`, `publish-failed`, `list-loading` and `list-failed` were not captured from the running application: they need a held or failing request and are asserted in Vitest only.
+
+**Documents (7.3):** `docs/herald-visual-direction.md` §9.3 (the UJ-02 setup row now points to the tournament setup captures and lists what supersedes them), `docs/roadmap.md` (current state, 11 November 2026), `README.md`, `CLAUDE.md` status and `openspec/config.yaml` say the slice is implemented and awaits archival.
+
+**Acceptance review against the specs:**
+
+| Requirement | Evidence |
+|---|---|
+| An owner creates a draft tournament; configuration values validated on every save | Domain tests; `TournamentSetupTests`; journey 10 |
+| Publication requires a complete configuration | Domain tests; `TournamentSetupTests`; review spec; journey 10 |
+| A published tournament stays editable and complete | Domain tests; `TournamentSetupTests`; form spec (published individual and team) |
+| Writes state the revision they were based on | `TournamentSetupTests`; form spec (conflict, repeat of a creation); review spec (stale review); journey 11 |
+| An owner lists and reads the organisation's tournaments | `TournamentSetupTests` (list, isolation, generic 404, public document) |
+| The admin application lists tournaments | List spec (empty, populated, loading, failed with retry) |
+| The configuration form keeps input and explains errors | Form spec (18 tests); journeys 10 and 11 |
+| An owner reviews a tournament before publishing it | Review spec (7 tests); journey 10 |
+| The critical journeys are covered (10 and 11) | `e2e/journeys/tournaments.spec.ts` |
+
+One departure from D-6 stands for the maintainer's decision: the form does not mirror the cross-field rules client-side (see "Admin application" above).

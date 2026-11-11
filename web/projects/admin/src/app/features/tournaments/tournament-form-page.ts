@@ -4,7 +4,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { HeraldHostAdminService, HttpValidationProblemDetails, problemOf, TournamentConfiguration, TournamentDetails } from '@herald/api-client/admin';
 import { Button, Icon, Notice, StatusLabel } from '@herald/ui';
 import { firstValueFrom } from 'rxjs';
-import { AccessState, CONFIRM, QUERY_CLIENT } from '../../platform';
+import { AccessState, CONFIRM, injectWorkingOrganisation, QUERY_CLIENT } from '../../platform';
 import {
   dateTimeText,
   fieldLabels,
@@ -130,6 +130,8 @@ export class TournamentFormPage {
   /** One identifier per content of a creation, reused when the same content is sent again after a lost answer. */
   private attempt: { readonly id: string; readonly content: string } | null = null;
 
+  private readonly workingOrganisation = injectWorkingOrganisation();
+  protected readonly organisationName = computed(() => (this.workingOrganisation.data() ? `${this.workingOrganisation.data()!.name} · ` : ''));
   protected readonly published = computed(() => this.stored()?.publication === 'published');
   protected readonly dirty = computed(() => JSON.stringify(this.draft()) !== this.baseline());
   protected readonly labels = computed(() => lifecycleLabels(this.stored() ?? { publication: 'draft', registration: 'notOpen', competition: 'preparation' }));

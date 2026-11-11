@@ -17,7 +17,7 @@
     <p class="lead">{{ starts() }}</p>
   } @else {
     <h1>{{ stored() ? 'Configure ' + stored()!.configuration.title : 'Create tournament' }}</h1>
-    <p class="lead">Draft configuration · not yet published</p>
+    <p class="lead">Draft configuration · {{ organisationName() }}not yet published</p>
   }
   <p class="labels">
     @for (label of labels(); track label) {

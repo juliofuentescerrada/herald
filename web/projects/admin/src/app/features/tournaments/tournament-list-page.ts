@@ -64,7 +64,7 @@ import { capacityText, dateTimeText, injectOrganisation, lifecycleLabels, locati
     }
   `,
   styles: `
-    .heading { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--herald-space-4); margin-bottom: var(--herald-space-6); }
+    .heading { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--herald-space-4); margin-bottom: var(--herald-space-6); max-width: 1040px; }
     h1 { font-size: 32px; margin-bottom: var(--herald-space-2); }
     .panel { max-width: 1040px; }
     .panel h2 { margin-top: 0; }

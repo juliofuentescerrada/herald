@@ -19,6 +19,7 @@ legend + * { clear: both; }
 .grid { display: grid; grid-template-columns: 1fr 1fr; column-gap: var(--herald-space-6); }
 .wide { grid-column: 1 / -1; }
 .field label { font-weight: 400; font-size: var(--herald-text-base); color: var(--herald-color-text-secondary); }
+.actions + .help { margin-top: var(--herald-space-3); }
 .written { color: var(--herald-color-text-primary); }
 .field-error { display: flex; align-items: flex-start; gap: var(--herald-space-2); }
 @media (max-width: 700px) {
