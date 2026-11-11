@@ -4,7 +4,7 @@ Functional/visual baseline v0.7, 7 November 2026. These are local review assets,
 
 ## Open
 
-Open `journeys.html`, `review-states.html`, `shell-states.html`, `access-states.html`, `tournament-setup-states.html`, `registration-window-states.html` or `index.html` directly in a browser. Alternatively, from the repository root:
+Open `journeys.html`, `review-states.html`, `shell-states.html`, `access-states.html`, `tournament-setup-states.html`, `registration-window-states.html`, `entries-states.html` or `index.html` directly in a browser. Alternatively, from the repository root:
 
 ```sh
 python3 -m http.server 4173 --bind 127.0.0.1 --directory prototypes/frontend
@@ -20,6 +20,7 @@ Then open `http://127.0.0.1:4173/journeys.html`. Stop the temporary server with 
 - `access-states.html`: 24 UJ-01 organisation/access fixtures selected with `?state=`. Covers assigned-only sign-in, owner creation, organisation switching, revoked access, expiry, recovery and generic denial under confirmed D-21. [State table, desktop/mobile captures and review assumptions](../../docs/assets/mockups/access/README.md). Proposals pending maintainer review; no real authentication, authorisation or persistence.
 - `tournament-setup-states.html`: 18 H1 setup fixtures selected with `?state=`: list empty/populated/loading/failure; individual/team drafts, incomplete configuration, validation, saving/failure/conflict; read-only publication previews, publishing/failure; editable published configuration. [State table, desktop/mobile captures and visual decisions](../../docs/assets/mockups/tournament-setup/README.md). Review material approves no product default; no real save or publication.
 - `registration-window-states.html`: 11 deterministic H1 registration fixtures selected with `?state=`. Published configuration with manual opening, closure, reopening, blockers, progress, failure, conflict and a rejected date removal; list with three separate lifecycle labels. [Captures and visual decisions](../../docs/assets/mockups/registration-window/README.md). Review material approves no product default.
+- `entries-states.html`: 22 deterministic H1 guest-entry fixtures selected with `?state=`: individual/team fields, guest choice/creation/duplicates, admission, cancellation, progress/failure/conflict, capacity mismatches, configuration constraints and tournament list counts. [Desktop/mobile captures, provenance and visual decisions](../../docs/assets/mockups/entries/README.md). Review material approves no product default.
 - `index.html`: the original eight-entrant individual league demo. `#admin`, `#discover` and `#public/saturday` select its views. Its results/standings are in memory and reset on reload. Discovery illustrates H2.
 
 ## Scope and review status

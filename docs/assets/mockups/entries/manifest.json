@@ -1,0 +1,1028 @@
+{
+  "description": "Deterministic entries documentation captures; review material approves no product default.",
+  "captureMethod": "Playwright with installed Google Chrome, headless, direct file://, device scale 1, en-GB, Europe/Madrid, local assets and system sans-serif fallback.",
+  "captures": [
+    {
+      "state": "entries-empty-open",
+      "label": "entries empty open",
+      "file": "entries-entries-empty-open-desktop.png",
+      "source": "prototypes/frontend/entries-states.html?state=entries-empty-open",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=entries-empty-open",
+      "viewport": [
+        1440,
+        1000
+      ],
+      "fullPage": true,
+      "sha256": "640e4d89757b5e227efaaeaa43efbf480dc4b0b63123531969493bfbd53e70c9",
+      "checks": {
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "heading": "Entries · Saturday Open",
+        "railVisible": true,
+        "targetsUnder44px": [],
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "entries-empty-open",
+      "label": "entries empty open",
+      "file": "entries-entries-empty-open-mobile.png",
+      "source": "prototypes/frontend/entries-states.html?state=entries-empty-open",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=entries-empty-open",
+      "viewport": [
+        390,
+        844
+      ],
+      "fullPage": true,
+      "sha256": "736634a7ae54481108be1f9ff551744deaa0cd51df81da2f49be2acfb66ad622",
+      "checks": {
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "heading": "Entries · Saturday Open",
+        "railVisible": true,
+        "targetsUnder44px": [],
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "entries-not-open",
+      "label": "entries not open",
+      "file": "entries-entries-not-open-desktop.png",
+      "source": "prototypes/frontend/entries-states.html?state=entries-not-open",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=entries-not-open",
+      "viewport": [
+        1440,
+        1000
+      ],
+      "fullPage": true,
+      "sha256": "d14bdea85bad5ec6dc312f657201b4b6adb0b0426a0fa0e0124aa5f8dab679f4",
+      "checks": {
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "heading": "Entries · Saturday Open",
+        "railVisible": true,
+        "targetsUnder44px": [],
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "entries-not-open",
+      "label": "entries not open",
+      "file": "entries-entries-not-open-mobile.png",
+      "source": "prototypes/frontend/entries-states.html?state=entries-not-open",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=entries-not-open",
+      "viewport": [
+        390,
+        844
+      ],
+      "fullPage": true,
+      "sha256": "ce0f20da0667ce637b0f9de2905887e048791413c6b859bae7c27e41d3d17659",
+      "checks": {
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "heading": "Entries · Saturday Open",
+        "railVisible": true,
+        "targetsUnder44px": [],
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "entries-automatic-full",
+      "label": "entries automatic full",
+      "file": "entries-entries-automatic-full-desktop.png",
+      "source": "prototypes/frontend/entries-states.html?state=entries-automatic-full",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=entries-automatic-full",
+      "viewport": [
+        1440,
+        1000
+      ],
+      "fullPage": true,
+      "sha256": "89aa4cf48f61cf56ded964888c825838fa1e6d71acccb6f8952b4a6517401a51",
+      "checks": {
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "heading": "Entries · Saturday Open",
+        "railVisible": true,
+        "targetsUnder44px": [],
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "entries-automatic-full",
+      "label": "entries automatic full",
+      "file": "entries-entries-automatic-full-mobile.png",
+      "source": "prototypes/frontend/entries-states.html?state=entries-automatic-full",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=entries-automatic-full",
+      "viewport": [
+        390,
+        844
+      ],
+      "fullPage": true,
+      "sha256": "6dd64f5a3cd34824afe811726429d4032ac92d2208e723437b2a3b7efc362f52",
+      "checks": {
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "heading": "Entries · Saturday Open",
+        "railVisible": true,
+        "targetsUnder44px": [],
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "entries-manual-team",
+      "label": "entries manual team",
+      "file": "entries-entries-manual-team-desktop.png",
+      "source": "prototypes/frontend/entries-states.html?state=entries-manual-team",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=entries-manual-team",
+      "viewport": [
+        1440,
+        1000
+      ],
+      "fullPage": true,
+      "sha256": "f2a808ec68be1349b0edcfe773a2b0eaeb71cb5742714db96e4f5493b4e6b267",
+      "checks": {
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "heading": "Entries · Saturday Team League",
+        "railVisible": true,
+        "targetsUnder44px": [],
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "entries-manual-team",
+      "label": "entries manual team",
+      "file": "entries-entries-manual-team-mobile.png",
+      "source": "prototypes/frontend/entries-states.html?state=entries-manual-team",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=entries-manual-team",
+      "viewport": [
+        390,
+        844
+      ],
+      "fullPage": true,
+      "sha256": "6a3ba9480799239330d57d6227cd17b635b658e01e64b299e0f09d22eb3d3854",
+      "checks": {
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "heading": "Entries · Saturday Team League",
+        "railVisible": true,
+        "targetsUnder44px": [],
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "entries-closed",
+      "label": "entries closed",
+      "file": "entries-entries-closed-desktop.png",
+      "source": "prototypes/frontend/entries-states.html?state=entries-closed",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=entries-closed",
+      "viewport": [
+        1440,
+        1000
+      ],
+      "fullPage": true,
+      "sha256": "d16aa9242dfb12f26da58781b9400706107ea155c4048f2c1ab648a82e33ed97",
+      "checks": {
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "heading": "Entries · Saturday Open",
+        "railVisible": true,
+        "targetsUnder44px": [],
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "entries-closed",
+      "label": "entries closed",
+      "file": "entries-entries-closed-mobile.png",
+      "source": "prototypes/frontend/entries-states.html?state=entries-closed",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=entries-closed",
+      "viewport": [
+        390,
+        844
+      ],
+      "fullPage": true,
+      "sha256": "3c04bbc1862f74d26ec4bbadade711dc2e4dd31f91fb4200de52363d98f213ee",
+      "checks": {
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "heading": "Entries · Saturday Open",
+        "railVisible": true,
+        "targetsUnder44px": [],
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "add-existing",
+      "label": "add existing",
+      "file": "entries-add-existing-desktop.png",
+      "source": "prototypes/frontend/entries-states.html?state=add-existing",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=add-existing",
+      "viewport": [
+        1440,
+        1000
+      ],
+      "fullPage": true,
+      "sha256": "074adbeaa4339cf3b5bf5983eeb4f93f247557ea50e83dd46b54543c043c9fd3",
+      "checks": {
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "heading": "Entries · Saturday Open",
+        "railVisible": true,
+        "targetsUnder44px": [],
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "add-existing",
+      "label": "add existing",
+      "file": "entries-add-existing-mobile.png",
+      "source": "prototypes/frontend/entries-states.html?state=add-existing",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=add-existing",
+      "viewport": [
+        390,
+        844
+      ],
+      "fullPage": true,
+      "sha256": "ffb4bf3a125271b2965cdcacb83d78b54eeebb649a2a74b1ab53fc68a860b41a",
+      "checks": {
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "heading": "Entries · Saturday Open",
+        "railVisible": true,
+        "targetsUnder44px": [],
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "add-new",
+      "label": "add new",
+      "file": "entries-add-new-desktop.png",
+      "source": "prototypes/frontend/entries-states.html?state=add-new",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=add-new",
+      "viewport": [
+        1440,
+        1000
+      ],
+      "fullPage": true,
+      "sha256": "6b5f47899c7198b85d34b934a4b84ea7bc419373220a73f6ab6a567e8ac6fb11",
+      "checks": {
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "heading": "Entries · Saturday Open",
+        "railVisible": true,
+        "targetsUnder44px": [],
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "add-new",
+      "label": "add new",
+      "file": "entries-add-new-mobile.png",
+      "source": "prototypes/frontend/entries-states.html?state=add-new",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=add-new",
+      "viewport": [
+        390,
+        844
+      ],
+      "fullPage": true,
+      "sha256": "0c42c7da48e3f81ee2f4373eea26c67f82d1578a8b92dd71963a52726ad617d1",
+      "checks": {
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "heading": "Entries · Saturday Open",
+        "railVisible": true,
+        "targetsUnder44px": [],
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "add-duplicate",
+      "label": "add duplicate",
+      "file": "entries-add-duplicate-desktop.png",
+      "source": "prototypes/frontend/entries-states.html?state=add-duplicate",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=add-duplicate",
+      "viewport": [
+        1440,
+        1000
+      ],
+      "fullPage": true,
+      "sha256": "e14f8ccfcc66ce9d0ddb733782a9fba10e21dda94d896908c4cc91757dcb5cf6",
+      "checks": {
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "heading": "Entries · Saturday Open",
+        "railVisible": true,
+        "targetsUnder44px": [],
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "add-duplicate",
+      "label": "add duplicate",
+      "file": "entries-add-duplicate-mobile.png",
+      "source": "prototypes/frontend/entries-states.html?state=add-duplicate",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=add-duplicate",
+      "viewport": [
+        390,
+        844
+      ],
+      "fullPage": true,
+      "sha256": "df872372c06d19b8ef56fe793e4ea6e238c98058745e4126a8f2c5cad09040c1",
+      "checks": {
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "heading": "Entries · Saturday Open",
+        "railVisible": true,
+        "targetsUnder44px": [],
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "adding",
+      "label": "adding",
+      "file": "entries-adding-desktop.png",
+      "source": "prototypes/frontend/entries-states.html?state=adding",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=adding",
+      "viewport": [
+        1440,
+        1000
+      ],
+      "fullPage": true,
+      "sha256": "9bc6aee1c08155df4ae8737c8e8a05ea73db3e20cb8117b4450c5f1e7297874b",
+      "checks": {
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "heading": "Entries · Saturday Open",
+        "railVisible": true,
+        "targetsUnder44px": [],
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "adding",
+      "label": "adding",
+      "file": "entries-adding-mobile.png",
+      "source": "prototypes/frontend/entries-states.html?state=adding",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=adding",
+      "viewport": [
+        390,
+        844
+      ],
+      "fullPage": true,
+      "sha256": "4d68068bb41e59307349b2bb27477348e162c28faad7fd4598a7ddd480875061",
+      "checks": {
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "heading": "Entries · Saturday Open",
+        "railVisible": true,
+        "targetsUnder44px": [],
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "add-failed",
+      "label": "add failed",
+      "file": "entries-add-failed-desktop.png",
+      "source": "prototypes/frontend/entries-states.html?state=add-failed",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=add-failed",
+      "viewport": [
+        1440,
+        1000
+      ],
+      "fullPage": true,
+      "sha256": "4fc420c172d085de1907850cf6b345eecfee69dc23c2d87828766397193d765d",
+      "checks": {
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "heading": "Entries · Saturday Open",
+        "railVisible": true,
+        "targetsUnder44px": [],
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "add-failed",
+      "label": "add failed",
+      "file": "entries-add-failed-mobile.png",
+      "source": "prototypes/frontend/entries-states.html?state=add-failed",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=add-failed",
+      "viewport": [
+        390,
+        844
+      ],
+      "fullPage": true,
+      "sha256": "fdbc7a2f3aebc9c0fa88dcf633daa7153e2dcad7be4dbeee7441821250b8783c",
+      "checks": {
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "heading": "Entries · Saturday Open",
+        "railVisible": true,
+        "targetsUnder44px": [],
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "admit-unavailable",
+      "label": "admit unavailable",
+      "file": "entries-admit-unavailable-desktop.png",
+      "source": "prototypes/frontend/entries-states.html?state=admit-unavailable",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=admit-unavailable",
+      "viewport": [
+        1440,
+        1000
+      ],
+      "fullPage": true,
+      "sha256": "89aa4cf48f61cf56ded964888c825838fa1e6d71acccb6f8952b4a6517401a51",
+      "checks": {
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "heading": "Entries · Saturday Open",
+        "railVisible": true,
+        "targetsUnder44px": [],
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "admit-unavailable",
+      "label": "admit unavailable",
+      "file": "entries-admit-unavailable-mobile.png",
+      "source": "prototypes/frontend/entries-states.html?state=admit-unavailable",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=admit-unavailable",
+      "viewport": [
+        390,
+        844
+      ],
+      "fullPage": true,
+      "sha256": "6dd64f5a3cd34824afe811726429d4032ac92d2208e723437b2a3b7efc362f52",
+      "checks": {
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "heading": "Entries · Saturday Open",
+        "railVisible": true,
+        "targetsUnder44px": [],
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "admit-out-of-order",
+      "label": "admit out of order",
+      "file": "entries-admit-out-of-order-desktop.png",
+      "source": "prototypes/frontend/entries-states.html?state=admit-out-of-order",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=admit-out-of-order",
+      "viewport": [
+        1440,
+        1000
+      ],
+      "fullPage": true,
+      "sha256": "917fc65aa2c963bd29236c61fed0fc4936b9129df2bc60a4b632124ebebe9b34",
+      "checks": {
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "heading": "Entries · Saturday Open",
+        "railVisible": true,
+        "targetsUnder44px": [],
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "admit-out-of-order",
+      "label": "admit out of order",
+      "file": "entries-admit-out-of-order-mobile.png",
+      "source": "prototypes/frontend/entries-states.html?state=admit-out-of-order",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=admit-out-of-order",
+      "viewport": [
+        390,
+        844
+      ],
+      "fullPage": true,
+      "sha256": "b3719a9f5e1812198df1d2f51527f0c7bdea4d13d3418f907f292f51d3e7e03a",
+      "checks": {
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "heading": "Entries · Saturday Open",
+        "railVisible": true,
+        "targetsUnder44px": [],
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "cancel-confirm",
+      "label": "cancel confirm",
+      "file": "entries-cancel-confirm-desktop.png",
+      "source": "prototypes/frontend/entries-states.html?state=cancel-confirm",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=cancel-confirm",
+      "viewport": [
+        1440,
+        1000
+      ],
+      "fullPage": true,
+      "sha256": "a47bd6561bf49b951d6587a9ec9d04e8437aa3d93293c26c81c22200ed6b5351",
+      "checks": {
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "heading": "Entries · Saturday Open",
+        "railVisible": true,
+        "targetsUnder44px": [],
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "cancel-confirm",
+      "label": "cancel confirm",
+      "file": "entries-cancel-confirm-mobile.png",
+      "source": "prototypes/frontend/entries-states.html?state=cancel-confirm",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=cancel-confirm",
+      "viewport": [
+        390,
+        844
+      ],
+      "fullPage": true,
+      "sha256": "052a24184dcd238d34351872f4fd1d1743006a3b545115bb36fc35a4bada3b1f",
+      "checks": {
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "heading": "Entries · Saturday Open",
+        "railVisible": true,
+        "targetsUnder44px": [],
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "cancel-confirm-closed",
+      "label": "cancel confirm closed",
+      "file": "entries-cancel-confirm-closed-desktop.png",
+      "source": "prototypes/frontend/entries-states.html?state=cancel-confirm-closed",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=cancel-confirm-closed",
+      "viewport": [
+        1440,
+        1000
+      ],
+      "fullPage": true,
+      "sha256": "46fe291978d8dfd45d0c8fb638f5b5178f2e0bb97d9595fa3e7cd2f904725f28",
+      "checks": {
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "heading": "Entries · Saturday Open",
+        "railVisible": true,
+        "targetsUnder44px": [],
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "cancel-confirm-closed",
+      "label": "cancel confirm closed",
+      "file": "entries-cancel-confirm-closed-mobile.png",
+      "source": "prototypes/frontend/entries-states.html?state=cancel-confirm-closed",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=cancel-confirm-closed",
+      "viewport": [
+        390,
+        844
+      ],
+      "fullPage": true,
+      "sha256": "d1eff098fc3129624cb0dc23c7533a1f796014d06651ae5575b9629d1bf5104d",
+      "checks": {
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "heading": "Entries · Saturday Open",
+        "railVisible": true,
+        "targetsUnder44px": [],
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "conflict",
+      "label": "conflict",
+      "file": "entries-conflict-desktop.png",
+      "source": "prototypes/frontend/entries-states.html?state=conflict",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=conflict",
+      "viewport": [
+        1440,
+        1000
+      ],
+      "fullPage": true,
+      "sha256": "51cf9c4a84f9220a67335902277aaa6560dde71bfa1e2d4cce11f00fbe92da90",
+      "checks": {
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "heading": "Entries · Saturday Open",
+        "railVisible": true,
+        "targetsUnder44px": [],
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "conflict",
+      "label": "conflict",
+      "file": "entries-conflict-mobile.png",
+      "source": "prototypes/frontend/entries-states.html?state=conflict",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=conflict",
+      "viewport": [
+        390,
+        844
+      ],
+      "fullPage": true,
+      "sha256": "e244366a5ff4a6b917fa7486721e82095e73f8511394c78fd49d5a972623c914",
+      "checks": {
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "heading": "Entries · Saturday Open",
+        "railVisible": true,
+        "targetsUnder44px": [],
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "over-capacity",
+      "label": "over capacity",
+      "file": "entries-over-capacity-desktop.png",
+      "source": "prototypes/frontend/entries-states.html?state=over-capacity",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=over-capacity",
+      "viewport": [
+        1440,
+        1000
+      ],
+      "fullPage": true,
+      "sha256": "eb33946b1fb38074e9d1e3140e0dc3e57cdba94f087246f6b43f9816dc9e45a1",
+      "checks": {
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "heading": "Entries · Saturday Open",
+        "railVisible": true,
+        "targetsUnder44px": [],
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "over-capacity",
+      "label": "over capacity",
+      "file": "entries-over-capacity-mobile.png",
+      "source": "prototypes/frontend/entries-states.html?state=over-capacity",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=over-capacity",
+      "viewport": [
+        390,
+        844
+      ],
+      "fullPage": true,
+      "sha256": "3d8d6ee10be0a573102dc8c43f961f36bd533a8ce5567cd9c032c566c0b44916",
+      "checks": {
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "heading": "Entries · Saturday Open",
+        "railVisible": true,
+        "targetsUnder44px": [],
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "loading",
+      "label": "loading",
+      "file": "entries-loading-desktop.png",
+      "source": "prototypes/frontend/entries-states.html?state=loading",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=loading",
+      "viewport": [
+        1440,
+        1000
+      ],
+      "fullPage": true,
+      "sha256": "096902e279694b4885494805011ec6f71784d96204c81dc147e8ec0bc22cd15b",
+      "checks": {
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "heading": "Entries · Saturday Open",
+        "railVisible": true,
+        "targetsUnder44px": [],
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "loading",
+      "label": "loading",
+      "file": "entries-loading-mobile.png",
+      "source": "prototypes/frontend/entries-states.html?state=loading",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=loading",
+      "viewport": [
+        390,
+        844
+      ],
+      "fullPage": true,
+      "sha256": "a8d8b2fcf5a52d582749e14bea499529b300b3ad7b34e51544b6ba737e754972",
+      "checks": {
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "heading": "Entries · Saturday Open",
+        "railVisible": true,
+        "targetsUnder44px": [],
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "failed",
+      "label": "failed",
+      "file": "entries-failed-desktop.png",
+      "source": "prototypes/frontend/entries-states.html?state=failed",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=failed",
+      "viewport": [
+        1440,
+        1000
+      ],
+      "fullPage": true,
+      "sha256": "82f8612fe92b5cdd2eb4e4d82bada0fa82f26ce26d01a24a192943d20b5e93ef",
+      "checks": {
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "heading": "Entries · Saturday Open",
+        "railVisible": true,
+        "targetsUnder44px": [],
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "failed",
+      "label": "failed",
+      "file": "entries-failed-mobile.png",
+      "source": "prototypes/frontend/entries-states.html?state=failed",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=failed",
+      "viewport": [
+        390,
+        844
+      ],
+      "fullPage": true,
+      "sha256": "5a7331fc562e1467f2aa77a85d52a42228e8d9bb8fb91cfc1c733359e1b94f79",
+      "checks": {
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "heading": "Entries · Saturday Open",
+        "railVisible": true,
+        "targetsUnder44px": [],
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "entries-link",
+      "label": "entries link",
+      "file": "entries-entries-link-desktop.png",
+      "source": "prototypes/frontend/entries-states.html?state=entries-link",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=entries-link",
+      "viewport": [
+        1440,
+        1000
+      ],
+      "fullPage": true,
+      "sha256": "cb7145aac5333fcffb539b7bf973bce039014750d1347e063531eaa1e209c017",
+      "checks": {
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "heading": "Saturday Open",
+        "railVisible": true,
+        "targetsUnder44px": [],
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "entries-link",
+      "label": "entries link",
+      "file": "entries-entries-link-mobile.png",
+      "source": "prototypes/frontend/entries-states.html?state=entries-link",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=entries-link",
+      "viewport": [
+        390,
+        844
+      ],
+      "fullPage": true,
+      "sha256": "fc68918b7bf19fa252cf7ca74d0e71e446190bdaf6d63737d23e747db359e0a4",
+      "checks": {
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "heading": "Saturday Open",
+        "railVisible": true,
+        "targetsUnder44px": [],
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "fields-locked",
+      "label": "fields locked",
+      "file": "entries-fields-locked-desktop.png",
+      "source": "prototypes/frontend/entries-states.html?state=fields-locked",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=fields-locked",
+      "viewport": [
+        1440,
+        1000
+      ],
+      "fullPage": true,
+      "sha256": "cb7145aac5333fcffb539b7bf973bce039014750d1347e063531eaa1e209c017",
+      "checks": {
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "heading": "Saturday Open",
+        "railVisible": true,
+        "targetsUnder44px": [],
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "fields-locked",
+      "label": "fields locked",
+      "file": "entries-fields-locked-mobile.png",
+      "source": "prototypes/frontend/entries-states.html?state=fields-locked",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=fields-locked",
+      "viewport": [
+        390,
+        844
+      ],
+      "fullPage": true,
+      "sha256": "fc68918b7bf19fa252cf7ca74d0e71e446190bdaf6d63737d23e747db359e0a4",
+      "checks": {
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "heading": "Saturday Open",
+        "railVisible": true,
+        "targetsUnder44px": [],
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "capacity-rejected",
+      "label": "capacity rejected",
+      "file": "entries-capacity-rejected-desktop.png",
+      "source": "prototypes/frontend/entries-states.html?state=capacity-rejected",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=capacity-rejected",
+      "viewport": [
+        1440,
+        1000
+      ],
+      "fullPage": true,
+      "sha256": "2d463383acf7e115e00d00a5f99592af08a0ef53efd8e0a8caee2a03ac1fcf04",
+      "checks": {
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "heading": "Saturday Open",
+        "railVisible": true,
+        "targetsUnder44px": [],
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "capacity-rejected",
+      "label": "capacity rejected",
+      "file": "entries-capacity-rejected-mobile.png",
+      "source": "prototypes/frontend/entries-states.html?state=capacity-rejected",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=capacity-rejected",
+      "viewport": [
+        390,
+        844
+      ],
+      "fullPage": true,
+      "sha256": "93950b8a4725ca05602b5dc6db615ff7c12a3afd7efd58aa3fab843151bad5f3",
+      "checks": {
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "heading": "Saturday Open",
+        "railVisible": true,
+        "targetsUnder44px": [],
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "list-with-entries",
+      "label": "list with entries",
+      "file": "entries-list-with-entries-desktop.png",
+      "source": "prototypes/frontend/entries-states.html?state=list-with-entries",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=list-with-entries",
+      "viewport": [
+        1440,
+        1000
+      ],
+      "fullPage": true,
+      "sha256": "0a433b8683f12fdaa7612c979fe95ac90e2a59b786bdc9a35abea4f5aba274c0",
+      "checks": {
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "heading": "Tournaments",
+        "railVisible": true,
+        "targetsUnder44px": [],
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "list-with-entries",
+      "label": "list with entries",
+      "file": "entries-list-with-entries-mobile.png",
+      "source": "prototypes/frontend/entries-states.html?state=list-with-entries",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=list-with-entries",
+      "viewport": [
+        390,
+        844
+      ],
+      "fullPage": true,
+      "sha256": "f6a9ed1b0376d940b3d7866401c8f96b0b2eca88f29dd70942922f10a708c632",
+      "checks": {
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "heading": "Tournaments",
+        "railVisible": true,
+        "targetsUnder44px": [],
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    }
+  ],
+  "interactionChecks": [
+    "Capacity summary focuses its field",
+    "Editing configuration disables the registration action",
+    "Retry retains guest input",
+    "Keyboard focus has a visible 3px solid outline",
+    "Out-of-order admission requires a non-empty private reason",
+    "Adding prevents repeat submissions",
+    "Team fixture has the expected tournament title"
+  ],
+  "limitations": "Static snapshots: no backend, persistence, automatic transitions or real revision reconciliation."
+}
