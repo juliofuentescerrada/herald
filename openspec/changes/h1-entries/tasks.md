@@ -35,8 +35,8 @@
 
 ## 7. End-to-end journeys
 
-- [ ] 7.1 Journey 13: individual, automatic admission, full field, waiting, cancellation promotes
-- [ ] 7.2 Journey 14: team, manual admission, possible duplicate, admission
+- [x] 7.1 Journey 13: individual, automatic admission, full field, waiting, cancellation promotes
+- [x] 7.2 Journey 14: team, manual admission, possible duplicate, admission
 
 ## 8. Validation and completion
 

@@ -235,3 +235,7 @@ The `entries` feature (`features/entries`, route `tournaments/:tournamentId/entr
 - A cancellation's effect also covers manual admission, registration not open, an over-capacity field and a kind mismatch; the over-capacity and kind-mismatch notices block adding and admitting, never cancelling (EN-12).
 
 `entries-page.spec.ts` (19 tests) covers each entries state of Visual input with `axe-core` on the main ones; the tournament form and list specs gain `entries-link`, `fields-locked`, `capacity-rejected` and `list-with-entries`. Admin 164 tests, lint and the boundary fixtures pass.
+
+### End-to-end journeys (tasks 7.1 and 7.2, 11 November 2026)
+
+`e2e/journeys/entries.spec.ts` holds journeys 13 and 14. Each publishes a tournament with both registration dates and opens its registration through the admin application, then reloads the entries page until adding is available, since Registration learns the terms through its local queue just after the write. Journey 14 needs a team guest with no active entry, so it enters a team and cancels it before typing the same name in another form (`cedar  owls`) to reach the possible duplicate. The whole suite (14 journeys) passes locally.
