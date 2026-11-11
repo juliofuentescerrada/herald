@@ -26,7 +26,7 @@
 
 ## 5. End-to-end journeys
 
-- [ ] 5.1 Update journeys whose confirmations or messages change (8, 11, 13, 14 and any other found by the run); the suite passes
+- [x] 5.1 Update journeys whose confirmations or messages change (8, 11, 13, 14 and any other found by the run); the suite passes
 
 ## 6. Validation and completion
 

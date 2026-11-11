@@ -39,7 +39,7 @@ const openForEntries = async (page: Page, title: string, terms: { team: boolean;
   }).toPass();
 };
 
-/** Adds an entry for a new guest through the add panel. */
+/** Adds an entry for a new guest through the add drawer. */
 const addNew = async (page: Page, kind: 'player' | 'team', name: string) => {
   await page.getByRole('button', { name: kind === 'team' ? 'Add team' : 'Add player' }).click();
   await page.getByRole('button', { name: 'Create new' }).click();
@@ -52,6 +52,7 @@ test('An owner enters players until the field is full, sees the next one wait, a
   await createOrganisation(page);
   await openForEntries(page, 'Saturday Open', { team: false, capacity: 2, admission: 'Automatic' });
   await expect(page.getByRole('heading', { name: '0 of 2 individual entries' })).toBeVisible();
+  await expect(page.getByText('Automatic admission · 0 waiting for a slot')).toBeVisible();
   await expect(page.getByRole('heading', { name: 'No entries yet' })).toBeVisible();
   await expectAccessible();
 
@@ -72,13 +73,21 @@ test('An owner enters players until the field is full, sees the next one wait, a
   await expectAccessible();
 
   await admitted.getByRole('button', { name: 'Cancel entry: Robin Vale' }).click();
-  await expect(page.getByRole('heading', { name: 'Cancel Robin Vale’s entry?' })).toBeFocused();
-  await expect(page.getByText('Ellis Stone, first in the capacity queue, will be admitted automatically.')).toBeVisible();
-  await page.getByRole('button', { name: 'Confirm cancellation' }).click();
+  const dialog = page.getByRole('dialog', { name: 'Cancel Robin Vale’s entry?' });
+  await expect(dialog.getByRole('button', { name: 'Keep entry' })).toBeFocused();
+  await expect(dialog.getByText('Ellis Stone, first in the capacity queue, will be admitted automatically.')).toBeVisible();
+  await expectAccessible();
+  await dialog.getByRole('button', { name: 'Confirm cancellation' }).click();
+  await expect(dialog).toBeHidden();
+  await expect(page.getByText('Robin Vale’s entry cancelled.')).toBeVisible();
 
   await expect(page.getByRole('list', { name: 'Admitted · 2' }).getByRole('heading', { level: 3 })).toHaveText(['Sam Reed', 'Ellis Stone']);
   await expect(page.getByRole('heading', { name: 'Waiting · 0' })).toBeVisible();
-  await expect(page.getByRole('list', { name: 'Cancelled · 1' }).getByRole('heading', { name: 'Robin Vale' })).toBeVisible();
+  // Cancelled entries are history: collapsed, with their count.
+  const history = page.getByRole('list', { name: 'Cancelled entries' });
+  await expect(history).toBeHidden();
+  await page.getByText('Cancelled · 1').click();
+  await expect(history.getByText('Robin Vale')).toBeVisible();
 
   await page.getByRole('link', { name: 'Back to configuration' }).click();
   await page.getByRole('link', { name: 'Back to tournaments' }).first().click();
@@ -97,7 +106,7 @@ test('An owner enters teams under manual admission, enters an existing team when
   await expect(page.getByText('Cedar Owls added · Waiting: Admission pending.')).toBeVisible();
   await page.getByRole('button', { name: 'Cancel entry: Cedar Owls' }).click();
   await page.getByRole('button', { name: 'Confirm cancellation' }).click();
-  await expect(page.getByRole('list', { name: 'Cancelled · 1' })).toBeVisible();
+  await expect(page.getByText('Cancelled · 1')).toBeVisible();
 
   await addNew(page, 'team', 'cedar  owls');
   await expect(page.getByText('Possible duplicate')).toBeVisible();
@@ -112,6 +121,7 @@ test('An owner enters teams under manual admission, enters an existing team when
   await expect(waiting.getByRole('heading', { name: '1. Cedar Owls' })).toBeVisible();
   await expect(waiting.getByText(/^Admission pending · Waiting since/)).toBeVisible();
   await expect(page.getByRole('heading', { name: '0 of 4 teams' })).toBeVisible();
+  await expect(page.getByText('Manual admission · 1 pending your decision')).toBeVisible();
 
   await waiting.getByRole('button', { name: 'Admit: Cedar Owls' }).click();
   await expect(page.getByRole('heading', { name: '1 of 4 teams' })).toBeVisible();
