@@ -10,8 +10,8 @@
 
 ## 3. Registration domain
 
-- [ ] 3.1 `Guest` with name rules and normalised name; `Field` with its terms, `Entry` entities and the rules EN-3 to EN-9 and EN-12; domain events
-- [ ] 3.2 Domain tests without mocks: creation and repeats of guests, normalisation, entering (open, closed, not open, kind, active duplicate, re-entry), automatic and manual admission, the capacity queue order, owner admission with and without a free slot and out of order, cancellation and promotion on cancellation, capacity increase and reopening, no promotion while closed, mismatches, revisions and repeats
+- [x] 3.1 `Guest` with name rules and normalised name; `Field` with its terms, `Entry` entities and the rules EN-3 to EN-9 and EN-12; domain events
+- [x] 3.2 Domain tests without mocks: creation and repeats of guests, normalisation, entering (open, closed, not open, kind, active duplicate, re-entry), automatic and manual admission, the capacity queue order, owner admission with and without a free slot and out of order, cancellation and promotion on cancellation, capacity increase and reopening, no promotion while closed, mismatches, revisions and repeats
 
 ## 4. Registration persistence and features
 

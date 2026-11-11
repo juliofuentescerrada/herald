@@ -189,3 +189,18 @@ None. Gate 1.1 was passed on 11 November 2026.
 Each consuming module's entry point routes the event it consumes to its own local queue (`RegistrationModule.Queue`, `TournamentsModule.Queue`), durable through the existing `UseDurableLocalQueues` policy; nothing else in the host changes, and the Service Bus transport receives no route. The deduplication window stays five minutes, its comment now pointing to ADR 0016.
 
 `IntegrationEventRoutingTests` (host, 2 tests) checks that each event has one route, to its consumer's local queue, and that the queue is durable. The event crossing between the two real modules, and an older snapshot changing nothing, need the handlers: they are tested in 4.2 and 5.3. Wolverine's generated code does not change (no handler yet). Architecture 42 and messaging 6 tests pass; format check clean.
+
+### Registration domain (tasks 3.1 and 3.2, 11 November 2026)
+
+`Herald.Registration/Domain`: `Guest` (name rules, `Normalise`, `Repeats`), `Field` with its `Entry` entities, and the module's own `WriteResult`/`BrokenRule`, as in Tournaments. The domain has its own `RegistrationState`, `EntryKind` and `Admission` in `EntryTerms`: it does not reference `Herald.Contracts`, and the handler of 4.2 maps the contract onto them.
+
+Details settled while implementing:
+
+- `Field.Revision` grows once per effective change (entering, admitting, cancelling, newer terms), whatever number of entries the change admits; it is the revision `TournamentFieldChanged` carries. `TermsRevision` is the tournament revision the terms came from; terms with the same or a lower revision change nothing.
+- An entry admitted on entering starts at revision 1; it grows when a waiting entry is admitted and when an entry is cancelled. A repeat is checked before the revision, as in Tournaments, so a repeated cancellation from an old page answers with the entry rather than a conflict.
+- A promotion records the method `Promotion` and, as the admitting person, the owner whose cancellation freed the slot, or nobody when new terms freed it.
+- `HasMismatch` covers both crossings of EN-12: `OverCapacityBy` and `HasKindMismatch`. A kind mismatch also stops promotion; cancelling stays possible in both.
+- `TermsReceivedAt` records when the terms last arrived, for the reads to show (design D-5).
+- An admission reason is optional except when skipping the capacity queue, trimmed, at most 500 characters.
+
+`tests/Herald.Registration.Tests` (new project in the solution): 40 domain tests without mocks (`GuestTests` 10, `FieldTests` 30) covering every item of task 3.2. Architecture 42 tests pass; format check clean.
