@@ -4,7 +4,7 @@ Functional/visual baseline v0.7, 7 November 2026. These are local review assets,
 
 ## Open
 
-Open `journeys.html`, `review-states.html`, `shell-states.html`, `access-states.html`, `tournament-setup-states.html`, `registration-window-states.html`, `entries-states.html`, `feedback-layout-states.html` or `index.html` directly in a browser. Alternatively, from the repository root:
+Open `journeys.html`, `review-states.html`, `shell-states.html`, `access-states.html`, `tournament-setup-states.html`, `registration-window-states.html`, `entries-states.html`, `feedback-layout-states.html`, `team-rosters-states.html` or `index.html` directly in a browser. Alternatively, from the repository root:
 
 ```sh
 python3 -m http.server 4173 --bind 127.0.0.1 --directory prototypes/frontend
@@ -22,6 +22,7 @@ Then open `http://127.0.0.1:4173/journeys.html`. Stop the temporary server with 
 - `registration-window-states.html`: 11 deterministic H1 registration fixtures selected with `?state=`. Published configuration with manual opening, closure, reopening, blockers, progress, failure, conflict and a rejected date removal; list with three separate lifecycle labels. [Captures and visual decisions](../../docs/assets/mockups/registration-window/README.md). Review material approves no product default.
 - `entries-states.html`: 22 deterministic H1 guest-entry fixtures selected with `?state=`: individual/team fields, guest choice/creation/duplicates, admission, cancellation, progress/failure/conflict, capacity mismatches, configuration constraints and tournament list counts. [Desktop/mobile captures, provenance and visual decisions](../../docs/assets/mockups/entries/README.md). Review material approves no product default.
 - `feedback-layout-states.html`: 38 deterministic feedback and layout fixtures in three batches, selected with `?state=`. Entries, configuration, administrative pages, public home and inline catalogue specimens. [79 captures, provenance, checks and visual decisions](../../docs/assets/mockups/feedback-layout/README.md). Review material approves no product default; no API or persistence.
+- `team-rosters-states.html`: 19 deterministic H1 team roster fixtures selected with `?state=`: team readiness, roster sizes, guest search/creation/duplicates, add/remove progress and failure, history, cancelled read-only access, awaiting terms, conflict and load recovery. [38 desktop/mobile captures, provenance and visual decisions](../../docs/assets/mockups/team-rosters/README.md). Review material approves no product default; no API or persistence.
 - `index.html`: the original eight-entrant individual league demo. `#admin`, `#discover` and `#public/saturday` select its views. Its results/standings are in memory and reset on reload. Discovery illustrates H2.
 
 ## Scope and review status
