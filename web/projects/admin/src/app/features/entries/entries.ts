@@ -24,7 +24,8 @@ export const cancellationEffect = (field: FieldDetails, entry: EntryDetails): st
   if (entry.state === 'waiting') return 'No slot is freed by cancelling a waiting entry. No waiting entry will be admitted.';
   if (field.terms.admission === 'manual') return 'No waiting entry will be admitted automatically because admission is manual.';
   if (field.terms.registration !== 'open') {
-    return 'No waiting entry will be admitted automatically because registration is not open. You can admit a waiting entry afterwards.';
+    const state = field.terms.registration === 'closed' ? 'closed' : 'not open';
+    return `No waiting entry will be admitted automatically because registration is ${state}. You can admit a waiting entry afterwards.`;
   }
   if (field.kindMismatch) return 'No waiting entry will be admitted automatically while the field has entries of the other kind.';
   if (field.overCapacityBy > 0) return 'The field stays full after this cancellation, so no waiting entry will be admitted.';

@@ -21,6 +21,7 @@ h3 { font-size: var(--herald-text-lg); margin: 0 0 var(--herald-space-1); }
 .operation .actions { margin-top: var(--herald-space-4); }
 .choices { margin-top: var(--herald-space-4); }
 .choices [aria-pressed='true'] { border-width: 2px; }
+.field label { font-weight: 400; font-size: var(--herald-text-base); color: var(--herald-color-text-secondary); }
 .field-error { display: flex; align-items: flex-start; gap: var(--herald-space-2); color: var(--herald-color-feedback-danger); font-weight: 700; margin: 0; }
 
 .group h2 { margin-bottom: var(--herald-space-4); }

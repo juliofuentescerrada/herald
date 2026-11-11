@@ -308,7 +308,7 @@ describe('The entries page', () => {
     page().querySelectorAll<HTMLButtonElement>('ol button')[2].click();
     await settle();
     expect(text('#admit-heading')).toBe('Admit Rowan Lake ahead of Ellis Stone?');
-    expect(text('.operation > p')).toContain('Registration is not open, so no entry is admitted automatically.');
+    expect(text('.operation > p')).toContain('Registration is closed, so no entry is admitted automatically.');
     expect(button('Admit Rowan Lake')?.disabled).toBe(true);
     expect(await violations(page())).toEqual([]);
 
@@ -350,7 +350,7 @@ describe('The entries page', () => {
     await vi.waitFor(() => expect(page().querySelectorAll('ul[aria-labelledby="admitted-heading"] li')).toHaveLength(2));
     page().querySelector<HTMLButtonElement>('ul[aria-labelledby="admitted-heading"] button')!.click();
     await settle();
-    expect(text('.operation herald-notice')).toContain('No waiting entry will be admitted automatically because registration is not open.');
+    expect(text('.operation herald-notice')).toContain('No waiting entry will be admitted automatically because registration is closed.');
   });
 
   it('says an entry changed elsewhere and reloads the latest field', async () => {

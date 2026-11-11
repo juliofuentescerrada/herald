@@ -103,7 +103,7 @@
                   [attr.aria-describedby]="nameError() ? 'name-help name-error' : 'name-help'"
                 />
                 <p class="help" id="name-help">
-                  {{ mode() === 'existing' ? 'Only ' + kind() + ' guests in this organisation.' : '1–80 characters after trimming. Review the name before creating the guest.' }}
+                  {{ mode() === 'existing' ? 'Only ' + kind() + ' guests in ' + (workingOrganisation.data()?.name ?? 'this organisation') + '.' : '1–80 characters after trimming. Review the name before creating the guest.' }}
                 </p>
                 @if (nameError(); as message) {
                   <p class="field-error" id="name-error"><herald-icon name="alert-circle" size="metadata" />Error: {{ message }}</p>
@@ -192,7 +192,7 @@
             <p>
               One slot is free. {{ first()?.guestName }} is earlier in the capacity queue.
               @if (field.data()!.terms.registration !== 'open') {
-                Registration is not open, so no entry is admitted automatically.
+                Registration is {{ field.data()!.terms.registration === 'closed' ? 'closed' : 'not open' }}, so no entry is admitted automatically.
               }
             </p>
             <form novalidate (submit)="$event.preventDefault(); confirmAdmit()">

@@ -239,3 +239,29 @@ The `entries` feature (`features/entries`, route `tournaments/:tournamentId/entr
 ### End-to-end journeys (tasks 7.1 and 7.2, 11 November 2026)
 
 `e2e/journeys/entries.spec.ts` holds journeys 13 and 14. Each publishes a tournament with both registration dates and opens its registration through the admin application, then reloads the entries page until adding is available, since Registration learns the terms through its local queue just after the write. Journey 14 needs a team guest with no active entry, so it enters a team and cancels it before typing the same name in another form (`cedar  owls`) to reach the possible duplicate. The whole suite (14 journeys) passes locally.
+
+### Validation and completion (tasks 8.1–8.3, 11 November 2026)
+
+**Full run (8.1).** `dotnet format --verify-no-changes` clean; build with no warnings; 273 .NET tests pass; `codegen write` and `pnpm api:generate` leave no difference; web lint, the boundary fixtures (15 planted, 15 reported), `test:all` (admin 164, public 12, catalogue 5, ui 19, api-client 9), the SSR isolation check and `build:all` pass; the e2e suite passes (14 journeys).
+
+**Visual comparison (8.2).** A temporary Playwright spec (not committed) built the states against the composed system, a real organisation and two published tournaments, forcing the rarer ones with `page.route` (field shapes, a slow or failed request, a 409, a 400), and captured all 22 states at 1440 × 1000 and 390 × 844, full page; each was compared side by side with its mockup. Corrected after the comparison: the out-of-order admission and the cancellation effect say "closed" when registration was closed instead of "not open"; field labels inside the add and admission panels use the form's quiet label style; the search help names the organisation. Kept, beyond V-1 and V-2: notices keep the `ui` component's maximum width, as on the tournament page, instead of filling the panel; the entries link has "View entries" beside its summary on desktop (stacked on mobile); the summary reads "Entry terms updated …" (see 6.1–6.3); the account menu, rail and lifecycle labels are the implemented shell's. The maintainer ran the slice through Aspire on 11 November 2026 (32-step checklist): functionally correct. Visual improvements requested in that run are deferred to a separate change, since they add `ui` controls and affect every admin screen, not only this slice's: modal dialogs for confirmations such as cancelling an entry; toasts for passing outcomes ("Ellis Stone admitted.") instead of text left on the page; and a desktop layout that uses the available width (the 960 px column leaves much empty space and elements narrower than the page).
+
+**Acceptance review (8.3)** against the change's specifications:
+
+| Specification | Requirement | Evidence |
+|---|---|---|
+| `guest-entries` | Guests created, flagged as possible duplicates, never merged | `GuestEntriesTests`; `Guest` domain tests; entries page duplicate test; journey 14 |
+| `guest-entries` | Entering while open; kind, active duplicate and lost response | `Field` domain tests; `GuestEntriesTests`; add-flow retries reuse identifiers (page spec) |
+| `guest-entries` | Admission by policy and capacity, the race for the last slot, a team taking one slot | Domain tests; parallel-entry API test; journeys 13 and 14 |
+| `guest-entries` | Owner admission, no free slot, skipping the queue with a reason | Domain and API tests; page specs for unavailable and out-of-order admission |
+| `guest-entries` | Cancellation and promotion, after closure, capacity raised, repeated cancellation | Domain and API tests; `TournamentEntriesTests` (capacity raised, reopening); journey 13 |
+| `guest-entries` | Revisions and another organisation's entries | API tests (409 with current revision, generic 404); page conflict test |
+| `guest-entries` | Crossed changes reported, not repaired | Lowered-capacity API test; over-capacity page test |
+| `guest-entries` | The admin application shows and manages entries | `entries-page.spec.ts` (19 tests, axe); journeys 13 and 14 |
+| `tournament-setup` | Lists and reads with entry counts; list in the admin application | `TournamentEntriesTests`; list spec (counts, "Entries", none on drafts) |
+| `tournament-setup` | Entries constrain the configuration (EN-10) and the form explains it | `TournamentEntryRulesTests`; API tests; form specs (locked fields, capacity hint and rejection) |
+| `registration-window` | Closing keeps entries; reopening fills freed slots | `TournamentEntriesTests` |
+| `transactional-messaging` | Integration events through durable local queues, older snapshots ignored | Routing host test; handler tests for both events; events crossing the real modules in `TournamentEntriesTests` |
+| `end-to-end-journeys` | Journeys 13 and 14 | `e2e/journeys/entries.spec.ts` |
+
+Status documents updated: `docs/herald-visual-direction.md` §9.3 (guest entries row), `docs/roadmap.md`, `README.md`, `CLAUDE.md` and `openspec/config.yaml`.
