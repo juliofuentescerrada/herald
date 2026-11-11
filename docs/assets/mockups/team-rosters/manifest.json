@@ -1,0 +1,1186 @@
+{
+  "description": "Deterministic team roster documentation captures; review material approves no product default.",
+  "captureMethod": "Playwright with installed Google Chrome, headless, direct file://, device scale 1, en-GB, Europe/Madrid, reduced motion, local assets and system sans-serif fallback.",
+  "captures": [
+    {
+      "state": "team-readiness",
+      "label": "team readiness",
+      "file": "team-rosters-team-readiness-desktop.png",
+      "source": "prototypes/frontend/team-rosters-states.html?state=team-readiness",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=team-readiness&capture=1",
+      "viewport": [
+        1440,
+        1000
+      ],
+      "fullPage": true,
+      "sha256": "01eaad2f2e0d618a37a2d91ff1fbf3937a6e38559607ceb34115261ede863c35",
+      "checks": {
+        "state": "team-readiness",
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "targetsUnder44px": [],
+        "heading": "Entries · Saturday Team League",
+        "modalFocusInside": null,
+        "focusOutline": null,
+        "primaryCovered": false,
+        "contentWidth": 1120,
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "team-readiness",
+      "label": "team readiness",
+      "file": "team-rosters-team-readiness-mobile.png",
+      "source": "prototypes/frontend/team-rosters-states.html?state=team-readiness",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=team-readiness&capture=1",
+      "viewport": [
+        390,
+        844
+      ],
+      "fullPage": true,
+      "sha256": "944e8499f32a03b7fe7e0a7dc90db49928a66160940a71adf4bb8b859b0074c3",
+      "checks": {
+        "state": "team-readiness",
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "targetsUnder44px": [],
+        "heading": "Entries · Saturday Team League",
+        "modalFocusInside": null,
+        "focusOutline": null,
+        "primaryCovered": false,
+        "contentWidth": 358,
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "roster-empty",
+      "label": "roster empty",
+      "file": "team-rosters-roster-empty-desktop.png",
+      "source": "prototypes/frontend/team-rosters-states.html?state=roster-empty",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=roster-empty&capture=1",
+      "viewport": [
+        1440,
+        1000
+      ],
+      "fullPage": true,
+      "sha256": "8adfebc0d53c860355ede54f459d8662e4e9d20469045b77720bc1b38af2fd1c",
+      "checks": {
+        "state": "roster-empty",
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "targetsUnder44px": [],
+        "heading": "Entries · Saturday Team League",
+        "modalFocusInside": true,
+        "focusOutline": {
+          "width": "3px",
+          "style": "solid"
+        },
+        "primaryCovered": false,
+        "modalWidth": 480,
+        "contentWidth": 1120,
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "roster-empty",
+      "label": "roster empty",
+      "file": "team-rosters-roster-empty-mobile.png",
+      "source": "prototypes/frontend/team-rosters-states.html?state=roster-empty",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=roster-empty&capture=1",
+      "viewport": [
+        390,
+        844
+      ],
+      "fullPage": true,
+      "sha256": "60e18405c09921d5f339d8eea2f9513355cc255509b0bd73307dfb6f70f8974f",
+      "checks": {
+        "state": "roster-empty",
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "targetsUnder44px": [],
+        "heading": "Entries · Saturday Team League",
+        "modalFocusInside": true,
+        "focusOutline": {
+          "width": "3px",
+          "style": "solid"
+        },
+        "primaryCovered": false,
+        "modalWidth": 390,
+        "contentWidth": 358,
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "roster-incomplete",
+      "label": "roster incomplete",
+      "file": "team-rosters-roster-incomplete-desktop.png",
+      "source": "prototypes/frontend/team-rosters-states.html?state=roster-incomplete",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=roster-incomplete&capture=1",
+      "viewport": [
+        1440,
+        1000
+      ],
+      "fullPage": true,
+      "sha256": "1a19b13b051dd4640d72ecbc2138d0960f3706b060a08e142c2be64675b244cc",
+      "checks": {
+        "state": "roster-incomplete",
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "targetsUnder44px": [],
+        "heading": "Entries · Saturday Team League",
+        "modalFocusInside": true,
+        "focusOutline": {
+          "width": "3px",
+          "style": "solid"
+        },
+        "primaryCovered": false,
+        "modalWidth": 480,
+        "contentWidth": 1120,
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "roster-incomplete",
+      "label": "roster incomplete",
+      "file": "team-rosters-roster-incomplete-mobile.png",
+      "source": "prototypes/frontend/team-rosters-states.html?state=roster-incomplete",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=roster-incomplete&capture=1",
+      "viewport": [
+        390,
+        844
+      ],
+      "fullPage": true,
+      "sha256": "ca1c719027bbb15a0cb47f5c879e4cc59b46c9d294e564590f17239abdde5b9f",
+      "checks": {
+        "state": "roster-incomplete",
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "targetsUnder44px": [],
+        "heading": "Entries · Saturday Team League",
+        "modalFocusInside": true,
+        "focusOutline": {
+          "width": "3px",
+          "style": "solid"
+        },
+        "primaryCovered": false,
+        "modalWidth": 390,
+        "contentWidth": 358,
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "roster-complete",
+      "label": "roster complete",
+      "file": "team-rosters-roster-complete-desktop.png",
+      "source": "prototypes/frontend/team-rosters-states.html?state=roster-complete",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=roster-complete&capture=1",
+      "viewport": [
+        1440,
+        1000
+      ],
+      "fullPage": true,
+      "sha256": "bb0ba588b4a8703da07d5f2e5687a78c6f29d762d3a2a4eb4558e2c2be204d4b",
+      "checks": {
+        "state": "roster-complete",
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "targetsUnder44px": [],
+        "heading": "Entries · Saturday Team League",
+        "modalFocusInside": true,
+        "focusOutline": {
+          "width": "3px",
+          "style": "solid"
+        },
+        "primaryCovered": false,
+        "modalWidth": 480,
+        "contentWidth": 1120,
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "roster-complete",
+      "label": "roster complete",
+      "file": "team-rosters-roster-complete-mobile.png",
+      "source": "prototypes/frontend/team-rosters-states.html?state=roster-complete",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=roster-complete&capture=1",
+      "viewport": [
+        390,
+        844
+      ],
+      "fullPage": true,
+      "sha256": "8f1cbc2d6f517b95c9e414c75641db8c94d8b76a445d4b1b69641ecda116ebd1",
+      "checks": {
+        "state": "roster-complete",
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "targetsUnder44px": [],
+        "heading": "Entries · Saturday Team League",
+        "modalFocusInside": true,
+        "focusOutline": {
+          "width": "3px",
+          "style": "solid"
+        },
+        "primaryCovered": false,
+        "modalWidth": 390,
+        "contentWidth": 358,
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "roster-full",
+      "label": "roster full",
+      "file": "team-rosters-roster-full-desktop.png",
+      "source": "prototypes/frontend/team-rosters-states.html?state=roster-full",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=roster-full&capture=1",
+      "viewport": [
+        1440,
+        1000
+      ],
+      "fullPage": true,
+      "sha256": "2a77aa0e13cf2ed29ea04416785605c345309c06b4180335368221ebc5a80823",
+      "checks": {
+        "state": "roster-full",
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "targetsUnder44px": [],
+        "heading": "Entries · Saturday Team League",
+        "modalFocusInside": true,
+        "focusOutline": {
+          "width": "3px",
+          "style": "solid"
+        },
+        "primaryCovered": false,
+        "modalWidth": 480,
+        "contentWidth": 1120,
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "roster-full",
+      "label": "roster full",
+      "file": "team-rosters-roster-full-mobile.png",
+      "source": "prototypes/frontend/team-rosters-states.html?state=roster-full",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=roster-full&capture=1",
+      "viewport": [
+        390,
+        844
+      ],
+      "fullPage": true,
+      "sha256": "008b5e7eb20d8bc2b166c61e5764035dd367e3a773ed2e606cbb945f6ccf07c2",
+      "checks": {
+        "state": "roster-full",
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "targetsUnder44px": [],
+        "heading": "Entries · Saturday Team League",
+        "modalFocusInside": true,
+        "focusOutline": {
+          "width": "3px",
+          "style": "solid"
+        },
+        "primaryCovered": false,
+        "modalWidth": 390,
+        "contentWidth": 358,
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "roster-above-maximum",
+      "label": "roster above maximum",
+      "file": "team-rosters-roster-above-maximum-desktop.png",
+      "source": "prototypes/frontend/team-rosters-states.html?state=roster-above-maximum",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=roster-above-maximum&capture=1",
+      "viewport": [
+        1440,
+        1000
+      ],
+      "fullPage": true,
+      "sha256": "5079443f83084d5025044bcc043be0dfdb922d73e8abf93c8cbbabc910bacb11",
+      "checks": {
+        "state": "roster-above-maximum",
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "targetsUnder44px": [],
+        "heading": "Entries · Saturday Team League",
+        "modalFocusInside": true,
+        "focusOutline": {
+          "width": "3px",
+          "style": "solid"
+        },
+        "primaryCovered": false,
+        "modalWidth": 480,
+        "contentWidth": 1120,
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "roster-above-maximum",
+      "label": "roster above maximum",
+      "file": "team-rosters-roster-above-maximum-mobile.png",
+      "source": "prototypes/frontend/team-rosters-states.html?state=roster-above-maximum",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=roster-above-maximum&capture=1",
+      "viewport": [
+        390,
+        844
+      ],
+      "fullPage": true,
+      "sha256": "96eecab39db1b9f6fcbbfed529a9df2e29242fa54e1ed65453a06d191744feac",
+      "checks": {
+        "state": "roster-above-maximum",
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "targetsUnder44px": [],
+        "heading": "Entries · Saturday Team League",
+        "modalFocusInside": true,
+        "focusOutline": {
+          "width": "3px",
+          "style": "solid"
+        },
+        "primaryCovered": false,
+        "modalWidth": 390,
+        "contentWidth": 358,
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "add-existing",
+      "label": "add existing",
+      "file": "team-rosters-add-existing-desktop.png",
+      "source": "prototypes/frontend/team-rosters-states.html?state=add-existing",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=add-existing&capture=1",
+      "viewport": [
+        1440,
+        1000
+      ],
+      "fullPage": true,
+      "sha256": "c4dd5302d5c9f0f295455b519fd33b3aa637841a06dd6b64134358349e3d8d47",
+      "checks": {
+        "state": "add-existing",
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "targetsUnder44px": [],
+        "heading": "Entries · Saturday Team League",
+        "modalFocusInside": true,
+        "focusOutline": {
+          "width": "3px",
+          "style": "solid"
+        },
+        "primaryCovered": false,
+        "modalWidth": 480,
+        "contentWidth": 1120,
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "add-existing",
+      "label": "add existing",
+      "file": "team-rosters-add-existing-mobile.png",
+      "source": "prototypes/frontend/team-rosters-states.html?state=add-existing",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=add-existing&capture=1",
+      "viewport": [
+        390,
+        844
+      ],
+      "fullPage": true,
+      "sha256": "763eecdb5282e7f9344bf3b51a4830302e08ccdfcb5e8fddd2e5db1eba8a5789",
+      "checks": {
+        "state": "add-existing",
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "targetsUnder44px": [],
+        "heading": "Entries · Saturday Team League",
+        "modalFocusInside": true,
+        "focusOutline": {
+          "width": "3px",
+          "style": "solid"
+        },
+        "primaryCovered": false,
+        "modalWidth": 390,
+        "contentWidth": 358,
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "add-new",
+      "label": "add new",
+      "file": "team-rosters-add-new-desktop.png",
+      "source": "prototypes/frontend/team-rosters-states.html?state=add-new",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=add-new&capture=1",
+      "viewport": [
+        1440,
+        1000
+      ],
+      "fullPage": true,
+      "sha256": "57f7c39145ce22d55967ccb0da9ea1f81e7dd3d38de936b91506f5943244bf8a",
+      "checks": {
+        "state": "add-new",
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "targetsUnder44px": [],
+        "heading": "Entries · Saturday Team League",
+        "modalFocusInside": true,
+        "focusOutline": {
+          "width": "3px",
+          "style": "solid"
+        },
+        "primaryCovered": false,
+        "modalWidth": 480,
+        "contentWidth": 1120,
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "add-new",
+      "label": "add new",
+      "file": "team-rosters-add-new-mobile.png",
+      "source": "prototypes/frontend/team-rosters-states.html?state=add-new",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=add-new&capture=1",
+      "viewport": [
+        390,
+        844
+      ],
+      "fullPage": true,
+      "sha256": "29122d4a941e00278c6a2c4d473063e6f30a7e334efe283c9654203c91bb9c65",
+      "checks": {
+        "state": "add-new",
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "targetsUnder44px": [],
+        "heading": "Entries · Saturday Team League",
+        "modalFocusInside": true,
+        "focusOutline": {
+          "width": "3px",
+          "style": "solid"
+        },
+        "primaryCovered": false,
+        "modalWidth": 390,
+        "contentWidth": 358,
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "add-duplicate",
+      "label": "add duplicate",
+      "file": "team-rosters-add-duplicate-desktop.png",
+      "source": "prototypes/frontend/team-rosters-states.html?state=add-duplicate",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=add-duplicate&capture=1",
+      "viewport": [
+        1440,
+        1000
+      ],
+      "fullPage": true,
+      "sha256": "02d43246f486b118e458aa9f21a12441078e4eb5db356c388be52204fe6b30b4",
+      "checks": {
+        "state": "add-duplicate",
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "targetsUnder44px": [],
+        "heading": "Entries · Saturday Team League",
+        "modalFocusInside": true,
+        "focusOutline": {
+          "width": "3px",
+          "style": "solid"
+        },
+        "primaryCovered": false,
+        "modalWidth": 480,
+        "contentWidth": 1120,
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "add-duplicate",
+      "label": "add duplicate",
+      "file": "team-rosters-add-duplicate-mobile.png",
+      "source": "prototypes/frontend/team-rosters-states.html?state=add-duplicate",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=add-duplicate&capture=1",
+      "viewport": [
+        390,
+        844
+      ],
+      "fullPage": true,
+      "sha256": "536990ce9e17d4c606cfd4d5621c318a322d97c548d474b5d7aa72c941b63468",
+      "checks": {
+        "state": "add-duplicate",
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "targetsUnder44px": [],
+        "heading": "Entries · Saturday Team League",
+        "modalFocusInside": true,
+        "focusOutline": {
+          "width": "3px",
+          "style": "solid"
+        },
+        "primaryCovered": false,
+        "modalWidth": 390,
+        "contentWidth": 358,
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "adding",
+      "label": "adding",
+      "file": "team-rosters-adding-desktop.png",
+      "source": "prototypes/frontend/team-rosters-states.html?state=adding",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=adding&capture=1",
+      "viewport": [
+        1440,
+        1000
+      ],
+      "fullPage": true,
+      "sha256": "18400a2176d542dfa961f825684a4ccc486d02d62d2e087643912638b1c82432",
+      "checks": {
+        "state": "adding",
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "targetsUnder44px": [],
+        "heading": "Entries · Saturday Team League",
+        "modalFocusInside": true,
+        "focusOutline": {
+          "width": "3px",
+          "style": "solid"
+        },
+        "primaryCovered": false,
+        "modalWidth": 480,
+        "contentWidth": 1120,
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "adding",
+      "label": "adding",
+      "file": "team-rosters-adding-mobile.png",
+      "source": "prototypes/frontend/team-rosters-states.html?state=adding",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=adding&capture=1",
+      "viewport": [
+        390,
+        844
+      ],
+      "fullPage": true,
+      "sha256": "e5cd2d428e571b162198d589ef0b1ade21942158e49043b11be91546a53d675a",
+      "checks": {
+        "state": "adding",
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "targetsUnder44px": [],
+        "heading": "Entries · Saturday Team League",
+        "modalFocusInside": true,
+        "focusOutline": {
+          "width": "3px",
+          "style": "solid"
+        },
+        "primaryCovered": false,
+        "modalWidth": 390,
+        "contentWidth": 358,
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "add-failed",
+      "label": "add failed",
+      "file": "team-rosters-add-failed-desktop.png",
+      "source": "prototypes/frontend/team-rosters-states.html?state=add-failed",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=add-failed&capture=1",
+      "viewport": [
+        1440,
+        1000
+      ],
+      "fullPage": true,
+      "sha256": "303c52351c47871db09230fc4739bb3811e763bd57118408ac534fa217a805cb",
+      "checks": {
+        "state": "add-failed",
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "targetsUnder44px": [],
+        "heading": "Entries · Saturday Team League",
+        "modalFocusInside": true,
+        "focusOutline": {
+          "width": "3px",
+          "style": "solid"
+        },
+        "primaryCovered": false,
+        "modalWidth": 480,
+        "contentWidth": 1120,
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "add-failed",
+      "label": "add failed",
+      "file": "team-rosters-add-failed-mobile.png",
+      "source": "prototypes/frontend/team-rosters-states.html?state=add-failed",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=add-failed&capture=1",
+      "viewport": [
+        390,
+        844
+      ],
+      "fullPage": true,
+      "sha256": "d92bc468f2e7eb0433e3a17432241550956f1b4f7dc281811a05a06a822a0c21",
+      "checks": {
+        "state": "add-failed",
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "targetsUnder44px": [],
+        "heading": "Entries · Saturday Team League",
+        "modalFocusInside": true,
+        "focusOutline": {
+          "width": "3px",
+          "style": "solid"
+        },
+        "primaryCovered": false,
+        "modalWidth": 390,
+        "contentWidth": 358,
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "remove",
+      "label": "remove",
+      "file": "team-rosters-remove-desktop.png",
+      "source": "prototypes/frontend/team-rosters-states.html?state=remove",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=remove&capture=1",
+      "viewport": [
+        1440,
+        1000
+      ],
+      "fullPage": true,
+      "sha256": "d418d39f9eb764d5eb284a7c326502162d95ac62d4356bd10b73150df3f95d04",
+      "checks": {
+        "state": "remove",
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "targetsUnder44px": [],
+        "heading": "Entries · Saturday Team League",
+        "modalFocusInside": true,
+        "focusOutline": {
+          "width": "3px",
+          "style": "solid"
+        },
+        "primaryCovered": false,
+        "modalWidth": 480,
+        "contentWidth": 1120,
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "remove",
+      "label": "remove",
+      "file": "team-rosters-remove-mobile.png",
+      "source": "prototypes/frontend/team-rosters-states.html?state=remove",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=remove&capture=1",
+      "viewport": [
+        390,
+        844
+      ],
+      "fullPage": true,
+      "sha256": "5b71be4e57afddaf9b503729111045b0c746c991d91235337db59352a1cbbab9",
+      "checks": {
+        "state": "remove",
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "targetsUnder44px": [],
+        "heading": "Entries · Saturday Team League",
+        "modalFocusInside": true,
+        "focusOutline": {
+          "width": "3px",
+          "style": "solid"
+        },
+        "primaryCovered": false,
+        "modalWidth": 390,
+        "contentWidth": 358,
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "possible-duplicate-member",
+      "label": "possible duplicate member",
+      "file": "team-rosters-possible-duplicate-member-desktop.png",
+      "source": "prototypes/frontend/team-rosters-states.html?state=possible-duplicate-member",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=possible-duplicate-member&capture=1",
+      "viewport": [
+        1440,
+        1000
+      ],
+      "fullPage": true,
+      "sha256": "3f75774584377f21ee68b19579901c4fc0eb5823791a6693af0b03561974f323",
+      "checks": {
+        "state": "possible-duplicate-member",
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "targetsUnder44px": [],
+        "heading": "Entries · Saturday Team League",
+        "modalFocusInside": true,
+        "focusOutline": {
+          "width": "3px",
+          "style": "solid"
+        },
+        "primaryCovered": false,
+        "modalWidth": 480,
+        "contentWidth": 1120,
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "possible-duplicate-member",
+      "label": "possible duplicate member",
+      "file": "team-rosters-possible-duplicate-member-mobile.png",
+      "source": "prototypes/frontend/team-rosters-states.html?state=possible-duplicate-member",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=possible-duplicate-member&capture=1",
+      "viewport": [
+        390,
+        844
+      ],
+      "fullPage": true,
+      "sha256": "fc27c710c1bc859c483937ac2dd0c2831fba5161a2b0206fa90e656965acf93a",
+      "checks": {
+        "state": "possible-duplicate-member",
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "targetsUnder44px": [],
+        "heading": "Entries · Saturday Team League",
+        "modalFocusInside": true,
+        "focusOutline": {
+          "width": "3px",
+          "style": "solid"
+        },
+        "primaryCovered": false,
+        "modalWidth": 390,
+        "contentWidth": 358,
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "history-expanded",
+      "label": "history expanded",
+      "file": "team-rosters-history-expanded-desktop.png",
+      "source": "prototypes/frontend/team-rosters-states.html?state=history-expanded",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=history-expanded&capture=1",
+      "viewport": [
+        1440,
+        1000
+      ],
+      "fullPage": true,
+      "sha256": "3b1c0c67b3f1cdbd358f177bdc55d486025da09dba8d08452206e268bdb748f0",
+      "checks": {
+        "state": "history-expanded",
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "targetsUnder44px": [],
+        "heading": "Entries · Saturday Team League",
+        "modalFocusInside": true,
+        "focusOutline": {
+          "width": "3px",
+          "style": "solid"
+        },
+        "primaryCovered": false,
+        "modalWidth": 480,
+        "contentWidth": 1120,
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "history-expanded",
+      "label": "history expanded",
+      "file": "team-rosters-history-expanded-mobile.png",
+      "source": "prototypes/frontend/team-rosters-states.html?state=history-expanded",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=history-expanded&capture=1",
+      "viewport": [
+        390,
+        844
+      ],
+      "fullPage": true,
+      "sha256": "a0849f6fd778b30479429c8092045856b05eb183554c1c3ba0cd216bd2dd2970",
+      "checks": {
+        "state": "history-expanded",
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "targetsUnder44px": [],
+        "heading": "Entries · Saturday Team League",
+        "modalFocusInside": true,
+        "focusOutline": {
+          "width": "3px",
+          "style": "solid"
+        },
+        "primaryCovered": false,
+        "modalWidth": 390,
+        "contentWidth": 358,
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "cancelled-read-only",
+      "label": "cancelled read only",
+      "file": "team-rosters-cancelled-read-only-desktop.png",
+      "source": "prototypes/frontend/team-rosters-states.html?state=cancelled-read-only",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=cancelled-read-only&capture=1",
+      "viewport": [
+        1440,
+        1000
+      ],
+      "fullPage": true,
+      "sha256": "0a0be77de77290b08b7ba40d944157ae34a3e9013f2f9fbaa881d2ef1c25c61c",
+      "checks": {
+        "state": "cancelled-read-only",
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "targetsUnder44px": [],
+        "heading": "Entries · Saturday Team League",
+        "modalFocusInside": true,
+        "focusOutline": {
+          "width": "3px",
+          "style": "solid"
+        },
+        "primaryCovered": false,
+        "modalWidth": 480,
+        "contentWidth": 1120,
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "cancelled-read-only",
+      "label": "cancelled read only",
+      "file": "team-rosters-cancelled-read-only-mobile.png",
+      "source": "prototypes/frontend/team-rosters-states.html?state=cancelled-read-only",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=cancelled-read-only&capture=1",
+      "viewport": [
+        390,
+        844
+      ],
+      "fullPage": true,
+      "sha256": "6d38a6867fc2e652a8ec63414cc6d54a0f35de9cdfad34b254ba4a4da0ab713e",
+      "checks": {
+        "state": "cancelled-read-only",
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "targetsUnder44px": [],
+        "heading": "Entries · Saturday Team League",
+        "modalFocusInside": true,
+        "focusOutline": {
+          "width": "3px",
+          "style": "solid"
+        },
+        "primaryCovered": false,
+        "modalWidth": 390,
+        "contentWidth": 358,
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "awaiting-terms",
+      "label": "awaiting terms",
+      "file": "team-rosters-awaiting-terms-desktop.png",
+      "source": "prototypes/frontend/team-rosters-states.html?state=awaiting-terms",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=awaiting-terms&capture=1",
+      "viewport": [
+        1440,
+        1000
+      ],
+      "fullPage": true,
+      "sha256": "a4fdbe3347c470bfe64992b71744e1e8849a8a6b0d091eab69b15ed680a7818a",
+      "checks": {
+        "state": "awaiting-terms",
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "targetsUnder44px": [],
+        "heading": "Entries · Saturday Team League",
+        "modalFocusInside": true,
+        "focusOutline": {
+          "width": "3px",
+          "style": "solid"
+        },
+        "primaryCovered": false,
+        "modalWidth": 480,
+        "contentWidth": 1120,
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "awaiting-terms",
+      "label": "awaiting terms",
+      "file": "team-rosters-awaiting-terms-mobile.png",
+      "source": "prototypes/frontend/team-rosters-states.html?state=awaiting-terms",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=awaiting-terms&capture=1",
+      "viewport": [
+        390,
+        844
+      ],
+      "fullPage": true,
+      "sha256": "81ba06425182da7bd0436e955d293c27ce3ef87bdb84bb27b1b0dce8daf2947b",
+      "checks": {
+        "state": "awaiting-terms",
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "targetsUnder44px": [],
+        "heading": "Entries · Saturday Team League",
+        "modalFocusInside": true,
+        "focusOutline": {
+          "width": "3px",
+          "style": "solid"
+        },
+        "primaryCovered": false,
+        "modalWidth": 390,
+        "contentWidth": 358,
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "conflict",
+      "label": "conflict",
+      "file": "team-rosters-conflict-desktop.png",
+      "source": "prototypes/frontend/team-rosters-states.html?state=conflict",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=conflict&capture=1",
+      "viewport": [
+        1440,
+        1000
+      ],
+      "fullPage": true,
+      "sha256": "2583776d571e5ffce22bb5e7bd2c96e444c5eb31b4b7948f340a7b6a63caef14",
+      "checks": {
+        "state": "conflict",
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "targetsUnder44px": [],
+        "heading": "Entries · Saturday Team League",
+        "modalFocusInside": true,
+        "focusOutline": {
+          "width": "3px",
+          "style": "solid"
+        },
+        "primaryCovered": false,
+        "modalWidth": 480,
+        "contentWidth": 1120,
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "conflict",
+      "label": "conflict",
+      "file": "team-rosters-conflict-mobile.png",
+      "source": "prototypes/frontend/team-rosters-states.html?state=conflict",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=conflict&capture=1",
+      "viewport": [
+        390,
+        844
+      ],
+      "fullPage": true,
+      "sha256": "441e8a7fab45ddd4b9438006e5c3f3d4d99c0d5b261805f9f8b3ff54f74f8b14",
+      "checks": {
+        "state": "conflict",
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "targetsUnder44px": [],
+        "heading": "Entries · Saturday Team League",
+        "modalFocusInside": true,
+        "focusOutline": {
+          "width": "3px",
+          "style": "solid"
+        },
+        "primaryCovered": false,
+        "modalWidth": 390,
+        "contentWidth": 358,
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "loading",
+      "label": "loading",
+      "file": "team-rosters-loading-desktop.png",
+      "source": "prototypes/frontend/team-rosters-states.html?state=loading",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=loading&capture=1",
+      "viewport": [
+        1440,
+        1000
+      ],
+      "fullPage": true,
+      "sha256": "57950005cca7704beb87341095b2948a3bd0765f2d613b63f8d98c1f6fb64a7b",
+      "checks": {
+        "state": "loading",
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "targetsUnder44px": [],
+        "heading": "Entries · Saturday Team League",
+        "modalFocusInside": true,
+        "focusOutline": {
+          "width": "3px",
+          "style": "solid"
+        },
+        "primaryCovered": false,
+        "modalWidth": 480,
+        "contentWidth": 1120,
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "loading",
+      "label": "loading",
+      "file": "team-rosters-loading-mobile.png",
+      "source": "prototypes/frontend/team-rosters-states.html?state=loading",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=loading&capture=1",
+      "viewport": [
+        390,
+        844
+      ],
+      "fullPage": true,
+      "sha256": "66e30ca14fae07a7273ece51613cb2c6d6e57aa4abe4d7f1b3b7b47122570031",
+      "checks": {
+        "state": "loading",
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "targetsUnder44px": [],
+        "heading": "Entries · Saturday Team League",
+        "modalFocusInside": true,
+        "focusOutline": {
+          "width": "3px",
+          "style": "solid"
+        },
+        "primaryCovered": false,
+        "modalWidth": 390,
+        "contentWidth": 358,
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "failed",
+      "label": "failed",
+      "file": "team-rosters-failed-desktop.png",
+      "source": "prototypes/frontend/team-rosters-states.html?state=failed",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=failed&capture=1",
+      "viewport": [
+        1440,
+        1000
+      ],
+      "fullPage": true,
+      "sha256": "1372541a2a8daa2cd206b42874d2d6f12d439338bd487bae0b3490d4ee6ff3b0",
+      "checks": {
+        "state": "failed",
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "targetsUnder44px": [],
+        "heading": "Entries · Saturday Team League",
+        "modalFocusInside": true,
+        "focusOutline": {
+          "width": "3px",
+          "style": "solid"
+        },
+        "primaryCovered": false,
+        "modalWidth": 480,
+        "contentWidth": 1120,
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "failed",
+      "label": "failed",
+      "file": "team-rosters-failed-mobile.png",
+      "source": "prototypes/frontend/team-rosters-states.html?state=failed",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=failed&capture=1",
+      "viewport": [
+        390,
+        844
+      ],
+      "fullPage": true,
+      "sha256": "2ba6a535ae47ba351af3e525d88d0faacd32312336846dc3b35d168dc6bbbc06",
+      "checks": {
+        "state": "failed",
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "targetsUnder44px": [],
+        "heading": "Entries · Saturday Team League",
+        "modalFocusInside": true,
+        "focusOutline": {
+          "width": "3px",
+          "style": "solid"
+        },
+        "primaryCovered": false,
+        "modalWidth": 390,
+        "contentWidth": 358,
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    }
+  ],
+  "interactionChecks": [
+    "Unknown query falls back; cancelled group opens a read-only roster; Escape restores focus",
+    "Add and remove update members, row readiness and history inside the open drawer, without a toast",
+    "Failed addition keeps editable input and retry adds that input",
+    "Busy add and removal cannot repeat or close",
+    "Full, above-maximum and awaiting-terms explain unavailable adding; conflict reload shows the latest roster",
+    "Load failure shows no stale members and can retry; keyboard focus wraps in the drawer",
+    "Layout checked at 699, 700 and 1920 px; drawer is full screen below 700 px and 480 px otherwise"
+  ],
+  "limitations": "Static review fixtures: no backend, persistence, real concurrency or production accessibility certification. Busy states deliberately remain in progress."
+}

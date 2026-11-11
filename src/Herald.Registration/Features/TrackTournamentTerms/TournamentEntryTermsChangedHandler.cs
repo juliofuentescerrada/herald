@@ -28,7 +28,9 @@ public static class TournamentEntryTermsChangedHandler
             },
             message.Capacity,
             message.EntryKind == Contract.EntryKind.Team ? Domain.EntryKind.Team : Domain.EntryKind.Individual,
-            message.Admission == Contract.Admission.Manual ? Domain.Admission.Manual : Domain.Admission.Automatic);
+            message.Admission == Contract.Admission.Manual ? Domain.Admission.Manual : Domain.Admission.Automatic,
+            message.MinimumRosterSize,
+            message.MaximumRosterSize);
         var now = DateTimeOffset.UtcNow;
 
         if (await db.Fields.SingleOrDefaultAsync(field => field.Id == id, cancellationToken) is not { } field)

@@ -128,3 +128,45 @@ test('An owner enters teams under manual admission, enters an existing team when
   await expect(page.getByRole('list', { name: 'Admitted · 1' }).getByRole('heading', { name: 'Cedar Owls' })).toBeVisible();
   await expect(page.getByText('Cedar Owls admitted.')).toBeVisible();
 });
+
+test('An owner builds a team’s roster to its minimum, is stopped from adding a player on another team, and sees the roster complete', async ({ page, signIn, expectAccessible }) => {
+  await signIn();
+  await createOrganisation(page);
+  await openForEntries(page, 'Sunday Team Cup', { team: true, capacity: 4, admission: 'Automatic' });
+  await addNew(page, 'team', 'North Stars');
+  await addNew(page, 'team', 'River Falcons');
+  const admitted = page.getByRole('list', { name: 'Admitted · 2' });
+  await expect(admitted.getByText('0 of 3–5 players · incomplete')).toHaveCount(2);
+
+  await admitted.getByRole('button', { name: 'Roster: North Stars' }).click();
+  const roster = page.getByRole('dialog', { name: 'Roster · North Stars' });
+  await expect(roster.getByText('No players yet.')).toBeVisible();
+  for (const player of ['Robin Vale', 'Sam Reed', 'Jamie Brook']) {
+    await roster.getByRole('button', { name: 'Add player' }).click();
+    await roster.getByRole('button', { name: 'Create new' }).click();
+    await roster.getByLabel('Name (alias)').fill(player);
+    await roster.getByRole('button', { name: 'Create and add player' }).click();
+    await expect(roster.getByText(player, { exact: true })).toBeVisible();
+  }
+  await expect(roster.getByRole('heading', { name: 'Members · 3' })).toBeVisible();
+  await expect(roster.getByText('3 of 3–5 players', { exact: true })).toBeVisible();
+  await expectAccessible();
+  await roster.getByRole('button', { name: 'Back to entries' }).click();
+  await expect(roster).toBeHidden();
+
+  // Robin Vale is on North Stars: River Falcons' search shows them unavailable, with no way to add them.
+  await admitted.getByRole('button', { name: 'Roster: River Falcons' }).click();
+  const other = page.getByRole('dialog', { name: 'Roster · River Falcons' });
+  await other.getByRole('button', { name: 'Add player' }).click();
+  await other.getByRole('button', { name: 'Choose existing' }).click();
+  await other.getByLabel('Search by name').fill('Robin');
+  const found = other.getByRole('list', { name: 'Existing player guests' });
+  await expect(found.getByText('On North Stars')).toBeVisible();
+  await expect(found.getByRole('button', { name: 'Add player: Robin Vale' })).toHaveCount(0);
+  await expectAccessible();
+  await other.getByRole('button', { name: 'Back to entries' }).click();
+
+  const north = admitted.getByRole('listitem').filter({ hasText: 'North Stars' });
+  await expect(north.getByText('3 of 3–5 players', { exact: true })).toBeVisible();
+  await expect(admitted.getByRole('listitem').filter({ hasText: 'River Falcons' }).getByText('0 of 3–5 players · incomplete')).toBeVisible();
+});

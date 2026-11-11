@@ -1,4 +1,4 @@
-import { EntryDetails, FieldDetails } from '@herald/api-client/admin';
+import { EntryDetails, EntryTerms, FieldDetails, RosterReadiness } from '@herald/api-client/admin';
 import { organisationKey } from '../../platform';
 
 /** The same keys as the tournaments feature uses, so a write here refreshes its tournament and list. */
@@ -6,9 +6,19 @@ export const tournamentKey = (organisation: string, id: string) => organisationK
 export const tournamentsKey = (organisation: string) => organisationKey(organisation, 'tournaments');
 export const fieldKey = (organisation: string, id: string) => organisationKey(organisation, 'field', id);
 export const guestsKey = (organisation: string) => organisationKey(organisation, 'guests');
+export const rosterKey = (organisation: string, tournament: string, entry: string) => organisationKey(organisation, 'roster', tournament, entry);
 
 /** A guest's kind follows the tournament's entry kind: players for individual entries, teams for team entries. */
 export const guestKind = (field: FieldDetails) => (field.terms.entryKind === 'team' ? 'team' : 'player');
+
+/** "2 of 3–5 players · incomplete": a roster's size against the tournament's bounds, in words (h1-team-rosters). */
+export const rosterText = (size: number, terms: Pick<EntryTerms, 'minimumRosterSize' | 'maximumRosterSize'>, readiness: RosterReadiness): string => {
+  if (readiness === 'awaitingTerms' || terms.minimumRosterSize == null || terms.maximumRosterSize == null) {
+    return `${size} ${size === 1 ? 'player' : 'players'} · waiting for the tournament’s roster sizes`;
+  }
+  const flag = readiness === 'incomplete' ? ' · incomplete' : readiness === 'aboveMaximum' ? ' · above maximum' : '';
+  return `${size} of ${terms.minimumRosterSize}–${terms.maximumRosterSize} players${flag}`;
+};
 
 export const waitingReasonText = (entry: EntryDetails): string => (entry.waitingReason === 'admissionPending' ? 'Admission pending' : 'Capacity full');
 
@@ -46,6 +56,11 @@ export const ruleText = (field: string, rule: string): string => {
     case 'reason/too-long': return 'Use at most 500 characters.';
     case 'name/required': return 'Enter a name.';
     case 'name/too-long': return 'Use at most 80 characters.';
+    case 'roster/full': return 'The roster is full.';
+    case 'roster/awaiting-terms': return 'The tournament’s roster sizes are not known yet.';
+    case 'guestId/not-a-player': return 'Only player guests can be on a roster.';
+    case 'guestId/on-another-team': return 'This player is on another team’s roster in this tournament.';
+    case 'entry/not-team-tournament': return 'Only team tournaments have rosters.';
     default: return 'Check the request and try again.';
   }
 };

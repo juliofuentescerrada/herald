@@ -16,6 +16,7 @@ import { injectQuery } from '@tanstack/angular-query-experimental';
 import { firstValueFrom } from 'rxjs';
 import { AccessState, AppContext, injectWorkingOrganisation, QUERY_CLIENT } from '../../platform';
 import { admittedText, dateTimeText, instantText, lifecycleLabels, locationText } from '../../shared';
+import { RosterDrawer } from './roster-drawer';
 import {
   cancellationEffect,
   fieldKey,
@@ -23,13 +24,14 @@ import {
   guestKind,
   guestsKey,
   hasFreeSlot,
+  rosterText,
   ruleText,
   tournamentKey,
   tournamentsKey,
   waitingReasonText,
 } from './entries';
 
-type Panel = { readonly kind: 'add' } | { readonly kind: 'cancel' | 'admit'; readonly entry: EntryDetails } | null;
+type Panel = { readonly kind: 'add' } | { readonly kind: 'cancel' | 'admit' | 'roster'; readonly entry: EntryDetails } | null;
 
 interface Failure {
   readonly heading: string;
@@ -39,7 +41,7 @@ interface Failure {
 /** A published tournament's entries: added as guests, admitted and cancelled by the owner (EN-1 to EN-12). */
 @Component({
   selector: 'app-entries-page',
-  imports: [Button, Dialog, Drawer, Icon, Notice, RouterLink, StatusLabel],
+  imports: [Button, Dialog, Drawer, Icon, Notice, RosterDrawer, RouterLink, StatusLabel],
   templateUrl: './entries-page.html',
   styleUrl: './entries-page.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -56,6 +58,7 @@ export class EntriesPage {
   private readonly addDrawer = viewChild.required<TemplateRef<DialogContext>>('addDrawer');
   private readonly cancelDialog = viewChild.required<TemplateRef<DialogContext>>('cancelDialog');
   private readonly admitDialog = viewChild.required<TemplateRef<DialogContext>>('admitDialog');
+  private readonly rosterDrawer = viewChild.required<TemplateRef<DialogContext>>('rosterDrawer');
   /** The open dialog or drawer, which shows `panel`. */
   private open: DialogRef | null = null;
   private readonly summaryHeading = viewChild<ElementRef<HTMLElement>>('summaryHeading');
@@ -161,6 +164,10 @@ export class EntriesPage {
 
   protected readonly zoned = (instant: string | null | undefined) => (instant ? `${instantText(instant, this.zone())} · ${this.zone()}` : '');
   protected readonly waitingReason = waitingReasonText;
+  protected readonly tournamentIdentifier = this.tournamentId;
+  /** A team tournament's rows show their roster's readiness and open it; an individual one has no rosters. */
+  protected readonly teams = computed(() => this.field.data()?.terms.entryKind === 'team');
+  protected readonly readiness = (entry: EntryDetails) => rosterText(entry.rosterSize ?? 0, this.field.data()!.terms, entry.rosterReadiness ?? 'awaitingTerms');
   protected readonly created = (guest: GuestDetails) => `Existing ${this.kind()} · created ${instantText(guest.createdAt, this.zone()).split(',')[0]}`;
 
   protected openAdd(trigger: HTMLElement): void {
@@ -181,6 +188,10 @@ export class EntriesPage {
     this.name.set(value);
     this.matches.set(null);
     this.nameError.set(null);
+  }
+
+  protected openRoster(entry: EntryDetails, trigger: HTMLElement): void {
+    this.show({ kind: 'roster', entry }, trigger);
   }
 
   protected askCancel(entry: EntryDetails, trigger: HTMLElement): void {
@@ -253,7 +264,7 @@ export class EntriesPage {
   private show(panel: Exclude<Panel, null>, trigger: HTMLElement): void {
     this.panel.set(panel);
     this.failure.set(null);
-    const open = this.dialogs.open({ add: this.addDrawer, cancel: this.cancelDialog, admit: this.admitDialog }[panel.kind](), { trigger, viewContainerRef: this.viewContainerRef });
+    const open = this.dialogs.open({ add: this.addDrawer, cancel: this.cancelDialog, admit: this.admitDialog, roster: this.rosterDrawer }[panel.kind](), { trigger, viewContainerRef: this.viewContainerRef });
     this.open = open;
     // Escape, the leaving action and a completed write all end here.
     void open.closed.then(() => {

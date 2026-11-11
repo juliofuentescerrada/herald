@@ -24,9 +24,24 @@ public enum AdmissionMethod
     Promotion,
 }
 
+public enum RosterChangeKind
+{
+    Added,
+    Removed,
+}
+
+// A player on a team entry's tournament roster, kept in the order added (A-3).
+public sealed record RosterMember(GuestId GuestId, Guid AddedBy, DateTimeOffset AddedAt);
+
+// One addition or removal, kept for good (ADR 0007): the roster revision it produced, who and when.
+public sealed record RosterChange(int RosterRevision, GuestId GuestId, RosterChangeKind Kind, Guid ChangedBy, DateTimeOffset ChangedAt);
+
 // A guest's entry in one field. Changed only through its Field, which decides admission.
 public sealed class Entry : Entity<EntryId>
 {
+    private readonly List<RosterMember> _members = [];
+    private readonly List<RosterChange> _rosterChanges = [];
+
     // For EF Core.
     private Entry(EntryId id)
         : base(id)
@@ -75,7 +90,28 @@ public sealed class Entry : Entity<EntryId>
 
     public DateTimeOffset? CancelledAt { get; private set; }
 
+    // Starts at 0 and grows by one with each addition or removal; roster writes state it (design D-2).
+    public int RosterRevision { get; private set; }
+
+    public IReadOnlyList<RosterMember> Members => _members;
+
+    public IReadOnlyList<RosterChange> RosterChanges => _rosterChanges;
+
     public bool IsActive => State != EntryState.Cancelled;
+
+    public bool HasMember(GuestId guest) => _members.Exists(member => member.GuestId == guest);
+
+    internal void AddMember(GuestId guest, Guid actor, DateTimeOffset at)
+    {
+        _members.Add(new(guest, actor, at));
+        _rosterChanges.Add(new(++RosterRevision, guest, RosterChangeKind.Added, actor, at));
+    }
+
+    internal void RemoveMember(GuestId guest, Guid actor, DateTimeOffset at)
+    {
+        _members.RemoveAll(member => member.GuestId == guest);
+        _rosterChanges.Add(new(++RosterRevision, guest, RosterChangeKind.Removed, actor, at));
+    }
 
     internal void Wait(WaitingReason reason)
     {

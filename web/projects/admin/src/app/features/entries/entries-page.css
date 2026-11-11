@@ -56,3 +56,10 @@ form herald-notice { display: flex; margin-top: var(--herald-space-4); }
 .cancelled[open] summary::after { content: '−' / ''; }
 /* In the narrow drawer a result's action goes under its name. */
 .guests li { flex-direction: column; align-items: flex-start; gap: var(--herald-space-3); }
+
+/* Roster readiness beside the team's name: text with a tone, never colour alone (h1-team-rosters). */
+.name-line { display: flex; flex-wrap: wrap; align-items: baseline; gap: 0 var(--herald-space-4); }
+.readiness { color: var(--herald-color-text-secondary); }
+.readiness-warning { color: var(--herald-color-feedback-warning-text); }
+.cancelled li { display: flex; align-items: center; justify-content: space-between; gap: var(--herald-space-4); }
+

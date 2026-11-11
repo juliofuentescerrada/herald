@@ -643,6 +643,263 @@
         }
       }
     },
+    "/api/organisations/{organisationId}/tournaments/{tournamentId}/entries/{entryId}/roster/members/{guestId}": {
+      "delete": {
+        "tags": [
+          "Herald.Registration.Features.RemoveRosterMember.RemoveRosterMemberEndpoint"
+        ],
+        "summary": "DELETE_api_organisations_organisationId_tournaments_tournamentId_entries_entryId_roster_members_guestId",
+        "description": "DELETE_api_organisations_organisationId_tournaments_tournamentId_entries_entryId_roster_members_guestId",
+        "operationId": "removeRosterMember",
+        "parameters": [
+          {
+            "name": "organisationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "tournamentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "entryId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "guestId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "expectedRevision",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RosterDetails"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Herald.Registration.Features.AddRosterMember.AddRosterMemberEndpoint"
+        ],
+        "summary": "PUT_api_organisations_organisationId_tournaments_tournamentId_entries_entryId_roster_members_guestId",
+        "description": "PUT_api_organisations_organisationId_tournaments_tournamentId_entries_entryId_roster_members_guestId",
+        "operationId": "addRosterMember",
+        "parameters": [
+          {
+            "name": "organisationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "tournamentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "entryId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "guestId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AddRosterMember"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RosterDetails"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/organisations/{organisationId}/tournaments/{tournamentId}/entries/{entryId}/roster": {
+      "get": {
+        "tags": [
+          "Herald.Registration.Features.GetRoster.GetRosterEndpoint"
+        ],
+        "summary": "GET_api_organisations_organisationId_tournaments_tournamentId_entries_entryId_roster",
+        "description": "GET_api_organisations_organisationId_tournaments_tournamentId_entries_entryId_roster",
+        "operationId": "getRoster",
+        "parameters": [
+          {
+            "name": "organisationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "tournamentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "entryId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/RosterDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/organisations/{organisationId}/tournaments/{tournamentId}/entries": {
       "get": {
         "tags": [
@@ -725,6 +982,14 @@
             "in": "query",
             "schema": {
               "type": "string"
+            }
+          },
+          {
+            "name": "tournamentId",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
             }
           }
         ],
@@ -1093,6 +1358,18 @@
   },
   "components": {
     "schemas": {
+      "AddRosterMember": {
+        "required": [
+          "expectedRevision"
+        ],
+        "type": "object",
+        "properties": {
+          "expectedRevision": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
       "Admission": {
         "enum": [
           "automatic",
@@ -1332,6 +1609,30 @@
               "string"
             ],
             "format": "date-time"
+          },
+          "rosterSize": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "rosterRevision": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "rosterReadiness": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/RosterReadiness"
+              }
+            ]
           }
         }
       },
@@ -1370,6 +1671,20 @@
           },
           "admission": {
             "$ref": "#/components/schemas/Admission"
+          },
+          "minimumRosterSize": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "maximumRosterSize": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
           }
         }
       },
@@ -1474,6 +1789,16 @@
           "createdAt": {
             "type": "string",
             "format": "date-time"
+          },
+          "team": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/RosterTeam"
+              }
+            ]
           }
         }
       },
@@ -1649,6 +1974,162 @@
           "open",
           "closed"
         ]
+      },
+      "RosterChangeDetails": {
+        "required": [
+          "rosterRevision",
+          "guestId",
+          "name",
+          "kind",
+          "changedBy",
+          "changedAt"
+        ],
+        "type": "object",
+        "properties": {
+          "rosterRevision": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "guestId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/RosterChangeKind"
+          },
+          "changedBy": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "changedAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "RosterChangeKind": {
+        "enum": [
+          "added",
+          "removed"
+        ]
+      },
+      "RosterDetails": {
+        "required": [
+          "entryId",
+          "teamName",
+          "entryState",
+          "revision",
+          "minimumRosterSize",
+          "maximumRosterSize",
+          "readiness",
+          "members",
+          "history"
+        ],
+        "type": "object",
+        "properties": {
+          "entryId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "teamName": {
+            "type": "string"
+          },
+          "entryState": {
+            "$ref": "#/components/schemas/EntryState"
+          },
+          "revision": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "minimumRosterSize": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "maximumRosterSize": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "readiness": {
+            "$ref": "#/components/schemas/RosterReadiness"
+          },
+          "members": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RosterMemberDetails"
+            }
+          },
+          "history": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RosterChangeDetails"
+            }
+          }
+        }
+      },
+      "RosterMemberDetails": {
+        "required": [
+          "guestId",
+          "name",
+          "addedAt",
+          "possibleDuplicateOf"
+        ],
+        "type": "object",
+        "properties": {
+          "guestId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "addedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "possibleDuplicateOf": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/RosterTeam"
+              }
+            ]
+          }
+        }
+      },
+      "RosterReadiness": {
+        "enum": [
+          "awaitingTerms",
+          "incomplete",
+          "complete",
+          "aboveMaximum"
+        ]
+      },
+      "RosterTeam": {
+        "required": [
+          "entryId",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "entryId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
       },
       "SaveTournament": {
         "required": [
@@ -2025,6 +2506,15 @@
     },
     {
       "name": "Herald.Tournaments.Features.CloseRegistration.CloseRegistrationEndpoint"
+    },
+    {
+      "name": "Herald.Registration.Features.RemoveRosterMember.RemoveRosterMemberEndpoint"
+    },
+    {
+      "name": "Herald.Registration.Features.AddRosterMember.AddRosterMemberEndpoint"
+    },
+    {
+      "name": "Herald.Registration.Features.GetRoster.GetRosterEndpoint"
     },
     {
       "name": "Herald.Registration.Features.GetField.GetFieldEndpoint"

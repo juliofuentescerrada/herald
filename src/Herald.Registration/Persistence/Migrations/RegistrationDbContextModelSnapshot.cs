@@ -70,6 +70,9 @@ namespace Herald.Registration.Persistence.Migrations
                     b.Property<int>("Revision")
                         .HasColumnType("integer");
 
+                    b.Property<int>("RosterRevision")
+                        .HasColumnType("integer");
+
                     b.Property<long>("Sequence")
                         .HasColumnType("bigint");
 
@@ -129,6 +132,12 @@ namespace Herald.Registration.Persistence.Migrations
                                 .IsRequired()
                                 .HasMaxLength(20)
                                 .HasColumnType("character varying(20)");
+
+                            b1.Property<int?>("MaximumRosterSize")
+                                .HasColumnType("integer");
+
+                            b1.Property<int?>("MinimumRosterSize")
+                                .HasColumnType("integer");
 
                             b1.Property<string>("Registration")
                                 .IsRequired()
@@ -280,6 +289,68 @@ namespace Herald.Registration.Persistence.Migrations
                         .HasForeignKey("TournamentId")
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
+
+                    b.OwnsMany("Herald.Registration.Domain.RosterChange", "RosterChanges", b1 =>
+                        {
+                            b1.Property<Guid>("TournamentId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<Guid>("EntryId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<int>("RosterRevision")
+                                .HasColumnType("integer");
+
+                            b1.Property<DateTimeOffset>("ChangedAt")
+                                .HasColumnType("timestamp with time zone");
+
+                            b1.Property<Guid>("ChangedBy")
+                                .HasColumnType("uuid");
+
+                            b1.Property<Guid>("GuestId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<string>("Kind")
+                                .IsRequired()
+                                .HasMaxLength(20)
+                                .HasColumnType("character varying(20)");
+
+                            b1.HasKey("TournamentId", "EntryId", "RosterRevision");
+
+                            b1.ToTable("RosterChanges", "registration");
+
+                            b1.WithOwner()
+                                .HasForeignKey("TournamentId", "EntryId");
+                        });
+
+                    b.OwnsMany("Herald.Registration.Domain.RosterMember", "Members", b1 =>
+                        {
+                            b1.Property<Guid>("TournamentId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<Guid>("EntryId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<Guid>("GuestId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<DateTimeOffset>("AddedAt")
+                                .HasColumnType("timestamp with time zone");
+
+                            b1.Property<Guid>("AddedBy")
+                                .HasColumnType("uuid");
+
+                            b1.HasKey("TournamentId", "EntryId", "GuestId");
+
+                            b1.ToTable("RosterMembers", "registration");
+
+                            b1.WithOwner()
+                                .HasForeignKey("TournamentId", "EntryId");
+                        });
+
+                    b.Navigation("Members");
+
+                    b.Navigation("RosterChanges");
                 });
 
             modelBuilder.Entity("Herald.Registration.Domain.Field", b =>
