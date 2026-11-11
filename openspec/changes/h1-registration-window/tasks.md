@@ -23,7 +23,7 @@
 
 ## 5. End-to-end journey
 
-- [ ] 5.1 Journey 12: open the registration of a published tournament, see it open in the list, close it and reopen it
+- [x] 5.1 Journey 12: open the registration of a published tournament, see it open in the list, close it and reopen it
 
 ## 6. Validation and completion
 

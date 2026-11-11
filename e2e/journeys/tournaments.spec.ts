@@ -85,3 +85,51 @@ test('An owner saving a tournament that changed in another tab keeps their input
   await expect(secondPage.getByLabel('Capacity in entries', { exact: true })).toHaveValue('8');
   await expect(secondPage.getByLabel('Game / variant', { exact: true })).toHaveValue('');
 });
+
+test('An owner opens the registration of a published tournament, closes it and reopens it', async ({ page, signIn, expectAccessible }) => {
+  await signIn();
+  await createOrganisation(page);
+  await createDraft(page, 'Spring Open');
+  await page.getByLabel('Game / variant', { exact: true }).fill('Card game · Constructed');
+  await page.getByLabel('Entry kind', { exact: true }).selectOption('Individual');
+  await page.getByLabel('Capacity in individual entries', { exact: true }).fill('8');
+  await page.getByLabel('Planned start', { exact: true }).fill('2026-11-21T10:00');
+  await page.getByLabel('Reference time zone', { exact: true }).selectOption('Europe/Madrid');
+  await page.getByLabel('Location mode', { exact: true }).selectOption('Online');
+  await page.getByLabel('Admission', { exact: true }).selectOption('Manual');
+  await page.getByLabel('Check-in', { exact: true }).selectOption('Mandatory');
+  await page.getByLabel('Visibility', { exact: true }).selectOption('Public');
+  await page.getByRole('button', { name: 'Save draft' }).click();
+  await page.getByRole('link', { name: 'Review and publish' }).click();
+  await page.getByRole('button', { name: 'Publish tournament' }).click();
+
+  const registration = page.getByRole('region', { name: 'Registration' });
+  await expect(registration.getByRole('button', { name: 'Open registration' })).toBeDisabled();
+  await expect(registration.getByText('Set both registration dates before opening registration.')).toBeVisible();
+  await registration.getByRole('link', { name: 'Set registration opening' }).click();
+  await expect(page.getByLabel('Registration opening', { exact: true })).toBeFocused();
+  await page.getByLabel('Registration opening', { exact: true }).fill('2026-11-10T09:00');
+  await page.getByLabel('Registration closure', { exact: true }).fill('2026-11-13T18:00');
+  await expect(registration.getByText('Save your changes first.')).toBeVisible();
+  await page.getByRole('button', { name: 'Save changes' }).click();
+  await expect(registration.getByText('13 November 2026, 18:00')).toBeVisible();
+
+  await registration.getByRole('button', { name: 'Open registration' }).click();
+  await expect(registration.getByRole('button', { name: 'Close registration' })).toBeVisible();
+  await expect(registration.getByText(/^Opened .* · Europe\/Madrid$/)).toBeVisible();
+  await expect(page.getByText('Registration open', { exact: true }).first()).toBeVisible();
+  await expectAccessible();
+
+  await page.getByRole('link', { name: 'Back to tournaments' }).first().click();
+  const row = page.getByRole('listitem').filter({ hasText: 'Spring Open' });
+  await expect(row.getByText('Registration open')).toBeVisible();
+  await expect(row.getByText('Published', { exact: true })).toBeVisible();
+
+  await row.getByRole('link', { name: 'Edit configuration: Spring Open' }).click();
+  await registration.getByRole('button', { name: 'Close registration' }).click();
+  await expect(registration.getByRole('button', { name: 'Reopen registration' })).toBeVisible();
+  await expect(registration.getByText(/^Closed .* · Europe\/Madrid$/)).toBeVisible();
+
+  await registration.getByRole('button', { name: 'Reopen registration' }).click();
+  await expect(registration.getByRole('button', { name: 'Close registration' })).toBeVisible();
+});
