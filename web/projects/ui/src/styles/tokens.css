@@ -54,6 +54,14 @@
   --herald-radius-default: 0;
   --herald-target-min: 44px;
   --herald-motion-fast: 150ms;
+
+  /* Content widths (visual direction §4). Breakpoints are 700 px (one column below) and 1200 px
+     (aside from); media queries cannot read custom properties, so stylesheets write those values. */
+  --herald-width-focused: 720px;
+  --herald-width-form: 960px;
+  --herald-width-wide: 1440px;
+  --herald-width-aside: 320px;
+  --herald-width-public: 1200px;
 }
 
 /* Graphite surfaces switch focus and control boundaries to their inverse mappings. */

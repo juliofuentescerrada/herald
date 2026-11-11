@@ -43,6 +43,8 @@ Existing mockups that remain valid for content and states: `docs/assets/mockups/
 
 `Dialog`, `Drawer` and `Toast` are `ui` controls on `ng-primitives`' dialog and toast primitives, so focus trapping, Escape handling, inert background and live regions come from one tested place. `Drawer` is the dialog primitive with a side placement and its own width (about 480 px on a wide screen, full screen below 700 px), not a separate mechanism. Each control gets its catalogue entry and accessibility tests, as the first controls did.
 
+*Implementation note (11 November 2026):* `Dialog` and `Drawer` use `ng-primitives`' dialog as decided. `Toast` does not use its toast primitive: that primitive stacks toasts as overlapping cards that expand on hover, pauses on hover but not on focus, and positions its region with inline styles, so the visible stack, the focus pause (A-2) and the narrow-screen placement would have needed workarounds. The toast service and outlet in `ui` are about a hundred lines with their own tests. The catalogue opens each dialog, drawer and toast state as the real overlay rather than inline specimens, so focus, Escape and the busy rule can be tried there.
+
 *Alternative considered:* the native `<dialog>` element. Rejected: it gives modality and Escape, but not focus return to a vanished trigger, inert handling across Angular portals or a toast region, and `ui` already standardised on `ng-primitives`.
 
 ### D-2 Toast state in `ui`, cleared by each app's platform

@@ -5,6 +5,37 @@
     <p>Each shared control in the states the shells use. Hover, press and keyboard focus are live: use the pointer and the Tab key.</p>
   </header>
 
+  <section aria-labelledby="dialogs">
+    <h2 id="dialogs">Dialog</h2>
+    <p class="help">Each opens the real modal dialog in one state. Escape and the leaving action close it; busy ignores Escape.</p>
+    <p class="row">
+      <button herald-button type="button" (click)="open(reload, 'default', $any($event.currentTarget))">Default</button>
+      <button herald-button type="button" (click)="open(cancel, 'default', $any($event.currentTarget))">Destructive confirmation</button>
+      <button herald-button type="button" (click)="open(cancel, 'busy', $any($event.currentTarget))">Busy</button>
+      <button herald-button type="button" (click)="open(cancel, 'failed', $any($event.currentTarget))">With an error inside</button>
+    </p>
+  </section>
+
+  <section aria-labelledby="drawers">
+    <h2 id="drawers">Drawer</h2>
+    <p class="help">The dialog at the side of a wide screen and over the whole of a narrow one.</p>
+    <p class="row">
+      <button herald-button type="button" (click)="open(add, 'default', $any($event.currentTarget))">Default</button>
+      <button herald-button type="button" (click)="open(add, 'busy', $any($event.currentTarget))">Busy</button>
+      <button herald-button type="button" (click)="open(add, 'failed', $any($event.currentTarget))">With an error inside</button>
+    </p>
+  </section>
+
+  <section aria-labelledby="toasts">
+    <h2 id="toasts">Toast</h2>
+    <p class="help">Outcomes of the person’s own action only. Hover or focus a toast to keep it.</p>
+    <p class="row">
+      <button herald-button type="button" (click)="toasts.show('Ellis Stone admitted.')">Success</button>
+      <button herald-button type="button" (click)="toasts.show('Changes saved.', 'info')">Info</button>
+      <button herald-button type="button" (click)="stack()">Three stacked</button>
+    </p>
+  </section>
+
   <section aria-labelledby="buttons">
     <h2 id="buttons">Buttons</h2>
     <table>
@@ -94,3 +125,52 @@
     <app-recovery-demo />
   </section>
 </main>
+
+<herald-toast-outlet />
+
+<ng-template #reload let-close="close">
+  <herald-dialog heading="Reload the latest entries?">
+    <p>Read the latest entries before continuing.</p>
+    <div heraldDialogActions>
+      <button herald-button variant="primary" type="button" (click)="close()">Reload latest</button>
+      <button herald-button type="button" (click)="close()">Back</button>
+    </div>
+  </herald-dialog>
+</ng-template>
+
+<ng-template #cancel let-close="close">
+  <herald-dialog heading="Cancel Robin Vale’s entry?" [busy]="surfaceState() === 'busy'">
+    <p>This cancellation is final for this entry. Entering Robin Vale again creates a new entry at the back of the queue.</p>
+    <herald-notice heading="Effect on the waiting list">
+      Ellis Stone, first in the capacity queue, will be admitted automatically when this slot is freed.
+    </herald-notice>
+    @if (surfaceState() === 'failed') {
+      <herald-notice tone="danger" heading="Entry was not cancelled">The request failed. Nothing changed. Try cancelling the entry again.</herald-notice>
+    }
+    <div heraldDialogActions>
+      <button herald-button variant="destructive" type="button" [loading]="surfaceState() === 'busy'" (click)="close()">
+        {{ surfaceState() === 'busy' ? 'Cancelling…' : surfaceState() === 'failed' ? 'Try again' : 'Confirm cancellation' }}
+      </button>
+      <button herald-button type="button" data-herald-initial-focus [disabled]="surfaceState() === 'busy'" (click)="close()">Keep entry</button>
+    </div>
+  </herald-dialog>
+</ng-template>
+
+<ng-template #add let-close="close">
+  <herald-drawer heading="Add player" [busy]="surfaceState() === 'busy'">
+    <p>Choose a guest of Northside Gaming or create a new player.</p>
+    <div class="field">
+      <label for="new-player">Player name</label>
+      <input id="new-player" value="Morgan Ash" [disabled]="surfaceState() === 'busy'" />
+    </div>
+    @if (surfaceState() === 'failed') {
+      <herald-notice tone="danger" heading="Player was not added">The request failed. Nothing was added. Your input is kept; try again.</herald-notice>
+    }
+    <div heraldDialogActions>
+      <button herald-button variant="primary" type="button" [loading]="surfaceState() === 'busy'">
+        {{ surfaceState() === 'busy' ? 'Adding…' : surfaceState() === 'failed' ? 'Retry add' : 'Create and enter player' }}
+      </button>
+      <button herald-button type="button" [disabled]="surfaceState() === 'busy'" (click)="close()">Back to entries</button>
+    </div>
+  </herald-drawer>
+</ng-template>

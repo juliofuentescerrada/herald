@@ -6,11 +6,11 @@
 
 ## 2. `ui` controls and tokens
 
-- [ ] 2.1 Width and aside tokens; breakpoints documented
-- [ ] 2.2 `Dialog` on `ng-primitives` (title as question, consequence, confirm/destructive and leave actions, Escape, focus trap and return, busy state that cannot close or repeat, error content, full width on narrow screens)
-- [ ] 2.3 `Drawer` on the same primitive (side placement, full screen below 700 px, same focus and busy rules)
-- [ ] 2.4 Toast service and outlet (success and info, polite announcement, at least 5 seconds, pause on hover and focus, dismiss, at most three, nothing rendered on the server)
-- [ ] 2.5 Catalogue entries for each control and state; Vitest with `axe-core`; lint and boundary checks pass
+- [x] 2.1 Width and aside tokens; breakpoints documented
+- [x] 2.2 `Dialog` on `ng-primitives` (title as question, consequence, confirm/destructive and leave actions, Escape, focus trap and return, busy state that cannot close or repeat, error content, full width on narrow screens)
+- [x] 2.3 `Drawer` on the same primitive (side placement, full screen below 700 px, same focus and busy rules)
+- [x] 2.4 Toast service and outlet (success and info, polite announcement, at least 5 seconds, pause on hover and focus, dismiss, at most three, nothing rendered on the server)
+- [x] 2.5 Catalogue entries for each control and state; Vitest with `axe-core`; lint and boundary checks pass
 
 ## 3. Admin application
 
