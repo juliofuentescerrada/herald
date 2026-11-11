@@ -1,7 +1,10 @@
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
+using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
 using Npgsql;
 using Testcontainers.PostgreSql;
+using Wolverine.Tracking;
 
 namespace Herald.Host.Tests;
 
@@ -36,6 +39,10 @@ public sealed class OrganisationApi : IAsyncLifetime
         client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TestTokens.For(objectId, name, organiser));
         return client;
     }
+
+    // Publishes as a module would and waits until every handler it reaches has finished, cascades included.
+    public async Task PublishAndWaitAsync(object message) =>
+        await _host!.Services.GetRequiredService<IHost>().TrackActivity().PublishMessageAndWaitAsync(message);
 
     public async Task ExecuteAsync(string sql, Guid parameter)
     {

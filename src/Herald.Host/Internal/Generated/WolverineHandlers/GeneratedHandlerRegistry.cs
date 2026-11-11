@@ -9,7 +9,7 @@ namespace Internal.Generated.WolverineHandlers
     {
         public override System.Type[] HandlerTypes()
         {
-            return System.Array.Empty<System.Type>();
+            return new System.Type[] { typeof(Herald.Registration.Features.TrackTournamentTerms.TournamentEntryTermsChangedHandler) };
         }
 
         public override System.Type[] MessageTypes()
@@ -28,6 +28,9 @@ namespace Internal.Generated.WolverineHandlers
     {
         [global::System.Runtime.CompilerServices.ModuleInitializer]
         [global::System.Diagnostics.CodeAnalysis.DynamicDependency(global::System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.All, typeof(global::Internal.Generated.WolverineHandlers.GeneratedHandlerRegistry))]
+        [global::System.Diagnostics.CodeAnalysis.DynamicDependency(global::System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.All, typeof(global::Internal.Generated.WolverineHandlers.TournamentEntryTermsChangedHandler863110260))]
+        [global::System.Diagnostics.CodeAnalysis.DynamicDependency(global::System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.All, typeof(global::Herald.Registration.Features.TrackTournamentTerms.TournamentEntryTermsChangedHandler))]
+        [global::System.Diagnostics.CodeAnalysis.DynamicDependency(global::System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.All, typeof(global::Herald.Contracts.Tournaments.V1.TournamentEntryTermsChanged))]
         public static void Pin()
         {
             // Intentionally empty. The [DynamicDependency] attributes above are the payload: they root the generated types for Native AOT, and [ModuleInitializer] guarantees this method is itself an ILC root.

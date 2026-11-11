@@ -204,3 +204,19 @@ Details settled while implementing:
 - An admission reason is optional except when skipping the capacity queue, trimmed, at most 500 characters.
 
 `tests/Herald.Registration.Tests` (new project in the solution): 40 domain tests without mocks (`GuestTests` 10, `FieldTests` 30) covering every item of task 3.2. Architecture 42 tests pass; format check clean.
+
+### Registration persistence and features (tasks 4.1–4.4, 11 November 2026)
+
+`RegistrationDbContext` is now organisation-scoped like Tournaments': `Guest` and `Field` are organisation-owned (shadow `OrganisationId`, filter, stamping); `Entry` rows (`registration."Entries"`, key tournament and entry) are reached only through their field, which is auto-included. `Field.Revision` is the concurrency token. Migration `AddGuestsAndFields`.
+
+Features, one file each: `CreateGuest`, `FindGuests`, `GetField`, `EnterGuest`, `AdmitEntry`, `CancelEntry`, and `TrackTournamentTerms` (the handler of `TournamentEntryTermsChanged`). Shared shapes at the root of `Features`: `GuestDetails`/`GuestConflict` and `FieldDetails`/`EntryDetails` with `FieldResults.WriteAsync`, which loads the field, applies the write, saves it and publishes `TournamentFieldChanged` through the endpoint's message bus, so the event commits with the change and leaves after the commit (checked in the generated code). Settled while implementing:
+
+- Every entry write answers with the whole field, admitted first, then waiting in queue order with its position, then cancelled; the private admission reason is not returned. Guest creation answers 200 for a new guest and for a repeat (PUT with the client's identifier).
+- A guest creation refused because of another guest answers 409 `GuestConflict`: `possible-duplicate` with its matches, or `guest-identifier-reused` with none. An entry write based on an older entry revision answers 409 `entry-revision-conflict` with the current revision. A guest of another organisation in an entry answers 400 `guestId: not-found`.
+- A write that loses a race on the same field (concurrency token) is tried again on the reloaded field, up to three times; EF Core's savepoint rolls back the failed attempt inside the endpoint's transaction. The handler retries on `DbUpdateException` (`[RetryNow]`), which also covers the first terms of a tournament arriving twice at once.
+- The handler enters the event's organisation into the scope's `OrganisationContext` before touching the field, since no request carries it.
+- `FindGuests` matches the start of the normalised name, at most 20, by name then creation.
+
+Risk noted: Registration's `EntryKind` and `Admission` have the same names and values as Tournaments', so the admin OpenAPI document holds one schema for each, the nullable form Tournaments needs. Harmless while the values are equal; if one module's values change, rename the other's type rather than let the document pick one.
+
+`GuestEntriesTests` (18 tests against PostgreSQL through the host) deliver the terms as Tournaments will, through the host's message bus and Registration's durable local queue, and wait for the handlers with Wolverine's tracking: guest creation, normalised search, name rules, possible duplicate and confirmation, repeat and reused identifier, another organisation's guests, filling up and waiting, manual admission, the race for the last slot (two parallel entries, one admitted), registration not open and wrong kind, an active guest entered again, promotion on cancellation, skipping the queue with a reason, entry revision conflict and repeat, a capacity increase promoting and older terms ignored, a lowered capacity reported and blocking, another organisation's field and entries as not found, no field without terms, and the public document without these operations. Host 81, Registration 40 and architecture 42 tests pass; format check clean; Wolverine's code, the admin OpenAPI document and the client regenerated; the web builds pass.

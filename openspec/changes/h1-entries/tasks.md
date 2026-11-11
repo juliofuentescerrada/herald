@@ -15,10 +15,10 @@
 
 ## 4. Registration persistence and features
 
-- [ ] 4.1 Mapping, organisation filters and migration `AddGuestsAndFields`
-- [ ] 4.2 Handler of `TournamentEntryTermsChanged` (creates or updates the field, keeps the highest revision, applies EN-8) and publication of `TournamentFieldChanged` with every effective field change; tests: the event crosses from Tournaments to Registration without a broker, and an older snapshot changes nothing
-- [ ] 4.3 Features `CreateGuest`, `FindGuests`, `GetField`, `EnterGuest`, `AdmitEntry`, `CancelEntry` with their endpoints (Admin group, operation names as in design D-6)
-- [ ] 4.4 API tests against PostgreSQL for the `guest-entries` scenarios, including the race for the last slot, another organisation's generic 404s and the public document without these operations
+- [x] 4.1 Mapping, organisation filters and migration `AddGuestsAndFields`
+- [x] 4.2 Handler of `TournamentEntryTermsChanged` (creates or updates the field, keeps the highest revision, applies EN-8) and publication of `TournamentFieldChanged` with every effective field change; tests: the event reaches Registration through its durable local queue without a broker, and an older snapshot changes nothing (the chain from Tournaments' own publication is tested in 5.3)
+- [x] 4.3 Features `CreateGuest`, `FindGuests`, `GetField`, `EnterGuest`, `AdmitEntry`, `CancelEntry` with their endpoints (Admin group, operation names as in design D-6)
+- [x] 4.4 API tests against PostgreSQL for the `guest-entries` scenarios, including the race for the last slot, another organisation's generic 404s and the public document without these operations
 
 ## 5. Tournaments
 
