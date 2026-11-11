@@ -1,6 +1,6 @@
 ## Status
 
-**Approved for implementation on 11 November 2026** (gate 1.1). The maintainer chose the scope (the window only) and the manual action, supplied the mockups ([registration window states](../../../docs/assets/mockups/registration-window/README.md)) and confirmed rows 2 and 3 of §5.1 (D-27) as applied here, the rules RW-1 to RW-6, the assumptions A-1 to A-4 and the corrections W-1 to W-3 of `design.md`, all the same day.
+**Approved for implementation on 11 November 2026** (gate 1.1). The maintainer chose the scope (the window only) and the manual action, supplied the mockups ([registration window states](../../../../docs/assets/mockups/registration-window/README.md)) and confirmed rows 2 and 3 of §5.1 (D-27) as applied here, the rules RW-1 to RW-6, the assumptions A-1 to A-4 and the corrections W-1 to W-3 of `design.md`, all the same day.
 
 ## Why
 

@@ -37,7 +37,7 @@ Confirmed rules:
 
 Screens modified: the published tournament page (a new registration area; the registration label) and the tournament list (the registration label). The draft form and the review page do not change. No screen is created.
 
-References: [registration window state review](../../../prototypes/frontend/registration-window-states.html) and its [11 states in 22 desktop/mobile captures](../../../docs/assets/mockups/registration-window/README.md), produced by the maintainer on 11 November 2026 from `.prompts/h1-registration-window-mockups.md`. The visual input is complete.
+References: [registration window state review](../../../../prototypes/frontend/registration-window-states.html) and its [11 states in 22 desktop/mobile captures](../../../../docs/assets/mockups/registration-window/README.md), produced by the maintainer on 11 November 2026 from `.prompts/h1-registration-window-mockups.md`. The visual input is complete.
 
 States covered (each desktop and mobile):
 
