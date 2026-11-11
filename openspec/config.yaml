@@ -36,8 +36,8 @@ context: |
     and m0-web-shell are done, as are the documentation consolidation and the static journey
     prototype, h1-organisation-access (ADR 0014, accepted) and e2e-critical-paths (ADR 0015).
     h1-tournament-setup (first F-02 slice: draft, configuration, review, publication, list) is
-    done too. h1-registration-window (open, close and reopen registration by hand) is
-    implemented and awaits archival; entries, competition and public reads do not exist.
+    done too, as is h1-registration-window (open, close and reopen registration by hand);
+    entries, competition and public reads do not exist.
   - Modular monolith: one module per bounded context, with Domain at the centre and vertical slices
     (Features: one namespace per use case, one file or cohesive folder; Persistence at the edge);
     features never depend on other features. Shared business rules belong in Domain; technical

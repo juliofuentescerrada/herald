@@ -39,6 +39,7 @@ The suite SHALL cover these journeys, each as one test named as a sentence:
 9. Signing out reloads the application's other tabs and asks for sign-in again.
 10. An owner creates a draft tournament with only a title, sees what it lacks for publication, completes it, reviews it and publishes it, and the list shows it as published with registration not open.
 11. An owner saving a tournament that changed in another tab sees the conflict with their input kept, and the other tab's change is intact.
+12. An owner opens the registration of a published tournament, sees it open in the list, closes it and reopens it.
 
 #### Scenario: Each journey checks what the person sees
 - **WHEN** a journey runs

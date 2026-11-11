@@ -96,7 +96,7 @@ Publication SHALL make the tournament published, record the acting person and ti
 - **THEN** the response lists the planned start among the values missing for publication
 
 ### Requirement: A published tournament stays editable and complete
-An owner SHALL be able to change the configuration of a published tournament, including its entry kind while no entries exist. A save of a published tournament SHALL be rejected, naming the values, when it would leave any value required for publication absent.
+An owner SHALL be able to change the configuration of a published tournament, including its entry kind while no entries exist. A save of a published tournament SHALL be rejected, naming the values, when it would leave any value required for publication absent. While its registration is open, a save SHALL also be rejected, naming the values, when it would leave the registration opening or the registration closure absent.
 
 #### Scenario: A published tournament's capacity changes
 - **WHEN** an owner saves a published tournament with capacity 16 instead of 8
@@ -105,6 +105,14 @@ An owner SHALL be able to change the configuration of a published tournament, in
 #### Scenario: A save would make a published tournament incomplete
 - **WHEN** an owner saves a published tournament with no planned start
 - **THEN** the save is rejected naming the planned start and the stored configuration is unchanged
+
+#### Scenario: A save would remove a registration date while registration is open
+- **WHEN** an owner saves a tournament whose registration is open with no registration closure
+- **THEN** the save is rejected naming the registration closure and the stored configuration is unchanged
+
+#### Scenario: A registration date is removed while registration is closed
+- **WHEN** an owner saves a tournament whose registration is closed or not open with no registration opening
+- **THEN** the save succeeds
 
 ### Requirement: Writes state the revision they were based on
 Every tournament SHALL have a revision that starts at 1 and increases by one with each effective change. Every save and publication SHALL state the revision it was based on. A write based on an older revision SHALL be rejected as a conflict that reports the current revision and changes nothing, except that a save whose content equals the stored configuration SHALL return the current tournament as a repeat. A save that changes nothing SHALL NOT increase the revision.
@@ -122,7 +130,7 @@ Every tournament SHALL have a revision that starts at 1 and increases by one wit
 - **THEN** publication is rejected as a conflict and the tournament is still a draft
 
 ### Requirement: An owner lists and reads the organisation's tournaments
-The API SHALL return the working organisation's tournaments, newest first, each with its title, game/variant, entry kind, capacity, planned start with its time zone, location and the three lifecycle facts (publication, registration, competition). It SHALL return one tournament with its full configuration, revision, lifecycle facts and the values missing for publication. Tournaments SHALL be organisation-owned: a member of another organisation SHALL receive the same generic not-found response as for a tournament that does not exist, on reads and writes. No public API operation SHALL expose a tournament in this change, whatever its visibility.
+The API SHALL return the working organisation's tournaments, newest first, each with its title, game/variant, entry kind, capacity, planned start with its time zone, location and the three lifecycle facts (publication, registration, competition). The registration fact SHALL be the tournament's current registration state: not open, open or closed. It SHALL return one tournament with its full configuration, revision, lifecycle facts, the values missing for publication, the values missing to open registration, and the time of the last registration change when there is one. Tournaments SHALL be organisation-owned: a member of another organisation SHALL receive the same generic not-found response as for a tournament that does not exist, on reads and writes. No public API operation SHALL expose a tournament in this change, whatever its visibility.
 
 #### Scenario: An organisation has no tournaments
 - **WHEN** an owner lists the tournaments of a new organisation
@@ -143,6 +151,14 @@ The API SHALL return the working organisation's tournaments, newest first, each 
 #### Scenario: A public tournament is published
 - **WHEN** a tournament with public visibility is published
 - **THEN** the public API document has no operation that returns it
+
+#### Scenario: A published tournament reports what opening registration lacks
+- **WHEN** an owner reads a published tournament with no registration opening
+- **THEN** the response lists the registration opening among the values missing to open registration
+
+#### Scenario: A tournament with open registration is listed
+- **WHEN** an owner lists tournaments after opening the registration of one
+- **THEN** that tournament's registration fact is open and the others' are unchanged
 
 ### Requirement: The admin application lists tournaments
 The admin application SHALL offer **Tournaments** as a workspace destination. Its page SHALL list the organisation's tournaments, each with its title, game/variant, entry kind, location, planned start in the reference time zone, capacity in its unit ("16 teams" or "16 individual entries") and the three lifecycle facts as separate labels, never merged into one status. A draft SHALL offer "Continue draft"; a published tournament SHALL offer "Edit configuration". The page SHALL have reviewed empty, loading and failed states, the last with a retry.
