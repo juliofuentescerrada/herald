@@ -91,7 +91,7 @@ One feature per use case, one file each, reusing `TournamentResults.SavedAsync`.
 
 ### D-4 Persistence
 
-Migration `AddRegistrationWindow`: `Registration` (integer, default 0 = not open, so existing rows are correct), `RegistrationChangedBy` and `RegistrationChangedAt` (nullable) on `tournaments."Tournaments"`. The revision stays the concurrency token, so an opening and a save cannot both succeed from the same revision.
+Migration `AddRegistrationWindow`: `Registration` (text, as `Publication` is stored; existing rows receive `NotOpen`), `RegistrationChangedBy` and `RegistrationChangedAt` (nullable) on `tournaments."Tournaments"`. The revision stays the concurrency token, so an opening and a save cannot both succeed from the same revision.
 
 ### D-5 Admin application
 
@@ -131,3 +131,13 @@ One additive migration with a default, so existing tournaments read as not open.
 ## Open Questions
 
 None. Gate 1.1 was passed on 11 November 2026.
+
+## Implementation record
+
+### Domain and migration (tasks 2.1, 2.2 and 3.1, 11 November 2026)
+
+`Tournament` has `Registration` (`RegistrationWindow`), `RegistrationChangedBy`/`At`, `OpenRegistration` and `CloseRegistration`; `Change` requires the registration dates while registration is open; `TournamentConfiguration.MissingForRegistration()` names the absent dates. Refusals that are not missing values are keyed by `registration`: `not-published` for a draft, `not-open` for closing a registration that was never opened. As in `Publish`, a transition already in effect is a repeat before the revision is looked at.
+
+The migration `AddRegistrationWindow` was done with the domain rather than in block 3: once the aggregate has new state, the host refuses to start with pending model changes, so the domain alone would have left the host's tests failing. The state is stored as text, like `Publication` (D-4 said an integer); the migration gives existing rows `NotOpen`.
+
+`tests/Herald.Tournaments.Tests`: 60 tests (15 new in `TournamentRegistrationTests`). All 189 .NET tests pass; format check clean.

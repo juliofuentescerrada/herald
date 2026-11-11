@@ -5,12 +5,12 @@
 
 ## 2. Tournaments domain
 
-- [ ] 2.1 `RegistrationWindow`, `Tournament.Registration` with `RegistrationChangedBy`/`At`, `OpenRegistration`, `CloseRegistration`, RW-5 in `Change`, `TournamentConfiguration.MissingForRegistration`; domain events `TournamentRegistrationOpened` and `TournamentRegistrationClosed`
-- [ ] 2.2 Domain tests without mocks: open (published with dates, draft, missing dates), close (open, not open, closed), reopen (with and without dates), repeats, stale revisions, revision increments, who/when, saves while open, closed and not open
+- [x] 2.1 `RegistrationWindow`, `Tournament.Registration` with `RegistrationChangedBy`/`At`, `OpenRegistration`, `CloseRegistration`, RW-5 in `Change`, `TournamentConfiguration.MissingForRegistration`; domain events `TournamentRegistrationOpened` and `TournamentRegistrationClosed`
+- [x] 2.2 Domain tests without mocks: open (published with dates, draft, missing dates), close (open, not open, closed), reopen (with and without dates), repeats, stale revisions, revision increments, who/when, saves while open, closed and not open
 
 ## 3. Persistence and features
 
-- [ ] 3.1 Map the new state; migration `AddRegistrationWindow` with not open as the default for existing rows
+- [x] 3.1 Map the new state; migration `AddRegistrationWindow` with not open as the default for existing rows
 - [ ] 3.2 Features `OpenRegistration` and `CloseRegistration` with their endpoints (Admin group, operation names as in design D-3); `TournamentDetails` and `TournamentSummary` return the real registration state, `missingForRegistration` and the time of the last window change
 - [ ] 3.3 API tests against PostgreSQL: the scenarios of `registration-window` (open, missing dates, draft, close, reopen, reopen without a date, close when not open, repeat, stale, another owner's generic 404) and of the modified `tournament-setup` requirements (save while open without a date, save while closed, missing-for-registration in the read, list after opening); the public document still has no tournament operation
 - [ ] 3.4 Regenerate Wolverine code (`codegen write`) and the OpenAPI documents and client (`pnpm api:generate`)
