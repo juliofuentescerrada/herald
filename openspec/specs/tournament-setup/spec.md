@@ -2,9 +2,7 @@
 
 ## Purpose
 An organisation's owner creates a draft tournament, configures it, reviews it and publishes it, and lists and edits the organisation's tournaments; publication opens nothing.
-
 ## Requirements
-
 ### Requirement: An owner creates a draft tournament
 An organisation's owner SHALL be able to create a tournament in that organisation. A new tournament SHALL be a draft with registration not open and competition in preparation. Creation SHALL require only a title, which is required after trimming and at most 120 characters; every other configuration value MAY be absent in a draft. Creation SHALL record the acting person and time. The client SHALL supply the new tournament's identifier, and a repeat with the same identifier and content SHALL return the original tournament instead of creating another.
 
@@ -183,7 +181,7 @@ The admin application SHALL offer **Tournaments** as a workspace destination. It
 ### Requirement: The configuration form keeps input and explains errors
 The admin application SHALL present the configuration as one form. Individual tournaments SHALL show no team structure fields; choosing team SHALL reveal them and label capacity in teams without clearing other input. Choosing online SHALL hide the venue. No value SHALL be preselected, except that the reference time zone is proposed from the browser. The competition profile SHALL be shown read-only. Each date-time field SHALL also show its value written as "14 November 2026, 10:00".
 
-A rejected, failed or conflicting save SHALL keep everything typed. Field errors SHALL appear at their field, associated with its control and distinguishable without relying on colour, and in a summary whose items move focus to the field. A draft with values missing for publication SHALL list them the same way and SHALL explain why review and publication are unavailable. Leaving the form with unsaved input SHALL ask first.
+A successful save SHALL be announced as a toast, together with what publication still lacks when the draft is incomplete. A rejected, failed or conflicting save SHALL keep everything typed. Field errors SHALL appear at their field, associated with its control and distinguishable without relying on colour, and in a summary whose items move focus to the field. A draft with values missing for publication SHALL list them the same way and SHALL explain why review and publication are unavailable. Leaving the form with unsaved input SHALL ask first.
 
 #### Scenario: An owner switches a draft to team
 - **WHEN** an owner who has typed a title changes entry kind to team
@@ -208,6 +206,10 @@ A rejected, failed or conflicting save SHALL keep everything typed. Field errors
 #### Scenario: An owner leaves with unsaved input
 - **WHEN** an owner navigates away from a form with unsaved changes
 - **THEN** the application asks before discarding them, and declining keeps the page and the input
+
+#### Scenario: A save succeeds
+- **WHEN** an owner saves a published tournament and the save succeeds
+- **THEN** a toast says the changes were saved, and no persistent success notice remains on the page
 
 ### Requirement: An owner reviews a tournament before publishing it
 Before publication the admin application SHALL show a read-only summary of the saved configuration, with the visibility stated in words, the statement that publishing keeps registration not open and creates no entries, pairings or play, and the statement that a published tournament cannot be unpublished. Publishing SHALL be the page's primary action and SHALL publish the revision that was reviewed. While publishing, the action SHALL not be repeatable; a failed publication SHALL leave a draft and offer a retry. After publication the application SHALL show the tournament with its name, game/variant, entry kind, location and planned start, the labels "Published", "Registration not open" and "Preparing", and its configuration still editable. It SHALL NOT offer to start the tournament.
@@ -246,3 +248,4 @@ A save SHALL be rejected, naming the field, when it would set the capacity below
 #### Scenario: The form explains the locked fields
 - **WHEN** an owner opens the configuration of a tournament with admitted entries
 - **THEN** entry kind and admission are unavailable with the reason that entries exist, and the capacity field says the lowest value allowed
+

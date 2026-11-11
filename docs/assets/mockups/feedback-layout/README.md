@@ -2,6 +2,8 @@
 
 11 November 2026 · **Proposals pending maintainer review** for `ui-feedback-and-layout`. All data is fictional. These captures are review material and **approve no product default**; they do not approve the OpenSpec change or implement production functionality.
 
+> **Composition superseded (11 November 2026).** The implementation revised the layout during the maintainer's run (design D-9 of `ui-feedback-and-layout`, visual direction §4 and §7.2): admin pages fill the width, with no named widths and no aside, labels beside the title and summary actions on the right. These captures are kept as delivered and are not regenerated; they remain valid for content, states, dialogs, drawer and toasts.
+
 **Batches: 3 of 3 delivered, complete.** Batch 1: states 1–21, 43 captures. Batch 2: states 22–34, 27 captures. Batch 3: states 35–38, 9 captures. Total: **38 states and 79 PNGs**.
 
 Open [feedback-layout-states.html](../../../../prototypes/frontend/feedback-layout-states.html) directly from the file system. No build step or network is required. Use **Review states** or `?state=<name>`; an unknown value falls back to `entries-wide`. Optional `&kind=team` also demonstrates guest drawers using team terminology; the required captures use the named fixtures.
