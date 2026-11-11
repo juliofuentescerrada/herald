@@ -54,8 +54,10 @@ context: |
     and typed errors; queries as no-tracking projections (ADR 0005). An acknowledgement is not
     proof that a derived projection is current. Preserve operation identity on retries.
   - DDD: aggregates own the rules and raise domain events; integration events leave through
-    the transactional outbox; consumers are idempotent; contract changes are backwards
-    compatible or versioned (ADRs 0006, 0008).
+    the transactional outbox and, between modules of the host, durable local queues (Service
+    Bus only when a party leaves the process); consumers are idempotent (state events are
+    revisioned snapshots); contract changes are backwards compatible or versioned (ADRs 0006,
+    0008, 0016).
   - Durable business history is owned by the relevant module (ADR 0007): preserve predecessor
     revisions, actor/time/reason and participation evidence with the effective state change.
     Logs and message retention are not the competitive audit trail. Only effective results score.

@@ -10,9 +10,9 @@ The maintainer decided on 11 November 2026:
 - **Coordination (D-08):** Tournaments and Registration exchange integration events and keep a local projection of the other's facts; no synchronous call between modules.
 - **Transport:** those events travel through Wolverine's durable local queues inside the host, not Service Bus (new ADR, refining ADR 0009).
 
-**Not yet approved for implementation.** Gate 1.1 needs the maintainer's review of the rules EN-1 to EN-12, the assumptions A-1 to A-9 and the corrections V-1 and V-2 below; the mockups were supplied on 11 November 2026 (Visual input).
+**Approved for implementation by the maintainer on 11 November 2026** (gate 1.1): the rules EN-1 to EN-12, the assumptions A-1 to A-9 and the corrections V-1 and V-2 below, with the mockups supplied the same day (Visual input). Decisions recorded in the functional discovery (D-06, D-08, D-22, F-04) and ADR 0016.
 
-Rules of this slice (proposed for confirmation at gate 1.1):
+Confirmed rules:
 
 - **EN-1** Entries are added by the organisation's owner only, as guests (H1 operator entry). No self-service.
 - **EN-2** Entering requires registration open (§5, CP-02 "closure prevents new applications"). Admitting and cancelling are possible while open or closed, before competition starts (always, in this slice).
@@ -47,7 +47,7 @@ Rules of this slice (proposed for confirmation at gate 1.1):
 
 Screens: the tournament entries page (new), the published tournament page and the tournament list (modified).
 
-References: [entries state review](../../../prototypes/frontend/entries-states.html) and its [22 states in 44 desktop/mobile captures](../../../docs/assets/mockups/entries/README.md), produced on 11 November 2026 from `.prompts/h1-entries-mockups.md` and supplied by the maintainer the same day. The visual input is complete; the captures are review material and approve no default until gate 1.1.
+References: [entries state review](../../../prototypes/frontend/entries-states.html) and its [22 states in 44 desktop/mobile captures](../../../docs/assets/mockups/entries/README.md), produced on 11 November 2026 from `.prompts/h1-entries-mockups.md` and supplied by the maintainer the same day. The visual input is complete; what they settle was adopted at gate 1.1.
 
 States covered (each desktop and mobile):
 
@@ -57,7 +57,7 @@ States covered (each desktop and mobile):
 | Published tournament page | `entries-link`, `fields-locked`, `capacity-rejected` |
 | Tournament list | `list-with-entries` |
 
-What the captures settle, proposed for adoption at gate 1.1: a page titled "Entries · <title>" with "Back to configuration", the three lifecycle labels and a summary ("8 of 8 individual entries", the admission policy and waiting count, when counts and terms were last updated) beside the one primary action "Add player" or "Add team"; three groups with their counts in the headings, admitted, waiting with visible ordinals, reason and "Waiting since", cancelled with its time; actions beside each row on desktop and stacked on mobile; "Admit" unavailable with its reason under the row; the add panel in the page above the groups, choosing an existing guest or creating one, with the possible duplicate as an information notice, the existing guest's "Enter this player" as the primary action and "Create a new player anyway" secondary; the out-of-order admission and the cancellation as in-page confirmations, the private reason required before confirming; conflict, over-capacity, loading and failed feedback above the field, with no rows while loading or failed; the entries link as its own quiet summary between the publication notice and the form; the list's "Entries" as a secondary action beside "Edit configuration", none on drafts.
+What the captures settle, adopted here: a page titled "Entries · <title>" with "Back to configuration", the three lifecycle labels and a summary ("8 of 8 individual entries", the admission policy and waiting count, when counts and terms were last updated) beside the one primary action "Add player" or "Add team"; three groups with their counts in the headings, admitted, waiting with visible ordinals, reason and "Waiting since", cancelled with its time; actions beside each row on desktop and stacked on mobile; "Admit" unavailable with its reason under the row; the add panel in the page above the groups, choosing an existing guest or creating one, with the possible duplicate as an information notice, the existing guest's "Enter this player" as the primary action and "Create a new player anyway" secondary; the out-of-order admission and the cancellation as in-page confirmations, the private reason required before confirming; conflict, over-capacity, loading and failed feedback above the field, with no rows while loading or failed; the entries link as its own quiet summary between the publication notice and the form; the list's "Entries" as a secondary action beside "Edit configuration", none on drafts.
 
 Corrections to apply when implementing (the captures are not regenerated for them):
 
@@ -99,11 +99,11 @@ Snapshots, not deltas: a consumer keeps the one with the highest revision and ig
 
 Each write uses its own module's projection only; neither module calls the other.
 
-### D-4 Durable local queues (new ADR 0016)
+### D-4 Durable local queues (ADR 0016)
 
 Wolverine routes a message to local handlers of the same application when one exists; with `UseDurableLocalQueues` those queues go through the shared store's outbox and inbox, so the state change and the event commit together and the receiver handles it once. The integration events are routed explicitly to named durable local queues (`tournaments`, `registration`) in each consuming module's entry point, and the Service Bus transport is not used for them. Tests and the end-to-end suite need no broker, which they lack.
 
-ADR 0016 records: durable local queues for integration events between modules of the host; Service Bus (ADR 0009) when a publisher or consumer leaves the process or an external consumer appears; the contract and idempotency rules of D-2 apply to both. ADR 0009 gains a note pointing to it (it is still Proposed, so it is refined rather than superseded).
+[ADR 0016](../../../docs/adr/0016-integration-events-between-modules-through-durable-local-queues.md) records: durable local queues for integration events between modules of the host; Service Bus (ADR 0009) when a publisher or consumer leaves the process or an external consumer appears; the contract and idempotency rules of D-2 apply to both. ADR 0009 gains a note pointing to it (it is still Proposed, so it is refined rather than superseded).
 
 *Alternative considered:* Service Bus as ADR 0009 states. Rejected by the maintainer: the end-to-end suite and the host's tests have no broker and the emulator needs a SQL Server container, too heavy for the local machine.
 
@@ -150,7 +150,7 @@ Each entry keeps who and when for entering, admission (with how and the optional
 
 ## Assumptions
 
-For the maintainer's review at gate 1.1.
+All accepted by the maintainer on 11 November 2026.
 
 | # | Assumption | Why |
 |---|---|---|
@@ -178,4 +178,4 @@ Registration: migration `AddGuestsAndFields` (guests, fields, entries). Tourname
 
 ## Open Questions
 
-- Gate 1.1: rules EN-1 to EN-12, assumptions A-1 to A-9 and corrections V-1 and V-2.
+None. Gate 1.1 was passed on 11 November 2026.

@@ -24,3 +24,4 @@ One significant decision per record: context, decision, alternatives and consequ
 | [0013](0013-functional-delivery-scope.md) | Functional delivery with identity and direct teams from H1 | Accepted |
 | [0014](0014-identity-and-organisation-isolation.md) | Sign in through the shared External ID directory; Herald authorises and isolates organisations | Accepted |
 | [0015](0015-end-to-end-journeys-with-a-fake-identity-provider.md) | Test complete journeys end to end, signing in through a fake OpenID Connect provider | Proposed |
+| [0016](0016-integration-events-between-modules-through-durable-local-queues.md) | Integration events between modules of the host travel through durable local queues | Proposed |

@@ -1,7 +1,7 @@
 ## 1. Review gates
 
-- [ ] 1.1 Maintainer reviews the proposal, specs and design (EN-1 to EN-12, A-1 to A-9, V-1 and V-2; mockups supplied and referenced on 11 November 2026); record implementation approval in proposal.md and design.md
-- [ ] 1.2 Record the decisions in `docs/herald-functional-discovery.md`: D-06 and D-22 (what this slice confirms), D-08 (coordination through events and projections), F-04's confirmed rules for this slice; write ADR 0016 (integration events between modules of the host through durable local queues) and the pointer note in ADR 0009
+- [x] 1.1 Maintainer reviews the proposal, specs and design (EN-1 to EN-12, A-1 to A-9, V-1 and V-2; mockups supplied and referenced on 11 November 2026); record implementation approval in proposal.md and design.md (11 November 2026: approved by the maintainer)
+- [x] 1.2 Record the decisions in `docs/herald-functional-discovery.md`: D-06 and D-22 (what this slice confirms), D-08 (coordination through events and projections), F-04's confirmed rules for this slice; write ADR 0016 (integration events between modules of the host through durable local queues) and the pointer note in ADR 0009
 
 ## 2. Contracts and messaging
 

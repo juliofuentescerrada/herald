@@ -1,6 +1,6 @@
 ## Status
 
-**Pending maintainer review (gate 1.1).** The maintainer chose on 11 November 2026: individual and team entries (a team is a name; its roster is a later slice), the whole admission behaviour of D-06 without rejection, organisation-scoped guests (D-22) and coordination between Tournaments and Registration through integration events with a local projection on each side (D-08), carried by Wolverine's durable local queues. The mockups were supplied the same day ([entries states](../../../docs/assets/mockups/entries/README.md)); implementation waits for gate 1.1.
+**Approved for implementation on 11 November 2026** (gate 1.1). The maintainer chose the scope (individual and team entries, a team being a name; the whole admission behaviour of D-06 without rejection; organisation-scoped guests, D-22; coordination through integration events with a local projection on each side, D-08, carried by durable local queues, ADR 0016), supplied the mockups ([entries states](../../../docs/assets/mockups/entries/README.md)) and approved the rules EN-1 to EN-12, the assumptions A-1 to A-9 and the corrections V-1 and V-2 of `design.md`, all the same day.
 
 ## Why
 
