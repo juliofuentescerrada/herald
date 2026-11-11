@@ -1,11 +1,11 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
-import { HeraldHostAdminService } from '@herald/api-client/admin';
+import { HeraldHostAdminService, TournamentSummary } from '@herald/api-client/admin';
 import { Button, Notice, StatusLabel } from '@herald/ui';
 import { injectQuery } from '@tanstack/angular-query-experimental';
 import { firstValueFrom } from 'rxjs';
 import { injectWorkingOrganisation } from '../../platform';
-import { capacityText, dateTimeText, injectOrganisation, lifecycleLabels, locationText, tournamentsKey } from './tournaments';
+import { admittedText, capacityText, dateTimeText, injectOrganisation, lifecycleLabels, locationText, tournamentsKey } from './tournaments';
 
 /** The organisation's tournaments, newest first, each with its three lifecycle facts. */
 @Component({
@@ -49,7 +49,7 @@ import { capacityText, dateTimeText, injectOrganisation, lifecycleLabels, locati
               @if (tournament.plannedStartAt) {
                 <p class="facts">{{ dateTime(tournament.plannedStartAt) }} · {{ tournament.timeZone }}</p>
               }
-              <p class="capacity">Capacity · {{ capacity(tournament) }}</p>
+              <p class="capacity">{{ capacityLine(tournament) }}</p>
               <p class="labels">
                 @for (label of labels(tournament); track label) {
                   <herald-status-label>{{ label }}</herald-status-label>
@@ -57,7 +57,12 @@ import { capacityText, dateTimeText, injectOrganisation, lifecycleLabels, locati
               </p>
             </div>
             <!-- The row names the tournament; the accessible name keeps it for screen readers. -->
-            <a herald-button [routerLink]="tournament.id" [attr.aria-label]="action(tournament) + ': ' + tournament.title">{{ action(tournament) }}</a>
+            <div class="row-actions">
+              <a herald-button [routerLink]="tournament.id" [attr.aria-label]="action(tournament) + ': ' + tournament.title">{{ action(tournament) }}</a>
+              @if (tournament.publication === 'published') {
+                <a herald-button [routerLink]="[tournament.id, 'entries']" [attr.aria-label]="'Entries: ' + tournament.title">Entries</a>
+              }
+            </div>
           </li>
         }
       </ul>
@@ -75,9 +80,10 @@ import { capacityText, dateTimeText, injectOrganisation, lifecycleLabels, locati
     .facts { color: var(--herald-color-text-secondary); margin: 0 0 var(--herald-space-2); }
     .capacity { font-weight: 700; font-size: var(--herald-text-lg); margin: 0 0 var(--herald-space-3); }
     .labels { display: flex; flex-wrap: wrap; gap: var(--herald-space-2); margin: 0; }
+    .row-actions { display: flex; flex: none; gap: var(--herald-space-3); }
     @media (max-width: 700px) {
       h1 { font-size: 28px; }
-      .heading, li { flex-direction: column; align-items: stretch; }
+      .heading, li, .row-actions { flex-direction: column; align-items: stretch; }
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -92,13 +98,19 @@ export class TournamentListPage {
     retry: false,
   }));
 
-  protected readonly capacity = capacityText;
   protected readonly dateTime = dateTimeText;
   protected readonly labels = lifecycleLabels;
 
   protected facts(tournament: { gameVariant: string | null; entryKind: string | null; location: string | null; venue: string | null }): string {
     const kind = tournament.entryKind === 'team' ? 'Team' : tournament.entryKind === 'individual' ? 'Individual' : null;
     return [tournament.gameVariant, kind, locationText(tournament as never)].filter(Boolean).join(' · ') || 'Configuration not started';
+  }
+
+  /** A published tournament shows its admitted entries against the capacity; a draft only its capacity. */
+  protected capacityLine(tournament: TournamentSummary): string {
+    if (tournament.publication !== 'published') return `Capacity · ${capacityText(tournament)}`;
+    const waiting = tournament.waitingEntries ? ` · ${tournament.waitingEntries} waiting` : '';
+    return `${admittedText(tournament.admittedEntries, tournament)} admitted${waiting}`;
   }
 
   protected action(tournament: { publication: string }): string {

@@ -58,6 +58,11 @@ export const routes: Routes = [
             title: 'Review before publishing · Herald',
             loadComponent: () => import('./features/tournaments').then((m) => m.TournamentReviewPage),
           },
+          {
+            path: 'tournaments/:tournamentId/entries',
+            title: 'Entries · Herald',
+            loadComponent: () => import('./features/entries').then((m) => m.EntriesPage),
+          },
           notFound,
         ],
       },

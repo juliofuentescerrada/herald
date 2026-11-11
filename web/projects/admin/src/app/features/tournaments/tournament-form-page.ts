@@ -6,6 +6,7 @@ import { Button, Icon, Notice, StatusLabel } from '@herald/ui';
 import { firstValueFrom } from 'rxjs';
 import { AccessState, CONFIRM, injectWorkingOrganisation, QUERY_CLIENT } from '../../platform';
 import {
+  admittedText,
   dateTimeText,
   fieldLabels,
   injectOrganisation,
@@ -34,6 +35,8 @@ interface Field {
   readonly help: string;
   readonly options?: readonly (readonly [string, string])[];
   readonly wide?: boolean;
+  /** Unavailable while the tournament has entries (EN-10). */
+  readonly locked?: boolean;
 }
 
 const empty = Object.fromEntries(names.map((name) => [name, ''])) as Draft;
@@ -88,6 +91,8 @@ const ruleText = (field: string, rule: string): string => {
     case 'not-after-opening': return 'Registration must close after it opens.';
     case 'after-planned-start': return 'Registration must close no later than the planned start.';
     case 'unknown': return 'Choose a time zone from the list.';
+    case 'below-admitted': return 'Capacity cannot be lower than the admitted entries.';
+    case 'locked-by-entries': return 'This cannot change while the tournament has entries.';
     case 'skipped-hour': return 'This time does not exist in the reference time zone: the clocks go forward.';
     default: return 'Check this value.';
   }
@@ -160,9 +165,23 @@ export class TournamentFormPage {
     return c?.plannedStartAt ? `${dateTimeText(c.plannedStartAt)} · ${c.timeZone}` : '';
   });
 
+  /** Registration's last report: entries lock the entry kind and admission, and admitted ones bound the capacity (EN-10). */
+  protected readonly entries = computed(() => {
+    const stored = this.stored();
+    return { admitted: stored?.admittedEntries ?? 0, active: (stored?.admittedEntries ?? 0) + (stored?.waitingEntries ?? 0) };
+  });
+  protected readonly entriesText = computed(() => {
+    const stored = this.stored()!;
+    const waiting = stored.waitingEntries ? ` · ${stored.waitingEntries} waiting` : '';
+    return `${admittedText(stored.admittedEntries, stored.configuration)} admitted${waiting}`;
+  });
+
   protected readonly sections = computed(() => {
     const d = this.draft();
     const team = d.entryKind === 'team';
+    const { admitted, active } = this.entries();
+    const lockedHelp = 'Locked while the tournament has entries. Cancel every entry to change it.';
+    const atLeast = admitted ? ` At least ${admitted}: the admitted entries.` : '';
     const zoneOptions = [...new Set([...zones(), ...(d.timeZone ? [d.timeZone] : [])])].sort().map((zone) => [zone, zone] as const);
     const field = (name: Name, kind: Field['kind'], help: string, extra: Partial<Field> = {}): Field => ({ name, kind, label: fieldLabels[name], help, ...extra });
     return [
@@ -172,8 +191,11 @@ export class TournamentFormPage {
         fields: [
           field('title', 'text', 'The tournament name shown when published.', { wide: true }),
           field('gameVariant', 'text', 'Free text, for example the game and its variant.', { wide: true }),
-          field('entryKind', 'select', 'Each entry takes one place in the tournament.', { options: [['individual', 'Individual'], ['team', 'Team']] }),
-          field('capacity', 'number', team ? '16 teams means 16 places, regardless of roster size.' : 'How many entries the tournament admits.', {
+          field('entryKind', 'select', active ? lockedHelp : 'Each entry takes one place in the tournament.', {
+            options: [['individual', 'Individual'], ['team', 'Team']],
+            locked: active > 0,
+          }),
+          field('capacity', 'number', (team ? '16 teams means 16 places, regardless of roster size.' : 'How many entries the tournament admits.') + atLeast, {
             label: team ? 'Capacity in teams' : d.entryKind === 'individual' ? 'Capacity in individual entries' : 'Capacity in entries',
           }),
         ],
@@ -210,7 +232,10 @@ export class TournamentFormPage {
         heading: 'Admission and visibility',
         help: 'Nothing is preselected: each is your decision for this tournament.',
         fields: [
-          field('admission', 'select', 'Automatic admission or an operator decision.', { options: [['automatic', 'Automatic'], ['manual', 'Manual']] }),
+          field('admission', 'select', active ? lockedHelp : 'Automatic admission or an operator decision.', {
+            options: [['automatic', 'Automatic'], ['manual', 'Manual']],
+            locked: active > 0,
+          }),
           field('checkIn', 'select', 'Whether admitted entrants must check in.', { options: [['optional', 'Optional'], ['mandatory', 'Mandatory']] }),
           field('visibility', 'select', 'Public: listed. Unlisted: readable by link. Private: owner-only access.', {
             options: [['public', 'Public'], ['unlisted', 'Unlisted'], ['private', 'Private']],

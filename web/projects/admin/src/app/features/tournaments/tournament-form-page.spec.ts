@@ -257,6 +257,49 @@ describe('The tournament configuration form', () => {
     expect(access.unsavedInput()).toBe('Title: Autumn Open\nReference time zone: Europe/Madrid');
   });
 
+  it('links a published tournament to its entries with the counts', async () => {
+    const { page, text } = await render(`/${tournamentId}`, { reads: [() => of(details({ publication: 'published', admittedEntries: 3, waitingEntries: 1 }))] });
+    expect(text('#entries-heading')).toBe('Entries');
+    expect(text('.summary.entries p')).toBe('3 of 16 individual entries admitted · 1 waiting');
+    expect(page().querySelector('.summary.entries a')?.getAttribute('href')).toBe(`${base}/${tournamentId}/entries`);
+  });
+
+  it('has no entries link on a draft', async () => {
+    const { page } = await render(`/${tournamentId}`, { reads: [() => of(details())] });
+    expect(page().querySelector('.summary.entries')).toBeNull();
+  });
+
+  it('locks entry kind and admission while entries exist, saying why, and gives the lowest capacity allowed', async () => {
+    const { page, control, text } = await render(`/${tournamentId}`, { reads: [() => of(details({ publication: 'published', admittedEntries: 3, waitingEntries: 1 }))] });
+    for (const name of ['entryKind', 'admission']) {
+      expect((control(name) as HTMLSelectElement).disabled).toBe(true);
+      expect(text(`#t-${name}-help`)).toBe('Locked while the tournament has entries. Cancel every entry to change it.');
+    }
+    expect(text('#t-capacity-help')).toBe('How many entries the tournament admits. At least 3: the admitted entries.');
+    expect((control('capacity') as HTMLInputElement).readOnly).toBe(false);
+    const { violations } = await axe.run(page(), { rules: { 'color-contrast': { enabled: false } } });
+    expect(violations.map((v) => v.id)).toEqual([]);
+  });
+
+  it('leaves entry kind and admission editable once every entry is cancelled', async () => {
+    const { control } = await render(`/${tournamentId}`, { reads: [() => of(details({ publication: 'published' }))] });
+    expect((control('entryKind') as HTMLSelectElement).disabled).toBe(false);
+    expect((control('admission') as HTMLSelectElement).disabled).toBe(false);
+  });
+
+  it('shows a capacity below the admitted entries as rejected, keeping the value typed', async () => {
+    const rejection = problem(400, { errors: { capacity: ['below-admitted'] } });
+    const { control, type, submit, text, texts } = await render(`/${tournamentId}`, {
+      reads: [() => of(details({ publication: 'published', admittedEntries: 3 }))],
+      writes: [() => throwError(() => rejection)],
+    });
+    await type('capacity', '2');
+    await submit();
+    await vi.waitFor(() => expect(text('#error-summary')).toBe('Correct 1 field to save'));
+    expect(texts('.summary.danger li')).toEqual(['Capacity: Capacity cannot be lower than the admitted entries.']);
+    expect(control('capacity')!.value).toBe('2');
+  });
+
   it('says a tournament that cannot be read is not available', async () => {
     const view = await open(`/${tournamentId}`, { getTournament: () => throwError(() => problem(404)) });
     await vi.waitFor(() => expect(view.text('herald-notice strong')).toBe('Tournament not available'));

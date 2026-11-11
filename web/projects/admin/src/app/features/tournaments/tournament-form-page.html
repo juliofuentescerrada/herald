@@ -37,6 +37,13 @@
       <herald-notice heading="Published · configuration remains editable">
         Competition is preparing. Saving configuration does not change registration.
       </herald-notice>
+      <section class="summary entries" aria-labelledby="entries-heading">
+        <div>
+          <h2 id="entries-heading">Entries</h2>
+          <p>{{ entriesText() }}</p>
+        </div>
+        <a herald-button routerLink="entries">View entries</a>
+      </section>
     }
     @if (state() === 'saved') {
       <herald-notice tone="success" [heading]="published() ? 'Changes saved' : 'Draft saved'">
@@ -89,7 +96,7 @@
                     [name]="field.name"
                     #select
                     (change)="set(field.name, select.value)"
-                    [disabled]="state() === 'saving'"
+                    [disabled]="state() === 'saving' || !!field.locked"
                     [attr.aria-invalid]="errorOf(field.name) ? 'true' : null"
                     [attr.aria-describedby]="describedBy(field)"
                   >

@@ -16,6 +16,8 @@ const row = (over: object) => ({
   publication: 'draft',
   registration: 'notOpen',
   competition: 'preparation',
+  admittedEntries: 0,
+  waitingEntries: 0,
   ...over,
 });
 
@@ -64,6 +66,26 @@ describe('The tournament list', () => {
       ['Published', 'Registration open', 'Preparing'],
       ['Published', 'Registration closed', 'Preparing'],
     ]);
+  });
+
+  it('shows a published tournament’s admitted and waiting entries and its entries action, and none on a draft', async () => {
+    const published = row({ id: 't2', publication: 'published', registration: 'open', admittedEntries: 3, waitingEntries: 1 });
+    const empty = row({ id: 't3', title: 'Winter Teams', entryKind: 'team', capacity: 4, publication: 'published', admittedEntries: 0, waitingEntries: 0 });
+    const { page } = await render(() => of([published, empty, row({})]));
+    await vi.waitFor(() => expect(page().querySelectorAll('li')).toHaveLength(3));
+    const [first, second, draft] = page().querySelectorAll('li');
+
+    expect(first.querySelector('.capacity')?.textContent).toBe('3 of 16 individual entries admitted · 1 waiting');
+    expect([...first.querySelectorAll('a')].map((a) => [a.textContent?.trim(), a.getAttribute('href'), a.getAttribute('aria-label')])).toEqual([
+      ['Edit configuration', `${base}/t2`, 'Edit configuration: Autumn Open'],
+      ['Entries', `${base}/t2/entries`, 'Entries: Autumn Open'],
+    ]);
+    expect(second.querySelector('.capacity')?.textContent).toBe('0 of 4 teams admitted');
+    expect(draft.querySelector('.capacity')?.textContent).toBe('Capacity · 16 individual entries');
+    expect([...draft.querySelectorAll('a')].map((a) => a.textContent?.trim())).toEqual(['Continue draft']);
+
+    const { violations } = await axe.run(page(), { rules: { 'color-contrast': { enabled: false } } });
+    expect(violations.map((v) => v.id)).toEqual([]);
   });
 
   it('says it is loading', async () => {

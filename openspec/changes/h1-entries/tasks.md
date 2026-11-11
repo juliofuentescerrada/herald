@@ -29,9 +29,9 @@
 
 ## 6. Admin application
 
-- [ ] 6.1 `entries` feature: route, page with counts and the three groups, add panel (find, create, possible duplicate), admit (with reason when out of order), cancel confirmation, and every state of design.md's Visual input; any new `ui` control with its catalogue entry
-- [ ] 6.2 `tournaments` feature: entries link with counts on the tournament page, locked entry kind and admission with their reason, capacity hint and rejection, counts and "Entries" action in the list
-- [ ] 6.3 Vitest for each Visual input state and `axe-core`; lint and boundary checks pass
+- [x] 6.1 `entries` feature: route, page with counts and the three groups, add panel (find, create, possible duplicate), admit (with reason when out of order), cancel confirmation, and every state of design.md's Visual input; any new `ui` control with its catalogue entry
+- [x] 6.2 `tournaments` feature: entries link with counts on the tournament page, locked entry kind and admission with their reason, capacity hint and rejection, counts and "Entries" action in the list
+- [x] 6.3 Vitest for each Visual input state and `axe-core`; lint and boundary checks pass
 
 ## 7. End-to-end journeys
 
