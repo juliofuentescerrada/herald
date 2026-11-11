@@ -108,7 +108,9 @@ internal static class TournamentResults
         },
         tournament.Configuration.Capacity!.Value,
         tournament.Configuration.EntryKind == Domain.EntryKind.Team ? Contract.EntryKind.Team : Contract.EntryKind.Individual,
-        tournament.Configuration.Admission == Domain.Admission.Manual ? Contract.Admission.Manual : Contract.Admission.Automatic);
+        tournament.Configuration.Admission == Domain.Admission.Manual ? Contract.Admission.Manual : Contract.Admission.Automatic,
+        tournament.Configuration.EntryKind == Domain.EntryKind.Team ? tournament.Configuration.MinimumRosterSize : null,
+        tournament.Configuration.EntryKind == Domain.EntryKind.Team ? tournament.Configuration.MaximumRosterSize : null);
 
     public static bool IsDuplicateKey(this DbUpdateException exception) =>
         exception.InnerException is PostgresException { SqlState: PostgresErrorCodes.UniqueViolation };

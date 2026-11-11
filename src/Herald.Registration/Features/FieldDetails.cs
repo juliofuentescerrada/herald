@@ -8,6 +8,7 @@ using Wolverine;
 namespace Herald.Registration.Features;
 
 // One entry as the owner sees it. The admission reason is private and not returned (EN-7).
+// The roster values are set for a team tournament only.
 public sealed record EntryDetails(
     Guid Id,
     int Revision,
@@ -20,7 +21,10 @@ public sealed record EntryDetails(
     DateTimeOffset? WaitingSince,
     AdmissionMethod? AdmissionMethod,
     DateTimeOffset? AdmittedAt,
-    DateTimeOffset? CancelledAt);
+    DateTimeOffset? CancelledAt,
+    int? RosterSize = null,
+    int? RosterRevision = null,
+    RosterReadiness? RosterReadiness = null);
 
 // What every entry write and the field read answer with: admitted, then waiting in order, then cancelled.
 public sealed record FieldDetails(
@@ -54,7 +58,10 @@ public sealed record FieldDetails(
             entry.WaitingSince,
             entry.AdmissionMethod,
             entry.AdmittedAt,
-            entry.CancelledAt);
+            entry.CancelledAt,
+            field.Terms.EntryKind == EntryKind.Team ? entry.Members.Count : null,
+            field.Terms.EntryKind == EntryKind.Team ? entry.RosterRevision : null,
+            field.ReadinessOf(entry));
 
         var admitted = field.Entries.Where(entry => entry.State == EntryState.Admitted).OrderBy(entry => entry.AdmittedAt).ThenBy(entry => entry.Sequence);
         var cancelled = field.Entries.Where(entry => entry.State == EntryState.Cancelled).OrderByDescending(entry => entry.CancelledAt);

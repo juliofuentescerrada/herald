@@ -66,9 +66,17 @@ namespace Internal.Generated.WolverineHandlers
                 }
 
                 var name = httpContext.Request.Query["name"];
+                string tournamentId_rawValue = httpContext.Request.Query["tournamentId"];
+                System.Nullable<System.Guid> tournamentId = default;
+
+                if (tournamentId_rawValue != null && System.Guid.TryParse(tournamentId_rawValue, System.Globalization.CultureInfo.InvariantCulture, out var tournamentId_parsed))
+                {
+                    tournamentId = tournamentId_parsed;
+                }
+
                 
                 // The actual HTTP request handler execution
-                var guestDetailsIReadOnlyList_response = await Herald.Registration.Features.FindGuests.FindGuestsEndpoint.Get(organisationId, kind, name, registrationDbContext, httpContext.RequestAborted).ConfigureAwait(false);
+                var guestDetailsIReadOnlyList_response = await Herald.Registration.Features.FindGuests.FindGuestsEndpoint.Get(organisationId, kind, name, tournamentId, registrationDbContext, httpContext.RequestAborted).ConfigureAwait(false);
 
                 
                 // Added by EF Core Transaction Middleware

@@ -27,7 +27,23 @@ public enum Admission
 }
 
 // The facts of the tournament that decide its entries, as Tournaments last reported them (design D-3).
-public sealed record EntryTerms(RegistrationState Registration, int Capacity, EntryKind EntryKind, Admission Admission);
+// The roster sizes are set for a team tournament; terms sent before rosters existed lack them.
+public sealed record EntryTerms(
+    RegistrationState Registration,
+    int Capacity,
+    EntryKind EntryKind,
+    Admission Admission,
+    int? MinimumRosterSize = null,
+    int? MaximumRosterSize = null);
+
+// Derived from the members and the bounds when read, never stored (h1-team-rosters D-4).
+public enum RosterReadiness
+{
+    AwaitingTerms,
+    Incomplete,
+    Complete,
+    AboveMaximum,
+}
 
 public sealed record GuestEntered(TournamentId TournamentId, EntryId EntryId, GuestId GuestId, Guid EnteredBy, DateTimeOffset EnteredAt) : IDomainEvent;
 
@@ -35,6 +51,10 @@ public sealed record GuestEntered(TournamentId TournamentId, EntryId EntryId, Gu
 public sealed record EntryAdmitted(TournamentId TournamentId, EntryId EntryId, AdmissionMethod Method, Guid? AdmittedBy, DateTimeOffset AdmittedAt) : IDomainEvent;
 
 public sealed record EntryCancelled(TournamentId TournamentId, EntryId EntryId, Guid CancelledBy, DateTimeOffset CancelledAt) : IDomainEvent;
+
+public sealed record RosterMemberAdded(TournamentId TournamentId, EntryId EntryId, GuestId GuestId, int RosterRevision, Guid AddedBy, DateTimeOffset AddedAt) : IDomainEvent;
+
+public sealed record RosterMemberRemoved(TournamentId TournamentId, EntryId EntryId, GuestId GuestId, int RosterRevision, Guid RemovedBy, DateTimeOffset RemovedAt) : IDomainEvent;
 
 // The entries of one tournament. Every admission rule is decided here, under one concurrency token,
 // so two writes cannot both take the last slot (EN-9) and a freed slot is filled in the same change.
@@ -221,6 +241,105 @@ public sealed class Field : AggregateRoot<TournamentId>
         entry.Cancel(actor, at);
         Raise(new EntryCancelled(Id, id, actor, at));
         Promote(actor, at);
+        Revision++;
+        return WriteOutcome.Applied;
+    }
+
+    // Null for an individual tournament, which has no rosters.
+    public RosterReadiness? ReadinessOf(Entry entry) => Terms switch
+    {
+        { EntryKind: not EntryKind.Team } => null,
+        { MinimumRosterSize: { } minimum, MaximumRosterSize: { } maximum } => entry.Members.Count < minimum ? RosterReadiness.Incomplete
+            : entry.Members.Count > maximum ? RosterReadiness.AboveMaximum
+            : RosterReadiness.Complete,
+        _ => RosterReadiness.AwaitingTerms,
+    };
+
+    // The active team entry, other than the one excepted, whose roster holds the player (R-5).
+    public Entry? TeamOf(GuestId player, EntryId? except = null) =>
+        _entries.Find(entry => entry.IsActive && entry.Id != except && entry.HasMember(player));
+
+    // The owner adds a guest player to an active team entry until start, open or closed (R-3, A-1).
+    public WriteResult AddRosterMember(EntryId id, GuestId player, GuestKind kind, int expectedRosterRevision, Guid actor, DateTimeOffset at)
+    {
+        var entry = Find(id) ?? throw new KeyNotFoundException($"No entry {id.Value} in field {Id.Value}.");
+        if (Terms.EntryKind != EntryKind.Team)
+        {
+            return WriteResult.Reject("entry", "not-team-tournament");
+        }
+
+        if (entry.HasMember(player))
+        {
+            return WriteOutcome.Repeated;
+        }
+
+        if (expectedRosterRevision != entry.RosterRevision)
+        {
+            return WriteOutcome.Stale;
+        }
+
+        if (entry.State == EntryState.Cancelled)
+        {
+            return WriteResult.Reject("entry", "cancelled");
+        }
+
+        if (kind != GuestKind.Player)
+        {
+            return WriteResult.Reject("guestId", "not-a-player");
+        }
+
+        if (Terms.MaximumRosterSize is not { } maximum)
+        {
+            return WriteResult.Reject("roster", "awaiting-terms");
+        }
+
+        if (TeamOf(player, id) is not null)
+        {
+            return WriteResult.Reject("guestId", "on-another-team");
+        }
+
+        if (entry.Members.Count >= maximum)
+        {
+            return WriteResult.Reject("roster", "full");
+        }
+
+        entry.AddMember(player, actor, at);
+        Raise(new RosterMemberAdded(Id, id, player, entry.RosterRevision, actor, at));
+        Revision++;
+        return WriteOutcome.Applied;
+    }
+
+    // Needs no reason (R-10); the removed player stays in the roster's history.
+    public WriteResult RemoveRosterMember(EntryId id, GuestId player, int expectedRosterRevision, Guid actor, DateTimeOffset at)
+    {
+        var entry = Find(id) ?? throw new KeyNotFoundException($"No entry {id.Value} in field {Id.Value}.");
+        if (Terms.EntryKind != EntryKind.Team)
+        {
+            return WriteResult.Reject("entry", "not-team-tournament");
+        }
+
+        if (!entry.HasMember(player))
+        {
+            return WriteOutcome.Repeated;
+        }
+
+        if (expectedRosterRevision != entry.RosterRevision)
+        {
+            return WriteOutcome.Stale;
+        }
+
+        if (entry.State == EntryState.Cancelled)
+        {
+            return WriteResult.Reject("entry", "cancelled");
+        }
+
+        if (Terms.MaximumRosterSize is null)
+        {
+            return WriteResult.Reject("roster", "awaiting-terms");
+        }
+
+        entry.RemoveMember(player, actor, at);
+        Raise(new RosterMemberRemoved(Id, id, player, entry.RosterRevision, actor, at));
         Revision++;
         return WriteOutcome.Applied;
     }

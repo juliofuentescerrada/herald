@@ -56,7 +56,7 @@ public static class CreateGuestEndpoint
                 .OrderBy(guest => guest.CreatedAt)
                 .ToListAsync(cancellationToken) is { Count: > 0 } matches)
         {
-            return GuestResults.Conflict(GuestResults.PossibleDuplicate, [.. matches.Select(GuestDetails.Of)]);
+            return GuestResults.Conflict(GuestResults.PossibleDuplicate, [.. matches.Select(match => GuestDetails.Of(match))]);
         }
 
         var actor = context.ActorId ?? throw new InvalidOperationException($"No acting person in organisation {organisationId}.");

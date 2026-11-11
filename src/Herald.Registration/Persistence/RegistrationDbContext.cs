@@ -60,6 +60,24 @@ public sealed class RegistrationDbContext(DbContextOptions<RegistrationDbContext
             entry.Property(e => e.AdmissionMethod).HasConversion<string>().HasMaxLength(20);
             entry.Property(e => e.AdmissionReason).HasMaxLength(Field.ReasonMaxLength);
             entry.HasIndex(nameof(Domain.Entry.GuestId));
+            entry.OwnsMany(e => e.Members, member =>
+            {
+                member.ToTable("RosterMembers");
+                member.WithOwner().HasForeignKey("TournamentId", "EntryId");
+                member.Property(m => m.GuestId).HasConversion(id => id.Value, value => new GuestId(value));
+                member.HasKey("TournamentId", "EntryId", nameof(RosterMember.GuestId));
+            });
+            entry.Navigation(e => e.Members).HasField("_members").UsePropertyAccessMode(PropertyAccessMode.Field);
+            entry.OwnsMany(e => e.RosterChanges, change =>
+            {
+                change.ToTable("RosterChanges");
+                change.WithOwner().HasForeignKey("TournamentId", "EntryId");
+                change.Property(c => c.GuestId).HasConversion(id => id.Value, value => new GuestId(value));
+                change.Property(c => c.Kind).HasConversion<string>().HasMaxLength(20);
+                change.Property(c => c.RosterRevision).ValueGeneratedNever();
+                change.HasKey("TournamentId", "EntryId", nameof(RosterChange.RosterRevision));
+            });
+            entry.Navigation(e => e.RosterChanges).HasField("_rosterChanges").UsePropertyAccessMode(PropertyAccessMode.Field);
         });
     }
 }

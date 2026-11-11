@@ -27,6 +27,10 @@ import type {
   Observable
 } from 'rxjs';
 
+export interface AddRosterMember {
+  expectedRevision: number;
+}
+
 export type Admission = typeof Admission[keyof typeof Admission] | null;
 
 
@@ -171,6 +175,16 @@ export const WaitingReason = {
   admissionPending: 'admissionPending',
 } as const;
 
+export type RosterReadiness = typeof RosterReadiness[keyof typeof RosterReadiness];
+
+
+export const RosterReadiness = {
+  awaitingTerms: 'awaitingTerms',
+  incomplete: 'incomplete',
+  complete: 'complete',
+  aboveMaximum: 'aboveMaximum',
+} as const;
+
 export interface EntryDetails {
   id: string;
   revision: number;
@@ -188,6 +202,11 @@ export interface EntryDetails {
   admittedAt: string | null;
   /** @nullable */
   cancelledAt: string | null;
+  /** @nullable */
+  rosterSize?: number | null;
+  /** @nullable */
+  rosterRevision?: number | null;
+  rosterReadiness?: null | RosterReadiness;
 }
 
 export type RegistrationState = typeof RegistrationState[keyof typeof RegistrationState];
@@ -204,6 +223,10 @@ export interface EntryTerms {
   capacity: number;
   entryKind: EntryKind;
   admission: Admission;
+  /** @nullable */
+  minimumRosterSize?: number | null;
+  /** @nullable */
+  maximumRosterSize?: number | null;
 }
 
 export interface FieldDetails {
@@ -218,11 +241,17 @@ export interface FieldDetails {
   entries: EntryDetails[];
 }
 
+export interface RosterTeam {
+  entryId: string;
+  name: string;
+}
+
 export interface GuestDetails {
   id: string;
   kind: GuestKind;
   name: string;
   createdAt: string;
+  team?: null | RosterTeam;
 }
 
 export interface GuestConflict {
@@ -298,6 +327,44 @@ export const RegistrationWindow = {
   closed: 'closed',
 } as const;
 
+export type RosterChangeKind = typeof RosterChangeKind[keyof typeof RosterChangeKind];
+
+
+export const RosterChangeKind = {
+  added: 'added',
+  removed: 'removed',
+} as const;
+
+export interface RosterChangeDetails {
+  rosterRevision: number;
+  guestId: string;
+  name: string;
+  kind: RosterChangeKind;
+  changedBy: string;
+  changedAt: string;
+}
+
+export interface RosterMemberDetails {
+  guestId: string;
+  name: string;
+  addedAt: string;
+  possibleDuplicateOf: null | RosterTeam;
+}
+
+export interface RosterDetails {
+  entryId: string;
+  teamName: string;
+  entryState: EntryState;
+  revision: number;
+  /** @nullable */
+  minimumRosterSize: number | null;
+  /** @nullable */
+  maximumRosterSize: number | null;
+  readiness: RosterReadiness;
+  members: RosterMemberDetails[];
+  history: RosterChangeDetails[];
+}
+
 export interface SaveTournament {
   expectedRevision: number;
   configuration: TournamentConfiguration;
@@ -346,9 +413,14 @@ export interface TournamentSummary {
   waitingEntries: number;
 }
 
+export type RemoveRosterMemberParams = {
+  expectedRevision?: number;
+};
+
 export type FindGuestsParams = {
   kind?: GuestKind;
   name?: string;
+  tournamentId?: string;
 };
 
 interface HttpClientOptions {
@@ -877,6 +949,156 @@ export class HeraldHostAdminService {
   }
 
 /**
+ * DELETE_api_organisations_organisationId_tournaments_tournamentId_entries_entryId_roster_members_guestId
+ * @summary DELETE_api_organisations_organisationId_tournaments_tournamentId_entries_entryId_roster_members_guestId
+ */
+ removeRosterMember<TData = RosterDetails>(organisationId: string,
+    tournamentId: string,
+    entryId: string,
+    guestId: string,
+    params?: RemoveRosterMemberParams, options?: HttpClientBodyOptions): Observable<TData>;
+ removeRosterMember<TData = RosterDetails>(organisationId: string,
+    tournamentId: string,
+    entryId: string,
+    guestId: string,
+    params?: RemoveRosterMemberParams, options?: HttpClientEventOptions): Observable<HttpEvent<TData>>;
+ removeRosterMember<TData = RosterDetails>(organisationId: string,
+    tournamentId: string,
+    entryId: string,
+    guestId: string,
+    params?: RemoveRosterMemberParams, options?: HttpClientResponseOptions): Observable<AngularHttpResponse<TData>>;
+  removeRosterMember<TData = RosterDetails>(
+    organisationId: string,
+    tournamentId: string,
+    entryId: string,
+    guestId: string,
+    params?: RemoveRosterMemberParams, options?: HttpClientObserveOptions): Observable<TData | HttpEvent<TData> | AngularHttpResponse<TData>> {
+    const filteredParams = filterParams({...params, ...options?.params}, new Set<string>([]));
+
+    if (options?.observe === 'events') {
+      return this.http.delete<TData>(
+      `/api/organisations/${organisationId}/tournaments/${tournamentId}/entries/${entryId}/roster/members/${guestId}`,{
+    ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'events',
+        params: filteredParams,}
+    );
+    }
+
+    if (options?.observe === 'response') {
+      return this.http.delete<TData>(
+      `/api/organisations/${organisationId}/tournaments/${tournamentId}/entries/${entryId}/roster/members/${guestId}`,{
+    ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'response',
+        params: filteredParams,}
+    );
+    }
+
+    return this.http.delete<TData>(
+      `/api/organisations/${organisationId}/tournaments/${tournamentId}/entries/${entryId}/roster/members/${guestId}`,{
+    ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'body',
+        params: filteredParams,}
+    );
+  }
+
+/**
+ * PUT_api_organisations_organisationId_tournaments_tournamentId_entries_entryId_roster_members_guestId
+ * @summary PUT_api_organisations_organisationId_tournaments_tournamentId_entries_entryId_roster_members_guestId
+ */
+ addRosterMember<TData = RosterDetails>(organisationId: string,
+    tournamentId: string,
+    entryId: string,
+    guestId: string,
+    addRosterMemberBody: AddRosterMember, options?: HttpClientBodyOptions): Observable<TData>;
+ addRosterMember<TData = RosterDetails>(organisationId: string,
+    tournamentId: string,
+    entryId: string,
+    guestId: string,
+    addRosterMemberBody: AddRosterMember, options?: HttpClientEventOptions): Observable<HttpEvent<TData>>;
+ addRosterMember<TData = RosterDetails>(organisationId: string,
+    tournamentId: string,
+    entryId: string,
+    guestId: string,
+    addRosterMemberBody: AddRosterMember, options?: HttpClientResponseOptions): Observable<AngularHttpResponse<TData>>;
+  addRosterMember<TData = RosterDetails>(
+    organisationId: string,
+    tournamentId: string,
+    entryId: string,
+    guestId: string,
+    addRosterMemberBody: AddRosterMember, options?: HttpClientObserveOptions): Observable<TData | HttpEvent<TData> | AngularHttpResponse<TData>> {
+    if (options?.observe === 'events') {
+      return this.http.put<TData>(
+      `/api/organisations/${organisationId}/tournaments/${tournamentId}/entries/${entryId}/roster/members/${guestId}`,
+      addRosterMemberBody,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'events',
+      }
+    );
+    }
+
+    if (options?.observe === 'response') {
+      return this.http.put<TData>(
+      `/api/organisations/${organisationId}/tournaments/${tournamentId}/entries/${entryId}/roster/members/${guestId}`,
+      addRosterMemberBody,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'response',
+      }
+    );
+    }
+
+    return this.http.put<TData>(
+      `/api/organisations/${organisationId}/tournaments/${tournamentId}/entries/${entryId}/roster/members/${guestId}`,
+      addRosterMemberBody,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'body',
+      }
+    );
+  }
+
+/**
+ * GET_api_organisations_organisationId_tournaments_tournamentId_entries_entryId_roster
+ * @summary GET_api_organisations_organisationId_tournaments_tournamentId_entries_entryId_roster
+ */
+ getRoster<TData = RosterDetails>(organisationId: string,
+    tournamentId: string,
+    entryId: string, options?: HttpClientBodyOptions): Observable<TData>;
+ getRoster<TData = RosterDetails>(organisationId: string,
+    tournamentId: string,
+    entryId: string, options?: HttpClientEventOptions): Observable<HttpEvent<TData>>;
+ getRoster<TData = RosterDetails>(organisationId: string,
+    tournamentId: string,
+    entryId: string, options?: HttpClientResponseOptions): Observable<AngularHttpResponse<TData>>;
+  getRoster<TData = RosterDetails>(
+    organisationId: string,
+    tournamentId: string,
+    entryId: string, options?: HttpClientObserveOptions): Observable<TData | HttpEvent<TData> | AngularHttpResponse<TData>> {
+    if (options?.observe === 'events') {
+      return this.http.get<TData>(
+      `/api/organisations/${organisationId}/tournaments/${tournamentId}/entries/${entryId}/roster`,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'events',
+      }
+    );
+    }
+
+    if (options?.observe === 'response') {
+      return this.http.get<TData>(
+      `/api/organisations/${organisationId}/tournaments/${tournamentId}/entries/${entryId}/roster`,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'response',
+      }
+    );
+    }
+
+    return this.http.get<TData>(
+      `/api/organisations/${organisationId}/tournaments/${tournamentId}/entries/${entryId}/roster`,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'body',
+      }
+    );
+  }
+
+/**
  * GET_api_organisations_organisationId_tournaments_tournamentId_entries
  * @summary GET_api_organisations_organisationId_tournaments_tournamentId_entries
  */
@@ -1164,6 +1386,9 @@ export type OpenRegistrationClientResult = NonNullable<TournamentDetails>
 export type ListTournamentsClientResult = NonNullable<TournamentSummary[]>
 export type CreateTournamentClientResult = NonNullable<IResult | TournamentDetails>
 export type CloseRegistrationClientResult = NonNullable<TournamentDetails>
+export type RemoveRosterMemberClientResult = NonNullable<RosterDetails>
+export type AddRosterMemberClientResult = NonNullable<RosterDetails>
+export type GetRosterClientResult = NonNullable<RosterDetails>
 export type GetFieldClientResult = NonNullable<FieldDetails>
 export type FindGuestsClientResult = NonNullable<GuestDetails[]>
 export type EnterGuestClientResult = NonNullable<FieldDetails>
