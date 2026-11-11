@@ -1,8 +1,8 @@
 ## 1. Review gates
 
 - [x] 1.1 Maintainer supplies the mockups listed in design.md (Visual input); record their references in design.md
-- [ ] 1.2 Maintainer reviews the proposal, specs and design (D-1 to D-7, A-1 to A-4) against the mockups; record implementation approval in proposal.md and design.md
-- [ ] 1.3 Record the rules in `docs/herald-visual-direction.md`: §4 named widths, aside, breakpoints and line length; §5 feedback matrix, Dialog, Drawer and Toast contracts, and the actionability rule; §7 and §8 admin and public compositions
+- [x] 1.2 Maintainer reviews the proposal, specs and design (D-1 to D-7, A-1 to A-4) against the mockups; record implementation approval in proposal.md and design.md
+- [x] 1.3 Record the rules in `docs/herald-visual-direction.md`: §4 named widths, aside, breakpoints and line length; §5 feedback matrix, Dialog, Drawer and Toast contracts, and the actionability rule; §7 and §8 admin and public compositions
 
 ## 2. `ui` controls and tokens
 

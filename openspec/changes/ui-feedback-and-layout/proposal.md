@@ -1,6 +1,6 @@
 ## Status
 
-**Pending approval.** The decisions below come from the maintainer's run of `h1-entries` through Aspire and the exploration that followed (11 November 2026). Mockups of every affected screen and state were supplied on 11 November 2026 and are referenced in design.md (Visual input); implementation waits for the maintainer's approval (task 1.2).
+**Approved for implementation by the maintainer on 11 November 2026.** The decisions below come from the maintainer's run of `h1-entries` through Aspire and the exploration that followed (11 November 2026). Mockups of every affected screen and state were supplied on 11 November 2026 and are referenced in design.md (Visual input); the maintainer reviewed them with this proposal and approved implementation on the same day.
 
 ## Why
 
