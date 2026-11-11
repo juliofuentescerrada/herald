@@ -4,8 +4,9 @@
 An organisation's owner opens, closes and reopens the registration of a published tournament by hand; the announced dates are an announcement, not a trigger.
 
 ## Requirements
+
 ### Requirement: An owner opens the registration of a published tournament
-An organisation's owner SHALL be able to open the registration of a tournament of that organisation that is published and whose registration is not open. Opening SHALL require the registration opening and registration closure dates to be present, and SHALL be rejected naming each missing one. Opening SHALL be an explicit action: the announced dates SHALL NOT open registration by themselves, and the current time SHALL NOT prevent the action. Opening SHALL make registration open, record the acting person and time, and change nothing else: publication, competition and configuration stay as they were and no entry is created. A draft's registration SHALL NOT be opened.
+An organisation's owner SHALL be able to open the registration of a tournament of that organisation that is published and whose registration is not open. Opening SHALL require the registration opening and registration closure dates to be present, and SHALL be rejected naming each missing one. Opening SHALL be an explicit action: the announced dates SHALL NOT open registration by themselves, and the current time SHALL NOT prevent the action. Opening SHALL make registration open, record the acting person and time, and change nothing else in the tournament: publication, competition and configuration stay as they were. Existing entries SHALL keep their state, except that with automatic admission free slots SHALL admit entries waiting with "capacity full" (guest entries). A draft's registration SHALL NOT be opened.
 
 #### Scenario: Registration is opened
 - **WHEN** an owner opens the registration of a published tournament that has both registration dates
@@ -27,8 +28,12 @@ An organisation's owner SHALL be able to open the registration of a tournament o
 - **WHEN** the announced opening date passes and nobody has opened registration
 - **THEN** registration is still not open
 
+#### Scenario: Reopening fills free slots
+- **WHEN** an owner reopens the registration of a tournament with automatic admission, one free slot and two entries waiting with "capacity full"
+- **THEN** the first waiting entry is admitted and the second still waits
+
 ### Requirement: An owner closes and reopens registration
-An owner SHALL be able to close an open registration and reopen a closed one. Closing SHALL make registration closed, record the acting person and time, and change nothing else. Reopening SHALL have the same preconditions and effects as opening. The announced closure date SHALL NOT close registration by itself. Closing a registration that was never opened SHALL be rejected.
+An owner SHALL be able to close an open registration and reopen a closed one. Closing SHALL make registration closed, record the acting person and time, and change nothing else: entries keep their state, and no entry is admitted automatically while registration is closed. Reopening SHALL have the same preconditions and effects as opening. The announced closure date SHALL NOT close registration by itself. Closing a registration that was never opened SHALL be rejected.
 
 #### Scenario: Registration is closed
 - **WHEN** an owner closes an open registration
@@ -49,6 +54,10 @@ An owner SHALL be able to close an open registration and reopen a closed one. Cl
 #### Scenario: The closure date passes
 - **WHEN** the announced closure date passes while registration is open
 - **THEN** registration is still open
+
+#### Scenario: Closing keeps the entries
+- **WHEN** an owner closes a registration with admitted and waiting entries
+- **THEN** every entry keeps its state and its place in the waiting order
 
 ### Requirement: Registration changes state the revision they were based on
 Opening and closing SHALL state the revision they were based on and SHALL increase the tournament's revision by one when they take effect. A change based on an older revision SHALL be rejected as a conflict that reports the current revision and changes nothing, except that a change whose result is already in effect SHALL return the current tournament as a repeat without a second effect. A tournament of another organisation SHALL receive the same generic not-found response as one that does not exist.

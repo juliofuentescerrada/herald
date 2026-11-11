@@ -2,7 +2,9 @@
 
 ## Purpose
 A Playwright suite in `e2e/` runs Herald's critical journeys against the composed system, signing in through a fake OpenID Connect provider so the production sign-in code runs (ADR 0015).
+
 ## Requirements
+
 ### Requirement: The suite tests the running system
 An end-to-end suite in the repository's `e2e/` folder SHALL start its own system before its journeys: PostgreSQL and a fake identity provider in containers, the host, the admin application and the public application's server rendering. It SHALL reach the system only through the browser, and SHALL leave no containers or processes running when it ends, whether it passes or fails.
 
@@ -40,6 +42,8 @@ The suite SHALL cover these journeys, each as one test named as a sentence:
 10. An owner creates a draft tournament with only a title, sees what it lacks for publication, completes it, reviews it and publishes it, and the list shows it as published with registration not open.
 11. An owner saving a tournament that changed in another tab sees the conflict with their input kept, and the other tab's change is intact.
 12. An owner opens the registration of a published tournament, sees it open in the list, closes it and reopens it.
+13. An owner enters players in an individual tournament with automatic admission until it is full, sees the next one wait, cancels an admitted entry and sees the waiting one admitted.
+14. An owner enters teams in a team tournament with manual admission, is warned of a possible duplicate team and enters the existing one, and admits a pending team.
 
 #### Scenario: Each journey checks what the person sees
 - **WHEN** a journey runs
@@ -51,4 +55,3 @@ Every distinct page or state a journey reaches SHALL pass an automated accessibi
 #### Scenario: An inaccessible state
 - **WHEN** a journey reaches a state with an automatically detectable accessibility violation
 - **THEN** the journey fails and names the violation
-
