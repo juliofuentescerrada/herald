@@ -46,5 +46,6 @@
 .herald-toast-dismiss:hover { background: color-mix(in srgb, var(--herald-color-text-primary) 6%, transparent); }
 
 @media (max-width: 699px) {
+  body { padding-bottom: var(--herald-toast-reserve, 0); }
   .herald-toasts { left: var(--herald-space-4); right: var(--herald-space-4); bottom: var(--herald-space-4); width: auto; max-width: none; }
 }

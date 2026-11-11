@@ -1,13 +1,14 @@
 import { TestBed } from '@angular/core/testing';
 import { SaveTournament, TournamentConfiguration } from '@herald/api-client/admin';
+import { Toasts } from '@herald/ui';
 import axe from 'axe-core';
 import { Observable, of, Subject, throwError } from 'rxjs';
-import { AccessState } from '../../platform';
+import { AccessState, Confirmation } from '../../platform';
 import { base, details, open, problem, team, tournamentId } from './tournaments.testing';
 
 type Answer = () => Observable<unknown>;
 
-async function render(path: string, options: { reads?: Answer[]; writes?: Answer[]; confirm?: (message: string) => boolean } = {}) {
+async function render(path: string, options: { reads?: Answer[]; writes?: Answer[]; confirm?: (options: Confirmation) => boolean } = {}) {
   const { reads = [], writes = [] } = options;
   const created: { tournamentId: string; configuration: TournamentConfiguration }[] = [];
   const saved: SaveTournament[] = [];
@@ -40,6 +41,8 @@ async function render(path: string, options: { reads?: Answer[]; writes?: Answer
   };
   return { ...view, control, type, submit, created, saved };
 }
+
+const toasts = () => TestBed.inject(Toasts).toasts().map((toast) => toast.text);
 
 describe('The tournament configuration form', () => {
   beforeEach(() => {
@@ -99,7 +102,8 @@ describe('The tournament configuration form', () => {
     await submit();
     await vi.waitFor(() => expect(router.url).toBe(`${base}/${created[0].tournamentId}`));
     expect(created[0].configuration).toMatchObject({ title: 'Autumn Open', capacity: null, entryKind: null, timeZone: 'Europe/Madrid' });
-    await vi.waitFor(() => expect(text('herald-notice strong')).toBe('Draft saved'));
+    expect(toasts()).toEqual(['Draft saved. It is not ready to publish yet.']);
+    expect(text('herald-notice strong')).toBeUndefined();
     expect(text('h1')).toBe('Configure Autumn Open');
     expect(texts('.summary li')).toEqual(['Capacity']);
   });
@@ -115,7 +119,7 @@ describe('The tournament configuration form', () => {
     await submit();
     expect(saved[0].expectedRevision).toBe(3);
     expect(saved[0].configuration).toMatchObject({ entryKind: 'individual', maximumRosterSize: null, location: 'online', venue: null, plannedStartAt: '2026-11-14T10:00:00' });
-    await vi.waitFor(() => expect(text('herald-notice strong')).toBe('Draft saved'));
+    await vi.waitFor(() => expect(toasts()).toEqual(['Draft saved. It has everything publication needs.']));
   });
 
   it('offers the review of a complete, saved draft and withdraws it while changes are unsaved', async () => {
@@ -231,14 +235,26 @@ describe('The tournament configuration form', () => {
     await type('capacity', '32');
     await submit();
     expect(saved[0].configuration.capacity).toBe(32);
-    await vi.waitFor(() => expect(texts('herald-notice strong')).toContain('Changes saved'));
+    await vi.waitFor(() => expect(toasts()).toEqual(['Changes saved.']));
+    // The outcome is a toast only: no persistent success notice remains on the page.
+    expect(texts('herald-notice strong')).toEqual(['Published · configuration remains editable']);
+  });
+
+  it('puts registration and entries in an aside for a published tournament, and none for a draft', async () => {
+    const published = await render(`/${tournamentId}`, { reads: [() => of(details({ publication: 'published' }))] });
+    expect(published.page().querySelector('.width-form.with-aside > .aside app-registration-area')).not.toBeNull();
+    expect(published.texts('.aside h2')).toContain('Entries');
+    TestBed.resetTestingModule();
+    const draft = await render(`/${tournamentId}`, { reads: [() => of(details())] });
+    expect(draft.page().querySelector('.width-form')).not.toBeNull();
+    expect(draft.page().querySelector('.with-aside, .aside')).toBeNull();
   });
 
   it('asks before leaving with unsaved input, and declining keeps the page and the input', async () => {
     const asked: string[] = [];
     const { control, type, router } = await render('/new', {
-      confirm: (message) => {
-        asked.push(message);
+      confirm: (options) => {
+        asked.push(options.heading);
         return false;
       },
     });

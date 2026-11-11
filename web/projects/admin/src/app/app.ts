@@ -1,7 +1,7 @@
-import { ChangeDetectionStrategy, Component, computed, DOCUMENT, effect, ElementRef, inject, signal, viewChild } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, DOCUMENT, effect, ElementRef, inject, signal, untracked, viewChild } from '@angular/core';
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { ActivatedRouteSnapshot, NavigationEnd, NavigationError, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
-import { Button, Icon, NavLink, Notice } from '@herald/ui';
+import { Button, Icon, NavLink, Notice, ToastOutlet, Toasts } from '@herald/ui';
 import { AccessPage } from './access-page';
 import { AccountMenu } from './account-menu';
 import { AccessState, AppContext, AUTH_CONFIG, injectWorkingOrganisation, Session } from './platform';
@@ -10,7 +10,7 @@ const deepest = (route: ActivatedRouteSnapshot): ActivatedRouteSnapshot => (rout
 
 /** The organiser shell: graphite rail with the working context and navigation, and the page. */
 @Component({
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, Button, Icon, NavLink, Notice, AccessPage, AccountMenu],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, Button, Icon, NavLink, Notice, ToastOutlet, AccessPage, AccountMenu],
   selector: 'app-root',
   templateUrl: './app.html',
   styleUrl: './app.css',
@@ -35,6 +35,11 @@ export class App {
   constructor() {
     // The failure replaces the page, possibly with focus inside it: move focus to its heading so it is announced.
     effect(() => this.failureHeading()?.nativeElement.focus());
+    // Toasts leave with their context: when access stops, as on a change of organisation or person (a full load).
+    const toasts = inject(Toasts);
+    effect(() => {
+      if (this.access.problem()) untracked(() => toasts.clear());
+    });
     this.router.events.pipe(takeUntilDestroyed())
       .subscribe((event) => {
         if (event instanceof NavigationError) this.failedUrl.set(event.url);

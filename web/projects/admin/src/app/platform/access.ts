@@ -1,5 +1,5 @@
 import { HttpErrorResponse, HttpInterceptorFn } from '@angular/common/http';
-import { DestroyRef, DOCUMENT, Injectable, InjectionToken, inject, signal } from '@angular/core';
+import { DestroyRef, Injectable, InjectionToken, inject, signal } from '@angular/core';
 import { CanDeactivateFn } from '@angular/router';
 import { AuthError } from '@azure/msal-browser';
 import { catchError, throwError } from 'rxjs';
@@ -71,14 +71,28 @@ export const accessErrors: HttpInterceptorFn = (request, next) => {
   );
 };
 
-/** Asks the person; a token so tests can answer. */
-export const CONFIRM = new InjectionToken<(message: string) => boolean>('Herald confirm', {
-  factory: () => {
-    const window = inject(DOCUMENT).defaultView;
-    return (message) => window?.confirm(message) ?? true;
-  },
-});
+/** One question with its consequence, a confirming action and a leaving action. */
+export interface Confirmation {
+  readonly heading: string;
+  readonly body: string;
+  readonly confirmLabel: string;
+  readonly leaveLabel: string;
+  readonly destructive?: boolean;
+}
 
-/** Leaving a form with unsaved input asks first (A-4); a switch from another tab cannot ask and discards it. */
+/** Asks the person; the composition provides a modal dialog (app.config.ts), tests their own answers. */
+export const CONFIRM = new InjectionToken<(question: Confirmation) => boolean | Promise<boolean>>('Herald confirm');
+
+/**
+ * Leaving a form with unsaved input asks first (A-4); a switch from another tab cannot ask and discards it.
+ * Closing or reloading the browser tab keeps the browser's own prompt (design D-5).
+ */
 export const confirmLeave: CanDeactivateFn<unknown> = () =>
-  !inject(AccessState).hasUnsavedInput() || inject(CONFIRM)('Discard your unsaved input? It is not saved anywhere.');
+  !inject(AccessState).hasUnsavedInput() ||
+  inject(CONFIRM)({
+    heading: 'Leave without saving your changes?',
+    body: 'Your unsaved changes will be lost when you leave this page.',
+    confirmLabel: 'Leave without saving',
+    leaveLabel: 'Stay on this page',
+    destructive: true,
+  });

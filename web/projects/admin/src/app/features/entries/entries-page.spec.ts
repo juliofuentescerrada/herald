@@ -7,6 +7,7 @@ import { EntryDetails, FieldDetails, HeraldHostAdminService, TournamentDetails }
 import { provideTanStackQuery, QueryClient } from '@tanstack/angular-query-experimental';
 import axe from 'axe-core';
 import { Observable, of, Subject, throwError } from 'rxjs';
+import { Toasts } from '@herald/ui';
 import { AccessState, AppContext, QUERY_CLIENT, Session } from '../../platform';
 import { EntriesPage } from './entries-page';
 
@@ -96,9 +97,11 @@ async function open(api: Record<string, unknown>, details: TournamentDetails = t
   const harness = await RouterTestingHarness.create(`/organisations/${organisation}/tournaments/${tournamentId}/entries`);
   document.body.appendChild(harness.fixture.nativeElement);
   const page = () => harness.routeNativeElement as HTMLElement;
-  const button = (text: string) => [...page().querySelectorAll<HTMLButtonElement>('button')].find((b) => b.textContent?.trim() === text);
+  // Dialogs and the drawer render over the page, outside it: queries look at the whole document.
+  const all = () => document.body;
+  const button = (text: string) => [...all().querySelectorAll<HTMLButtonElement>('button')].find((b) => b.textContent?.trim() === text);
   const type = (selector: string, value: string) => {
-    const input = page().querySelector<HTMLInputElement | HTMLTextAreaElement>(selector)!;
+    const input = all().querySelector<HTMLInputElement | HTMLTextAreaElement>(selector)!;
     input.value = value;
     input.dispatchEvent(new Event('input'));
   };
@@ -107,8 +110,11 @@ async function open(api: Record<string, unknown>, details: TournamentDetails = t
     button,
     type,
     settle: () => harness.fixture.whenStable(),
-    text: (selector: string) => page().querySelector(selector)?.textContent?.replace(/\s+/g, ' ').trim(),
-    texts: (selector: string) => [...page().querySelectorAll(selector)].map((e) => e.textContent?.replace(/\s+/g, ' ').trim()),
+    text: (selector: string) => all().querySelector(selector)?.textContent?.replace(/\s+/g, ' ').trim(),
+    texts: (selector: string) => [...all().querySelectorAll(selector)].map((e) => e.textContent?.replace(/\s+/g, ' ').trim()),
+    toasts: () => TestBed.inject(Toasts).toasts().map((toast) => toast.text),
+    dialog: () => document.querySelector<HTMLElement>('[role=dialog]'),
+    heading: () => document.getElementById(document.querySelector('[role=dialog]')!.getAttribute('aria-labelledby')!)?.textContent?.trim(),
   };
 }
 
@@ -119,7 +125,10 @@ const violations = async (page: HTMLElement) =>
   (await axe.run(page, { rules: { 'color-contrast': { enabled: false } } })).violations.map((v) => v.id);
 
 describe('The entries page', () => {
-  afterEach(() => TestBed.resetTestingModule());
+  afterEach(() => {
+    TestBed.resetTestingModule();
+    document.querySelectorAll('herald-dialog, herald-drawer').forEach((element) => element.remove());
+  });
 
   it('shows an empty open field with adding a player as its one primary action', async () => {
     const { page, text, texts } = await open({ getField: () => of(field([])) });
@@ -127,9 +136,11 @@ describe('The entries page', () => {
 
     expect(text('h1')).toBe('Entries · Saturday Open');
     expect(texts('herald-status-label')).toEqual(['Published', 'Registration open', 'Preparing']);
-    expect(texts('.summary .help')).toEqual(['Automatic admission · 0 waiting', 'Entry terms updated 11 November 2026, 10:10 · Europe/Madrid']);
+    expect(texts('.summary .help')).toEqual(['Automatic admission · 0 waiting for a slot', 'Entry terms updated 11 November 2026, 10:10 · Europe/Madrid']);
     expect(text('#empty-heading')).toBe('No entries yet');
-    expect(texts('.group h2')).toEqual(['Admitted · 0', 'Waiting · 0', 'Cancelled · 0']);
+    expect(texts('.group h2')).toEqual(['Admitted · 0', 'Waiting · 0']);
+    // No history, no cancelled group.
+    expect(page().querySelector('details.cancelled')).toBeNull();
     expect(page().querySelector('a.back')?.getAttribute('href')).toBe(`/organisations/${organisation}/tournaments/${tournamentId}`);
     expect(await violations(page())).toEqual([]);
   });
@@ -156,15 +167,17 @@ describe('The entries page', () => {
   it('admits a pending team at once under manual admission', async () => {
     const pending = field([entry('North Stars'), waiting('Cedar Owls', 1, 'admissionPending')], { entryKind: 'team', capacity: 4, admission: 'manual' });
     const admitEntry = vi.fn(() => of(field([entry('North Stars'), entry('Cedar Owls')], { entryKind: 'team', capacity: 4, admission: 'manual' })));
-    const { page, button, text } = await open({ getField: () => of(pending), admitEntry });
+    const { page, button, text, texts, toasts } = await open({ getField: () => of(pending), admitEntry });
     await vi.waitFor(() => expect(text('#summary-heading')).toBe('1 of 4 teams'));
+    expect(texts('.summary .help')[0]).toBe('Manual admission · 1 pending your decision');
 
     expect(button('Add team')).toBeTruthy();
     expect(text('ol li .help')).toContain('Admission pending');
     page().querySelector<HTMLButtonElement>('ol button')!.click();
     await vi.waitFor(() => expect(text('#summary-heading')).toBe('2 of 4 teams'));
     expect(admitEntry).toHaveBeenCalledWith(organisation, tournamentId, 'e-Cedar-Owls', { expectedRevision: 1, reason: null });
-    expect(text('.announcement')).toBe('Cedar Owls admitted.');
+    // In order: no confirmation, and the outcome is a toast.
+    expect(toasts()).toEqual(['Cedar Owls admitted.']);
   });
 
   it('keeps admission available after closure while adding says to reopen registration', async () => {
@@ -178,25 +191,27 @@ describe('The entries page', () => {
   it('finds an existing guest by name, tells same-name guests apart by creation, and enters the chosen one', async () => {
     const findGuests = vi.fn(() => of([{ id: 'g-quinn', kind: 'player', name: 'Quinn Ash', createdAt: '2026-11-10T09:00:00Z' }]));
     const enterGuest = vi.fn(() => of(field([entry('Robin Vale'), entry('Quinn Ash', { id: 'x' })])));
-    const { page, button, type, text, settle } = await open({ getField: () => of(field([entry('Robin Vale')])), findGuests, enterGuest });
+    const { button, type, text, settle, dialog, heading } = await open({ getField: () => of(field([entry('Robin Vale')])), findGuests, enterGuest });
     await vi.waitFor(() => expect(button('Add player')).toBeTruthy());
 
     button('Add player')!.click();
     await settle();
-    await vi.waitFor(() => expect(document.activeElement?.id).toBe('add-heading'));
+    expect(document.querySelector('herald-drawer')).not.toBeNull();
+    expect(heading()).toBe('Add player');
+    await vi.waitFor(() => expect(dialog()!.contains(document.activeElement)).toBe(true));
     expect(button('Choose existing')?.getAttribute('aria-pressed')).toBe('true');
     type('#guest-name', 'Qui');
     await vi.waitFor(() => expect(text('.guests h3')).toBe('Quinn Ash'));
     expect(findGuests).toHaveBeenCalledWith(organisation, { kind: 'player', name: 'Qui' });
     expect(text('.guests .help')).toBe('Existing player · created 10 November 2026');
-    expect(await violations(page())).toEqual([]);
+    expect(await violations(document.querySelector('herald-drawer')!)).toEqual([]);
 
     button('Enter this player')!.click();
     await vi.waitFor(() => expect(text('#summary-heading')).toBe('2 of 2 individual entries'));
     const [, , entryId, body] = enterGuest.mock.calls[0] as unknown as [string, string, string, object];
     expect(body).toEqual({ guestId: 'g-quinn' });
     expect(entryId).toMatch(/^[0-9a-f-]{36}$/);
-    expect(page().querySelector('#add-heading')).toBeNull();
+    await vi.waitFor(() => expect(dialog()).toBeNull());
   });
 
   it('marks a guest already in the field instead of offering to enter it again', async () => {
@@ -234,7 +249,7 @@ describe('The entries page', () => {
       () => throwError(() => problem(409, { type: 'possible-duplicate', title: 'Conflict', status: 409, matches: [match] })),
       () => of({ ...match, id: 'g-second' }),
     );
-    const { page, button, type, text, texts, settle } = await open({ getField: () => of(field([])), createGuest, enterGuest: () => of(field([entry('Quinn Ash')])) });
+    const { button, type, text, texts, settle } = await open({ getField: () => of(field([])), createGuest, enterGuest: () => of(field([entry('Quinn Ash')])) });
     await vi.waitFor(() => expect(button('Add player')).toBeTruthy());
     button('Add player')!.click();
     await settle();
@@ -247,7 +262,7 @@ describe('The entries page', () => {
     expect(text('.guests h3')).toBe('Quinn Ash');
     expect(button('Enter this player')).toBeTruthy();
     expect(button('Create and enter player')).toBeUndefined();
-    expect(await violations(page())).toEqual([]);
+    expect(await violations(document.querySelector('herald-drawer')!)).toEqual([]);
 
     button('Create a new player anyway')!.click();
     await vi.waitFor(() => expect(text('#summary-heading')).toBe('1 of 2 individual entries'));
@@ -268,7 +283,9 @@ describe('The entries page', () => {
     type('#guest-name', 'Reese Moss');
     button('Create and enter player')!.click();
 
-    await vi.waitFor(() => expect(text('.operation [role="status"]')).toBe('Adding entry. Please wait; do not submit again.'));
+    await vi.waitFor(() => expect(text('[role=dialog] [role="status"]')).toBe('Adding entry. Please wait; do not submit again.'));
+    expect(text('[role=dialog]')).toBeTruthy();
+    expect(document.querySelector('[role=dialog]')!.getAttribute('aria-busy')).toBe('true');
     expect(button('Add player')?.disabled).toBe(true);
     expect(text('#add-reason')).toBe('Request in progress. Please wait; do not submit again.');
     button('Adding…')!.click();
@@ -287,9 +304,11 @@ describe('The entries page', () => {
     type('#guest-name', 'Reese Moss');
     button('Create and enter player')!.click();
 
-    await vi.waitFor(() => expect(text('.operation herald-notice strong')).toBe('Entry was not added'));
-    expect(text('.operation herald-notice')).toContain('Nothing was added. Your input is kept; try again.');
-    expect(page().querySelector<HTMLInputElement>('#guest-name')!.value).toBe('Reese Moss');
+    // The drawer stays open with the input and explains the failure inside it.
+    await vi.waitFor(() => expect(text('[role=dialog] herald-notice strong')).toBe('Entry was not added'));
+    expect(text('[role=dialog] herald-notice')).toContain('Nothing was added. Your input is kept; try again.');
+    expect(document.querySelector<HTMLInputElement>('#guest-name')!.value).toBe('Reese Moss');
+    expect(page().querySelector('herald-notice')).toBeNull();
 
     button('Retry add')!.click();
     await vi.waitFor(() => expect(text('#summary-heading')).toBe('1 of 2 individual entries'));
@@ -302,15 +321,16 @@ describe('The entries page', () => {
   it('asks for a private reason before admitting ahead of the capacity queue', async () => {
     const closed = field([entry('Robin Vale'), waiting('Ellis Stone', 1), waiting('Rowan Lake', 2)], { registration: 'closed' });
     const admitEntry = vi.fn(() => of(field([entry('Robin Vale'), entry('Rowan Lake'), waiting('Ellis Stone', 1)], { registration: 'closed' })));
-    const { page, button, type, text, settle } = await open({ getField: () => of(closed), admitEntry }, tournament({ registration: 'closed' }));
+    const { page, button, type, text, settle, heading } = await open({ getField: () => of(closed), admitEntry }, tournament({ registration: 'closed' }));
     await vi.waitFor(() => expect(page().querySelectorAll('ol li')).toHaveLength(2));
 
     page().querySelectorAll<HTMLButtonElement>('ol button')[2].click();
     await settle();
-    expect(text('#admit-heading')).toBe('Admit Rowan Lake ahead of Ellis Stone?');
-    expect(text('.operation > p')).toContain('Registration is closed, so no entry is admitted automatically.');
+    expect(heading()).toBe('Admit Rowan Lake ahead of Ellis Stone?');
+    expect(text('[role=dialog] .herald-dialog-body > p')).toContain('Registration is closed, so no entry is admitted automatically.');
     expect(button('Admit Rowan Lake')?.disabled).toBe(true);
-    expect(await violations(page())).toEqual([]);
+    await vi.waitFor(() => expect(document.activeElement?.id).toBe('admit-reason'));
+    expect(await violations(document.querySelector('herald-dialog')!)).toEqual([]);
 
     type('#admit-reason', '  Organiser seed  ');
     await settle();
@@ -322,15 +342,17 @@ describe('The entries page', () => {
   it('names the waiting entry a cancellation will admit, and shows it admitted after confirming', async () => {
     const promoted = field([entry('Sam Reed'), entry('Ellis Stone'), cancelled('Robin Vale')]);
     const cancelEntry = vi.fn(() => of(promoted));
-    const { page, button, text, settle } = await open({ getField: () => of(full()), cancelEntry });
+    const { page, button, text, texts, settle, heading, toasts } = await open({ getField: () => of(full()), cancelEntry });
     await vi.waitFor(() => expect(page().querySelectorAll('ul[aria-labelledby="admitted-heading"] li')).toHaveLength(2));
 
     const trigger = page().querySelector<HTMLButtonElement>('ul[aria-labelledby="admitted-heading"] button')!;
     trigger.click();
     await settle();
-    expect(text('#cancel-heading')).toBe('Cancel Robin Vale’s entry?');
-    expect(text('.operation herald-notice')).toContain('Ellis Stone, first in the capacity queue, will be admitted automatically.');
-    expect(await violations(page())).toEqual([]);
+    expect(heading()).toBe('Cancel Robin Vale’s entry?');
+    expect(text('[role=dialog] herald-notice')).toContain('Ellis Stone, first in the capacity queue, will be admitted automatically.');
+    expect(button('Confirm cancellation')?.getAttribute('data-variant')).toBe('destructive');
+    await vi.waitFor(() => expect(document.activeElement).toBe(button('Keep entry')));
+    expect(await violations(document.querySelector('herald-dialog')!)).toEqual([]);
 
     button('Keep entry')!.click();
     await vi.waitFor(() => expect(document.activeElement).toBe(trigger));
@@ -340,8 +362,40 @@ describe('The entries page', () => {
     await vi.waitFor(() => expect(text('ol')).toBeUndefined());
     expect(cancelEntry).toHaveBeenCalledWith(organisation, tournamentId, 'e-Robin-Vale', { expectedRevision: 1 });
     expect(text('ul[aria-labelledby="admitted-heading"]')).toContain('Ellis Stone');
-    expect(text('ul[aria-labelledby="cancelled-heading"] h3')).toBe('Robin Vale');
-    expect(text('ul[aria-labelledby="cancelled-heading"] .help')).toBe('Cancelled · 11 November 2026, 09:45 · Europe/Madrid');
+    expect(toasts()).toEqual(['Robin Vale’s entry cancelled.']);
+    // History is a compact group, collapsed by default, after the summary.
+    const history = page().querySelector<HTMLDetailsElement>('details.cancelled')!;
+    expect(history.open).toBe(false);
+    expect(text('details.cancelled summary')).toBe('Cancelled · 1');
+    expect(texts('details.cancelled li')).toEqual(['Robin Vale · Cancelled 11 November 2026, 09:45 · Europe/Madrid']);
+    expect(page().querySelector('details.cancelled button')).toBeNull();
+    await vi.waitFor(() => expect(document.activeElement?.id).toBe('summary-heading'));
+  });
+
+  it('keeps the cancellation dialog open and unrepeatable while its request is in progress, then explains a failure inside it', async () => {
+    const pending = new Subject<FieldDetails>();
+    const cancelEntry = answers(() => pending, () => of(field([entry('Sam Reed'), entry('Ellis Stone'), cancelled('Robin Vale')])));
+    const { page, button, text, settle, dialog, toasts } = await open({ getField: () => of(full()), cancelEntry });
+    await vi.waitFor(() => expect(page().querySelectorAll('ul[aria-labelledby="admitted-heading"] li')).toHaveLength(2));
+    page().querySelector<HTMLButtonElement>('ul[aria-labelledby="admitted-heading"] button')!.click();
+    await settle();
+    button('Confirm cancellation')!.click();
+    await settle();
+
+    expect(dialog()!.getAttribute('aria-busy')).toBe('true');
+    expect(button('Keep entry')!.disabled).toBe(true);
+    dialog()!.dispatchEvent(new KeyboardEvent('keydown', { key: 'Escape', bubbles: true }));
+    button('Cancelling…')!.click();
+    await settle();
+    expect(dialog()).not.toBeNull();
+    expect(cancelEntry).toHaveBeenCalledTimes(1);
+
+    pending.error(problem(500));
+    await vi.waitFor(() => expect(text('[role=dialog] herald-notice[data-tone=danger] strong')).toBe('Entry was not cancelled'));
+    expect(toasts()).toEqual([]);
+    button('Try again')!.click();
+    await vi.waitFor(() => expect(dialog()).toBeNull());
+    expect(toasts()).toEqual(['Robin Vale’s entry cancelled.']);
   });
 
   it('says no waiting entry is admitted automatically when cancelling after closure', async () => {
@@ -350,7 +404,7 @@ describe('The entries page', () => {
     await vi.waitFor(() => expect(page().querySelectorAll('ul[aria-labelledby="admitted-heading"] li')).toHaveLength(2));
     page().querySelector<HTMLButtonElement>('ul[aria-labelledby="admitted-heading"] button')!.click();
     await settle();
-    expect(text('.operation herald-notice')).toContain('No waiting entry will be admitted automatically because registration is closed.');
+    expect(text('[role=dialog] herald-notice')).toContain('No waiting entry will be admitted automatically because registration is closed.');
   });
 
   it('says an entry changed elsewhere and reloads the latest field', async () => {
@@ -363,6 +417,9 @@ describe('The entries page', () => {
     button('Confirm cancellation')!.click();
 
     await vi.waitFor(() => expect(texts('herald-notice strong')).toContain('This entry changed elsewhere'));
+    // A conflict is a persistent notice on the page, not inside the dialog, which closes.
+    await vi.waitFor(() => expect(document.querySelector('[role=dialog]')).toBeNull());
+    expect(page().textContent).toContain('This entry changed elsewhere');
     expect(text('#add-reason')).toBe('Reload the latest version first.');
     button('Reload latest')!.click();
     await vi.waitFor(() => expect(text('#summary-heading')).toBe('1 of 2 individual entries'));

@@ -7,5 +7,6 @@ export type { AuthConfig } from './session';
 export { apiToken, signedIn } from './sign-in';
 export { injectWorkingOrganisation } from './working-organisation';
 export { AccessState, accessErrors, CONFIRM, confirmLeave, signInProblem } from './access';
+export type { Confirmation } from './access';
 export type { AccessProblem } from './access';
 export { injectMe } from './me';

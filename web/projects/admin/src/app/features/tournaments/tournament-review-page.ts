@@ -30,6 +30,7 @@ const words: Record<string, string> = {
 /** The saved configuration, read-only, before the one action that cannot be undone. */
 @Component({
   selector: 'app-tournament-review-page',
+  host: { class: 'width-form' },
   imports: [Button, Notice, RouterLink, StatusLabel],
   template: `
     <a class="back" routerLink="..">Back to configuration</a>
@@ -93,7 +94,7 @@ const words: Record<string, string> = {
     h1 { font-size: 32px; margin: var(--herald-space-4) 0 var(--herald-space-2); }
     .back { color: var(--herald-color-text-secondary); }
     .labels { display: flex; flex-wrap: wrap; gap: var(--herald-space-2); margin: var(--herald-space-4) 0 var(--herald-space-6); }
-    .column { display: flex; flex-direction: column; gap: var(--herald-space-6); max-width: 960px; }
+    .column { display: flex; flex-direction: column; gap: var(--herald-space-6); }
     .column herald-notice { display: flex; }
     .panel h2 { border-top: 1px solid var(--herald-color-border-default); padding-top: var(--herald-space-6); }
     .panel h2:first-child { border-top: 0; padding-top: 0; margin-top: 0; }
@@ -102,7 +103,7 @@ const words: Record<string, string> = {
     dd { margin: 0; font-size: var(--herald-text-lg); }
     .wide { grid-column: 1 / -1; }
     .statement { margin: 0 0 var(--herald-space-2); }
-    @media (max-width: 700px) { h1 { font-size: 28px; } dl { grid-template-columns: 1fr; } }
+    @media (max-width: 699px) { h1 { font-size: 28px; } dl { grid-template-columns: 1fr; } }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

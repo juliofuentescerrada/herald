@@ -25,29 +25,28 @@
     }
   </p>
 
-  <div class="column">
+  <!-- A published tournament keeps registration and entries in an aside; below 1200 px they come before the form. -->
+  <div class="width-form" [class.with-aside]="published()">
     @if (published()) {
-      <app-registration-area
-        [organisation]="organisation"
-        [tournament]="stored()!"
-        [unsaved]="dirty()"
-        (changed)="registrationChanged($event)"
-        (reload)="reloadLatest()"
-      />
-      <herald-notice heading="Published · configuration remains editable">
-        Competition is preparing. Saving configuration does not change registration.
-      </herald-notice>
-      <section class="summary entries" aria-labelledby="entries-heading">
-        <div>
+      <div class="aside">
+        <app-registration-area
+          [organisation]="organisation"
+          [tournament]="stored()!"
+          [unsaved]="dirty()"
+          (changed)="registrationChanged($event)"
+          (reload)="reloadLatest()"
+        />
+        <section class="summary entries" aria-labelledby="entries-heading">
           <h2 id="entries-heading">Entries</h2>
           <p>{{ entriesText() }}</p>
-        </div>
-        <a herald-button routerLink="entries">View entries</a>
-      </section>
+          <a herald-button routerLink="entries">View entries</a>
+        </section>
+      </div>
     }
-    @if (state() === 'saved') {
-      <herald-notice tone="success" [heading]="published() ? 'Changes saved' : 'Draft saved'">
-        {{ missing().length ? 'It is not ready to publish yet: see what is missing below.' : published() ? 'The published tournament is up to date.' : 'It has everything publication needs.' }}
+  <div class="main column">
+    @if (published()) {
+      <herald-notice heading="Published · configuration remains editable">
+        Competition is preparing. Saving configuration does not change registration.
       </herald-notice>
     }
     @if (state() === 'failed') {
@@ -154,5 +153,6 @@
         <p class="help" id="review-why">Review is unavailable. {{ why }}</p>
       }
     </form>
+  </div>
   </div>
 }

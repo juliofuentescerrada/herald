@@ -80,9 +80,9 @@ describe('Leaving a form', () => {
     expect(confirm).not.toHaveBeenCalled();
   });
 
-  it.each([true, false])('asks before discarding unsaved input and respects the answer (%s)', (answer) => {
-    TestBed.configureTestingModule({ providers: [{ provide: CONFIRM, useValue: () => answer }] });
+  it.each([true, false])('asks before discarding unsaved input and respects the answer (%s)', async (answer) => {
+    TestBed.configureTestingModule({ providers: [{ provide: CONFIRM, useValue: () => Promise.resolve(answer) }] });
     TestBed.createComponent(DraftForm).componentInstance.text.set('Spring league');
-    expect(leave()).toBe(answer);
+    expect(await leave()).toBe(answer);
   });
 });

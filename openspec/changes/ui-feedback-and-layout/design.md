@@ -87,6 +87,8 @@ The cancellation and out-of-order admission panels become dialogs with the same 
 - [Focus handling regressions] → Catalogue and Vitest tests with `axe-core` for each control; journeys 13 and 14 exercise the dialog and drawer.
 - [Visual churn across screens already reviewed] → Content, texts and states stay; only composition, confirmations and feedback change, compared against the new mockups.
 
+- [The admin initial bundle grows to about 945 kB, over its 900 kB warning budget (error at 1 MB)] → The dialog primitive (focus trap, portal, Escape routing) is the cost; loading it lazily did not help because the `ui` entry point is bundled whole. The warning stays; the maintainer decided on 11 November 2026 to optimise the bundle later if it becomes an obstacle.
+
 ## Migration Plan
 
 Frontend only; no data or API migration. Rollback is reverting the change.

@@ -1,14 +1,30 @@
 body { background: var(--herald-color-canvas-admin); }
 
-/* Standalone pages (access states, organisation creation): a panel and a side note under the top bar. */
-.standalone-page { display: grid; grid-template-columns: minmax(0, 560px) minmax(0, 360px); gap: var(--herald-space-16); padding: var(--herald-space-16); }
+/* Named page widths (visual direction §4): each page declares one instead of its own maximum. */
+.width-focused, .width-form, .width-wide { display: block; }
+.width-focused { max-width: var(--herald-width-focused); }
+.width-form { max-width: var(--herald-width-form); }
+.width-wide { max-width: var(--herald-width-wide); }
+main p:not(.panel) { max-inline-size: 75ch; }
+
+/* A main column and, from 1200 px, a 320 px aside beside it. Below 1200 px the aside keeps its
+   place in the reading order: pages put it first in the markup when it comes before the main content. */
+.with-aside { display: grid; gap: var(--herald-space-8); align-items: start; }
+.with-aside.width-form { max-width: calc(var(--herald-width-form) + var(--herald-width-aside) + var(--herald-space-8)); }
+@media (min-width: 1200px) {
+  .with-aside { grid-template-columns: minmax(0, 1fr) var(--herald-width-aside); }
+  .with-aside > .aside { grid-column: 2; grid-row: 1; }
+  .with-aside > .main { grid-column: 1; grid-row: 1; }
+}
+
+/* Standalone pages (access states, organisation creation): a focused panel and a side note under the top bar. */
+.standalone-page { display: grid; gap: var(--herald-space-6); max-width: calc(var(--herald-width-focused) + 2 * var(--herald-space-16)); padding: var(--herald-space-16); }
 .panel { padding: var(--herald-space-8); background: var(--herald-color-surface-default); border: 1px solid var(--herald-color-border-default); }
 .panel h1 { font-size: 32px; margin-bottom: var(--herald-space-4); }
 .panel h2 { font-size: 20px; margin: var(--herald-space-6) 0 var(--herald-space-3); }
 .panel p { font-size: var(--herald-text-lg); }
 .panel herald-notice { margin-bottom: var(--herald-space-6); }
 .lead { color: var(--herald-color-text-secondary); font-size: var(--herald-text-lg); }
-.side-note { padding-top: var(--herald-space-8); }
 .side-note h2 { font-size: 20px; }
 .side-note p { color: var(--herald-color-text-secondary); font-size: var(--herald-text-lg); }
 
@@ -23,10 +39,9 @@ body { background: var(--herald-color-canvas-admin); }
 .panel .field-error { color: var(--herald-color-feedback-danger); font-size: var(--herald-text-base); font-weight: 700; margin: 0; }
 .actions { display: flex; flex-wrap: wrap; gap: var(--herald-space-3); margin-top: var(--herald-space-6); }
 
-@media (max-width: 900px) {
-  .standalone-page { grid-template-columns: minmax(0, 1fr); gap: var(--herald-space-6); padding: var(--herald-space-6) var(--herald-space-4); }
+@media (max-width: 699px) {
+  .standalone-page { padding: var(--herald-space-6) var(--herald-space-4); }
   .panel { padding: var(--herald-space-6); }
   .panel h1 { font-size: 28px; }
   .actions { flex-direction: column; align-items: stretch; }
-  .side-note { padding-top: 0; }
 }

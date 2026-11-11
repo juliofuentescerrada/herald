@@ -2,7 +2,7 @@ h1 { font-size: 32px; margin: var(--herald-space-4) 0 var(--herald-space-2); }
 .lead { margin: 0 0 var(--herald-space-2); }
 .back { color: var(--herald-color-text-secondary); }
 .labels { display: flex; flex-wrap: wrap; gap: var(--herald-space-2); margin: var(--herald-space-4) 0 var(--herald-space-6); }
-.column { display: flex; flex-direction: column; gap: var(--herald-space-6); max-width: 960px; }
+.column, .aside { display: flex; flex-direction: column; gap: var(--herald-space-6); }
 .column herald-notice { display: flex; }
 .notice-action { display: block; margin-top: var(--herald-space-3); }
 .help { color: var(--herald-color-text-secondary); margin: 0; }
@@ -10,10 +10,14 @@ h2 { font-size: 20px; margin: 0 0 var(--herald-space-2); }
 h2:focus { outline: none; } /* a focus target, not a control */
 h3 { font-size: var(--herald-text-lg); margin: 0 0 var(--herald-space-1); }
 
-.summary { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--herald-space-6); }
 .summary .help + .help { margin-top: var(--herald-space-1); }
-.summary-action { display: flex; flex-direction: column; align-items: flex-end; gap: var(--herald-space-2); max-inline-size: 320px; }
-.announcement:empty { display: none; }
+.summary-action { display: flex; flex-direction: column; align-items: flex-start; gap: var(--herald-space-2); margin-top: var(--herald-space-4); }
+
+/* Read-only history: compact, collapsed, one line per entry (visual direction §5). */
+.cancelled summary { display: inline-flex; align-items: center; min-height: var(--herald-target-min); font-weight: 700; cursor: pointer; }
+.cancelled ul { list-style: none; margin: 0; padding: 0; }
+.cancelled li { padding: var(--herald-space-2) 0; border-top: 1px solid var(--herald-color-border-default); }
+.cancelled .help { font-size: var(--herald-text-sm); }
 
 .operation { padding: var(--herald-space-6); background: var(--herald-color-surface-default); border: 1px solid var(--herald-color-border-default); }
 .operation > p { margin: 0 0 var(--herald-space-4); max-inline-size: 75ch; }
@@ -32,9 +36,10 @@ h3 { font-size: var(--herald-text-lg); margin: 0 0 var(--herald-space-1); }
 .guests { margin-top: var(--herald-space-4); }
 .row-actions { display: flex; flex: none; gap: var(--herald-space-3); }
 
-@media (max-width: 700px) {
+@media (max-width: 699px) {
   h1 { font-size: 28px; }
-  .summary, .rows li { flex-direction: column; align-items: stretch; }
-  .summary-action { align-items: stretch; max-inline-size: none; }
+  .rows li { flex-direction: column; align-items: stretch; }
+  .summary-action { align-items: stretch; }
   .row-actions { flex-direction: column; }
 }
+form herald-notice { display: flex; margin-top: var(--herald-space-4); }

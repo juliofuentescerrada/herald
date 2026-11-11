@@ -1,7 +1,10 @@
 import {
+  afterEveryRender,
   ChangeDetectionStrategy,
   Component,
   DestroyRef,
+  DOCUMENT,
+  ElementRef,
   inject,
   Injectable,
   PLATFORM_ID,
@@ -124,5 +127,12 @@ export class ToastOutlet {
 
   constructor() {
     inject(DestroyRef).onDestroy(() => this.toasts.clear());
+    // On a narrow screen the page reserves the stack's height below its content, so the stack never covers its primary action.
+    const host: HTMLElement = inject(ElementRef).nativeElement;
+    const body = inject(DOCUMENT).body;
+    afterEveryRender(() => {
+      const height = host.querySelector('.herald-toasts')?.getBoundingClientRect().height ?? 0;
+      body.style.setProperty('--herald-toast-reserve', height ? `${height + 16}px` : '0px');
+    });
   }
 }

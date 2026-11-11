@@ -6,6 +6,7 @@ import { AppContext, injectMe, organisationPath } from '../../platform';
 /** The person's organisations; switching opens the other one as a new document, never combining them. */
 @Component({
   selector: 'app-organisation-selector-page',
+  host: { class: 'width-focused' },
   imports: [Button, RouterLink],
   template: `
     <h1>Choose an organisation</h1>
@@ -42,13 +43,13 @@ import { AppContext, injectMe, organisationPath } from '../../platform';
   `,
   styles: `
     h1 { font-size: 32px; margin-bottom: var(--herald-space-2); }
-    .panel { max-width: 800px; margin-top: var(--herald-space-6); }
+    .panel { margin-top: var(--herald-space-6); }
     .panel h2 { margin-top: 0; }
     .organisations { list-style: none; margin: 0; padding: 0; }
     li { display: flex; align-items: center; justify-content: space-between; gap: var(--herald-space-4); padding: var(--herald-space-4) 0; border-top: 1px solid var(--herald-color-border-default); font-size: var(--herald-text-lg); }
     li div { display: flex; flex-direction: column; }
     small { color: var(--herald-color-text-secondary); font-size: var(--herald-text-base); }
-    @media (max-width: 700px) { h1 { font-size: 28px; } li { flex-direction: column; align-items: stretch; } }
+    @media (max-width: 699px) { h1 { font-size: 28px; } li { flex-direction: column; align-items: stretch; } }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

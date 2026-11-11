@@ -6,6 +6,7 @@ import { AppContext, injectWorkingOrganisation } from './platform';
 /** Generic on purpose: it never confirms that an address exists in another organisation. */
 @Component({
   selector: 'app-not-found-page',
+  host: { class: 'width-focused' },
   imports: [RouterLink, Button],
   template: `
     <section class="not-found" aria-labelledby="not-found-heading">
@@ -15,10 +16,10 @@ import { AppContext, injectWorkingOrganisation } from './platform';
     </section>
   `,
   styles: `
-    .not-found { max-width: 720px; padding: var(--herald-space-8); background: var(--herald-color-surface-default); border: 1px solid var(--herald-color-border-default); }
+    .not-found { padding: var(--herald-space-8); background: var(--herald-color-surface-default); border: 1px solid var(--herald-color-border-default); }
     h1 { font-size: 32px; margin-bottom: var(--herald-space-3); }
     p { font-size: var(--herald-text-lg); margin: 0 0 var(--herald-space-6); }
-    @media (max-width: 700px) { .not-found { padding: var(--herald-space-6) var(--herald-space-4); } h1 { font-size: 28px; } }
+    @media (max-width: 699px) { .not-found { padding: var(--herald-space-6) var(--herald-space-4); } h1 { font-size: 28px; } }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

@@ -14,11 +14,11 @@
 
 ## 3. Admin application
 
-- [ ] 3.1 Platform: toast outlet in the shell; toasts cleared on a change of organisation or person; `CONFIRM` opens the dialog (`confirmLeave` and "Reload latest")
-- [ ] 3.2 Layout classes in the global stylesheet; tournament list (`wide`), review (`form`), organisation selector and creation and not-found pages (`focused`); 900 px breakpoint removed
-- [ ] 3.3 Tournament configuration: `form` width with an aside for registration and entries; "Changes saved" as a toast; draft composition as the mockups show
-- [ ] 3.4 Entries page: `wide` with aside; cancellation and out-of-order admission dialogs; add drawer; toasts for additions, admissions and cancellations; cancelled entries collapsed, compact and omitted when empty; pending decisions in the summary
-- [ ] 3.5 Vitest updated and extended for every state of design.md's Visual input, with `axe-core`
+- [x] 3.1 Platform: toast outlet in the shell; toasts cleared on a change of organisation or person; `CONFIRM` opens the dialog (`confirmLeave` and "Reload latest")
+- [x] 3.2 Layout classes in the global stylesheet; tournament list (`wide`), review (`form`), organisation selector and creation and not-found pages (`focused`); 900 px breakpoint removed
+- [x] 3.3 Tournament configuration: `form` width with an aside for registration and entries; "Changes saved" as a toast; draft composition as the mockups show
+- [x] 3.4 Entries page: `wide` with aside; cancellation and out-of-order admission dialogs; add drawer; toasts for additions, admissions and cancellations; cancelled entries collapsed, compact and omitted when empty; pending decisions in the summary
+- [x] 3.5 Vitest updated and extended for every state of design.md's Visual input, with `axe-core`
 
 ## 4. Public application
 
