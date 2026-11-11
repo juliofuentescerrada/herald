@@ -115,6 +115,7 @@ describe('The registration area', () => {
     const { area, action, texts } = await render([() => of(published())], { open: [() => throwError(() => problem(500)), () => of(published({ registration: 'open' }))] });
     action().click();
     await vi.waitFor(() => expect(area()!.querySelector('herald-notice strong')?.textContent?.trim()).toBe('Registration was not opened'));
+    expect(area()!.querySelector('herald-notice')?.textContent).toContain('The request failed. Registration is still not open. Try opening it again.');
     expect(texts('herald-status-label')[1]).toBe('Registration not open');
     expect(action().textContent?.trim()).toBe('Open registration');
 

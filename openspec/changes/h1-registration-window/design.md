@@ -155,3 +155,33 @@ The migration `AddRegistrationWindow` was done with the domain rather than in bl
 The published notice now reads "Competition is preparing. Saving configuration does not change registration." A rejected save that removed a registration date says "Required while registration is open.": publication never requires those dates, so the rule code `required` on them comes only from an open registration.
 
 Vitest: `registration-area.spec.ts` (9 tests: not open and ready, missing dates with focus links, unsaved changes, in progress without repetition, open and closed with their last change, failed with retry, conflict and reload, a save rejected while open, no area on a draft) and one list test for the three registration labels; `axe-core` on the area. Admin 139 tests; lint, the boundary fixtures (15 of 15) and the admin build pass. A temporary capture run against the real API (desktop) showed the area as the captures, with the published notice limited to `ui`'s 75-character width as on the tournament setup pages.
+
+### End-to-end journey (task 5.1, 11 November 2026)
+
+Journey 12 in `e2e/journeys/tournaments.spec.ts` publishes a complete tournament without registration dates, sees the opening unavailable, follows the focus link to set the dates, sees "Save your changes first." until it saves, opens registration (axe on that state), sees "Registration open" beside "Published" in the list, closes it and reopens it, checking the last change in the reference time zone each time.
+
+### Validation and completion (tasks 6.1–6.3, 11 November 2026)
+
+**Full run (6.1), all passing:** `dotnet format --verify-no-changes`; Release build with no errors; Wolverine's code deleted, rewritten and unchanged; 201 .NET tests; `pnpm api:generate` with no drift; lint for the five web projects; 15 of 15 boundary fixtures; Vitest admin 139, public 12, catalogue 5, ui 19, api-client 9; the SSR isolation check; production builds of admin, public and catalogue; the end-to-end suite, 12 journeys.
+
+**Comparison with the captures (6.2):** the eleven states were captured from the running application at 1440 and 390 px through the end-to-end composition with its test identity provider (opening and closing held back, a failed and a conflicting opening answered by the browser) and compared with the reviewed captures. The maintainer's own run through Aspire is recorded below when done.
+
+Corrected from that comparison: a failed action now says "Registration is still not open. Try opening it again." (or "still open… closing", "still closed… reopening"), as the captures do, where it read "Registration not open still. Try again when you are ready."; the announcement sentence is limited to 75 characters, as the captures wrap it; the "Set registration opening/closure" links take the text colour, as the captures draw them, instead of the browser's default blue.
+
+Differences kept, beyond W-1 to W-3:
+
+- Notices use `herald-notice` with its tones and icons, where the captures draw plain bordered panels, as on the tournament setup pages.
+- On narrow widths the registration action keeps its own width, where the captures stretch it across the area.
+- After a save, the page's "Changes saved" notice stays under the published notice while the area changes state; the captures show each state on a fresh page.
+
+**Acceptance review against the specs (6.3):**
+
+| Requirement | Evidence |
+|---|---|
+| An owner opens the registration of a published tournament | `TournamentRegistrationTests`; `RegistrationWindowTests` (open, missing dates, draft, another owner's generic 404); area spec (ready, missing dates, unsaved changes); journey 12 |
+| An owner closes and reopens registration | `TournamentRegistrationTests`; `RegistrationWindowTests` (close, reopen, reopen without a date, close when not open); area spec (open and closed with their last change); journey 12 |
+| Registration changes state the revision they were based on | `TournamentRegistrationTests` (stale, repeats, increments); `RegistrationWindowTests` (repeat, stale); area spec (conflict and reload, in progress without repetition) |
+| The admin application shows and changes the registration window | Area spec (9 tests, `axe-core`); list spec (three registration labels); journey 12 with axe on the open state |
+| A published tournament stays editable and complete (modified) | `TournamentRegistrationTests` (saves while open, closed and not open); `RegistrationWindowTests` (save while open without a date, save while closed); area spec (a save rejected while open) |
+| An owner lists and reads the organisation's tournaments (modified) | `RegistrationWindowTests` (missing-for-registration in the read, list after opening, public document without tournament operations) |
+| The critical journeys are covered (journey 12) | `e2e/journeys/tournaments.spec.ts` |

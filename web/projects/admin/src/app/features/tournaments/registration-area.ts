@@ -33,7 +33,7 @@ import { dateTimeText, fieldLabels, instantText, registrationText } from './tour
         <p class="last">{{ change }}</p>
       }
       @if (state() === 'failed') {
-        <herald-notice tone="danger" [heading]="failedHeading()">The request failed. {{ stateText() }} still. Try again when you are ready.</herald-notice>
+        <herald-notice tone="danger" [heading]="failedHeading()">The request failed. {{ failedText() }}</herald-notice>
       }
       @if (state() === 'conflict') {
         <herald-notice tone="danger" heading="This tournament changed elsewhere">
@@ -65,12 +65,13 @@ import { dateTimeText, fieldLabels, instantText, registrationText } from './tour
     dt { color: var(--herald-color-text-secondary); margin-bottom: var(--herald-space-1); }
     dd { margin: 0; }
     .wide { grid-column: 1 / -1; }
-    .help { color: var(--herald-color-text-secondary); margin: 0 0 var(--herald-space-4); }
+    .help { color: var(--herald-color-text-secondary); margin: 0 0 var(--herald-space-4); max-inline-size: 75ch; }
     .last { margin: 0 0 var(--herald-space-4); }
     herald-notice { display: flex; margin-bottom: var(--herald-space-4); }
     .notice-action { display: block; margin-top: var(--herald-space-3); }
     ul { margin: 0 0 var(--herald-space-4); padding-left: var(--herald-space-6); }
     li { padding: var(--herald-space-1) 0; }
+    a { color: inherit; }
     @media (max-width: 700px) { dl { grid-template-columns: 1fr; } }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -98,6 +99,10 @@ export class RegistrationArea {
     return this.tournament().registration === 'closed' ? 'Reopen registration' : 'Open registration';
   });
   protected readonly failedHeading = computed(() => (this.isOpen() ? 'Registration was not closed' : 'Registration was not opened'));
+  protected readonly failedText = computed(() => {
+    if (this.isOpen()) return 'Registration is still open. Try closing it again.';
+    return this.tournament().registration === 'closed' ? 'Registration is still closed. Try reopening it again.' : 'Registration is still not open. Try opening it again.';
+  });
   /** Why the action is unavailable, or null when it is. */
   protected readonly reason = computed(() => {
     if (this.state() === 'busy') return 'Request in progress. Please wait; do not submit again.';
