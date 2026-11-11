@@ -26,7 +26,7 @@
 
 ## 6. End-to-end journey
 
-- [ ] 6.1 Journey 15: a team's roster built to its minimum, a player on another team refused, the team complete
+- [x] 6.1 Journey 15: a team's roster built to its minimum, a player on another team refused, the team complete
 
 ## 7. Validation and completion
 
