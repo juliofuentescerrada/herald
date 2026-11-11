@@ -32,8 +32,8 @@
 
 ## 6. End-to-end journeys
 
-- [ ] 6.1 Journey 10: create a draft with a title, see what it lacks, complete, review, publish, and see it published in the list
-- [ ] 6.2 Journey 11: a save conflicts with a change from another tab, input kept, other change intact
+- [x] 6.1 Journey 10: create a draft with a title, see what it lacks, complete, review, publish, and see it published in the list
+- [x] 6.2 Journey 11: a save conflicts with a change from another tab, input kept, other change intact
 
 ## 7. Validation and completion
 

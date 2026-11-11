@@ -202,3 +202,9 @@ Decisions taken while implementing:
 - A tournament that cannot be read shows "Tournament not available" with a retry, a state the captures do not have.
 
 Vitest: 29 tests in three specs (list 4, form 18, review 7) cover every reviewed state, input retention, summary and missing-value focus, leave confirmation, copy-on-lost-access and `axe-core` (colour contrast excluded, as in the other specs). Admin 129 tests pass; lint, the boundary fixtures (15 of 15) and the admin production build pass.
+
+### End-to-end journeys (tasks 6.1–6.2, 11 November 2026)
+
+`e2e/journeys/tournaments.spec.ts` has journeys 10 and 11. Journey 10 creates a team tournament (title only, then the missing values, review, publication, the list) and runs axe on the empty list, the incomplete draft, the review and the published page. Journey 11 signs the same person into a second tab, saves a capacity there, and checks that the first tab's save reports the conflict with its input kept and that the second tab's reload still shows its own change and not the first tab's. The journey sets the reference time zone explicitly: the headless browser's zone is not a fixed fact of the suite.
+
+The whole suite passes locally: 11 journeys, typecheck clean.
