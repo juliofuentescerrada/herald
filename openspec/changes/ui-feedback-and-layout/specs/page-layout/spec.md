@@ -4,27 +4,31 @@ How pages of the admin and public applications use the width of the screen, wher
 
 ## ADDED Requirements
 
-### Requirement: Admin pages use one of three named widths
-Each admin page SHALL use one of three content widths: focused, about 720 px, for a single short task; form, about 960 px, for a long form; wide, filling the available width up to about 1440 px, for operational pages such as lists and entries. A paragraph of running text SHALL be limited to about 75 characters per line, whatever the width of its container. Layout SHALL change at two breakpoints only: below 700 px content stacks in one column, and from 1200 px a page may show an aside.
+### Requirement: Admin pages use the full width
+Each admin page SHALL fill the content area beside the navigation rail, or under the top bar for a page without it, with no maximum width. A paragraph of running text SHALL be limited to about 75 characters per line, whatever the width of its container; notices and panels fill theirs. Layout SHALL change at one breakpoint only: below 700 px content stacks in one column with narrower gutters.
 
 #### Scenario: An operational page on a wide screen
-- **WHEN** an owner opens the tournament list on a 1600 px wide screen
-- **THEN** the list fills the content area up to the wide limit instead of a narrow column
+- **WHEN** an owner opens the tournament list on a 1920 px wide screen
+- **THEN** the list fills the content area instead of a narrow column
 
 #### Scenario: A short task
-- **WHEN** a person opens the page that creates an organisation
-- **THEN** its content uses the focused width
+- **WHEN** a person opens the page that creates an organisation on a 1920 px wide screen
+- **THEN** its panel fills the width under the top bar and its paragraphs keep a readable line length
 
 #### Scenario: A narrow screen
 - **WHEN** any admin page is shown 390 px wide
 - **THEN** its content stacks in one column with no horizontal scrolling
 
-### Requirement: Secondary content goes in an aside on wide screens
-From 1200 px, a page with a summary or secondary sections SHALL show them in an aside about 320 px wide beside its main content; below 1200 px the aside SHALL appear in reading order before or after the main content, as each page states.
+### Requirement: Secondary content is stacked with the main content
+A page with a summary or secondary sections SHALL show them in one column with its main content at every width, in the order the page states. A summary's action SHALL sit to the right of its text when there is room, and below it otherwise. A page title's status labels SHALL sit beside the title when there is room.
 
 #### Scenario: The tournament configuration
 - **WHEN** an owner opens a published tournament on a 1440 px wide screen
-- **THEN** the configuration form uses the form width and the registration and entries sections are in an aside beside it
+- **THEN** the state notice, the registration area and the entries summary, with "View entries" on its right, come before the configuration form, each across the full width
+
+#### Scenario: The entries page
+- **WHEN** an owner opens the entries of a tournament on a 1440 px wide screen
+- **THEN** the summary comes first with its add action on the right, followed by the admitted, waiting and cancelled groups
 
 ### Requirement: Public content is capped at 1200 px
 Public pages SHALL cap their content at 1200 px and keep a fluid outer gutter of the larger of 5 % of the viewport and 24 px.

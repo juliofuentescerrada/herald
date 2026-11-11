@@ -31,8 +31,6 @@ describe('The tournament list', () => {
     await vi.waitFor(() => expect(text('h2')).toBe('No tournaments yet'));
     expect(texts('a[herald-button], button')).toEqual(['Create tournament']);
     expect(page().querySelector('a[herald-button]')?.getAttribute('href')).toBe(`${base}/new`);
-    // An operational page: the wide width (visual direction §7.2).
-    expect(page().classList).toContain('width-wide');
   });
 
   it('shows each tournament with its capacity unit, three separate labels and its action', async () => {

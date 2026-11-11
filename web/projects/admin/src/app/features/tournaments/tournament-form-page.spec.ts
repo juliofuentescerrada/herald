@@ -240,14 +240,13 @@ describe('The tournament configuration form', () => {
     expect(texts('herald-notice strong')).toEqual(['Published · configuration remains editable']);
   });
 
-  it('puts registration and entries in an aside for a published tournament, and none for a draft', async () => {
+  it('shows registration and entries before the form for a published tournament, and neither for a draft', async () => {
     const published = await render(`/${tournamentId}`, { reads: [() => of(details({ publication: 'published' }))] });
-    expect(published.page().querySelector('.width-form.with-aside > .aside app-registration-area')).not.toBeNull();
-    expect(published.texts('.aside h2')).toContain('Entries');
+    expect(published.page().querySelector('app-registration-area')?.compareDocumentPosition(published.page().querySelector('form')!)).toBe(Node.DOCUMENT_POSITION_FOLLOWING);
+    expect(published.texts('h2')).toContain('Entries');
     TestBed.resetTestingModule();
     const draft = await render(`/${tournamentId}`, { reads: [() => of(details())] });
-    expect(draft.page().querySelector('.width-form')).not.toBeNull();
-    expect(draft.page().querySelector('.with-aside, .aside')).toBeNull();
+    expect(draft.page().querySelector('app-registration-area, #entries-heading')).toBeNull();
   });
 
   it('asks before leaving with unsaved input, and declining keeps the page and the input', async () => {

@@ -31,9 +31,13 @@
 ## 6. Validation and completion
 
 - [x] 6.1 Full run: format, build, all .NET tests, web lint/tests/boundaries/builds, SSR check, codegen and API drift checks, e2e suite; record in design.md
-- [ ] 6.2 Capture the Visual input states at 1440 and 390 px and compare with the mockups; maintainer run through Aspire; record differences in design.md
+- [x] 6.2 Capture the Visual input states at 1440 and 390 px and compare with the mockups; maintainer run through Aspire; record differences in design.md
 - [x] 6.3 Update `docs/herald-visual-direction.md` §9.3, `docs/roadmap.md`, `README.md`, `CLAUDE.md` status and `openspec/config.yaml`; acceptance review against the specs in design.md
 
 ## 7. Notifications decision
 
 - [x] 7.1 ADR 0017 with the inventory of notifiable facts; rule in `CLAUDE.md` and `openspec/config.yaml`; ADR index and F-10 pointer
+
+## 8. Layout revision from the maintainer's run
+
+- [x] 8.1 Full-width admin pages: named widths, aside and their tokens removed; secondary content stacked; labels beside the title; summary actions on the right; cancelled group after waiting; creation note inside its panel; `Notice` fills its container; specs, visual direction and design D-9 updated

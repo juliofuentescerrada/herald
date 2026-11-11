@@ -1,8 +1,13 @@
-h1 { font-size: 32px; margin: var(--herald-space-4) 0 var(--herald-space-2); }
+h1 { font-size: 32px; }
+/* The title with its status labels beside it; they wrap below it when there is no room. */
+.page-header { margin-bottom: var(--herald-space-6); }
+.title { display: flex; flex-wrap: wrap; align-items: center; gap: var(--herald-space-2) var(--herald-space-4); margin: var(--herald-space-4) 0 var(--herald-space-2); }
+.title h1 { margin: 0; }
 .lead { margin: 0 0 var(--herald-space-2); }
+.lead:last-child { margin-bottom: 0; }
 .back { color: var(--herald-color-text-secondary); }
-.labels { display: flex; flex-wrap: wrap; gap: var(--herald-space-2); margin: var(--herald-space-4) 0 var(--herald-space-6); }
-.column, .aside { display: flex; flex-direction: column; gap: var(--herald-space-6); }
+.labels { display: flex; flex-wrap: wrap; gap: var(--herald-space-2); margin: 0; }
+.column { display: flex; flex-direction: column; gap: var(--herald-space-6); }
 .column herald-notice { display: flex; }
 .notice-action { display: block; margin-top: var(--herald-space-3); }
 .help { color: var(--herald-color-text-secondary); margin: 0; }
@@ -11,7 +16,9 @@ h2:focus { outline: none; } /* a focus target, not a control */
 h3 { font-size: var(--herald-text-lg); margin: 0 0 var(--herald-space-1); }
 
 .summary .help + .help { margin-top: var(--herald-space-1); }
-.summary-action { display: flex; flex-direction: column; align-items: flex-start; gap: var(--herald-space-2); margin-top: var(--herald-space-4); }
+/* The summary on the left, adding on the right; stacked on a narrow screen. */
+.summary { display: flex; align-items: center; justify-content: space-between; gap: var(--herald-space-4); }
+.summary-action { display: flex; flex-direction: column; align-items: flex-end; gap: var(--herald-space-2); text-align: right; }
 
 /* Read-only history: compact, collapsed, one line per entry (visual direction §5). */
 .cancelled summary { display: inline-flex; align-items: center; min-height: var(--herald-target-min); font-weight: 700; cursor: pointer; }
@@ -39,7 +46,8 @@ h3 { font-size: var(--herald-text-lg); margin: 0 0 var(--herald-space-1); }
 @media (max-width: 699px) {
   h1 { font-size: 28px; }
   .rows li { flex-direction: column; align-items: stretch; }
-  .summary-action { align-items: stretch; }
+  .summary { flex-direction: column; align-items: stretch; }
+  .summary-action { align-items: stretch; text-align: left; }
   .row-actions { flex-direction: column; }
 }
 form herald-notice { display: flex; margin-top: var(--herald-space-4); }

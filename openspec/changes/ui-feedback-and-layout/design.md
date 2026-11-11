@@ -57,7 +57,7 @@ A toast service with no app dependencies lives in `ui` (a presentation contract,
 
 The toast outlet renders nothing on the server and starts in the browser; dialogs and drawers only open on interaction. The public SSR isolation check keeps passing because no request-scoped state is added.
 
-### D-4 Widths as tokens and app classes
+### D-4 Widths as tokens and app classes (superseded by D-9)
 
 `ui` defines `--herald-width-focused`, `--herald-width-form`, `--herald-width-wide` and `--herald-width-aside`, and documents the breakpoints (700 and 1200 px; custom properties cannot be used in media queries, so the values are written in the stylesheets and named in a comment). Each app's global stylesheet gains a few layout classes (a page of a given width, a main-and-aside grid) that pages use instead of their own `max-width`. Running text gets `max-inline-size: 75ch` on paragraphs.
 
@@ -84,6 +84,19 @@ The cancellation and out-of-order admission panels become dialogs with the same 
 
 Added on 11 November 2026 at the maintainer's request, with no code impact. Notices were not covered by any architecture decision, and today's snapshot events cannot express F-10's facts. ADR 0017 (proposed) settles a consumer-only `Notifications` module fed by fact events, published once a consumer exists. Its inventory records `h1-entries`' admission, promotion and cancellation, which Registration's `Entry` already persists. Later proposals list their notifiable facts there.
 
+### D-9 Full-width admin layout (maintainer's run through Aspire)
+
+Settled with the maintainer during the run of 11 November 2026 (task 6.2), after trying the named widths and the aside on the real screens. They supersede D-4, the width and aside parts of the accepted mockups, and the "Aside from 1200 px" compositions.
+
+- **Every admin page fills the available width.** The named widths (`focused`, `form`, `wide`), their classes and their `ui` tokens (with `--herald-width-aside`) are removed, as are the 720 px cap on the shell's failure section and the 800 px cap on the "Organisation created" notice. Standalone pages (access states, organisation creation) keep their padding with no maximum. Only `--herald-width-public` remains.
+- **Running text keeps about 75 characters per line**; `Notice` loses its own 75 ch cap and fills its container in every app, so a notice lines up with the panels around it.
+- **No aside; one breakpoint.** Secondary content is stacked with the main content at every width; 700 px is the only breakpoint. Tournament configuration (published): the "Published · configuration remains editable" notice, the registration area and the entries summary, then the form. Entries: the summary, the admitted and waiting groups, then the collapsed cancelled group.
+- **Labels beside the title.** On the tournament configuration and entries pages the lifecycle labels sit to the right of the title and wrap below it when there is no room. The review page keeps them under its lead, because its title is fixed while its labels wait for the tournament.
+- **Summary actions on the right.** "View entries" and "Add player"/"Add team" (with the reason when unavailable) sit to the right of their summary text, and stack under it below 700 px.
+- **Organisation creation.** "A workspace of your own" sits inside the creation panel, under the form; the access pages keep their side note after the panel.
+
+*Alternatives tried:* a 1440 px cap aligned left (it leaves an uneven empty margin on wider screens) or centred; the 320 px aside beside the configuration form and the entries groups (rejected by the maintainer on sight); the creation note at full width beside the panel (lines too long).
+
 ## Risks / Trade-offs
 
 - [`ng-primitives` is pre-1.0 and its API may change] → Only `ui` imports it; a change touches the three controls and their tests, not features.
@@ -103,6 +116,8 @@ Frontend only; no data or API migration. Rollback is reverting the change.
 
 **Visual comparison (6.2).** A temporary Playwright spec (not committed) built the states against the composed system, a real organisation with an individual automatic tournament (three admitted, two waiting, three cancelled) and a team manual one, forcing the rarer states with `page.route` (a held or failed cancellation and addition, a 409, a 400, a free slot, over capacity, a slow or failed field), and captured 34 states at 1440 × 1000 and 390 × 844, full page, plus `entries-wide`, `list-wide` and `public-home` at 1920 × 1080; the catalogue states were captured from the built catalogue in block 2. Each was compared with its mockup. Corrected after the comparison: the cancelled disclosure keeps a visible "+"/"−" marker, which the native one lost with its inline layout; result rows in the add drawer put "Enter this player" under the name, as in the mockup, instead of squeezing it beside it. Kept: the public hero band stays full width, with its content capped at 1200 px (the mockup insets the band); the catalogue opens each dialog, drawer and toast state as the real overlay (see D-1). Observed, as in the mockups: on a wide screen a toast can sit over the bottom of the aside, for example over "View entries" for the few seconds after a save; it can be dismissed and pauses on hover. Not captured in the real system: `cancel-dialog-closed`, which differs from `cancel-dialog` only by its effect sentence and is covered by Vitest.
 
+**Maintainer's run through Aspire (6.2), 11 November 2026.** The maintainer ran the system and revised the layout: D-9 records the decisions, which supersede the width and aside parts of the comparison above (the toast over the aside no longer applies). After the revision: admin Vitest 167, `ui` 31 and public 13 pass; lint and the boundary rules pass; the catalogue builds.
+
 ## Acceptance review
 
 | Requirement | Evidence |
@@ -114,11 +129,11 @@ Frontend only; no data or API migration. Rollback is reverting the change.
 | Dialogs keep focus and requests under control | `ui/dialog.spec.ts` (Escape, focus kept and returned, busy ignores Escape and repeats nothing); entries spec (busy cancellation); journey 13 (focus on "Keep entry") |
 | Multi-step flows that keep their context open in a drawer | Entries spec (drawer, search, duplicate, failed addition keeps the name); journey 14; captures `add-drawer-*` |
 | Long reviews are pages and reversible actions act at once | Review page unchanged; entries spec (in-order admission without a dialog); registration journey unchanged |
-| Admin pages use one of three named widths | List and selector specs (`width-wide`, `width-focused`); form spec (`width-form`); captures `list-wide` at 1920 px and every state at 390 px with no horizontal scroll |
-| Secondary content goes in an aside on wide screens | Form spec (aside for a published tournament, none for a draft); entries page aside; captures `config-published`, `entries-wide` |
+| Admin pages use the full width | No page or `ui` stylesheet sets a maximum width for admin content (D-9); paragraphs keep `max-inline-size: 75ch`; maintainer's run at desktop width; captures at 390 px with no horizontal scroll |
+| Secondary content is stacked with the main content | Form spec (registration and entries before the form for a published tournament, neither for a draft); entries spec and journeys 13–14 on the stacked page; maintainer's run |
 | Public content is capped at 1200 px | Measured on the built home: content starts at x = 360 at 1920 px; capture `public-home` |
 | Visual weight follows what a person can act on | Entries spec (collapsed compact cancelled group with its count, omitted when empty; "pending your decision" and "waiting for a slot"); journey 13 |
 | Guest entries (modified) | Entries spec and journeys 13–14 cover every scenario, including the dialog naming the waiting entry and the drawer's duplicate |
 | Tournament setup (modified) | Form spec: a successful save is a toast and leaves no persistent success notice; the other scenarios keep their tests |
 
-Pending: the maintainer's run through Aspire (task 6.2).
+The maintainer's run through Aspire (task 6.2) is done; its layout decisions are D-9.

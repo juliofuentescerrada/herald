@@ -18,7 +18,7 @@ import { injectWorkingOrganisation } from './platform';
   `,
   styles: `
     h1 { font-size: 32px; margin-bottom: var(--herald-space-2); }
-    .created { display: flex; margin-bottom: var(--herald-space-6); max-width: 800px; }
+    .created { display: flex; margin-bottom: var(--herald-space-6); }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })

@@ -30,7 +30,6 @@ const words: Record<string, string> = {
 /** The saved configuration, read-only, before the one action that cannot be undone. */
 @Component({
   selector: 'app-tournament-review-page',
-  host: { class: 'width-form' },
   imports: [Button, Notice, RouterLink, StatusLabel],
   template: `
     <a class="back" routerLink="..">Back to configuration</a>

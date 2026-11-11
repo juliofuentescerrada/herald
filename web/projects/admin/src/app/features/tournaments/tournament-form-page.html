@@ -11,43 +11,43 @@
     </div>
   </section>
 } @else {
-  @if (published()) {
-    <h1>{{ stored()!.configuration.title }}</h1>
-    <p class="lead">{{ facts() }}</p>
-    <p class="lead">{{ starts() }}</p>
-  } @else {
-    <h1>{{ stored() ? 'Configure ' + stored()!.configuration.title : 'Create tournament' }}</h1>
-    <p class="lead">Draft configuration · {{ organisationName() }}not yet published</p>
-  }
-  <p class="labels">
-    @for (label of labels(); track label) {
-      <herald-status-label>{{ label }}</herald-status-label>
-    }
-  </p>
-
-  <!-- A published tournament keeps registration and entries in an aside; below 1200 px they come before the form. -->
-  <div class="width-form" [class.with-aside]="published()">
+  <header class="page-header">
+    <div class="title">
+      <h1>{{ published() ? stored()!.configuration.title : stored() ? 'Configure ' + stored()!.configuration.title : 'Create tournament' }}</h1>
+      <p class="labels">
+        @for (label of labels(); track label) {
+          <herald-status-label>{{ label }}</herald-status-label>
+        }
+      </p>
+    </div>
     @if (published()) {
-      <div class="aside">
-        <app-registration-area
-          [organisation]="organisation"
-          [tournament]="stored()!"
-          [unsaved]="dirty()"
-          (changed)="registrationChanged($event)"
-          (reload)="reloadLatest()"
-        />
-        <section class="summary entries" aria-labelledby="entries-heading">
-          <h2 id="entries-heading">Entries</h2>
-          <p>{{ entriesText() }}</p>
-          <a herald-button routerLink="entries">View entries</a>
-        </section>
-      </div>
+      <p class="lead">{{ facts() }}</p>
+      <p class="lead">{{ starts() }}</p>
+    } @else {
+      <p class="lead">Draft configuration · {{ organisationName() }}not yet published</p>
     }
-  <div class="main column">
+  </header>
+
+  <!-- A published tournament shows its state, registration and entries before the form, stacked at every width. -->
+  <div class="column">
     @if (published()) {
       <herald-notice heading="Published · configuration remains editable">
         Competition is preparing. Saving configuration does not change registration.
       </herald-notice>
+      <app-registration-area
+        [organisation]="organisation"
+        [tournament]="stored()!"
+        [unsaved]="dirty()"
+        (changed)="registrationChanged($event)"
+        (reload)="reloadLatest()"
+      />
+      <section class="summary entries" aria-labelledby="entries-heading">
+        <div>
+          <h2 id="entries-heading">Entries</h2>
+          <p>{{ entriesText() }}</p>
+        </div>
+        <a herald-button routerLink="entries">View entries</a>
+      </section>
     }
     @if (state() === 'failed') {
       <herald-notice tone="danger" [heading]="published() ? 'Changes not saved' : 'Draft not saved'">The save failed. Everything you typed has been kept. Try again when you are ready.</herald-notice>
@@ -153,6 +153,5 @@
         <p class="help" id="review-why">Review is unavailable. {{ why }}</p>
       }
     </form>
-  </div>
   </div>
 }

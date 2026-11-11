@@ -6,7 +6,6 @@ import { AppContext, injectWorkingOrganisation } from './platform';
 /** Generic on purpose: it never confirms that an address exists in another organisation. */
 @Component({
   selector: 'app-not-found-page',
-  host: { class: 'width-focused' },
   imports: [RouterLink, Button],
   template: `
     <section class="not-found" aria-labelledby="not-found-heading">

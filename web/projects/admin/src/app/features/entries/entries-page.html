@@ -13,24 +13,28 @@
     </div>
   </section>
 } @else {
-  <h1>Entries · {{ tournament.data()!.configuration.title }}</h1>
-  <p class="lead">{{ facts() }}</p>
-  @if (starts()) {
-    <p class="lead">{{ starts() }}</p>
-  }
-  <p class="labels">
-    @for (label of labels(); track label) {
-      <herald-status-label>{{ label }}</herald-status-label>
+  <header class="page-header">
+    <div class="title">
+      <h1>Entries · {{ tournament.data()!.configuration.title }}</h1>
+      <p class="labels">
+        @for (label of labels(); track label) {
+          <herald-status-label>{{ label }}</herald-status-label>
+        }
+      </p>
+    </div>
+    <p class="lead">{{ facts() }}</p>
+    @if (starts()) {
+      <p class="lead">{{ starts() }}</p>
     }
-  </p>
+  </header>
 
   @if (field.isPending()) {
-    <section class="operation width-wide" role="status" aria-busy="true">
+    <section class="operation" role="status" aria-busy="true">
       <h2>Loading entries…</h2>
       <p>Please wait while the tournament field is loaded.</p>
     </section>
   } @else if (field.isError()) {
-    <div class="width-wide">
+    <div>
       <herald-notice tone="danger" heading="Entries could not be loaded">
         No entries are shown. Try loading the field again.
         <span class="notice-action">
@@ -39,115 +43,113 @@
       </herald-notice>
     </div>
   } @else {
-    <!-- The summary and the cancelled history are an aside from 1200 px; below, they come before the groups. -->
-    <div class="with-aside width-wide">
-      <div class="aside">
-        <section class="summary" aria-labelledby="summary-heading">
+    <!-- Stacked at every width: the summary, the groups, then the cancelled history. -->
+    <div class="column">
+      <section class="summary" aria-labelledby="summary-heading">
+        <div>
           <h2 id="summary-heading" tabindex="-1" #summaryHeading>{{ summary() }}</h2>
           <p class="help">{{ policy() }}</p>
           <p class="help">{{ termsUpdated() }}</p>
-          <div class="summary-action">
-            @if (addBlocked(); as why) {
-              <button herald-button type="button" disabled aria-describedby="add-reason">{{ addLabel() }}</button>
-              <p class="help" id="add-reason">{{ why }}</p>
-            } @else {
-              <button herald-button variant="primary" type="button" (click)="openAdd($any($event.currentTarget))">{{ addLabel() }}</button>
+        </div>
+        <div class="summary-action">
+          @if (addBlocked(); as why) {
+            <button herald-button type="button" disabled aria-describedby="add-reason">{{ addLabel() }}</button>
+            <p class="help" id="add-reason">{{ why }}</p>
+          } @else {
+            <button herald-button variant="primary" type="button" (click)="openAdd($any($event.currentTarget))">{{ addLabel() }}</button>
+          }
+        </div>
+      </section>
+
+      @if (state() === 'conflict') {
+        <herald-notice tone="danger" heading="This entry changed elsewhere">
+          Nothing changed with this request. Reload the latest entries before trying again.
+          <span class="notice-action"><button herald-button type="button" (click)="reload()">Reload latest</button></span>
+        </herald-notice>
+      }
+      @if (field.data()!.overCapacityBy > 0) {
+        <herald-notice tone="danger" heading="Field is over capacity">
+          {{ field.data()!.admitted }} admitted entries exceed the capacity of {{ field.data()!.terms.capacity }}. Changes made at the same time left
+          this mismatch, and nothing was removed automatically. Cancel an admitted entry or raise the capacity to resolve it. Adding and admitting are
+          blocked.
+        </herald-notice>
+      }
+      @if (field.data()!.kindMismatch) {
+        <herald-notice tone="danger" heading="Entries of the other kind">
+          Some active entries do not match the tournament’s entry kind. Changes made at the same time left this mismatch, and nothing was converted
+          automatically. Cancel those entries or change the entry kind back. Adding and admitting are blocked.
+        </herald-notice>
+      }
+      @if (!panel() && failure(); as failed) {
+        <herald-notice tone="danger" [heading]="failed.heading">{{ failed.text }}</herald-notice>
+      }
+
+      @if (!admitted().length && !waiting().length) {
+        <section class="operation" aria-labelledby="empty-heading">
+          <h2 id="empty-heading">No entries yet</h2>
+          <p>Admitted and waiting entries will appear here. Each {{ kind() === 'team' ? 'team' : 'individual entry' }} takes one slot.</p>
+        </section>
+      }
+      <section class="group" aria-labelledby="admitted-heading">
+        <h2 id="admitted-heading">Admitted · {{ admitted().length }}</h2>
+        @if (admitted().length) {
+          <ul class="rows" aria-labelledby="admitted-heading">
+            @for (entry of admitted(); track entry.id) {
+              <li>
+                <div>
+                  <h3>{{ entry.guestName }}</h3>
+                  <p class="help">Admitted</p>
+                </div>
+                <div class="row-actions">
+                  <button herald-button type="button" [disabled]="state() !== 'ready'" (click)="askCancel(entry, $any($event.currentTarget))"
+                    [attr.aria-label]="'Cancel entry: ' + entry.guestName">Cancel entry</button>
+                </div>
+              </li>
             }
-          </div>
-        </section>
+          </ul>
+        } @else {
+          <p class="help">No admitted entries.</p>
+        }
+      </section>
 
-        @if (cancelled().length) {
-          <details class="cancelled">
-            <summary>Cancelled · {{ cancelled().length }}</summary>
-            <ul aria-label="Cancelled entries">
-              @for (entry of cancelled(); track entry.id) {
-                <li><span class="name">{{ entry.guestName }}</span><span class="help">{{ ' · Cancelled ' + zoned(entry.cancelledAt) }}</span></li>
-              }
-            </ul>
-          </details>
+      <section class="group" aria-labelledby="waiting-heading">
+        <h2 id="waiting-heading">Waiting · {{ waiting().length }}</h2>
+        @if (waiting().length) {
+          <ol class="rows" aria-labelledby="waiting-heading">
+            @for (entry of waiting(); track entry.id) {
+              <li>
+                <div>
+                  <h3>{{ entry.position }}. {{ entry.guestName }}</h3>
+                  <p class="help">{{ waitingReason(entry) }} · Waiting since {{ zoned(entry.waitingSince) }}</p>
+                  @if (admitBlocked(); as why) {
+                    <p class="help" [id]="'admit-why-' + entry.id">{{ why }}</p>
+                  }
+                </div>
+                <div class="row-actions">
+                  <button herald-button type="button" [disabled]="!!admitBlocked() || state() !== 'ready'"
+                    [attr.aria-describedby]="admitBlocked() ? 'admit-why-' + entry.id : null" [attr.aria-label]="'Admit: ' + entry.guestName"
+                    (click)="admit(entry, $any($event.currentTarget))">Admit</button>
+                  <button herald-button type="button" [disabled]="state() !== 'ready'" (click)="askCancel(entry, $any($event.currentTarget))"
+                    [attr.aria-label]="'Cancel entry: ' + entry.guestName">Cancel entry</button>
+                </div>
+              </li>
+            }
+          </ol>
+        } @else {
+          <p class="help">No waiting entries.</p>
         }
-      </div>
+      </section>
 
-      <div class="main column">
-        @if (state() === 'conflict') {
-          <herald-notice tone="danger" heading="This entry changed elsewhere">
-            Nothing changed with this request. Reload the latest entries before trying again.
-            <span class="notice-action"><button herald-button type="button" (click)="reload()">Reload latest</button></span>
-          </herald-notice>
-        }
-        @if (field.data()!.overCapacityBy > 0) {
-          <herald-notice tone="danger" heading="Field is over capacity">
-            {{ field.data()!.admitted }} admitted entries exceed the capacity of {{ field.data()!.terms.capacity }}. Changes made at the same time left
-            this mismatch, and nothing was removed automatically. Cancel an admitted entry or raise the capacity to resolve it. Adding and admitting are
-            blocked.
-          </herald-notice>
-        }
-        @if (field.data()!.kindMismatch) {
-          <herald-notice tone="danger" heading="Entries of the other kind">
-            Some active entries do not match the tournament’s entry kind. Changes made at the same time left this mismatch, and nothing was converted
-            automatically. Cancel those entries or change the entry kind back. Adding and admitting are blocked.
-          </herald-notice>
-        }
-        @if (!panel() && failure(); as failed) {
-          <herald-notice tone="danger" [heading]="failed.heading">{{ failed.text }}</herald-notice>
-        }
-
-        @if (!admitted().length && !waiting().length) {
-          <section class="operation" aria-labelledby="empty-heading">
-            <h2 id="empty-heading">No entries yet</h2>
-            <p>Admitted and waiting entries will appear here. Each {{ kind() === 'team' ? 'team' : 'individual entry' }} takes one slot.</p>
-          </section>
-        }
-        <section class="group" aria-labelledby="admitted-heading">
-          <h2 id="admitted-heading">Admitted · {{ admitted().length }}</h2>
-          @if (admitted().length) {
-            <ul class="rows" aria-labelledby="admitted-heading">
-              @for (entry of admitted(); track entry.id) {
-                <li>
-                  <div>
-                    <h3>{{ entry.guestName }}</h3>
-                    <p class="help">Admitted</p>
-                  </div>
-                  <div class="row-actions">
-                    <button herald-button type="button" [disabled]="state() !== 'ready'" (click)="askCancel(entry, $any($event.currentTarget))"
-                      [attr.aria-label]="'Cancel entry: ' + entry.guestName">Cancel entry</button>
-                  </div>
-                </li>
-              }
-            </ul>
-          } @else {
-            <p class="help">No admitted entries.</p>
-          }
-        </section>
-
-        <section class="group" aria-labelledby="waiting-heading">
-          <h2 id="waiting-heading">Waiting · {{ waiting().length }}</h2>
-          @if (waiting().length) {
-            <ol class="rows" aria-labelledby="waiting-heading">
-              @for (entry of waiting(); track entry.id) {
-                <li>
-                  <div>
-                    <h3>{{ entry.position }}. {{ entry.guestName }}</h3>
-                    <p class="help">{{ waitingReason(entry) }} · Waiting since {{ zoned(entry.waitingSince) }}</p>
-                    @if (admitBlocked(); as why) {
-                      <p class="help" [id]="'admit-why-' + entry.id">{{ why }}</p>
-                    }
-                  </div>
-                  <div class="row-actions">
-                    <button herald-button type="button" [disabled]="!!admitBlocked() || state() !== 'ready'"
-                      [attr.aria-describedby]="admitBlocked() ? 'admit-why-' + entry.id : null" [attr.aria-label]="'Admit: ' + entry.guestName"
-                      (click)="admit(entry, $any($event.currentTarget))">Admit</button>
-                    <button herald-button type="button" [disabled]="state() !== 'ready'" (click)="askCancel(entry, $any($event.currentTarget))"
-                      [attr.aria-label]="'Cancel entry: ' + entry.guestName">Cancel entry</button>
-                  </div>
-                </li>
-              }
-            </ol>
-          } @else {
-            <p class="help">No waiting entries.</p>
-          }
-        </section>
-      </div>
+      @if (cancelled().length) {
+        <details class="cancelled">
+          <summary>Cancelled · {{ cancelled().length }}</summary>
+          <ul aria-label="Cancelled entries">
+            @for (entry of cancelled(); track entry.id) {
+              <li><span class="name">{{ entry.guestName }}</span><span class="help">{{ ' · Cancelled ' + zoned(entry.cancelledAt) }}</span></li>
+            }
+          </ul>
+        </details>
+      }
     </div>
   }
 }

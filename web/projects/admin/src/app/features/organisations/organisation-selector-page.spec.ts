@@ -42,8 +42,6 @@ describe('Choosing an organisation', () => {
     expect(second.querySelector('button')?.textContent?.trim()).toBe('Switch');
     expect(second.querySelector('button')?.getAttribute('aria-label')).toBe('Switch to Southside Club');
     expect([...element.querySelectorAll('a')].map((a) => a.textContent?.trim())).toEqual(['Create another organisation', 'Keep current organisation']);
-    // One short task: the focused width.
-    expect(element.classList).toContain('width-focused');
   });
 
   it('opens the chosen organisation with a full load', async () => {

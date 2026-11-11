@@ -10,7 +10,7 @@ The maintainer's run of `h1-entries` found the admin application functionally ri
 
 - **Feedback placement:** an outcome of the person's own action (an entry admitted, changes saved) is announced as a toast that disappears by itself. Errors never go to a toast: a field error stays at its field and in the summary; a failed action started in a dialog or drawer is shown inside it, which stays open; a conflict or a state that blocks actions stays on the page as a persistent notice.
 - **Confirmations:** an action with consequences that fits one question and a short input confirms in a modal dialog (cancelling an entry; admitting out of queue order with its reason). A flow of several steps that benefits from keeping the page in view opens in a drawer (adding a player or team). A long review stays a page (review before publishing). Reversible actions without side effects act at once (admitting in order, opening or closing registration).
-- **Layout:** three named content widths, `focused` (about 720 px) for one short task, `form` (about 960 px) for long forms and `wide` (fluid, capped at about 1440 px) for operational pages, with a 320 px aside from 1200 px; two breakpoints, 700 and 1200 px; running text kept to about 75 characters per line within any width. Public content is capped at 1200 px with the existing fluid gutter.
+- **Layout (as proposed; revised by design D-9 during the maintainer's run: every admin page fills the width, no aside, one 700 px breakpoint):** three named content widths, `focused` (about 720 px) for one short task, `form` (about 960 px) for long forms and `wide` (fluid, capped at about 1440 px) for operational pages, with a 320 px aside from 1200 px; two breakpoints, 700 and 1200 px; running text kept to about 75 characters per line within any width. Public content is capped at 1200 px with the existing fluid gutter.
 - **Visual weight follows actionability:** what has actions or changes comes first at full weight; read-only history is compact, after it and collapsed. On the entries page, cancelled entries are a collapsed, compact group hidden when empty, and the summary says what waits for the owner ("2 pending your decision" with manual admission, "2 waiting for a slot" with automatic).
 - **`ui` library:** dialog, drawer and toast controls built on `ng-primitives` (already a dependency), with their catalogue entries; width and breakpoint tokens.
 - **Existing screens adopt the rules:** entries page (dialogs, drawer, toasts, `wide` with aside, cancelled collapsed, pending in the summary), tournament configuration (`form` with an aside for registration and entries, "Changes saved" as a toast), tournament list and review, organisation selector and creation, not-found pages, and the public home (1200 px cap). Browser `confirm` prompts inside the application become dialogs.
@@ -23,7 +23,7 @@ Out of scope: tabs within a tournament (§7.1), tables, a public discovery page,
 ### New Capabilities
 
 - `feedback-and-confirmation`: where outcomes and errors are shown (toasts for outcomes only, errors at their origin) and how consequential actions and multi-step flows are confirmed (modal dialog, drawer, page, direct action), in both applications.
-- `page-layout`: named content widths, the aside, breakpoints and line length for the admin application; the public content cap; and the rule that visual weight follows actionability.
+- `page-layout`: full-width admin pages, stacked secondary content, the breakpoint and line length for the admin application; the public content cap; and the rule that visual weight follows actionability.
 
 ### Modified Capabilities
 
@@ -37,4 +37,5 @@ Out of scope: tabs within a tournament (§7.1), tables, a public discovery page,
 - `web/projects/public`: toast outlet available to future pages (client-side only); home capped at 1200 px.
 - `e2e/`: journeys whose confirmations or outcome messages change are updated; no new journey.
 - No API, domain or persistence change.
+- Layout revised during the maintainer's run on 11 November 2026 (design D-9): admin pages use the full width with secondary content stacked; the width and aside tokens are removed from `ui`, and `Notice` fills its container.
 - Documentation only, added on 11 November 2026: ADR 0017 (notifications consume fact events, proposed) with its inventory of notifiable facts, the matching rule in `CLAUDE.md` and `openspec/config.yaml`, and a pointer from F-10. No notice is published or delivered.

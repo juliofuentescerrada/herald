@@ -2,7 +2,6 @@
   display: flex;
   align-items: flex-start;
   gap: var(--herald-space-3);
-  max-width: 75ch;
   padding: var(--herald-space-3) var(--herald-space-4);
   border-left: 4px solid var(--herald-notice-accent);
   border-radius: var(--herald-radius-default);

@@ -6,7 +6,6 @@ import { AppContext, injectMe, organisationPath } from '../../platform';
 /** The person's organisations; switching opens the other one as a new document, never combining them. */
 @Component({
   selector: 'app-organisation-selector-page',
-  host: { class: 'width-focused' },
   imports: [Button, RouterLink],
   template: `
     <h1>Choose an organisation</h1>

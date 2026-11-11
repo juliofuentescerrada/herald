@@ -10,7 +10,6 @@ import { admittedText, capacityText, dateTimeText, injectOrganisation, lifecycle
 /** The organisation's tournaments, newest first, each with its three lifecycle facts. */
 @Component({
   selector: 'app-tournament-list-page',
-  host: { class: 'width-wide' },
   imports: [Button, Notice, RouterLink, StatusLabel],
   template: `
     <header class="heading">
