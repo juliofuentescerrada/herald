@@ -25,3 +25,4 @@ One significant decision per record: context, decision, alternatives and consequ
 | [0014](0014-identity-and-organisation-isolation.md) | Sign in through the shared External ID directory; Herald authorises and isolates organisations | Accepted |
 | [0015](0015-end-to-end-journeys-with-a-fake-identity-provider.md) | Test complete journeys end to end, signing in through a fake OpenID Connect provider | Proposed |
 | [0016](0016-integration-events-between-modules-through-durable-local-queues.md) | Integration events between modules of the host travel through durable local queues | Proposed |
+| [0017](0017-notifications-consume-fact-events.md) | Notifications consume fact events and live in their own module | Proposed |

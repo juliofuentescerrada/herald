@@ -61,6 +61,11 @@ context: |
     Bus only when a party leaves the process); consumers are idempotent (state events are
     revisioned snapshots); contract changes are backwards compatible or versioned (ADRs 0006,
     0008, 0016).
+  - Notifications (ADR 0017): a future Notifications module consumes integration events; no
+    module sends notices. F-10's notifiable facts become fact events (subject, subject revision,
+    actor, time, reason code; no private text or wording), published only once a consumer exists.
+    Every proposal lists the notifiable facts it introduces, persists them so later publication
+    needs no data migration, and adds them to ADR 0017's inventory.
   - Durable business history is owned by the relevant module (ADR 0007): preserve predecessor
     revisions, actor/time/reason and participation evidence with the effective state change.
     Logs and message retention are not the competitive audit trail. Only effective results score.

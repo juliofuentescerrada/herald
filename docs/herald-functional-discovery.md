@@ -312,6 +312,8 @@ Acceptance: withdrawn entries retain previous results. Authorised correction rev
 
 Each notice identifies tournament/reason, links to current state and avoids visible duplicates for the same fact. Delivery failure does not reverse admission or resolution. The user dashboard remains authoritative. Team notices reach the assigned representatives; player-specific lineup notices follow visibility settings. Promotional preferences are separate from operational notices.
 
+Architecture: ADR 0017 (proposed) delivers these notices through a consumer-only `Notifications` module fed by fact events; each change records its notifiable facts in that ADR's inventory.
+
 ## 7. Competition systems and rules profiles
 
 ### 7.1 Independent dimensions

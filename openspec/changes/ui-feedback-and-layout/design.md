@@ -80,6 +80,10 @@ The cancellation and out-of-order admission panels become dialogs with the same 
 | A-3 | Toasts stack at most three; older ones leave first | Several quick writes stay readable without covering the page |
 | A-4 | The drawer is about 480 px wide on wide screens | Room for a search field and result rows while the list stays visible |
 
+### D-8 Notifications kept in mind (ADR 0017)
+
+Added on 11 November 2026 at the maintainer's request, with no code impact. Notices were not covered by any architecture decision, and today's snapshot events cannot express F-10's facts. ADR 0017 (proposed) settles a consumer-only `Notifications` module fed by fact events, published once a consumer exists. Its inventory records `h1-entries`' admission, promotion and cancellation, which Registration's `Entry` already persists. Later proposals list their notifiable facts there.
+
 ## Risks / Trade-offs
 
 - [`ng-primitives` is pre-1.0 and its API may change] → Only `ui` imports it; a change touches the three controls and their tests, not features.

@@ -37,3 +37,4 @@ Out of scope: tabs within a tournament (§7.1), tables, a public discovery page,
 - `web/projects/public`: toast outlet available to future pages (client-side only); home capped at 1200 px.
 - `e2e/`: journeys whose confirmations or outcome messages change are updated; no new journey.
 - No API, domain or persistence change.
+- Documentation only, added on 11 November 2026: ADR 0017 (notifications consume fact events, proposed) with its inventory of notifiable facts, the matching rule in `CLAUDE.md` and `openspec/config.yaml`, and a pointer from F-10. No notice is published or delivered.
