@@ -187,3 +187,18 @@ Decisions taken while implementing:
 - `registration`, `competition` and `profile` are string constants in the read model (`notOpen`, `preparation`, `singleRoundRobin-3-1-0`).
 
 `TournamentSetupTests` (20 tests against PostgreSQL through the host) cover the scenarios of task 4.3, including that the stored `CreatedBy` is a person of the Organisations module (the actor of D-5 through a real request). Host 49, Architecture 42, Organisations 24, ModuleHosting 8, Messaging 6 and Tournaments 45 tests pass; format check clean. Wolverine's code, the admin OpenAPI document and the admin client were regenerated; the public document did not change.
+
+### Admin application (tasks 5.1–5.7, 11 November 2026)
+
+`features/tournaments`: `tournaments.ts` (query keys under the organisation, the tournament query, date-time/capacity/lifecycle wording), `TournamentListPage`, `TournamentFormPage` (new, draft and published in one component) and `TournamentReviewPage`; the four routes and the **Tournaments** rail link are composed in `app.routes.ts` and `app.html`. The field presentation was already in the application's `styles.css`; it gained `select`, a read-only background and a 2px border on a field in error (V-4).
+
+Decisions taken while implementing:
+
+- The form holds text per control, so nothing typed is lost while it is not a valid value; hidden controls (team structure of an individual tournament, venue of an online one) keep their text and are sent as absent.
+- The form does not mirror the cross-field rules of R-2 client-side, unlike D-6 proposed: the API's 400 names field and rule, and one wording table (`ruleText`) reports it. A second copy of the rules would have to be kept equal to Domain for a saving of one request.
+- Review is offered only for a saved draft without unsaved changes and nothing missing, because it shows what is stored; otherwise the action is disabled and the reason is written under it.
+- A new tournament keeps one client identifier per content, so a retry after a lost answer repeats the creation (D-3); after the first save the address is replaced with the tournament's.
+- A stale or no-longer-complete publication (409 or 400) reloads the tournament and shows it for another review.
+- A tournament that cannot be read shows "Tournament not available" with a retry, a state the captures do not have.
+
+Vitest: 29 tests in three specs (list 4, form 18, review 7) cover every reviewed state, input retention, summary and missing-value focus, leave confirmation, copy-on-lost-access and `axe-core` (colour contrast excluded, as in the other specs). Admin 129 tests pass; lint, the boundary fixtures (15 of 15) and the admin production build pass.

@@ -22,13 +22,13 @@
 
 ## 5. Admin application
 
-- [ ] 5.1 `tournaments` feature skeleton: routes (list, new, tournament, review) composed in `app.routes.ts`, **Tournaments** rail link, queries and mutations with keys under the organisation
-- [ ] 5.2 List page: empty, populated (capacity unit, three lifecycle labels, "Continue draft" / "Edit configuration"), loading, failed with retry
-- [ ] 5.3 Configuration form: fields and sections as the captures, individual/team and on-site/online switching without losing input, read-only profile, time zone proposed from the browser, date-time text (V-3), `confirmLeave`; field presentation shared within the admin application
-- [ ] 5.4 Form states: missing-for-publication list with focus links and unavailable review, field errors and summary (V-2, V-4, Q-1 wording), saving, save failed with retry, revision conflict with "Reload latest"
-- [ ] 5.5 Review page: read-only summary (individual and team), visibility in words, publication statements, publishing, publish failed, stale review
-- [ ] 5.6 Published tournament: header facts, three labels, editable configuration with "Save changes", no start action (V-1)
-- [ ] 5.7 Vitest for each reviewed state, input retention, summary focus, leave confirmation and `axe-core`; lint and boundary checks pass
+- [x] 5.1 `tournaments` feature skeleton: routes (list, new, tournament, review) composed in `app.routes.ts`, **Tournaments** rail link, queries and mutations with keys under the organisation
+- [x] 5.2 List page: empty, populated (capacity unit, three lifecycle labels, "Continue draft" / "Edit configuration"), loading, failed with retry
+- [x] 5.3 Configuration form: fields and sections as the captures, individual/team and on-site/online switching without losing input, read-only profile, time zone proposed from the browser, date-time text (V-3), `confirmLeave`; field presentation shared within the admin application
+- [x] 5.4 Form states: missing-for-publication list with focus links and unavailable review, field errors and summary (V-2, V-4, Q-1 wording), saving, save failed with retry, revision conflict with "Reload latest"
+- [x] 5.5 Review page: read-only summary (individual and team), visibility in words, publication statements, publishing, publish failed, stale review
+- [x] 5.6 Published tournament: header facts, three labels, editable configuration with "Save changes", no start action (V-1)
+- [x] 5.7 Vitest for each reviewed state, input retention, summary focus, leave confirmation and `axe-core`; lint and boundary checks pass
 
 ## 6. End-to-end journeys
 

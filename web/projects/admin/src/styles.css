@@ -15,9 +15,10 @@ body { background: var(--herald-color-canvas-admin); }
 .field { display: flex; flex-direction: column; gap: var(--herald-space-2); margin-top: var(--herald-space-6); }
 .field label { font-weight: 700; font-size: var(--herald-text-lg); }
 .field label small { color: var(--herald-color-text-secondary); font-size: var(--herald-text-base); }
-.field input, .field textarea { min-height: var(--herald-target-min); padding: var(--herald-space-3); border: 1px solid var(--herald-color-border-control); background: var(--herald-color-surface-default); font-size: var(--herald-text-lg); }
+.field input, .field textarea, .field select { min-height: var(--herald-target-min); padding: var(--herald-space-3); border: 1px solid var(--herald-color-border-control); background: var(--herald-color-surface-default); font-size: var(--herald-text-lg); }
 .field textarea { resize: vertical; }
-.field [aria-invalid='true'] { border-color: var(--herald-color-feedback-danger); }
+.field [aria-invalid='true'] { border-color: var(--herald-color-feedback-danger); border-width: 2px; }
+.field input[readonly] { background: var(--herald-color-neutral-surface); }
 .panel .help { color: var(--herald-color-text-secondary); font-size: var(--herald-text-base); margin: 0; }
 .panel .field-error { color: var(--herald-color-feedback-danger); font-size: var(--herald-text-base); font-weight: 700; margin: 0; }
 .actions { display: flex; flex-wrap: wrap; gap: var(--herald-space-3); margin-top: var(--herald-space-6); }

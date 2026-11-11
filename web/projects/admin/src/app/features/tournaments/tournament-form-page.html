@@ -1,0 +1,144 @@
+<a class="back" [routerLink]="listPath">Back to tournaments</a>
+
+@if (!isNew && tournament.isPending()) {
+  <p class="panel" role="status">Loading tournament…</p>
+} @else if (!isNew && tournament.isError() && !stored()) {
+  <section class="panel">
+    <herald-notice tone="danger" heading="Tournament not available">It does not exist in this organisation, or it could not be read.</herald-notice>
+    <div class="actions">
+      <button herald-button variant="primary" type="button" [loading]="tournament.isFetching()" (click)="tournament.refetch()">Try again</button>
+      <a herald-button [routerLink]="listPath">Back to tournaments</a>
+    </div>
+  </section>
+} @else {
+  @if (published()) {
+    <h1>{{ stored()!.configuration.title }}</h1>
+    <p class="lead">{{ facts() }}</p>
+    <p class="lead">{{ starts() }}</p>
+  } @else {
+    <h1>{{ stored() ? 'Configure ' + stored()!.configuration.title : 'Create tournament' }}</h1>
+    <p class="lead">Draft configuration · not yet published</p>
+  }
+  <p class="labels">
+    @for (label of labels(); track label) {
+      <herald-status-label>{{ label }}</herald-status-label>
+    }
+  </p>
+
+  <div class="column">
+    @if (published()) {
+      <herald-notice heading="Published · configuration remains editable">
+        Registration is still not open and competition is preparing. Saving configuration does not open registration.
+      </herald-notice>
+    }
+    @if (state() === 'saved') {
+      <herald-notice tone="success" [heading]="published() ? 'Changes saved' : 'Draft saved'">
+        {{ missing().length ? 'It is not ready to publish yet: see what is missing below.' : published() ? 'The published tournament is up to date.' : 'It has everything publication needs.' }}
+      </herald-notice>
+    }
+    @if (state() === 'failed') {
+      <herald-notice tone="danger" [heading]="published() ? 'Changes not saved' : 'Draft not saved'">The save failed. Everything you typed has been kept. Try again when you are ready.</herald-notice>
+    }
+    @if (state() === 'conflict') {
+      <herald-notice tone="danger" heading="This tournament changed elsewhere">
+        Your save was not applied, so nothing was overwritten. Everything you typed is still here: copy what you need, then reload the latest version.
+        <span class="notice-action"><button herald-button type="button" (click)="reloadLatest()">Reload latest</button></span>
+      </herald-notice>
+    }
+    @if (errorList().length) {
+      <section class="summary danger" aria-labelledby="error-summary" tabindex="-1" #summary>
+        <h2 id="error-summary">Correct {{ errorList().length }} {{ errorList().length === 1 ? 'field' : 'fields' }} to save</h2>
+        <p>Nothing was saved. Everything you typed has been kept.</p>
+        <ul>
+          @for (error of errorList(); track error.field) {
+            <li><a [href]="'#t-' + error.field" (click)="focus($event, error.field)">{{ error.text }}</a></li>
+          }
+        </ul>
+      </section>
+    } @else if (missing().length) {
+      <section class="summary" aria-labelledby="missing-summary">
+        <h2 id="missing-summary">Missing for publication</h2>
+        <p>The draft is saved. Publication needs {{ missing().length === 1 ? 'this value' : 'these values' }}:</p>
+        <ul>
+          @for (name of missing(); track name) {
+            <li><a [href]="'#t-' + name" (click)="focus($event, name)">{{ label(name) }}</a></li>
+          }
+        </ul>
+      </section>
+    }
+
+    <form class="panel" novalidate (submit)="submit($event)" [attr.aria-busy]="state() === 'saving'">
+      @for (section of sections(); track section.heading) {
+        <fieldset>
+          <legend>{{ section.heading }}</legend>
+          <p class="help">{{ section.help }}</p>
+          <div class="grid">
+            @for (field of section.fields; track field.name) {
+              <div class="field" [class.wide]="field.wide">
+                <label [for]="'t-' + field.name">{{ field.label }}</label>
+                @if (field.kind === 'select') {
+                  <select
+                    [id]="'t-' + field.name"
+                    [name]="field.name"
+                    #select
+                    (change)="set(field.name, select.value)"
+                    [disabled]="state() === 'saving'"
+                    [attr.aria-invalid]="errorOf(field.name) ? 'true' : null"
+                    [attr.aria-describedby]="describedBy(field)"
+                  >
+                    <option value="" [selected]="value(field.name) === ''">Choose…</option>
+                    @for (option of field.options; track option[0]) {
+                      <option [value]="option[0]" [selected]="value(field.name) === option[0]">{{ option[1] }}</option>
+                    }
+                  </select>
+                } @else {
+                  <input
+                    [id]="'t-' + field.name"
+                    [name]="field.name"
+                    #input
+                    [type]="field.kind === 'number' ? 'number' : field.kind === 'datetime' ? 'datetime-local' : 'text'"
+                    [attr.inputmode]="field.kind === 'number' ? 'numeric' : null"
+                    [attr.step]="field.kind === 'number' ? 1 : null"
+                    autocomplete="off"
+                    [value]="value(field.name)"
+                    (input)="set(field.name, input.value)"
+                    [readOnly]="field.kind === 'readonly' || state() === 'saving'"
+                    [attr.aria-invalid]="errorOf(field.name) ? 'true' : null"
+                    [attr.aria-describedby]="describedBy(field)"
+                  />
+                }
+                <p class="help" [id]="'t-' + field.name + '-help'">{{ field.help }}</p>
+                @if (field.kind === 'datetime' && value(field.name)) {
+                  <p class="help written" [id]="'t-' + field.name + '-text'">{{ dateTime(value(field.name)) }}</p>
+                }
+                @if (errorOf(field.name); as message) {
+                  <p class="field-error" [id]="'t-' + field.name + '-error'"><herald-icon name="alert-circle" size="metadata" />Error: {{ message }}</p>
+                }
+              </div>
+            }
+          </div>
+        </fieldset>
+      }
+
+      @if (state() === 'saving') {
+        <p class="help" role="status">Saving. Please wait; do not submit again.</p>
+      }
+      <div class="actions">
+        <button herald-button variant="primary" type="submit" [loading]="state() === 'saving'">
+          {{ state() === 'saving' ? 'Saving…' : state() === 'failed' ? 'Try again' : published() ? 'Save changes' : 'Save draft' }}
+        </button>
+        @if (!published()) {
+          @if (reviewBlocked(); as why) {
+            <button herald-button type="button" disabled aria-describedby="review-why">Review and publish</button>
+          } @else {
+            <a herald-button routerLink="review">Review and publish</a>
+          }
+        }
+        <a herald-button [routerLink]="listPath">Back to tournaments</a>
+      </div>
+      @if (!published() && reviewBlocked(); as why) {
+        <p class="help" id="review-why">Review is unavailable. {{ why }}</p>
+      }
+    </form>
+  </div>
+}
