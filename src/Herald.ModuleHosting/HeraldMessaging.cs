@@ -9,7 +9,8 @@ namespace Herald.ModuleHosting;
 public static class HeraldMessaging
 {
     // How long a handled envelope id is remembered to reject redeliveries; set explicitly
-    // (transactional-messaging spec), its value to be chosen with the first integration event (H1).
+    // (transactional-messaging spec). Chosen in ADR 0016: local queues redeliver only after a restart,
+    // and snapshot consumers are idempotent beyond any window.
     public static readonly TimeSpan DeduplicationWindow = TimeSpan.FromMinutes(5);
 
     public static WolverineOptions UseHeraldMessaging(this WolverineOptions options, bool createTablesOnStartup)

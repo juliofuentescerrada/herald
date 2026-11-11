@@ -5,8 +5,8 @@
 
 ## 2. Contracts and messaging
 
-- [ ] 2.1 `Herald.Contracts`: `TournamentEntryTermsChanged` and `TournamentFieldChanged`, version 1, with their own enumerations
-- [ ] 2.2 Durable local queue routing for integration events in each consuming module's entry point; deduplication window recorded as chosen; messaging tests: an event crosses between the real modules without a broker, and an older snapshot changes nothing
+- [x] 2.1 `Herald.Contracts`: `TournamentEntryTermsChanged` and `TournamentFieldChanged`, version 1, with their own enumerations
+- [x] 2.2 Durable local queue routing for integration events in each consuming module's entry point; deduplication window recorded as chosen; a host test checks each event's route (the event crossing between the real modules and an older snapshot changing nothing are tested with their handlers, in 4.2 and 5.3)
 
 ## 3. Registration domain
 
@@ -16,7 +16,7 @@
 ## 4. Registration persistence and features
 
 - [ ] 4.1 Mapping, organisation filters and migration `AddGuestsAndFields`
-- [ ] 4.2 Handler of `TournamentEntryTermsChanged` (creates or updates the field, keeps the highest revision, applies EN-8) and publication of `TournamentFieldChanged` with every effective field change
+- [ ] 4.2 Handler of `TournamentEntryTermsChanged` (creates or updates the field, keeps the highest revision, applies EN-8) and publication of `TournamentFieldChanged` with every effective field change; tests: the event crosses from Tournaments to Registration without a broker, and an older snapshot changes nothing
 - [ ] 4.3 Features `CreateGuest`, `FindGuests`, `GetField`, `EnterGuest`, `AdmitEntry`, `CancelEntry` with their endpoints (Admin group, operation names as in design D-6)
 - [ ] 4.4 API tests against PostgreSQL for the `guest-entries` scenarios, including the race for the last slot, another organisation's generic 404s and the public document without these operations
 

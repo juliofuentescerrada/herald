@@ -179,3 +179,13 @@ Registration: migration `AddGuestsAndFields` (guests, fields, entries). Tourname
 ## Open Questions
 
 None. Gate 1.1 was passed on 11 November 2026.
+
+## Implementation record
+
+### Contracts and messaging (tasks 2.1 and 2.2, 11 November 2026)
+
+`Herald.Contracts/Tournaments/V1/TournamentEntryTermsChanged` and `Herald.Contracts/Registration/V1/TournamentFieldChanged`, with their own `RegistrationState`, `EntryKind` and `Admission` enumerations. The version is the namespace (`…V1`): a version 2 is a new type beside it, and the message type name Wolverine stores carries it. `TournamentFieldChanged` carries admitted and waiting counts; `Active` is derived from them.
+
+Each consuming module's entry point routes the event it consumes to its own local queue (`RegistrationModule.Queue`, `TournamentsModule.Queue`), durable through the existing `UseDurableLocalQueues` policy; nothing else in the host changes, and the Service Bus transport receives no route. The deduplication window stays five minutes, its comment now pointing to ADR 0016.
+
+`IntegrationEventRoutingTests` (host, 2 tests) checks that each event has one route, to its consumer's local queue, and that the queue is durable. The event crossing between the two real modules, and an older snapshot changing nothing, need the handlers: they are tested in 4.2 and 5.3. Wolverine's generated code does not change (no handler yet). Architecture 42 and messaging 6 tests pass; format check clean.
