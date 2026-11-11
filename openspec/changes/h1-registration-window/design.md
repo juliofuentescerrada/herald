@@ -141,3 +141,9 @@ None. Gate 1.1 was passed on 11 November 2026.
 The migration `AddRegistrationWindow` was done with the domain rather than in block 3: once the aggregate has new state, the host refuses to start with pending model changes, so the domain alone would have left the host's tests failing. The state is stored as text, like `Publication` (D-4 said an integer); the migration gives existing rows `NotOpen`.
 
 `tests/Herald.Tournaments.Tests`: 60 tests (15 new in `TournamentRegistrationTests`). All 189 .NET tests pass; format check clean.
+
+### Features and API (tasks 3.2–3.4, 11 November 2026)
+
+`Features/OpenRegistration` and `Features/CloseRegistration`, one file each, as `PublishTournament`. `TournamentDetails.Registration` and `TournamentSummary.Registration` are the `RegistrationWindow` enumeration (`notOpen`, `open`, `closed`); the detail gains `missingForRegistration` and `registrationChangedAt`.
+
+`RegistrationWindowTests` (12 tests against PostgreSQL through the host) cover the scenarios of task 3.3, including that the stored person is one of the Organisations module. A repeated opening returns the stored time, which PostgreSQL keeps to the microsecond while the first answer carries .NET's ticks: the test compares with the stored value. Host 61 tests; all 201 .NET tests pass; format check clean. Wolverine's code, the admin OpenAPI document and the admin client were regenerated; the public document did not change. The admin test fixture gained the two new fields so the application still compiles; nothing else in the application changed yet (block 4).

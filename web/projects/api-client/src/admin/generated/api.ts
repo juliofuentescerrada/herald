@@ -43,6 +43,10 @@ export const CheckIn = {
   mandatory: 'mandatory',
 } as const;
 
+export interface CloseRegistration {
+  expectedRevision: number;
+}
+
 export interface CreatedOrganisation {
   id: string;
   name: string;
@@ -130,6 +134,10 @@ export interface HttpValidationProblemDetails {
 
 export interface IResult { [key: string]: unknown }
 
+export interface OpenRegistration {
+  expectedRevision: number;
+}
+
 export interface OrganisationSummary {
   id: string;
   name: string;
@@ -165,6 +173,15 @@ export interface PublishTournament {
   expectedRevision: number;
 }
 
+export type RegistrationWindow = typeof RegistrationWindow[keyof typeof RegistrationWindow];
+
+
+export const RegistrationWindow = {
+  notOpen: 'notOpen',
+  open: 'open',
+  closed: 'closed',
+} as const;
+
 export interface SaveTournament {
   expectedRevision: number;
   configuration: TournamentConfiguration;
@@ -179,11 +196,14 @@ export interface TournamentDetails {
   id: string;
   revision: number;
   publication: Publication;
-  registration: string;
+  registration: RegistrationWindow;
   competition: string;
   profile: string;
   configuration: TournamentConfiguration;
   missingForPublication: string[];
+  missingForRegistration: string[];
+  /** @nullable */
+  registrationChangedAt: string | null;
 }
 
 export interface TournamentSummary {
@@ -202,7 +222,7 @@ export interface TournamentSummary {
   /** @nullable */
   venue: string | null;
   publication: Publication;
-  registration: string;
+  registration: RegistrationWindow;
   competition: string;
 }
 
@@ -492,6 +512,52 @@ export class HeraldHostAdminService {
   }
 
 /**
+ * POST_api_organisations_organisationId_tournaments_tournamentId_registration_opening
+ * @summary POST_api_organisations_organisationId_tournaments_tournamentId_registration_opening
+ */
+ openRegistration<TData = TournamentDetails>(organisationId: string,
+    tournamentId: string,
+    openRegistrationBody: OpenRegistration, options?: HttpClientBodyOptions): Observable<TData>;
+ openRegistration<TData = TournamentDetails>(organisationId: string,
+    tournamentId: string,
+    openRegistrationBody: OpenRegistration, options?: HttpClientEventOptions): Observable<HttpEvent<TData>>;
+ openRegistration<TData = TournamentDetails>(organisationId: string,
+    tournamentId: string,
+    openRegistrationBody: OpenRegistration, options?: HttpClientResponseOptions): Observable<AngularHttpResponse<TData>>;
+  openRegistration<TData = TournamentDetails>(
+    organisationId: string,
+    tournamentId: string,
+    openRegistrationBody: OpenRegistration, options?: HttpClientObserveOptions): Observable<TData | HttpEvent<TData> | AngularHttpResponse<TData>> {
+    if (options?.observe === 'events') {
+      return this.http.post<TData>(
+      `/api/organisations/${organisationId}/tournaments/${tournamentId}/registration/opening`,
+      openRegistrationBody,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'events',
+      }
+    );
+    }
+
+    if (options?.observe === 'response') {
+      return this.http.post<TData>(
+      `/api/organisations/${organisationId}/tournaments/${tournamentId}/registration/opening`,
+      openRegistrationBody,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'response',
+      }
+    );
+    }
+
+    return this.http.post<TData>(
+      `/api/organisations/${organisationId}/tournaments/${tournamentId}/registration/opening`,
+      openRegistrationBody,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'body',
+      }
+    );
+  }
+
+/**
  * GET_api_organisations_organisationId_tournaments
  * @summary GET_api_organisations_organisationId_tournaments
  */
@@ -568,6 +634,52 @@ export class HeraldHostAdminService {
     );
   }
 
+/**
+ * POST_api_organisations_organisationId_tournaments_tournamentId_registration_closure
+ * @summary POST_api_organisations_organisationId_tournaments_tournamentId_registration_closure
+ */
+ closeRegistration<TData = TournamentDetails>(organisationId: string,
+    tournamentId: string,
+    closeRegistrationBody: CloseRegistration, options?: HttpClientBodyOptions): Observable<TData>;
+ closeRegistration<TData = TournamentDetails>(organisationId: string,
+    tournamentId: string,
+    closeRegistrationBody: CloseRegistration, options?: HttpClientEventOptions): Observable<HttpEvent<TData>>;
+ closeRegistration<TData = TournamentDetails>(organisationId: string,
+    tournamentId: string,
+    closeRegistrationBody: CloseRegistration, options?: HttpClientResponseOptions): Observable<AngularHttpResponse<TData>>;
+  closeRegistration<TData = TournamentDetails>(
+    organisationId: string,
+    tournamentId: string,
+    closeRegistrationBody: CloseRegistration, options?: HttpClientObserveOptions): Observable<TData | HttpEvent<TData> | AngularHttpResponse<TData>> {
+    if (options?.observe === 'events') {
+      return this.http.post<TData>(
+      `/api/organisations/${organisationId}/tournaments/${tournamentId}/registration/closure`,
+      closeRegistrationBody,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'events',
+      }
+    );
+    }
+
+    if (options?.observe === 'response') {
+      return this.http.post<TData>(
+      `/api/organisations/${organisationId}/tournaments/${tournamentId}/registration/closure`,
+      closeRegistrationBody,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'response',
+      }
+    );
+    }
+
+    return this.http.post<TData>(
+      `/api/organisations/${organisationId}/tournaments/${tournamentId}/registration/closure`,
+      closeRegistrationBody,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'body',
+      }
+    );
+  }
+
 };
 
 export type GetOrganisationClientResult = NonNullable<OrganisationSummary>
@@ -576,5 +688,7 @@ export type CreateOrganisationClientResult = NonNullable<IResult | CreatedOrgani
 export type SaveTournamentClientResult = NonNullable<TournamentDetails>
 export type GetTournamentClientResult = NonNullable<TournamentDetails>
 export type PublishTournamentClientResult = NonNullable<TournamentDetails>
+export type OpenRegistrationClientResult = NonNullable<TournamentDetails>
 export type ListTournamentsClientResult = NonNullable<TournamentSummary[]>
 export type CreateTournamentClientResult = NonNullable<IResult | TournamentDetails>
+export type CloseRegistrationClientResult = NonNullable<TournamentDetails>

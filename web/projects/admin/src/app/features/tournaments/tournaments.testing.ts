@@ -47,6 +47,8 @@ export const details = (over: Partial<TournamentDetails> = {}, config: Partial<T
   profile: 'singleRoundRobin-3-1-0',
   configuration: configuration(config),
   missingForPublication: [],
+  missingForRegistration: [],
+  registrationChangedAt: null,
   ...over,
 });
 
