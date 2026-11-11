@@ -22,7 +22,7 @@ Open [the local prototype](../../../../prototypes/frontend/registration-window-s
 
 ## Provenance
 
-Source: [task brief](../../../../.prompts/h1-registration-window-mockups.md), [proposal](../../../../openspec/changes/h1-registration-window/proposal.md), [design](../../../../openspec/changes/h1-registration-window/design.md), [registration specification](../../../../openspec/changes/h1-registration-window/specs/registration-window/spec.md), functional discovery §5/§5.1 rows 2–3, and visual direction §9.3. This support does not override those documents or settle the change's pending decisions.
+Source: [task brief](../../../../.prompts/h1-registration-window-mockups.md), [proposal](../../../../openspec/changes/archive/2026-11-11-h1-registration-window/proposal.md), [design](../../../../openspec/changes/archive/2026-11-11-h1-registration-window/design.md), [registration specification](../../../../openspec/changes/archive/2026-11-11-h1-registration-window/specs/registration-window/spec.md), functional discovery §5/§5.1 rows 2–3, and visual direction §9.3. This support does not override those documents or settle the change's pending decisions.
 
 The prototype reuses `style.css`, `access-states.css` and `tournament-setup-states.css`, the setup fixture names and configuration composition, and the implemented `tournament-form-page.html` corrections. The rail contains Overview and Tournaments only. Published pages contain no draft sentence. Date controls also have written dates; errors have danger borders, an icon and “Error:”; information and danger notices have matching tones and icons. Existing contract colours, fonts, square geometry and spacing are retained.
 
