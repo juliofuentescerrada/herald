@@ -29,7 +29,7 @@ This change is the first slice of F-02. The maintainer confirmed on 10 November 
 
 Screens: tournament list; configuration form (new, draft, published; individual and team); review before publishing; published tournament page. The admin rail gains **Tournaments**.
 
-References: [tournament setup state review](../../../prototypes/frontend/tournament-setup-states.html) and its [18 states in 36 desktop/mobile captures](../../../docs/assets/mockups/tournament-setup/README.md), produced by the maintainer on 10 November 2026 from `.prompts/h1-tournament-setup-mockups.md`. They replace `journeys.html?step=setup` and the `configuration` state as the reference for these screens.
+References: [tournament setup state review](../../../../prototypes/frontend/tournament-setup-states.html) and its [18 states in 36 desktop/mobile captures](../../../../docs/assets/mockups/tournament-setup/README.md), produced by the maintainer on 10 November 2026 from `.prompts/h1-tournament-setup-mockups.md`. They replace `journeys.html?step=setup` and the `configuration` state as the reference for these screens.
 
 | Screen | States covered |
 |---|---|

@@ -1,6 +1,6 @@
 ## Status
 
-**Approved for implementation on 10 November 2026** (gate 1.1). Scope, the first row of §5.1 (D-27), the D-08 note, the rule decisions R-1 to R-5, the assumptions A-1 to A-4 and the deviation Q-1 were confirmed by the maintainer the same day; the mockups ([tournament setup states](../../../docs/assets/mockups/tournament-setup/README.md)) were supplied the same day and are referenced in `design.md`.
+**Approved for implementation on 10 November 2026** (gate 1.1). Scope, the first row of §5.1 (D-27), the D-08 note, the rule decisions R-1 to R-5, the assumptions A-1 to A-4 and the deviation Q-1 were confirmed by the maintainer the same day; the mockups ([tournament setup states](../../../../docs/assets/mockups/tournament-setup/README.md)) were supplied the same day and are referenced in `design.md`.
 
 ## Why
 
