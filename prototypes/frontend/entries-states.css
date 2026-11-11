@@ -1,0 +1,27 @@
+/* H1 entries extends the existing setup and registration review surfaces. */
+.registration-page .operation,.registration-page .entry-link{max-width:960px;background:var(--surface);border:1px solid var(--line);padding:var(--s6);margin-top:var(--s6)}
+.registration-page .operation>p,.registration-page .entry-link>p{margin:var(--s3) 0;max-width:75ch}
+.registration-page .operation .actions{justify-content:flex-start;margin-top:var(--s4);flex-wrap:wrap}
+.registration-page .operation form{margin-top:var(--s6)}
+.registration-page .guest-results{margin-top:var(--s4)}
+.registration-page .entries-summary{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,auto);gap:var(--s6);align-items:start;margin:var(--s8) 0;max-width:960px}
+.registration-page .entries-summary>div:last-child{max-width:320px}
+.registration-page .entry-group{margin-top:var(--s8);max-width:960px}
+.registration-page .entry-group>h2{margin-bottom:var(--s4)}
+.registration-page .entry-group .list{list-style:none}
+.registration-page .entry-group .actions{justify-content:flex-start;flex-wrap:wrap}
+.registration-page textarea{width:100%;min-height:96px;padding:var(--s3);border:1px solid var(--control);border-radius:0;background:var(--surface);color:var(--ink);font:inherit;resize:vertical}
+.registration-page .registration-area{padding:var(--s6)}
+.registration-page .registration-area>button{width:auto}
+.registration-page .registration-state{margin:0 0 var(--s4)}
+.registration-page .registration-area .facts{gap:var(--s4)}
+.registration-page .help{color:var(--muted)}
+.registration-page p{max-width:75ch}
+.registration-page :focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+.registration-page .rail :focus-visible{outline-color:var(--inverse-focus)}
+@media(max-width:700px){
+ .registration-page .entries-summary{grid-template-columns:minmax(0,1fr)}
+ .registration-page .entries-summary>div:last-child{max-width:none}
+ .registration-page .entry-group .list>li{padding:var(--s4)}
+ .registration-page .actions{flex-wrap:wrap;justify-content:flex-start}
+}

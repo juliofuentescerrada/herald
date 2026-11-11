@@ -1,8 +1,11 @@
+using Herald.Contracts.Tournaments.V1;
 using Herald.Tournaments.Domain;
 using Herald.Tournaments.Persistence;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Npgsql;
+using Wolverine;
+using Contract = Herald.Contracts.Tournaments.V1;
 
 namespace Herald.Tournaments.Features;
 
@@ -17,7 +20,9 @@ public sealed record TournamentDetails(
     TournamentConfiguration Configuration,
     IReadOnlyList<string> MissingForPublication,
     IReadOnlyList<string> MissingForRegistration,
-    DateTimeOffset? RegistrationChangedAt)
+    DateTimeOffset? RegistrationChangedAt,
+    int AdmittedEntries,
+    int WaitingEntries)
 {
     // A constant until its slice exists: nothing can start competition yet.
     public const string CompetitionPreparation = "preparation";
@@ -25,7 +30,7 @@ public sealed record TournamentDetails(
     // The only H1 profile (D-04): single round-robin, 3 / 1 / 0.
     public const string RoundRobinProfile = "singleRoundRobin-3-1-0";
 
-    public static TournamentDetails Of(Tournament tournament) => new(
+    public static TournamentDetails Of(Tournament tournament, EntryCounts entries) => new(
         tournament.Id.Value,
         tournament.Revision,
         tournament.Publication,
@@ -36,7 +41,9 @@ public sealed record TournamentDetails(
         tournament.Configuration.MissingForPublication(),
         tournament.Configuration.MissingForRegistration(),
         // The person is stored but not returned: Tournaments cannot name them (design W-1).
-        tournament.RegistrationChangedAt);
+        tournament.RegistrationChangedAt,
+        entries.Admitted,
+        entries.Waiting);
 }
 
 internal static class TournamentResults
@@ -56,7 +63,9 @@ internal static class TournamentResults
         extensions: new Dictionary<string, object?> { ["currentRevision"] = currentRevision });
 
     // Saves now, so a write that lost a race answers 409 instead of failing after the handler.
-    public static async Task<IResult> SavedAsync(this TournamentsDbContext db, Tournament tournament, WriteResult result, CancellationToken cancellationToken)
+    // A published tournament's change also tells Registration its entry terms, in the same transaction.
+    public static async Task<IResult> SavedAsync(
+        this TournamentsDbContext db, IMessageBus bus, Guid organisationId, Tournament tournament, WriteResult result, CancellationToken cancellationToken)
     {
         switch (result.Outcome)
         {
@@ -75,11 +84,31 @@ internal static class TournamentResults
                     return Stale(tournament.Revision);
                 }
 
+                if (tournament.Publication == Publication.Published)
+                {
+                    await bus.PublishAsync(EntryTerms(organisationId, tournament));
+                }
+
                 break;
         }
 
-        return Results.Ok(TournamentDetails.Of(tournament));
+        return Results.Ok(TournamentDetails.Of(tournament, await db.EntryCountsAsync(tournament.Id, cancellationToken)));
     }
+
+    // A published tournament is complete, so its entry terms are all present (R-5).
+    public static TournamentEntryTermsChanged EntryTerms(Guid organisationId, Tournament tournament) => new(
+        organisationId,
+        tournament.Id.Value,
+        tournament.Revision,
+        tournament.Registration switch
+        {
+            RegistrationWindow.Open => RegistrationState.Open,
+            RegistrationWindow.Closed => RegistrationState.Closed,
+            _ => RegistrationState.NotOpen,
+        },
+        tournament.Configuration.Capacity!.Value,
+        tournament.Configuration.EntryKind == Domain.EntryKind.Team ? Contract.EntryKind.Team : Contract.EntryKind.Individual,
+        tournament.Configuration.Admission == Domain.Admission.Manual ? Contract.Admission.Manual : Contract.Admission.Automatic);
 
     public static bool IsDuplicateKey(this DbUpdateException exception) =>
         exception.InnerException is PostgresException { SqlState: PostgresErrorCodes.UniqueViolation };

@@ -14,6 +14,14 @@ public sealed class TournamentsDbContext(DbContextOptions<TournamentsDbContext> 
 
     public DbSet<Tournament> Tournaments => Set<Tournament>();
 
+    public DbSet<FieldCounts> FieldCounts => Set<FieldCounts>();
+
+    // Registration's last report for the tournament, or none before its first.
+    public async Task<EntryCounts> EntryCountsAsync(TournamentId id, CancellationToken cancellationToken) =>
+        await FieldCounts.AsNoTracking().Where(counts => counts.TournamentId == id)
+            .Select(counts => new EntryCounts(counts.Admitted, counts.Waiting))
+            .SingleOrDefaultAsync(cancellationToken);
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.MapModule(Schema);
@@ -43,6 +51,13 @@ public sealed class TournamentsDbContext(DbContextOptions<TournamentsDbContext> 
                 configuration.Property(c => c.RegistrationClosesAt).HasColumnType(LocalDateTime);
                 configuration.Property(c => c.PlannedStartAt).HasColumnType(LocalDateTime);
             });
+        });
+
+        modelBuilder.Entity<FieldCounts>(counts =>
+        {
+            counts.HasKey(c => c.TournamentId);
+            counts.Property(c => c.TournamentId).HasConversion(id => id.Value, value => new TournamentId(value));
+            counts.Ignore(c => c.Counts);
         });
     }
 }

@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
+using Wolverine;
 using Wolverine.Http;
 
 namespace Herald.Tournaments.Features.SaveTournament;
@@ -22,7 +23,7 @@ public static class SaveTournamentEndpoint
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound, "application/problem+json")]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict, "application/problem+json")]
     public static async Task<IResult> Put(
-        Guid organisationId, Guid tournamentId, SaveTournament command, OrganisationContext context, TournamentsDbContext db, CancellationToken cancellationToken)
+        Guid organisationId, Guid tournamentId, SaveTournament command, OrganisationContext context, TournamentsDbContext db, IMessageBus bus, CancellationToken cancellationToken)
     {
         var id = new TournamentId(tournamentId);
         if (await db.Tournaments.SingleOrDefaultAsync(tournament => tournament.Id == id, cancellationToken) is not { } tournament)
@@ -31,7 +32,8 @@ public static class SaveTournamentEndpoint
         }
 
         var actor = context.ActorId ?? throw new InvalidOperationException($"No acting person in organisation {organisationId}.");
-        var result = tournament.Change(command.Configuration ?? new TournamentConfiguration(""), command.ExpectedRevision, actor, DateTimeOffset.UtcNow);
-        return await db.SavedAsync(tournament, result, cancellationToken);
+        var entries = await db.EntryCountsAsync(id, cancellationToken);
+        var result = tournament.Change(command.Configuration ?? new TournamentConfiguration(""), command.ExpectedRevision, actor, DateTimeOffset.UtcNow, entries);
+        return await db.SavedAsync(bus, organisationId, tournament, result, cancellationToken);
     }
 }

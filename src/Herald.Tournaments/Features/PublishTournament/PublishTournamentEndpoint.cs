@@ -5,6 +5,7 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
+using Wolverine;
 using Wolverine.Http;
 
 namespace Herald.Tournaments.Features.PublishTournament;
@@ -22,7 +23,7 @@ public static class PublishTournamentEndpoint
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound, "application/problem+json")]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict, "application/problem+json")]
     public static async Task<IResult> Post(
-        Guid organisationId, Guid tournamentId, PublishTournament command, OrganisationContext context, TournamentsDbContext db, CancellationToken cancellationToken)
+        Guid organisationId, Guid tournamentId, PublishTournament command, OrganisationContext context, TournamentsDbContext db, IMessageBus bus, CancellationToken cancellationToken)
     {
         var id = new TournamentId(tournamentId);
         if (await db.Tournaments.SingleOrDefaultAsync(tournament => tournament.Id == id, cancellationToken) is not { } tournament)
@@ -32,6 +33,6 @@ public static class PublishTournamentEndpoint
 
         var actor = context.ActorId ?? throw new InvalidOperationException($"No acting person in organisation {organisationId}.");
         var result = tournament.Publish(command.ExpectedRevision, actor, DateTimeOffset.UtcNow);
-        return await db.SavedAsync(tournament, result, cancellationToken);
+        return await db.SavedAsync(bus, organisationId, tournament, result, cancellationToken);
     }
 }

@@ -642,6 +642,453 @@
           }
         }
       }
+    },
+    "/api/organisations/{organisationId}/tournaments/{tournamentId}/entries": {
+      "get": {
+        "tags": [
+          "Herald.Registration.Features.GetField.GetFieldEndpoint"
+        ],
+        "summary": "GET_api_organisations_organisationId_tournaments_tournamentId_entries",
+        "description": "GET_api_organisations_organisationId_tournaments_tournamentId_entries",
+        "operationId": "getField",
+        "parameters": [
+          {
+            "name": "organisationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "tournamentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FieldDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/organisations/{organisationId}/guests": {
+      "get": {
+        "tags": [
+          "Herald.Registration.Features.FindGuests.FindGuestsEndpoint"
+        ],
+        "summary": "GET_api_organisations_organisationId_guests",
+        "description": "GET_api_organisations_organisationId_guests",
+        "operationId": "findGuests",
+        "parameters": [
+          {
+            "name": "organisationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "kind",
+            "in": "query",
+            "schema": {
+              "$ref": "#/components/schemas/GuestKind"
+            }
+          },
+          {
+            "name": "name",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GuestDetails"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/organisations/{organisationId}/tournaments/{tournamentId}/entries/{entryId}": {
+      "put": {
+        "tags": [
+          "Herald.Registration.Features.EnterGuest.EnterGuestEndpoint"
+        ],
+        "summary": "PUT_api_organisations_organisationId_tournaments_tournamentId_entries_entryId",
+        "description": "PUT_api_organisations_organisationId_tournaments_tournamentId_entries_entryId",
+        "operationId": "enterGuest",
+        "parameters": [
+          {
+            "name": "organisationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "tournamentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "entryId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EnterGuest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FieldDetails"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/organisations/{organisationId}/guests/{guestId}": {
+      "put": {
+        "tags": [
+          "Herald.Registration.Features.CreateGuest.CreateGuestEndpoint"
+        ],
+        "summary": "PUT_api_organisations_organisationId_guests_guestId",
+        "description": "PUT_api_organisations_organisationId_guests_guestId",
+        "operationId": "createGuest",
+        "parameters": [
+          {
+            "name": "organisationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "guestId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateGuest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GuestDetails"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GuestConflict"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/organisations/{organisationId}/tournaments/{tournamentId}/entries/{entryId}/cancellation": {
+      "post": {
+        "tags": [
+          "Herald.Registration.Features.CancelEntry.CancelEntryEndpoint"
+        ],
+        "summary": "POST_api_organisations_organisationId_tournaments_tournamentId_entries_entryId_cancellation",
+        "description": "POST_api_organisations_organisationId_tournaments_tournamentId_entries_entryId_cancellation",
+        "operationId": "cancelEntry",
+        "parameters": [
+          {
+            "name": "organisationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "tournamentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "entryId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CancelEntry"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FieldDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/organisations/{organisationId}/tournaments/{tournamentId}/entries/{entryId}/admission": {
+      "post": {
+        "tags": [
+          "Herald.Registration.Features.AdmitEntry.AdmitEntryEndpoint"
+        ],
+        "summary": "POST_api_organisations_organisationId_tournaments_tournamentId_entries_entryId_admission",
+        "description": "POST_api_organisations_organisationId_tournaments_tournamentId_entries_entryId_admission",
+        "operationId": "admitEntry",
+        "parameters": [
+          {
+            "name": "organisationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "tournamentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "entryId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AdmitEntry"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FieldDetails"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -652,6 +1099,44 @@
           "manual",
           null
         ]
+      },
+      "AdmissionMethod": {
+        "enum": [
+          "automatic",
+          "owner",
+          "promotion",
+          null
+        ]
+      },
+      "AdmitEntry": {
+        "required": [
+          "expectedRevision"
+        ],
+        "type": "object",
+        "properties": {
+          "expectedRevision": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "reason": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "CancelEntry": {
+        "required": [
+          "expectedRevision"
+        ],
+        "type": "object",
+        "properties": {
+          "expectedRevision": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
       },
       "CheckIn": {
         "enum": [
@@ -688,6 +1173,35 @@
           }
         }
       },
+      "CreateGuest": {
+        "required": [
+          "kind",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "kind": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/GuestKind"
+              }
+            ]
+          },
+          "name": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "confirmNew": {
+            "type": "boolean",
+            "default": false
+          }
+        }
+      },
       "CreateOrganisation": {
         "required": [
           "organisationId",
@@ -720,11 +1234,253 @@
           }
         }
       },
+      "EnterGuest": {
+        "required": [
+          "guestId"
+        ],
+        "type": "object",
+        "properties": {
+          "guestId": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "EntryDetails": {
+        "required": [
+          "id",
+          "revision",
+          "guestId",
+          "guestName",
+          "state",
+          "waitingReason",
+          "position",
+          "enteredAt",
+          "waitingSince",
+          "admissionMethod",
+          "admittedAt",
+          "cancelledAt"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "revision": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "guestId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "guestName": {
+            "type": "string"
+          },
+          "state": {
+            "$ref": "#/components/schemas/EntryState"
+          },
+          "waitingReason": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/WaitingReason"
+              }
+            ]
+          },
+          "position": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "enteredAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "waitingSince": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "admissionMethod": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/AdmissionMethod"
+              }
+            ]
+          },
+          "admittedAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "cancelledAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          }
+        }
+      },
       "EntryKind": {
         "enum": [
           "individual",
           "team",
           null
+        ]
+      },
+      "EntryState": {
+        "enum": [
+          "waiting",
+          "admitted",
+          "cancelled"
+        ]
+      },
+      "EntryTerms": {
+        "required": [
+          "registration",
+          "capacity",
+          "entryKind",
+          "admission"
+        ],
+        "type": "object",
+        "properties": {
+          "registration": {
+            "$ref": "#/components/schemas/RegistrationState"
+          },
+          "capacity": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "entryKind": {
+            "$ref": "#/components/schemas/EntryKind"
+          },
+          "admission": {
+            "$ref": "#/components/schemas/Admission"
+          }
+        }
+      },
+      "FieldDetails": {
+        "required": [
+          "tournamentId",
+          "revision",
+          "terms",
+          "termsReceivedAt",
+          "admitted",
+          "waiting",
+          "overCapacityBy",
+          "kindMismatch",
+          "entries"
+        ],
+        "type": "object",
+        "properties": {
+          "tournamentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "revision": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "terms": {
+            "$ref": "#/components/schemas/EntryTerms"
+          },
+          "termsReceivedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "admitted": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "waiting": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "overCapacityBy": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "kindMismatch": {
+            "type": "boolean"
+          },
+          "entries": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EntryDetails"
+            }
+          }
+        }
+      },
+      "GuestConflict": {
+        "required": [
+          "type",
+          "title",
+          "status",
+          "matches"
+        ],
+        "type": "object",
+        "properties": {
+          "type": {
+            "type": "string"
+          },
+          "title": {
+            "type": "string"
+          },
+          "status": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "matches": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/GuestDetails"
+            }
+          }
+        }
+      },
+      "GuestDetails": {
+        "required": [
+          "id",
+          "kind",
+          "name",
+          "createdAt"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "kind": {
+            "$ref": "#/components/schemas/GuestKind"
+          },
+          "name": {
+            "type": "string"
+          },
+          "createdAt": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "GuestKind": {
+        "enum": [
+          "player",
+          "team"
         ]
       },
       "HttpValidationProblemDetails": {
@@ -879,6 +1635,13 @@
             "format": "int32"
           }
         }
+      },
+      "RegistrationState": {
+        "enum": [
+          "notOpen",
+          "open",
+          "closed"
+        ]
       },
       "RegistrationWindow": {
         "enum": [
@@ -1060,7 +1823,9 @@
           "configuration",
           "missingForPublication",
           "missingForRegistration",
-          "registrationChangedAt"
+          "registrationChangedAt",
+          "admittedEntries",
+          "waitingEntries"
         ],
         "type": "object",
         "properties": {
@@ -1105,6 +1870,14 @@
               "string"
             ],
             "format": "date-time"
+          },
+          "admittedEntries": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "waitingEntries": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       },
@@ -1121,7 +1894,9 @@
           "venue",
           "publication",
           "registration",
-          "competition"
+          "competition",
+          "admittedEntries",
+          "waitingEntries"
         ],
         "type": "object",
         "properties": {
@@ -1192,6 +1967,14 @@
           },
           "competition": {
             "type": "string"
+          },
+          "admittedEntries": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "waitingEntries": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       },
@@ -1200,6 +1983,13 @@
           "public",
           "unlisted",
           "private",
+          null
+        ]
+      },
+      "WaitingReason": {
+        "enum": [
+          "capacityFull",
+          "admissionPending",
           null
         ]
       }
@@ -1235,6 +2025,24 @@
     },
     {
       "name": "Herald.Tournaments.Features.CloseRegistration.CloseRegistrationEndpoint"
+    },
+    {
+      "name": "Herald.Registration.Features.GetField.GetFieldEndpoint"
+    },
+    {
+      "name": "Herald.Registration.Features.FindGuests.FindGuestsEndpoint"
+    },
+    {
+      "name": "Herald.Registration.Features.EnterGuest.EnterGuestEndpoint"
+    },
+    {
+      "name": "Herald.Registration.Features.CreateGuest.CreateGuestEndpoint"
+    },
+    {
+      "name": "Herald.Registration.Features.CancelEntry.CancelEntryEndpoint"
+    },
+    {
+      "name": "Herald.Registration.Features.AdmitEntry.AdmitEntryEndpoint"
     }
   ]
 }

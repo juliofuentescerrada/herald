@@ -2,7 +2,7 @@
 
 - Status: Proposed
 - Date: 2026-11-06
-- Revised: 2026-11-08 (local broker and packages answered by `m0-messaging`)
+- Revised: 2026-11-08 (local broker and packages answered by `m0-messaging`); 2026-11-11 (traffic between modules of the host refined by ADR 0016)
 
 ## Context
 
@@ -20,6 +20,8 @@ Use **Azure Service Bus** (topics and subscriptions, one topic per publishing mo
 
 **Locally** (answered in `m0-messaging`), the AppHost runs the Azure Service Bus emulator through Aspire, so the same transport and routing code runs locally and in Azure. The AppHost declares the topics and subscriptions and is their only source: Wolverine provisions nothing and its system queues are off. The emulator would accept Wolverine's administration calls, but Aspire provides no management connection string, and two sources of topology would diverge. The same declarations are the starting point for M4's Azure resources. No broker runs in CI until the first integration event (H1).
 
+**Inside the host** (refined by [ADR 0016](0016-integration-events-between-modules-through-durable-local-queues.md), 11 November 2026): integration events between modules of the same host travel through durable local queues. Service Bus carries them when a publisher or consumer leaves the process or an external consumer appears.
+
 ## Alternatives considered
 
 - **MassTransit 9 with a commercial licence:** the most mature option, too expensive for a personal project.
@@ -33,4 +35,4 @@ Use **Azure Service Bus** (topics and subscriptions, one topic per publishing mo
 - Positive: one MIT library for mediation, outbox, inbox and transport; the broker is replaceable through Wolverine's transports.
 - Negative: Herald depends heavily on Wolverine; if its licence changes, this ADR is superseded and the cost of leaving is real. Licence terms checked on a date age.
 - Negative: the emulator needs two containers (the emulator and SQL Server) locally.
-- Follow-ups: declare the first topic and subscription and add a broker test to CI with the first integration event (H1); managed identity and Azure resources in M4.
+- Follow-ups: declare the first topic and subscription and add a broker test to CI with the first integration event that leaves the host (ADR 0016); managed identity and Azure resources in M4.

@@ -12,6 +12,8 @@ h1 { font-size: 32px; margin: var(--herald-space-4) 0 var(--herald-space-2); }
 .summary p { margin: 0 0 var(--herald-space-3); }
 .summary ul { margin: 0; padding-left: var(--herald-space-6); }
 .summary li { padding: var(--herald-space-1) 0; }
+.summary.entries { display: flex; align-items: center; justify-content: space-between; gap: var(--herald-space-4); }
+.summary.entries p { margin: 0; }
 fieldset { border: 0; border-top: 1px solid var(--herald-color-border-default); margin: 0 0 var(--herald-space-8); padding: var(--herald-space-6) 0 0; min-width: 0; }
 fieldset:first-of-type { border-top: 0; padding-top: 0; }
 legend { float: left; width: 100%; padding: 0; font-size: 20px; font-weight: 700; margin-bottom: var(--herald-space-2); }
@@ -25,4 +27,5 @@ legend + * { clear: both; }
 @media (max-width: 700px) {
   h1 { font-size: 28px; }
   .grid { grid-template-columns: 1fr; }
+  .summary.entries { flex-direction: column; align-items: stretch; }
 }

@@ -36,8 +36,9 @@ context: |
     and m0-web-shell are done, as are the documentation consolidation and the static journey
     prototype, h1-organisation-access (ADR 0014, accepted) and e2e-critical-paths (ADR 0015).
     h1-tournament-setup (first F-02 slice: draft, configuration, review, publication, list) is
-    done too, as is h1-registration-window (open, close and reopen registration by hand);
-    entries, competition and public reads do not exist.
+    done too, as is h1-registration-window (open, close and reopen registration by hand).
+    h1-entries (guest entries, admission, waiting queue, cancellation, first integration events)
+    is implemented and awaits archival; rosters, check-in, competition and public reads do not exist.
   - Modular monolith: one module per bounded context, with Domain at the centre and vertical slices
     (Features: one namespace per use case, one file or cohesive folder; Persistence at the edge);
     features never depend on other features. Shared business rules belong in Domain; technical
@@ -54,8 +55,10 @@ context: |
     and typed errors; queries as no-tracking projections (ADR 0005). An acknowledgement is not
     proof that a derived projection is current. Preserve operation identity on retries.
   - DDD: aggregates own the rules and raise domain events; integration events leave through
-    the transactional outbox; consumers are idempotent; contract changes are backwards
-    compatible or versioned (ADRs 0006, 0008).
+    the transactional outbox and, between modules of the host, durable local queues (Service
+    Bus only when a party leaves the process); consumers are idempotent (state events are
+    revisioned snapshots); contract changes are backwards compatible or versioned (ADRs 0006,
+    0008, 0016).
   - Durable business history is owned by the relevant module (ADR 0007): preserve predecessor
     revisions, actor/time/reason and participation evidence with the effective state change.
     Logs and message retention are not the competitive audit trail. Only effective results score.
