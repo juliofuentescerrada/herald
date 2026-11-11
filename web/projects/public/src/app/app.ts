@@ -2,12 +2,12 @@ import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/cor
 import { takeUntilDestroyed } from '@angular/core/rxjs-interop';
 import { NavigationEnd, Router, RouterLink, RouterLinkActive, RouterOutlet } from '@angular/router';
 import { filter } from 'rxjs';
-import { Button, Icon } from '@herald/ui';
+import { Button, Icon, ToastOutlet } from '@herald/ui';
 import { ORGANISER_WORKSPACE_URL } from './platform';
 
 /** The public shell: graphite header with a menu disclosure on narrow screens, the page and a footer. */
 @Component({
-  imports: [RouterOutlet, RouterLink, RouterLinkActive, Button, Icon],
+  imports: [RouterOutlet, RouterLink, RouterLinkActive, Button, Icon, ToastOutlet],
   selector: 'app-root',
   templateUrl: './app.html',
   styleUrl: './app.css',

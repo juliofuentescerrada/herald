@@ -22,7 +22,7 @@
 
 ## 4. Public application
 
-- [ ] 4.1 Toast outlet (client-side only); home content capped at 1200 px; SSR isolation check passes
+- [x] 4.1 Toast outlet (client-side only); home content capped at 1200 px; SSR isolation check passes
 
 ## 5. End-to-end journeys
 

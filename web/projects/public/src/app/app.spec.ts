@@ -31,6 +31,12 @@ describe('The public shell', () => {
     expect(element.querySelectorAll('h3')).toHaveLength(3);
   });
 
+  it('has one toast stack, ready in the browser and empty', async () => {
+    const { element } = await openShell();
+    expect(element.querySelectorAll('herald-toast-outlet')).toHaveLength(1);
+    expect(element.querySelector('herald-toast-outlet [role=status]')?.children).toHaveLength(0);
+  });
+
   it('offers Sign in, which leads to the admin application', async () => {
     const { element } = await openShell();
     const signIn = [...element.querySelectorAll('nav a')].find((a) => a.textContent?.trim() === 'Sign in');
