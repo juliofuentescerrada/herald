@@ -123,7 +123,7 @@
                     <button herald-button type="button" [disabled]="state() !== 'ready' || working" (click)="openRoster(entry, $any($event.currentTarget))"
                       [attr.aria-label]="'Roster: ' + entry.guestName">Roster</button>
                   }
-                  <button herald-button type="button" [loading]="working" [disabled]="state() === 'conflict'" (click)="toggleCheckIn(entry)"
+                  <button herald-button type="button" [loading]="working" [disabled]="state() !== 'ready'" (click)="toggleCheckIn(entry)"
                     [attr.aria-label]="(working ? (confirmed ? 'Undoing check-in' : 'Checking in') : confirmed ? 'Undo check-in' : 'Check in') + ': ' + entry.guestName">
                     {{ working ? (confirmed ? 'Undoing…' : 'Checking in…') : confirmed ? 'Undo check-in' : 'Check in' }}
                   </button>

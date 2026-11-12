@@ -63,7 +63,6 @@ public class CheckInTests(OrganisationApi api)
         owner.Client.DeleteAsync($"{EntryPath(owner, tournament, entry)}/check-in?expectedRevision={revision ?? CheckInRevision(entry)}", Cancellation);
 
     [Fact]
-
     [Trait("covers", "entrant-check-in: An owner checks in an admitted player")]
     public async Task An_owner_checks_in_an_admitted_player()
     {
@@ -84,7 +83,6 @@ public class CheckInTests(OrganisationApi api)
     }
 
     [Fact]
-
     [Trait("covers", "entrant-check-in: A waiting entry cannot check in")]
     public async Task A_waiting_entry_cannot_check_in()
     {
@@ -100,7 +98,6 @@ public class CheckInTests(OrganisationApi api)
     }
 
     [Fact]
-
     [Trait("covers", "entrant-check-in: A cancelled entry cannot check in")]
     public async Task A_cancelled_entry_cannot_check_in()
     {
@@ -117,7 +114,6 @@ public class CheckInTests(OrganisationApi api)
     }
 
     [Fact]
-
     [Trait("covers", "entrant-check-in: An owner undoes a check-in made by mistake")]
     public async Task An_owner_undoes_a_check_in_and_a_repeat_returns_the_field()
     {
@@ -138,7 +134,33 @@ public class CheckInTests(OrganisationApi api)
     }
 
     [Fact]
+    [Trait("covers", "entrant-check-in: Every change is recorded")]
+    public async Task Every_check_in_and_undo_is_stored_in_order_with_who_and_when()
+    {
+        var owner = await OwnerAsync();
+        var tournament = await TournamentAsync(owner);
+        var ana = await EnteredAsync(owner, tournament, "Ana Ruiz");
+        (await CheckInAsync(owner, tournament, ana, revision: 0)).StatusCode.ShouldBe(HttpStatusCode.OK);
+        (await UndoAsync(owner, tournament, ana, revision: 1)).StatusCode.ShouldBe(HttpStatusCode.OK);
+        (await CheckInAsync(owner, tournament, ana, revision: 2)).StatusCode.ShouldBe(HttpStatusCode.OK);
+        var entry = ana.GetProperty("id").GetGuid();
 
+        (await api.TextAsync(
+            """select string_agg("CheckInRevision" || ' ' || "Kind", ', ' order by "CheckInRevision") from registration."CheckInChanges" where "EntryId" = $1""", entry))
+            .ShouldBe("1 Confirmed, 2 Undone, 3 Confirmed");
+
+        // One acting person, and each change no earlier than the one before.
+        (await api.CountAsync(
+            """
+            select count(*) from (
+              select "ChangedBy", "ChangedAt", lag("ChangedAt") over (order by "CheckInRevision") as previous
+              from registration."CheckInChanges" where "EntryId" = $1) changes
+            where "ChangedBy" <> '00000000-0000-0000-0000-000000000000' and (previous is null or "ChangedAt" >= previous)
+            """, entry)).ShouldBe(3);
+        (await api.CountAsync("""select count(distinct "ChangedBy") from registration."CheckInChanges" where "EntryId" = $1""", entry)).ShouldBe(1);
+    }
+
+    [Fact]
     [Trait("covers", "entrant-check-in: A stale check-in write is a conflict")]
     public async Task A_stale_check_in_write_is_a_conflict()
     {
@@ -173,7 +195,6 @@ public class CheckInTests(OrganisationApi api)
     }
 
     [Fact]
-
     [Trait("covers", "entrant-check-in: Cancelling keeps the evidence")]
     public async Task Cancelling_keeps_the_check_in_and_stops_counting_it()
     {

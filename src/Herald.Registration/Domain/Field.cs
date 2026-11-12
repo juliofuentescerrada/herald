@@ -354,16 +354,8 @@ public sealed class Field : AggregateRoot<TournamentId>
     public WriteResult SetCheckIn(EntryId id, bool checkedIn, int expectedCheckInRevision, Guid actor, DateTimeOffset at)
     {
         var entry = Find(id) ?? throw new KeyNotFoundException($"No entry {id.Value} in field {Id.Value}.");
-        if (entry.HasCheckIn && entry.IsCheckedIn == checkedIn)
-        {
-            return WriteOutcome.Repeated;
-        }
 
-        if (expectedCheckInRevision != entry.CheckInRevision)
-        {
-            return WriteOutcome.Stale;
-        }
-
+        // The state first: a cancelled entry keeps its check-in read only, even one matching the request.
         if (entry.State == EntryState.Cancelled)
         {
             return WriteResult.Reject("entry", "cancelled");
@@ -372,6 +364,16 @@ public sealed class Field : AggregateRoot<TournamentId>
         if (entry.State != EntryState.Admitted)
         {
             return WriteResult.Reject("entry", "not-admitted");
+        }
+
+        if (entry.IsCheckedIn == checkedIn)
+        {
+            return WriteOutcome.Repeated;
+        }
+
+        if (expectedCheckInRevision != entry.CheckInRevision)
+        {
+            return WriteOutcome.Stale;
         }
 
         entry.SetCheckIn(checkedIn, actor, at);

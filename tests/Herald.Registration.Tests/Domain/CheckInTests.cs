@@ -24,7 +24,6 @@ public class CheckInTests
     private WriteResult Undo(Field field, Entry entry) => field.SetCheckIn(entry.Id, checkedIn: false, entry.CheckInRevision, _owner, _at);
 
     [Fact]
-
     [Trait("covers", "entrant-check-in: An owner checks in an admitted player")]
     public void An_owner_checks_in_an_admitted_player()
     {
@@ -56,7 +55,6 @@ public class CheckInTests
     }
 
     [Fact]
-
     [Trait("covers", "entrant-check-in: Check-in works whatever the registration state")]
     public void Check_in_works_after_registration_closes()
     {
@@ -70,7 +68,6 @@ public class CheckInTests
     }
 
     [Fact]
-
     [Trait("covers", "entrant-check-in: A waiting entry cannot check in")]
     public void A_waiting_entry_cannot_check_in()
     {
@@ -85,7 +82,6 @@ public class CheckInTests
     }
 
     [Fact]
-
     [Trait("covers", "entrant-check-in: A cancelled entry cannot check in")]
     public void A_cancelled_entry_cannot_check_in()
     {
@@ -100,7 +96,21 @@ public class CheckInTests
     }
 
     [Fact]
+    public void A_cancelled_entry_keeps_its_check_in_read_only_even_for_a_matching_request()
+    {
+        var field = Track();
+        var entry = Enter(field);
+        CheckIn(field, entry);
+        field.Cancel(entry.Id, entry.Revision, _owner, _at);
 
+        CheckIn(field, entry).Broken.ShouldBe([new BrokenRule("entry", "cancelled")]);
+        Undo(field, entry).Broken.ShouldBe([new BrokenRule("entry", "cancelled")]);
+
+        entry.IsCheckedIn.ShouldBeTrue();
+        entry.CheckInRevision.ShouldBe(1);
+    }
+
+    [Fact]
     [Trait("covers", "entrant-check-in: A team checks in without a complete roster")]
     public void A_team_checks_in_without_a_complete_roster()
     {
@@ -115,7 +125,6 @@ public class CheckInTests
     }
 
     [Fact]
-
     [Trait("covers", "entrant-check-in: A promoted entry starts pending")]
     public void A_promoted_entry_starts_pending()
     {
@@ -132,7 +141,6 @@ public class CheckInTests
     }
 
     [Fact]
-
     [Trait("covers", "entrant-check-in: An owner undoes a check-in made by mistake")]
     public void An_owner_undoes_a_check_in_made_by_mistake()
     {
@@ -165,7 +173,6 @@ public class CheckInTests
     }
 
     [Fact]
-
     [Trait("covers", "entrant-check-in: Every change is recorded")]
     public void Every_change_is_recorded()
     {
@@ -179,10 +186,10 @@ public class CheckInTests
         entry.CheckInRevision.ShouldBe(3);
         entry.CheckInChanges.Select(change => (change.CheckInRevision, change.Kind)).ShouldBe(
             [(1, CheckInChangeKind.Confirmed), (2, CheckInChangeKind.Undone), (3, CheckInChangeKind.Confirmed)]);
+        entry.CheckInChanges.ShouldAllBe(change => change.ChangedBy == _owner && change.ChangedAt == _at);
     }
 
     [Fact]
-
     [Trait("covers", "entrant-check-in: A stale check-in write is a conflict")]
     public void A_stale_check_in_write_is_a_conflict()
     {
@@ -212,7 +219,6 @@ public class CheckInTests
     }
 
     [Fact]
-
     [Trait("covers", "entrant-check-in: Cancelling keeps the evidence")]
 
     [Trait("covers", "entrant-check-in: The count follows check-ins and cancellations")]
