@@ -1,4 +1,4 @@
-<a class="back" routerLink="..">Back to configuration</a>
+<a class="back" routerLink=".."><herald-icon name="arrow-left" size="metadata" />Back to configuration</a>
 
 @if (tournament.isPending()) {
   <p class="panel" role="status">Loading entries…</p>
@@ -9,7 +9,7 @@
     </herald-notice>
     <div class="actions">
       <button herald-button variant="primary" type="button" [loading]="tournament.isFetching()" (click)="tournament.refetch()">Try again</button>
-      <a herald-button routerLink="../..">Back to tournaments</a>
+      <a herald-button routerLink="../.."><herald-icon name="arrow-left" />Back to tournaments</a>
     </div>
   </section>
 } @else {
@@ -17,8 +17,8 @@
     <div class="title">
       <h1>Entries · {{ tournament.data()!.configuration.title }}</h1>
       <p class="labels">
-        @for (label of labels(); track label) {
-          <herald-status-label>{{ label }}</herald-status-label>
+        @for (label of labels(); track label.text) {
+          <herald-status-label [icon]="label.icon">{{ label.text }}</herald-status-label>
         }
       </p>
     </div>
@@ -87,6 +87,7 @@
 
       @if (!admitted().length && !waiting().length) {
         <section class="operation" aria-labelledby="empty-heading">
+          <herald-icon class="empty-icon" name="users" size="empty" />
           <h2 id="empty-heading">No entries yet</h2>
           <p>Admitted and waiting entries will appear here. Each {{ kind() === 'team' ? 'team' : 'individual entry' }} takes one slot.</p>
         </section>
@@ -102,7 +103,7 @@
                 <div>
                   <div class="name-line">
                     <h3>{{ entry.guestName }}</h3>
-                    <herald-status-label [tone]="confirmed ? 'success' : 'neutral'">{{ confirmed ? 'Checked in' : 'Check-in pending' }}</herald-status-label>
+                    <herald-status-label [tone]="confirmed ? 'success' : 'neutral'" [icon]="confirmed ? 'circle-check' : 'circle-dashed'">{{ confirmed ? 'Checked in' : 'Check-in pending' }}</herald-status-label>
                     @if (teams()) {
                       <span class="readiness" [class.readiness-warning]="entry.rosterReadiness !== 'complete'">{{ readiness(entry) }}</span>
                     }
@@ -185,7 +186,7 @@
                   <span class="name-line">
                     <span><span class="name">{{ entry.guestName }}</span><span class="help">{{ ' · Cancelled ' + zoned(entry.cancelledAt) }}</span></span>
                     @if (entry.checkIn === 'confirmed') {
-                      <herald-status-label tone="success">Checked in</herald-status-label>
+                      <herald-status-label tone="success" icon="circle-check">Checked in</herald-status-label>
                     }
                   </span>
                   @if (entry.checkIn === 'confirmed') {
@@ -286,7 +287,7 @@
             </button>
           }
         }
-        <button herald-button type="button" [disabled]="state() === 'busy'" (click)="close()">Back to entries</button>
+        <button herald-button type="button" [disabled]="state() === 'busy'" (click)="close()"><herald-icon name="arrow-left" />Back to entries</button>
       </div>
     </form>
   </herald-drawer>

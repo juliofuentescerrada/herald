@@ -2,7 +2,7 @@ import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
 import { Router, RouterLink } from '@angular/router';
 import { HeraldHostAdminService, TournamentDetails } from '@herald/api-client/admin';
-import { Button, Notice, StatusLabel } from '@herald/ui';
+import { Button, Icon, Notice, StatusLabel } from '@herald/ui';
 import { firstValueFrom } from 'rxjs';
 import { AccessState, QUERY_CLIENT } from '../../platform';
 import {
@@ -30,22 +30,22 @@ const words: Record<string, string> = {
 /** The saved configuration, read-only, before the one action that cannot be undone. */
 @Component({
   selector: 'app-tournament-review-page',
-  imports: [Button, Notice, RouterLink, StatusLabel],
+  imports: [Button, Icon, Notice, RouterLink, StatusLabel],
   template: `
-    <a class="back" routerLink="..">Back to configuration</a>
+    <a class="back" routerLink=".."><herald-icon name="arrow-left" size="metadata" />Back to configuration</a>
     <h1>Review before publishing</h1>
     @if (tournament.isPending()) {
       <p class="panel" role="status">Loading tournament…</p>
     } @else if (!tournament.data()) {
       <section class="panel">
         <herald-notice tone="danger" heading="Tournament not available">It does not exist in this organisation, or it could not be read.</herald-notice>
-        <div class="actions"><a herald-button [routerLink]="listPath">Back to tournaments</a></div>
+        <div class="actions"><a herald-button [routerLink]="listPath"><herald-icon name="arrow-left" />Back to tournaments</a></div>
       </section>
     } @else {
       <p class="lead">Read-only configuration summary · {{ tournament.data()!.configuration.title }}</p>
       <p class="labels">
-        @for (label of labels(); track label) {
-          <herald-status-label>{{ label }}</herald-status-label>
+        @for (label of labels(); track label.text) {
+          <herald-status-label [icon]="label.icon">{{ label.text }}</herald-status-label>
         }
       </p>
       <div class="column">
@@ -91,7 +91,7 @@ const words: Record<string, string> = {
   `,
   styles: `
     h1 { font-size: 32px; margin: var(--herald-space-4) 0 var(--herald-space-2); }
-    .back { color: var(--herald-color-text-secondary); }
+    .back { display: inline-flex; align-items: center; gap: var(--herald-space-2); color: var(--herald-color-text-secondary); }
     .labels { display: flex; flex-wrap: wrap; gap: var(--herald-space-2); margin: var(--herald-space-4) 0 var(--herald-space-6); }
     .column { display: flex; flex-direction: column; gap: var(--herald-space-6); }
     .column herald-notice { display: flex; }

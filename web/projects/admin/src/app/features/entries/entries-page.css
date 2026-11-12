@@ -5,7 +5,8 @@ h1 { font-size: 32px; }
 .title h1 { margin: 0; }
 .lead { margin: 0 0 var(--herald-space-2); }
 .lead:last-child { margin-bottom: 0; }
-.back { color: var(--herald-color-text-secondary); }
+.back { display: inline-flex; align-items: center; gap: var(--herald-space-2); color: var(--herald-color-text-secondary); }
+.empty-icon { color: var(--herald-color-text-secondary); margin-bottom: var(--herald-space-2); }
 .labels { display: flex; flex-wrap: wrap; gap: var(--herald-space-2); margin: 0; }
 .column { display: flex; flex-direction: column; gap: var(--herald-space-6); }
 .column herald-notice { display: flex; }

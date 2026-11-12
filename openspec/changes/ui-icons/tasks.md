@@ -9,10 +9,10 @@
 
 ## 3. Admin application
 
-- [ ] 3.0 Capture the screens of design.md's Visual input at 1440 and 390 px before any change
-- [ ] 3.1 Rail navigation icons; `lifecycleLabels` with icons in the list, configuration form and entries page; check-in label icons
-- [ ] 3.2 Back and entries links, and the empty panels' icons
-- [ ] 3.3 Page specs for each `interface-icons` scenario, with `covers` markers; axe passes; lint and boundary checks pass
+- [x] 3.0 Capture the screens of design.md's Visual input at 1440 and 390 px before any change
+- [x] 3.1 Rail navigation icons; `lifecycleLabels` with icons in the list, configuration form and entries page; check-in label icons
+- [x] 3.2 Back and entries links, and the empty panels' icons
+- [x] 3.3 Page specs for each `interface-icons` scenario, with `covers` markers; axe passes; lint and boundary checks pass
 
 ## 4. Test script and validation
 

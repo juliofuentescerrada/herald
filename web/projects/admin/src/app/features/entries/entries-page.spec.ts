@@ -132,6 +132,14 @@ describe('The entries page', () => {
     document.querySelectorAll('herald-dialog, herald-drawer').forEach((element) => element.remove());
   });
 
+  it('shows the entries icon above the empty field’s heading', { meta: { type: 'covers', description: 'interface-icons: An empty field carries its icon' } }, async () => {
+    const { page, text } = await open({ getField: () => of(field([])) });
+    await vi.waitFor(() => expect(text('#empty-heading')).toBe('No entries yet'));
+    const icon = page().querySelector('#empty-heading')?.previousElementSibling;
+    expect(icon?.getAttribute('data-icon')).toBe('users');
+    expect(icon?.querySelector('svg')?.getAttribute('aria-hidden')).toBe('true');
+  });
+
   it('shows an empty open field with adding a player as its one primary action', async () => {
     const { page, text, texts } = await open({ getField: () => of(field([])) });
     await vi.waitFor(() => expect(text('#summary-heading')).toBe('0 of 2 individual entries'));
@@ -820,6 +828,16 @@ describe('Check-in on the entries page', () => {
   const row = (page: () => HTMLElement, name: string) =>
     [...page().querySelectorAll<HTMLLIElement>('ul[aria-labelledby="admitted-heading"] li')].find((li) => li.querySelector('h3')?.textContent?.trim() === name)!;
   const action = (page: () => HTMLElement, label: string) => page().querySelector<HTMLButtonElement>(`button[aria-label="${label}"]`)!;
+
+  it('puts each check-in label’s icon before its text', { meta: { type: 'covers', description: 'interface-icons: Check-in labels carry icons' } }, async () => {
+    const { page, text } = await open({ getField: () => of(desk(confirmed('Robin Vale'), pending('Sam Reed'))) }, mandatory);
+    await vi.waitFor(() => expect(text('#summary-heading')).toBe('2 of 4 individual entries'));
+    const labels = [...page().querySelectorAll('ul[aria-labelledby="admitted-heading"] herald-status-label')];
+    expect(labels.map((l) => [l.firstElementChild?.getAttribute('data-icon'), l.textContent?.trim()])).toEqual([
+      ['circle-check', 'Checked in'],
+      ['circle-dashed', 'Check-in pending'],
+    ]);
+  });
 
   it('shows each admitted entry’s check-in beside its name, its last confirmation and the count with the policy', async () => {
     const { page, text, texts } = await open({ getField: () => of(desk(confirmed('Robin Vale'), pending('Sam Reed'))) }, mandatory);

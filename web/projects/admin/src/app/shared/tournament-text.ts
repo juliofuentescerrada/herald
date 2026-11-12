@@ -1,3 +1,5 @@
+import type { IconName } from '@herald/ui';
+
 /** How the admin application writes a tournament's facts, shared by the features that show a tournament. */
 
 const day = new Intl.DateTimeFormat('en-GB', { day: 'numeric', month: 'long', year: 'numeric', timeZone: 'UTC' });
@@ -36,9 +38,16 @@ export const locationText = (configuration: { location?: string | null; venue?: 
 const registrationWords: Record<string, string> = { notOpen: 'Registration not open', open: 'Registration open', closed: 'Registration closed' };
 export const registrationText = (registration: string): string => registrationWords[registration] ?? registration;
 
-/** Publication, registration and competition are three facts, never one "Active" label. */
-export const lifecycleLabels = (tournament: { publication: string; registration: string; competition: string }): string[] => [
-  tournament.publication === 'published' ? 'Published' : 'Draft',
-  registrationText(tournament.registration),
-  tournament.competition === 'preparation' ? 'Preparing' : tournament.competition,
+export interface LifecycleLabel {
+  readonly text: string;
+  readonly icon?: IconName;
+}
+
+const registrationIcons: Record<string, IconName> = { notOpen: 'clock', open: 'door-enter', closed: 'lock' };
+
+/** Publication, registration and competition are three facts, never one "Active" label; each icon follows its meaning (ui-icons D-1). */
+export const lifecycleLabels = (tournament: { publication: string; registration: string; competition: string }): LifecycleLabel[] => [
+  tournament.publication === 'published' ? { text: 'Published', icon: 'world' } : { text: 'Draft', icon: 'pencil' },
+  { text: registrationText(tournament.registration), icon: registrationIcons[tournament.registration] },
+  tournament.competition === 'preparation' ? { text: 'Preparing', icon: 'hourglass' } : { text: tournament.competition },
 ];
