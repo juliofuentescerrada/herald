@@ -9,8 +9,8 @@
 
 ## 3. Registration domain
 
-- [ ] 3.1 `Entry` check-in (state, check-in revision, `CheckInChange` history), `Field` methods to check in and undo with repeats, conflicts, waiting and cancelled entries; the checked-in count; domain events `EntryCheckedIn` and `EntryCheckInUndone`
-- [ ] 3.2 Domain tests without mocks for every `entrant-check-in` rule: check in, undo, repeats, stale revisions, waiting and cancelled entries, promotion starting pending, cancellation keeping evidence, team check-in independent of the roster, the count
+- [x] 3.1 `Entry` check-in (state, check-in revision, `CheckInChange` history), `Field` methods to check in and undo with repeats, conflicts, waiting and cancelled entries; the checked-in count; domain events `EntryCheckedIn` and `EntryCheckInUndone`
+- [x] 3.2 Domain tests without mocks for every `entrant-check-in` rule: check in, undo, repeats, stale revisions, waiting and cancelled entries, promotion starting pending, cancellation keeping evidence, team check-in independent of the roster, the count
 
 ## 4. Registration persistence and features
 
