@@ -54,6 +54,8 @@ Each icon is a Tabler outline icon, added to the `ui` registry under its Tabler 
 | Empty panel | No tournaments yet | `trophy` | empty state (32) |
 | Empty panel | No entries yet | `users` | empty state (32) |
 
+The host returns only `preparation` as a competition state in H1 (`TournamentDetails.CompetitionPreparation`); the slice that adds the next state adds its icon here. An unknown value is shown as text without an icon.
+
 "Back to entries" and "Back to roster" in the roster and add drawers are buttons that close a drawer, not links; the maintainer chose to give them the back arrow too (R-1, 12 November 2026), so every "Back to …" reads the same.
 
 ### D-2 Empty-state size
