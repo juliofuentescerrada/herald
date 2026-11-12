@@ -8,10 +8,13 @@
 // - Push rounds: several pushes since the maintainer's last message are refused.
 //
 // Messages that wake the session from GitHub or a schedule are not the maintainer and reset nothing.
+// - Metrics: each turn's tool calls, failures, pushes and duration, appended at Stop to
+//   <tmp>/herald-guard/<session>.jsonl (harness-engineering D-12); scripts/harness-metrics.mjs sums them.
+//
 // Limits: HERALD_GUARD_MAX_TOOLS (400), HERALD_GUARD_MAX_FAILURES (3), HERALD_GUARD_MAX_PUSHES (3).
 // HERALD_GUARD=off disables every guard.
 
-import { mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { appendFileSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 
@@ -48,9 +51,14 @@ const loadState = (file) => {
   try {
     return JSON.parse(readFileSync(file, 'utf8'));
   } catch {
-    return { tools: 0, totalTools: 0, failures: {}, pushes: 0, warned: false };
+    return { tools: 0, totalTools: 0, failures: {}, pushes: 0, warned: false, turn: newTurn() };
   }
 };
+
+// The current turn's counters, reset when any message starts a turn, the maintainer's or a wake-up's.
+function newTurn() {
+  return { number: 0, startedAt: Date.now(), tools: 0, failures: 0, pushes: 0, maintainer: true };
+}
 
 const normalise = (command) => String(command ?? '').trim().replace(/\s+/g, ' ');
 const isPush = (command) => /(^|[;&|]\s*)git\s+push\b/.test(command);
@@ -83,11 +91,13 @@ if (!input || process.env.HERALD_GUARD === 'off') process.exit(0);
 
 const file = stateFile(input.session_id ?? 'unknown');
 const state = loadState(file);
+state.turn ??= newTurn();
 const command = input.tool_name === 'Bash' ? normalise(input.tool_input?.command) : '';
 let exitCode = 0;
 
 switch (input.hook_event_name) {
   case 'UserPromptSubmit':
+    state.turn = { ...newTurn(), number: state.turn.number + 1, maintainer: fromMaintainer(input.prompt) };
     if (fromMaintainer(input.prompt)) {
       state.tools = 0;
       state.pushes = 0;
@@ -98,6 +108,7 @@ switch (input.hook_event_name) {
 
   case 'PreToolUse': {
     state.tools += 1;
+    state.turn.tools += 1;
     state.totalTools += 1;
     const escape = isGit(command) || String(input.tool_name).startsWith('mcp__github__');
     if (state.tools > maxTools && !escape) {
@@ -119,7 +130,10 @@ switch (input.hook_event_name) {
   case 'PostToolUse':
     if (command) {
       delete state.failures[command];
-      if (isPush(command)) state.pushes += 1;
+      if (isPush(command)) {
+        state.pushes += 1;
+        state.turn.pushes += 1;
+      }
     }
     // Repository rules on the file just edited (harness-engineering D-1): the agent sees a finding in the same turn.
     if (editTools.has(input.tool_name) && input.tool_input?.file_path) {
@@ -142,7 +156,25 @@ switch (input.hook_event_name) {
   case 'PostToolUseFailure':
     if (command && !input.is_interrupt && /^Exit code \d+/.test(String(input.error ?? ''))) {
       state.failures[command] = (state.failures[command] ?? 0) + 1;
+      state.turn.failures += 1;
     }
+    break;
+
+  // One line per turn; a Stop hook must never block the turn from ending, so nothing here exits non-zero.
+  case 'Stop':
+    appendFileSync(
+      file.replace(/\.json$/, '.jsonl'),
+      `${JSON.stringify({
+        session: input.session_id ?? 'unknown',
+        turn: state.turn.number,
+        maintainer: state.turn.maintainer,
+        tools: state.turn.tools,
+        failures: state.turn.failures,
+        pushes: state.turn.pushes,
+        durationMs: Date.now() - state.turn.startedAt,
+        endedAt: new Date().toISOString(),
+      })}\n`,
+    );
     break;
 }
 

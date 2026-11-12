@@ -11,16 +11,16 @@
 - [x] 2.5 ADR 0017 inventory test in `Herald.Architecture.Tests`, with exemptions and reasons
 - [x] 2.6 Marker forms: xunit `covers` trait, Playwright `covers` annotation, `// covers:` in the scripts' tests
 - [x] 2.7 `scripts/spec-coverage`, the starting baseline, the CI and `scripts/check` steps; mark this change's own scenarios
-- [ ] 2.8 `scripts/bootstrap` from the cloud setup script, with the git hooks; the cloud environment's setup script calls it after this pull request is merged; `README.md` and `CLAUDE.md` point to it
+- [x] 2.8 `scripts/bootstrap` from the cloud setup script, with the git hooks; the cloud environment's setup script calls it since 12 November 2026, after pull request 1 merged (run here from the checkouts' folder; its first fresh container is still to confirm); `README.md` and `CLAUDE.md` point to it
 - [x] 2.9 Permissions in `.claude/settings.json`, refined with the `fewer-permission-prompts` skill
 - [x] 2.10 `CLAUDE.md` names each enforced rule's check instead of restating it; `herald-docs` requires covered scenarios on archive
 
 ## 3. Pull request 2: review and measurement
 
-- [ ] 3.1 `.claude/agents/herald-reviewer.md` with read-only tools and its output format
-- [ ] 3.2 Run it on pull request 2 itself; record findings and outcomes
-- [ ] 3.3 `Stop` handling in `guard.mjs` writing per-turn metrics; tests with synthetic hook inputs
-- [ ] 3.4 Pull request summary of a session's metrics; ADR 0018's follow-ups point to them
+- [x] 3.1 `.claude/agents/herald-reviewer.md` with read-only tools and its output format
+- [x] 3.2 Run it on pull request 2 itself; record findings and outcomes
+- [x] 3.3 `Stop` handling in `guard.mjs` writing per-turn metrics; tests with synthetic hook inputs
+- [x] 3.4 Pull request summary of a session's metrics; ADR 0018's follow-ups point to them
 
 ## 4. Pull request 3: the agent tests the running application
 

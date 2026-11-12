@@ -51,6 +51,7 @@ The maintainer keeps the decisions, ADR acceptance and the merge. Nothing here l
 - Follow-ups:
   - M4's exit criteria include the `main` environment and the `preview` slot with seeded data and persona test accounts (ADR 0019, `docs/roadmap.md`).
   - A `herald` cloud environment whose setup script installs the .NET SDK and the workspaces' dependencies, so cloud sessions can build and test.
+  - Measure the guard: `harness-engineering` records each turn's tool calls, failures, pushes and duration and summarises them in each slice's pull request (`scripts/harness-metrics.mjs`); the limits above are recalibrated from those numbers after the first slices. Its `herald-reviewer` subagent reviews every slice with a clean context before the pull request opens.
   - Playwright journeys also run on pull requests, so the agent verifies its work before asking for a test round (today they run after merges to `main`, about three minutes).
   - Before H2's first batch, try the trigger chain on a small trial batch: scheduled tasks are a research preview and may change.
   - On acceptance, before H2's first batch: revise the `herald-screens` and `herald-docs` skills, `openspec/config.yaml` and `.github/pull_request_template.md` (prototypes instead of requested mockups, archive in the same pull request, status pointers, test script); create the milestones, labels (`batch`, `slice`, `batch-proposals`, the status labels), project board, the next-slice scheduled task and the H2 batch issues.
