@@ -24,9 +24,9 @@
 
 ## 4. Pull request 3: the agent tests the running application
 
-- [ ] 4.1 `aspire agent mcp` in `.mcp.json`, installed by `scripts/bootstrap` with the AppHost's Aspire version; verify it against a running AppHost
-- [ ] 4.2 `e2e/scripts/` structure, a runner on the E2E environment with seeded data, screenshots at scale factor 2
-- [ ] 4.3 A first test script for an existing flow, its screenshots attached to pull request 3
+- [x] 4.1 `aspire agent mcp` in `.mcp.json` through `scripts/aspire-mcp`, with the AppHost's Aspire version; verified from Claude Code without a running AppHost (`list_apphosts`, `doctor`); a running AppHost is checked in the maintainer's next Aspire run
+- [x] 4.2 `e2e/scripts/` structure, a runner on the E2E environment with seeded data, screenshots at scale factor 2
+- [x] 4.3 A first test script for an existing flow (`seeded-entries`), its screenshots linked from pull request 3 as CI's `test-script-screens` artefact
 
 ## 5. Close
 

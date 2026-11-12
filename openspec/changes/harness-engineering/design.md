@@ -77,6 +77,8 @@ Findings that shape the design (12 November 2026):
   - A slice's test script lives in `e2e/scripts/<change>.spec.ts`, on the E2E environment (fake identity provider) with the seeded scenarios.
   - It takes screenshots at device scale factor 2 at each step the maintainer will check; the agent attaches them to the pull request.
   - These scripts are not journeys: they are not part of the post-merge suite unless promoted.
+  - Implemented with `e2e/scripts.config.ts`, which shares the suite's servers (`e2e/servers.ts`) and seeds through a global setup. A pull request cannot carry uploaded images through the API, so CI runs the scripts in a `test-scripts` job and uploads their screenshots as the `test-script-screens` artefact, which the pull request links. Where the preinstalled browser does not match the pinned Playwright, `HERALD_CHROMIUM` names it (set on the `herald` cloud environment).
+- **D-13 as implemented:** `scripts/aspire-mcp` starts `aspire agent mcp` at the AppHost's Aspire version through `dnx`; `.mcp.json` launches it from the repository root. It was verified from Claude Code (`list_apphosts`, `doctor`) without a running AppHost; reading a running AppHost's resources and logs is checked in the maintainer's next Aspire run.
 
 ## Risks / Trade-offs
 

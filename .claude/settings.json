@@ -2,6 +2,7 @@
   "permissions": {
     "allow": [
       "mcp__codegraph__*",
+      "mcp__aspire__*",
       "Bash(dotnet build *)",
       "Bash(dotnet test *)",
       "Bash(dotnet format *)",

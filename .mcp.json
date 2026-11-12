@@ -3,9 +3,22 @@
     "codegraph": {
       "type": "stdio",
       "command": "codegraph",
-      "args": ["serve", "--mcp"],
-      "env": { "CODEGRAPH_TELEMETRY": "0" },
+      "args": [
+        "serve",
+        "--mcp"
+      ],
+      "env": {
+        "CODEGRAPH_TELEMETRY": "0"
+      },
       "alwaysLoad": true
+    },
+    "aspire": {
+      "type": "stdio",
+      "command": "bash",
+      "args": [
+        "-c",
+        "exec \"$(git rev-parse --show-toplevel)/scripts/aspire-mcp\""
+      ]
     }
   }
 }
