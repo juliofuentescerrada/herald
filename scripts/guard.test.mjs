@@ -5,7 +5,7 @@ import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { after, test } from 'node:test';
-import { markdown, summarise } from './harness-metrics.mjs';
+import { markdown, summarise, turnsOf } from './harness-metrics.mjs';
 
 const temp = mkdtempSync(join(tmpdir(), 'herald-guard-test-'));
 after(() => rmSync(temp, { recursive: true, force: true }));
@@ -22,7 +22,6 @@ const hook = (session, event, extra = {}, env = {}) => {
 const bash = (command) => ({ tool_name: 'Bash', tool_input: { command } });
 const metrics = (session) => readFileSync(join(temp, 'herald-guard', `${session}.jsonl`), 'utf8').split('\n').filter(Boolean).map((line) => JSON.parse(line));
 
-// covers: agent-harness: A slice pull request
 test('Each turn ends with one line of its tool calls, failures, pushes and duration', () => {
   hook('m1', 'UserPromptSubmit', { prompt: 'Implement the slice' });
   hook('m1', 'PreToolUse', bash('dotnet test'));
@@ -58,11 +57,25 @@ test('A command that failed three times in a row is refused', () => {
   assert.match(hook('m3', 'PreToolUse', bash('pnpm test')).stdout, /"permissionDecision":"deny"/);
 });
 
+// covers: agent-harness: A slice pull request
+test('The pull request summary counts finished turns and the one still opening it', () => {
+  hook('m4', 'UserPromptSubmit', { prompt: 'Start the slice' });
+  hook('m4', 'PreToolUse', bash('dotnet build'));
+  hook('m4', 'Stop');
+  hook('m4', 'UserPromptSubmit', { prompt: '<wake reason="external-event"><event source="github">merged</event></wake>' });
+  hook('m4', 'PreToolUse', bash('git push -u origin b'));
+  hook('m4', 'PostToolUse', bash('git push -u origin b'));
+
+  const totals = summarise(turnsOf('m4', join(temp, 'herald-guard')));
+  assert.deepEqual({ turns: totals.turns, tools: totals.tools, pushes: totals.pushes }, { turns: 2, tools: 2, pushes: 1 });
+  assert.match(markdown(['m4'], totals), /\| Pushes \| 1 \|/);
+});
+
 test('The summary adds the turns of a session up for the pull request', () => {
   const totals = summarise([
     JSON.stringify({ maintainer: true, tools: 10, failures: 1, pushes: 1, durationMs: 120000 }),
     JSON.stringify({ maintainer: false, tools: 5, failures: 0, pushes: 1, durationMs: 60000 }),
   ]);
   assert.deepEqual(totals, { turns: 2, maintainerTurns: 1, tools: 15, failures: 1, pushes: 2, minutes: 3 });
-  assert.match(markdown('s', totals), /\| Tool calls \| 15 \|/);
+  assert.match(markdown(['s', 't'], totals), /\| Tool calls \| 15 \|/);
 });
