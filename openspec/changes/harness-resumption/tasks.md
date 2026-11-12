@@ -1,6 +1,6 @@
 ## 1. Approval
 
-- [ ] 1.1 Maintainer review of the proposal, specs and design, with answers to Q-1 to Q-3; record the approval in `proposal.md`
+- [ ] 1.1 Maintainer review of the proposal, specs and design; record the approval in `proposal.md` (Q-1 to Q-3 answered on 12 November 2026)
 
 ## 2. Checkpoints and metrics
 
@@ -18,8 +18,7 @@
 
 ## 4. Phase guard
 
-- [ ] 4.1 `guard.mjs` refuses file-tool edits under `src/`, `web/projects/` and `tools/` without an approved active change (D-6, and Q-1's answer); tests for both scenarios
-- [ ] 4.2 If Q-2 is accepted: the CI check for the phase, as a step of `scripts/check rules`
+- [ ] 4.1 `guard.mjs` refuses file-tool edits under `src/`, `web/projects/` and `tools/` without an approved active change (D-6; not `tests/` or `e2e/`, Q-1); tests for both scenarios
 
 ## 5. Documents and review
 

@@ -33,7 +33,7 @@ Findings that shape the design (12 November 2026):
 
 - **D-1 A checkpoint per task.** When the agent checks a task in `tasks.md`, it commits the task's work together with the checked box and pushes to the slice's branch. The commit message names the task (`<type>(<change>): <task id> <summary>`). The branch and `tasks.md` are the state; no other progress file is needed.
   - *Alternative:* a progress file on disk. Rejected: it duplicates `tasks.md` (ADR 0001) and is lost unless pushed anyway.
-  - *Alternative:* a checkpoint per task group. Fewer pushes, but a group can take most of a session (Q-3).
+  - *Alternative:* a checkpoint per task group. Fewer pushes, but a group can take most of a session (rejected in Q-3).
 - **D-2 Push rounds count from the pull request.**
   - The guard counts towards `HERALD_GUARD_MAX_PUSHES` only pushes made after the session has opened or updated a pull request. It knows this from a successful `mcp__github__create_pull_request`, or from a GitHub pull request event waking the session.
   - Before that, a push is a checkpoint: it is bounded by the tool budget, not by the push rounds.
@@ -56,7 +56,7 @@ Findings that shape the design (12 November 2026):
   - At most one slice stays in progress, and a person decides the resumption.
 - **D-6 The phase guard.**
   - On `PreToolUse` for `Edit`, `Write`, `MultiEdit` and `NotebookEdit` on a path under `src/`, `web/projects/` or `tools/`, the guard looks for an active change (a folder of `openspec/changes/` other than `archive/`) whose `proposal.md` contains "Approved for implementation". If there is none, it denies with: "no approved change: propose one (`/opsx:propose`) and wait for the maintainer's approval".
-  - Tests (`tests/`, `e2e/`), documentation, `openspec/` and the harness itself stay editable: proposals need them, and they are not production code (Q-1).
+  - Tests (`tests/`, `e2e/`), documentation, `openspec/` and the harness itself stay editable: proposals need them, and they are not production code (confirmed in Q-1).
   - `HERALD_GUARD=off` disables this guard like the others.
   - *Alternative:* the approval recorded in `tasks.md` 1.1. Rejected: the proposal's Status is where every approved change already records it.
 - **D-7 The definition of the harness.**
@@ -72,14 +72,14 @@ Findings that shape the design (12 November 2026):
 
 ## Risks / Trade-offs
 
-- **Edits through Bash (`sed`, here-documents) bypass the phase guard** → CI is the backstop that hooks need (harness-engineering D-1). Q-2 asks whether to add a CI check: a pull request that changes production paths must carry or follow an approved change.
+- **Edits through Bash (`sed`, here-documents) bypass the phase guard** → accepted (Q-2): the guard covers the agent's usual route, and the reviewer and the maintainer's merge see any production change without an approved change.
 - **A push per task could trigger CI each time** → checked: `ci.yml` runs on `pull_request` and on pushes to `main`, so checkpoints before the pull request trigger nothing.
 - **The trailer can be wrong when several sessions share a container** → it names its sessions, and the guard state records per session.
 - **A false refusal from the phase guard blocks legitimate work** → the message says what is missing, and `HERALD_GUARD=off` remains for the maintainer.
 - **The state output costs tokens on every compaction** → capped at about 40 lines, measured with the metrics.
 
-## Open Questions
+## Maintainer answers (12 November 2026)
 
-- **Q-1** Should the phase guard also cover `tests/` and `e2e/`? A test written before approval is harmless but is still implementation. The proposal leaves them out.
-- **Q-2** Should CI check the phase too (a pull request that changes `src/`, `web/projects/` or `tools/` without an approved change in the repository or in the diff), to close the Bash route?
-- **Q-3** A checkpoint per task (D-1) or per task group?
+- **Q-1 Tests and journeys:** the phase guard does not cover `tests/` or `e2e/` (D-6 as written).
+- **Q-2 CI check for the phase:** not needed; the Bash route is an accepted risk (see Risks).
+- **Q-3 Checkpoint granularity:** one checkpoint per task (D-1 as written).
