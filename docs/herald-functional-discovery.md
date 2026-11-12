@@ -284,7 +284,7 @@ Acceptance: 2–0 is valid for a two-win series profile; 3–0 is not. A tied sc
 
 The director sees pending, reported, disputed and resolved matches, withdrawals, assignments and team-readiness blockers. No-show, concession and administrative decision are distinct actions. None automatically fabricates played-game scores.
 
-A round completes when every pairing has a valid terminal resolution, including byes and administrative outcomes. Voiding a match needs system-specific treatment; deleting it is not a completion rule. Timer expiry only alerts: the profile and an authorised action resolve the match. Synchronized timers and game-specific overtime procedures are later extensions.
+A round completes when every pairing has a valid terminal resolution, including byes and administrative outcomes. Voiding a match needs system-specific treatment; deleting it is not a completion rule. Timer expiry only alerts: the profile and an authorised action resolve the match. Synchronised timers and game-specific overtime procedures are later extensions.
 
 Swiss waits for the previous round to complete. Round-robin can schedule all rounds initially and allow matches from different rounds according to schedule. Elimination can unlock a match as soon as both slots are determined without waiting for an entire bracket level.
 

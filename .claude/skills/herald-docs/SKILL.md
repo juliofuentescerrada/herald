@@ -30,7 +30,7 @@ State each fact in its source and link to it elsewhere; do not restate it.
 
 - `openspec/specs/` describes what is implemented; target deltas remain in active changes until implemented and archived.
 - Archived changes and dated reviews are historical evidence, not live architecture instructions.
-- When archiving a change, update the roadmap's current-state row for it, the README's status if it changes, and ADR 0017's inventory if the change introduced notifiable facts.
+- When archiving a change, update the roadmap's current-state row for it, the README's status if it changes, and ADR 0017's inventory if the change introduced notifiable facts. Every scenario the change adds to `openspec/specs/` must be marked by a test (`scripts/spec-coverage.mjs`); the baseline of uncovered scenarios never gains a line.
 - `openspec/config.yaml` holds the context and per-artifact rules OpenSpec gives the agent; keep it consistent with `CLAUDE.md` and these skills, without restating them.
 
 ## Pull requests

@@ -1,0 +1,4 @@
+#!/bin/sh
+# Herald's repository rules on the staged files (harness-engineering D-1). Enabled by scripts/bootstrap
+# (git config core.hooksPath .githooks). CI runs the same rules on every file, so bypassing this only delays them.
+exec node "$(git rev-parse --show-toplevel)/scripts/rules.mjs" --staged

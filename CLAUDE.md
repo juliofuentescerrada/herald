@@ -18,16 +18,17 @@ Herald runs tournaments (league, knockout, single match) and is game-agnostic: g
 
 ## Rules
 
-- Everything in English (ADR 0003). Organisation, never "tenant", for the organising entity; British spelling in code and docs.
+- Everything in English (ADR 0003). Organisation, never "tenant", for the organising entity; British spelling in code and docs. `scripts/rules.mjs` checks both (`docs/rules/`), after each edit, before each commit and in CI; an intended exception goes in `docs/rules/` with its reason.
 - Original work only: no code, names, structure or text taken from other codebases, the maintainer's employers' included. Concepts are public knowledge; their implementation here is Herald's own.
-- The core is game-agnostic (ADR 0002): no game names or rules in `Domain`; a game's rules enter as a policy, its data through an adapter. No Wizards of the Coast content in the repository.
+- The core is game-agnostic (ADR 0002): no game names or rules in `Domain`; a game's rules enter as a policy, its data through an adapter. No Wizards of the Coast content, and no sibling project named in code except what Herald shares with it (checked by `scripts/rules.mjs`).
 - One maintained source per responsibility (ADR 0001): state a fact where it belongs and link to it elsewhere.
-- Licences: a dependency must be free for an open-source personal project; check the licence of the exact version before adding it (ADR 0009 records why MediatR and MassTransit were left out).
+- Licences: a dependency must be free for an open-source personal project (ADR 0009 records why MediatR and MassTransit were left out). `scripts/rules.mjs` checks every package against `docs/rules/licences.json`; a licence not on it is the maintainer's decision.
 - M4 waits for the shared platform (ADR 0012): never add Herald resources to Arcana's state.
 
 ## Working economically
 
-- Check with `scripts/check [dotnet|web|all]`: CI's steps with one line each and only the errors on failure.
+- Check with `scripts/check [rules|dotnet|web|all]`: CI's steps with one line each and only the errors on failure. A new machine or cloud session is prepared by `scripts/bootstrap`.
+- A test that proves a specified scenario carries its marker (`[Trait("covers", "<capability>: <scenario>")]`, a Playwright `covers` annotation or `// covers:`); `scripts/spec-coverage.mjs` fails on a new scenario without one. `docs/rules/uncovered-scenarios.txt` only shrinks: never add a line.
 - Use CodeGraph (`codegraph_explore`, configured in `.mcp.json`) before reading code files: one call returns the relevant source, its callers and the tests affected. A fresh clone needs `codegraph init` once; the index then follows file changes.
 - Read large documents by section (`grep` for the D-, F- or § reference, then read those lines), never whole: the discovery alone is about 37,000 tokens.
 - Stop and ask instead of retrying when the same CI failure returns after one fix, when a flaky journey fails again after one retry, or when a slice clearly outgrows its `tasks.md` (propose splitting it). Never skip or disable a test to get green.

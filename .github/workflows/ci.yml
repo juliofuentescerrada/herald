@@ -13,6 +13,37 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # Repository rules and spec traceability on every file (harness-engineering): the edit and commit hooks run
+  # the same checks earlier, but can be bypassed; this job cannot.
+  rules:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+        with:
+          package_json_file: web/package.json
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: web/.nvmrc
+          cache: pnpm
+          cache-dependency-path: |
+            web/pnpm-lock.yaml
+            e2e/pnpm-lock.yaml
+      - uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
+        with:
+          global-json-file: global.json
+      - run: pnpm install --frozen-lockfile
+        working-directory: web
+      - run: pnpm install --frozen-lockfile
+        working-directory: e2e
+      - run: dotnet restore Herald.slnx
+      - name: Forbidden terms, spelling and licences
+        run: node scripts/rules.mjs
+      - name: Every specified scenario has a test, or is in the shrinking baseline
+        run: node scripts/spec-coverage.mjs
+      - name: The rules' own tests
+        run: node --test scripts/*.test.mjs
+
   dotnet:
     runs-on: ubuntu-latest
     steps:

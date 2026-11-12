@@ -72,6 +72,8 @@ flowchart LR
 
 Production changes start as an [OpenSpec](https://github.com/Fission-AI/OpenSpec) proposal (`openspec/changes/`): specification, design, relevant visual states and tasks are reviewed before implementation. Significant decisions get an ADR. Domain rules are tested as sentences, for example `Starting_a_tournament_requires_at_least_two_eligible_entrants`; registration itself may close with fewer entries. Retrying the same operation returns its original receipt rather than creating a second effect.
 
+To work on it, run `scripts/bootstrap` once (it installs the toolchain and dependencies and enables the repository's git hooks), then `scripts/check` runs what CI runs. Repository rules (terms, British spelling, licences) and the link from every specified scenario to its test are checked after each edit, before each commit and in CI (`docs/rules/`).
+
 ## Stack (planned)
 
 .NET 10 · ASP.NET Core · Wolverine · EF Core · PostgreSQL · Azure Service Bus · .NET Aspire · OpenTelemetry · xUnit · Testcontainers · Angular · TanStack Query · Vitest · Playwright · Azure Container Apps · Key Vault · Entra ID · OpenTofu · GitHub Actions

@@ -1,0 +1,47 @@
+{
+  "$comment": "Terms Herald's code must not use (ADR 0002, ADR 0003; harness-engineering D-3). Checked by scripts/rules.mjs. Each exception names a file, the term and why it stays.",
+  "scopes": {
+    "code": ["src/", "web/projects/", "tests/", "tools/", "e2e/", "scripts/", ".github/", ".claude/hooks/"],
+    "specs": ["openspec/specs/"]
+  },
+  "terms": [
+    {
+      "name": "tenant",
+      "pattern": "\\btenants?\\b",
+      "flags": "i",
+      "scopes": ["code", "specs"],
+      "message": "The organising entity is an organisation, never a tenant (ADR 0003). The identity directory's tenant is an external name: add an exception with its reason."
+    },
+    {
+      "name": "game names",
+      "pattern": "\\b(Magic|Pauper)\\b",
+      "scopes": ["code"],
+      "message": "No game names in code (ADR 0002): a game's rules enter as a policy, its data through an adapter."
+    },
+    {
+      "name": "Wizards of the Coast",
+      "pattern": "Wizards of the Coast|\\bMTG\\b|Magic: The Gathering|\\bGatherer\\b",
+      "flags": "i",
+      "scopes": ["code"],
+      "message": "No Wizards of the Coast content in the repository's code."
+    },
+    {
+      "name": "sibling projects",
+      "pattern": "\\b(Arcana|Archivist|PauperPilot)\\b",
+      "scopes": ["code"],
+      "message": "Herald's code does not name its sibling projects, except where it shares something with them: add an exception with its reason."
+    }
+  ],
+  "exceptions": [
+    { "path": "src/Herald.AppHost/AppHost.cs", "term": "sibling projects", "reason": "The External ID directory is shared with Arcana (ADR 0014)." },
+    { "path": "src/Herald.AppHost/AppHost.cs", "term": "tenant", "reason": "The directory's tenant id in the sign-in authority, an External ID name." },
+    { "path": "src/Herald.Host/RelinkPersonCommand.cs", "term": "tenant", "reason": "The directory's tenant id (`tid`), an External ID name." },
+    { "path": "src/Herald.Organisations/Domain/Person.cs", "term": "tenant", "reason": "The directory's tenant id (`tid`), an External ID name." },
+    { "path": "e2e/environment.ts", "term": "tenant", "reason": "The test identity provider's issuer stands for the directory's tenant." },
+    { "path": "web/projects/admin/src/app/platform/session.spec.ts", "term": "tenant", "reason": "A test authority path shaped like the directory's tenant path." },
+    { "path": "openspec/specs/sign-in/spec.md", "term": "tenant", "reason": "Sign-in identifies people by the directory's tenant and object ids (ADR 0014)." },
+    { "path": "scripts/rules.test.mjs", "term": "tenant", "reason": "The rules' own tests." },
+    { "path": "scripts/rules.test.mjs", "term": "game names", "reason": "The rules' own tests." },
+    { "path": "scripts/rules.test.mjs", "term": "sibling projects", "reason": "The rules' own tests." }
+  ]
+}

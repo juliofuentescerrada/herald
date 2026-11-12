@@ -1,0 +1,33 @@
+{
+  "$comment": "Licences allowed for Herald's .NET and web packages, direct and transitive (CLAUDE.md, ADR 0009; harness-engineering D-5). A package outside this list fails scripts/rules.mjs until the maintainer decides. Accepted 12 November 2026 as the licences in use then.",
+  "allowed": {
+    "MIT": "Permissive.",
+    "MIT-0": "Permissive.",
+    "Apache-2.0": "Permissive.",
+    "BSD-2-Clause": "Permissive.",
+    "BSD-3-Clause": "Permissive.",
+    "0BSD": "Permissive.",
+    "ISC": "Permissive.",
+    "BlueOak-1.0.0": "Permissive.",
+    "CC0-1.0": "Public domain dedication.",
+    "PostgreSQL": "Permissive (Npgsql).",
+    "MPL-2.0": "File-level copyleft: Herald does not modify these files; accepted by the maintainer.",
+    "CC-BY-4.0": "Data, not code (browser compatibility data); accepted by the maintainer.",
+    "Python-2.0": "Permissive in practice for the bundled helper using it; accepted by the maintainer.",
+    "(Apache-2.0 AND BSD-3-Clause)": "Both permissive.",
+    "(MIT OR CC0-1.0)": "Either permissive.",
+    "Unlicense": "Public domain dedication (tweetnacl, in the end-to-end suite). Proposed in harness-engineering; the maintainer confirms it in review.",
+    "WTFPL": "Permissive (a cspell dictionary, development only). Proposed in harness-engineering; the maintainer confirms it in review.",
+    "CC BY-SA 4.0": "Share-alike data (cspell's common-misspellings list, development only, not distributed). Proposed in harness-engineering; the maintainer confirms it in review."
+  },
+  "packages": {
+    "Fractions": {
+      "licence": "BSD-2-Clause",
+      "reason": "Declared as a licence file; read on 12 November 2026."
+    },
+    "System.Security.Cryptography.ProtectedData": {
+      "licence": "MIT",
+      "reason": "Declares the .NET corefx licence URL, which is MIT."
+    }
+  }
+}

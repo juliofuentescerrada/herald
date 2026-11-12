@@ -18,6 +18,7 @@ public class SyntheticDataTests(SeededDatabases databases)
         $"/api/organisations/{Organisation(scenario)}/tournaments/{Ids.For("tournament", key)}";
 
     [Fact]
+    [Trait("covers", "synthetic-data: A seeded team tournament reaches Registration")]
     public async Task A_seeded_team_tournament_reaches_registration_with_rosters_recorded_by_the_persona()
     {
         var database = await databases.NewDatabaseAsync();
@@ -38,6 +39,7 @@ public class SyntheticDataTests(SeededDatabases databases)
     }
 
     [Fact]
+    [Trait("covers", "synthetic-data: The tool finishes only when the outbox is empty")]
     public async Task Seeding_finishes_with_no_integration_event_left_pending()
     {
         var database = await databases.NewDatabaseAsync();
@@ -48,6 +50,7 @@ public class SyntheticDataTests(SeededDatabases databases)
     }
 
     [Fact]
+    [Trait("covers", "synthetic-data: The same scenario seeded twice on fresh databases")]
     public async Task The_same_scenarios_on_two_fresh_databases_produce_the_same_data()
     {
         var first = await databases.NewDatabaseAsync();
@@ -62,6 +65,7 @@ public class SyntheticDataTests(SeededDatabases databases)
     }
 
     [Fact]
+    [Trait("covers", "synthetic-data: An open registration stays open")]
     public async Task An_open_registration_is_open_and_closes_after_the_time_of_seeding()
     {
         var database = await databases.NewDatabaseAsync();
@@ -75,6 +79,8 @@ public class SyntheticDataTests(SeededDatabases databases)
     }
 
     [Fact]
+    [Trait("covers", "synthetic-data: Signing in as the seeded persona")]
+    [Trait("covers", "synthetic-data: Isolation between personas")]
     public async Task The_main_persona_owns_its_organisations_and_cannot_read_the_rivals()
     {
         var database = await databases.NewDatabaseAsync();
@@ -89,6 +95,7 @@ public class SyntheticDataTests(SeededDatabases databases)
     }
 
     [Fact]
+    [Trait("covers", "synthetic-data: Seeding a database that is already seeded")]
     public async Task Seeding_a_seeded_database_skips_every_scenario_and_changes_nothing()
     {
         var database = await databases.NewDatabaseAsync();
@@ -102,6 +109,7 @@ public class SyntheticDataTests(SeededDatabases databases)
     }
 
     [Fact]
+    [Trait("covers", "synthetic-data: Production refused")]
     public async Task Production_is_refused_before_any_connection()
     {
         var configuration = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>

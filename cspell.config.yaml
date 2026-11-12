@@ -1,0 +1,88 @@
+# Spelling for Herald's code and documents (ADR 0003, harness-engineering D-4), run by scripts/rules.mjs.
+# Code is checked for unknown words only: American forms there are external API names (CSS `color`,
+# `Normalize`, MSAL's `initialize`). Prose in Markdown must be British: its American forms are flagged.
+version: "0.2"
+language: en-GB
+import:
+  - ./web/node_modules/@cspell/dict-en-gb-mit/cspell-ext.json
+dictionaryDefinitions:
+  - name: herald-words
+    path: ./docs/rules/words.txt
+    addWords: true
+dictionaries:
+  - herald-words
+ignoreWords:
+  - MediatR
+ignorePaths:
+  - "**/node_modules/**"
+  - "**/bin/**"
+  - "**/obj/**"
+  - "**/dist/**"
+  - "**/Internal/Generated/**"
+  - "**/Persistence/Migrations/**"
+  - "**/generated/**"
+  - "**/pnpm-lock.yaml"
+  - "openspec/changes/archive/**"
+  - ".claude/skills/openspec-*/**"
+  - ".claude/commands/opsx/**"
+  - "docs/assets/**"
+  - "prototypes/**"
+overrides:
+  - filename: "**/*.md"
+    ignoreRegExpList:
+      - "/`[^`\\n]+`/g"
+      - "/```[\\s\\S]*?```/g"
+      - "/\\]\\([^)]*\\)/g"
+    flagWords:
+      - organization
+      - organizations
+      - organize
+      - organized
+      - organizer
+      - organizers
+      - behavior
+      - behaviors
+      - canceled
+      - canceling
+      - favor
+      - favorite
+      - analyze
+      - analyzed
+      - labeled
+      - labeling
+      - fulfill
+      - catalog
+      - initialize
+      - initialized
+      - normalize
+      - normalized
+      - finalize
+      - finalized
+      - recognize
+      - recognized
+      - prioritize
+      - prioritized
+      - summarize
+      - summarized
+      - authorize
+      - authorized
+      - customize
+      - customized
+      - serialize
+      - serialized
+      - synchronize
+      - synchronized
+      - optimize
+      - optimized
+      - realize
+      - realized
+      - minimize
+      - minimized
+      - maximize
+      - maximized
+      - modeling
+      - modeled
+      - traveled
+      - honor
+      - defense
+      - offense
