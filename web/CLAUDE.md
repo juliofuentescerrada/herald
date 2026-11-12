@@ -1,0 +1,8 @@
+# Frontend rules
+
+Loaded when working under `web/`. The root `CLAUDE.md` still applies. `web/README.md` has the workspace's commands. For screens, states and layout, use the `herald-screens` skill.
+
+- UI sharing (ADR 0011): an internal `ui` library from M0, consumed by both shells, separate from `api-client`; feature and app-local shared presentation remain in their app. `ui` supports SSR and has no app/API/query-cache/session/permission/routing dependencies. `api-client` owns no UI, navigation or business state. Add a component/state catalogue as development tooling with the first controls, not a third product app.
+- Rendering (ADR 0011): one Angular workspace, admin (CSR) and public/participant (hybrid) apps; SSG for corporate pages, SSR for dynamic public entry pages, CSR for personal workflows and live updates. Shared UI/tokens/API client, isolated SSR request state and public-only shared caches. Hosting includes an SSR runtime (ADR 0012).
+- Features own routes, components, forms, queries/mutations and tests. Features do not import other features or the other app; app composition accesses their explicit entry points. App platform owns session/organisation context and API configuration without importing features. Query owns server state; signals own local interaction state. Define invalidation on user/organisation change. The import matrix is enforced in CI (`pnpm lint:boundaries`); do not mirror backend modules mechanically or require an Angular NgModule/library per feature.
+- The generated client in `api-client` comes from the host's OpenAPI documents: after an endpoint changes, run `pnpm api:generate` and commit the result (CI fails otherwise).

@@ -3,6 +3,7 @@
 - Status: Proposed
 - Date: 2026-11-06
 - Consolidated: 2026-11-07
+- Revised: 2026-11-12 (agent conventions split by when they apply)
 
 ## Context
 
@@ -27,7 +28,7 @@ Keep one maintained source for each responsibility:
 | `docs/assets/mockups/`, `prototypes/frontend/` | Labelled conceptual or deterministic review artefacts; no production functionality |
 | `openspec/specs/` | Implemented and archived requirements, not every proposed target |
 | `openspec/changes/<change>/` | Proposed deltas, design notes, review evidence and tasks |
-| `CLAUDE.md`, `openspec/config.yaml` | Matching contributor/agent conventions |
+| `CLAUDE.md` and the folder `CLAUDE.md` files, `.claude/skills/herald-*`, `openspec/config.yaml` | Contributor/agent conventions, each rule in one of them: always-applicable rules in the root `CLAUDE.md`, folder rules in the folder's `CLAUDE.md`, procedures in skills, per-artifact proposal rules in `openspec/config.yaml` |
 
 Confirmed product clauses and accepted ADR decisions take precedence over proposals. The functional decision ledger identifies which product defaults remain proposed. A concept image cannot override those rules, and a target ADR cannot imply that its code already exists. Archived changes and dated reviews describe their historical snapshot; link them to the current baseline rather than treating them as live instructions.
 

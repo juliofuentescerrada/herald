@@ -1,0 +1,28 @@
+name: Slice
+description: One OpenSpec change inside a batch, implemented in one pull request and tested on its preview (ADR 0018).
+title: "Slice: "
+labels: ["slice"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Add this issue as a sub-issue of its batch. The pull request closes it (`Closes #…`) and carries the test script; feedback goes on the pull request.
+  - type: input
+    id: change
+    attributes:
+      label: OpenSpec change
+      placeholder: openspec/changes/<name>/
+    validations:
+      required: true
+  - type: textarea
+    id: scope
+    attributes:
+      label: Scope
+      description: What the slice delivers, in one or two sentences. The change's proposal is the source.
+    validations:
+      required: true
+  - type: textarea
+    id: questions
+    attributes:
+      label: Open questions
+      description: Rules the decision register does not settle, found during implementation. The agent records them here and in the pull request and does not decide them.
