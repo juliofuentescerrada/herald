@@ -1,0 +1,12 @@
+/* Slice additions over the incumbent deterministic admin composition. */
+.check-label,.labels span{display:inline-flex;align-items:center;padding:var(--space-1) var(--space-2);font-size:var(--text-base);font-weight:600;white-space:nowrap;background:var(--herald-color-neutral-surface);color:var(--ink);border:0}
+.check-label.confirmed{background:var(--herald-color-feedback-success-surface);color:var(--success)}
+.entry-copy{flex:1;min-width:0}.row-error{color:var(--danger);margin:var(--space-2) 0 0}.team-identity{gap:var(--space-2) var(--space-4)}
+.check-toasts{position:fixed;right:var(--space-6);bottom:var(--space-6);z-index:10;max-width:calc(100% - var(--space-8));width:360px}.check-toast{display:flex;align-items:center;gap:var(--space-3);padding:var(--space-2) var(--space-2) var(--space-2) var(--space-4);border:1px solid var(--herald-color-feedback-success);background:var(--herald-color-feedback-success-surface);color:var(--herald-color-feedback-success);box-shadow:0 4px 12px color-mix(in srgb,var(--ink) 12%,transparent)}.check-toast p{margin:0;flex:1;color:var(--ink)}.check-toast button{flex:none;min-width:44px;min-height:44px;padding:0;border:0;background:transparent;color:inherit}.check-toast:focus-within{outline:3px solid var(--focus);outline-offset:3px}
+
+.fl-history .team-identity strong{font-weight:600}.fl-history .help{font-size:var(--text-sm)}
+.config-fields{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-6)}.config-fields .wide{grid-column:1/-1;margin:0}.config-fields .written{margin:0}.registration dl{display:grid;grid-template-columns:1fr 1fr;gap:var(--space-4)}.registration dt{color:var(--secondary)}.registration dd{margin:var(--space-1) 0 0}.registration .wide{grid-column:1/-1;margin:0}
+#configuration fieldset{border:0;border-top:1px solid var(--line);margin:0 0 var(--space-8);padding:var(--space-6) 0 0;min-width:0}#configuration fieldset:first-child{border:0;padding-top:0}#configuration legend{float:left;width:100%;padding:0;font-size:20px;font-weight:700;margin-bottom:var(--space-2)}#configuration legend+p{clear:both;margin-bottom:var(--space-4)}
+summary:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+.fl-notice{border:1px solid var(--line)}
+@media(max-width:699px){body{padding-bottom:var(--check-toast-reserve,0)}.config-fields,.registration dl{grid-template-columns:1fr}.check-toasts{bottom:var(--space-4);right:var(--space-4);width:calc(100% - var(--space-8))}.check-toast{flex-wrap:wrap}.row-actions{gap:var(--space-2)}}
