@@ -1,11 +1,11 @@
 ## 1. Review gate
 
-- [ ] 1.1 Maintainer reviews the proposal, the spec and design D-1 to D-5 (the icon table, R-1 and R-2); record the answers and implementation approval in proposal.md and design.md; `openspec validate ui-icons`
+- [x] 1.1 Maintainer reviews the proposal, the spec and design D-1 to D-5 (the icon table, R-1 and R-2); record the answers and implementation approval in proposal.md and design.md; `openspec validate ui-icons`
 
 ## 2. ui library
 
-- [ ] 2.1 Add the table's icons to the `herald-icon` registry, the `empty` size (32 px) and a `data-icon` attribute; `StatusLabel` and `NavLink` take an optional `icon`
-- [ ] 2.2 Specs for the new inputs, the size and the decorative icons; the catalogue's controls page shows them
+- [x] 2.1 Add the table's icons to the `herald-icon` registry, the `empty` size (32 px) and a `data-icon` attribute; `StatusLabel` and `NavLink` take an optional `icon`
+- [x] 2.2 Specs for the new inputs, the size and the decorative icons; the catalogue's controls page shows them
 
 ## 3. Admin application
 
