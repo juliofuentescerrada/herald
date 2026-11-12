@@ -32,8 +32,8 @@
 
 ## 7. End-to-end journey
 
-- [ ] 7.1 Journey 16: two admitted players checked in, one undone, the count 1 of 2; the suite passes
-- [ ] 7.2 Test script in `e2e/scripts/` (seeded data, `scriptPersona`) with a screenshot per step of checking in, undoing and the locked check-in policy, for the maintainer's test round
+- [x] 7.1 Journey 16: two admitted players checked in, one undone, the count 1 of 2; the suite passes
+- [x] 7.2 Test script in `e2e/scripts/` (seeded data, `scriptPersona`) with a screenshot per step of checking in, undoing and the locked check-in policy, for the maintainer's test round
 
 ## 8. Validation and completion
 
