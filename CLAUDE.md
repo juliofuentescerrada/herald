@@ -13,7 +13,7 @@ Herald runs tournaments (league, knockout, single match) and is game-agnostic: g
 
 ## Working with OpenSpec
 
-- Specs live in `openspec/specs/` and describe what is implemented; proposed changes live in `openspec/changes/`. No production code without an approved change: propose (`/opsx:propose`), human review, implement (`/opsx:apply`), archive (`/opsx:archive`). Run `openspec validate <change>` before asking for review.
+- Specs live in `openspec/specs/` and describe what is implemented; proposed changes live in `openspec/changes/`. No production code without an approved change (the loop guard refuses edits to `src/`, `web/projects/` and `tools/` until an active change records its approval): propose (`/opsx:propose`), human review, implement (`/opsx:apply`), archive (`/opsx:archive`). Run `openspec validate <change>` before asking for review.
 - Product decisions are the maintainer's. A rule the decision register (`docs/herald-functional-discovery.md` §15) does not settle is asked, not decided.
 
 ## Rules
@@ -29,14 +29,15 @@ Herald runs tournaments (league, knockout, single match) and is game-agnostic: g
 
 - Check with `scripts/check [rules|dotnet|web|all]`: CI's steps with one line each and only the errors on failure. A new machine or cloud session is prepared by `scripts/bootstrap`.
 - A test that proves a specified scenario carries its marker (`[Trait("covers", "<capability>: <scenario>")]`, a Playwright `covers` annotation or `// covers:`); `scripts/spec-coverage.mjs` fails on a new scenario without one. `docs/rules/uncovered-scenarios.txt` only shrinks: never add a line.
-- Before opening a slice's pull request, write `git diff main...HEAD` to a file and have the `herald-reviewer` subagent review it with its change's name; the pull request records its findings and how each was resolved, and ends with `node scripts/harness-metrics.mjs <session ids> --markdown` for the sessions the slice took (`--list` shows them; without ids it takes the latest).
+- Each completed task of `tasks.md` is a checkpoint: commit its work with the box checked and push to the slice's branch; pushes before the pull request opens do not count towards the guard's push rounds. A session that resumes, or whose context was compacted, continues from the first unchecked task that `node scripts/slice-state.mjs` shows (a `SessionStart` hook runs it).
+- Before opening a slice's pull request, write `git diff main...HEAD` to a file and have the `herald-reviewer` subagent review it with its change's name; the pull request records its findings and how each was resolved, and ends with `node scripts/harness-metrics.mjs --branch --markdown`, which adds up the `Harness-Metrics` trailers of the branch's commits and the turns not yet committed.
 - With an AppHost running, read its resources, logs and traces through Aspire's MCP server (`mcp__aspire__*`, `.mcp.json`) before guessing at a failure.
 - Each slice adds an executable test script in `e2e/scripts/` (`pnpm test:scripts` in `e2e/`, seeded data, the persona of `scriptPersona`) with a screenshot per step the maintainer will check; CI uploads them as the `test-script-screens` artefact, which the pull request links. Run it before asking for a test round.
 - Use CodeGraph (`codegraph_explore`, configured in `.mcp.json`) before reading code files: one call returns the relevant source, its callers and the tests affected. A fresh clone needs `codegraph init` once; the index then follows file changes.
 - Read large documents by section (`grep` for the D-, F- or § reference, then read those lines), never whole: the discovery alone is about 37,000 tokens.
 - Stop and ask instead of retrying when the same CI failure returns after one fix, when a flaky journey fails again after one retry, or when a slice clearly outgrows its `tasks.md` (propose splitting it). Never skip or disable a test to get green.
 - Schedule only one-off wake-ups; no recurring schedule that starts sessions without a limit.
-- `.claude/hooks/guard.mjs` enforces a tool budget since the maintainer's last message, refuses a command after repeated identical failures and limits pushes (ADR 0018). When it refuses, report where you stopped and end the turn; do not work around it.
+- `.claude/hooks/guard.mjs` enforces a tool budget since the maintainer's last message, refuses a command after repeated identical failures, limits pushes once a pull request is open and refuses production edits without an approved change (ADR 0018). When it refuses, report where you stopped and end the turn; do not work around it.
 
 ## Commands
 
