@@ -1,7 +1,7 @@
 # repository-rules Specification
 
 ## Purpose
-TBD - created by archiving change harness-engineering. Update Purpose after archive.
+The verification part of Herald's harness (see `agent-harness`) for repository-wide rules: forbidden terms, British spelling, dependency licences and ADR 0017's inventory. These rules are checked by scripts and tests, not left as prose, and they run after each edit, before each commit and in CI.
 ## Requirements
 ### Requirement: Repository rules are checked at the edit, the commit and in CI
 One rules script SHALL check forbidden terms, British spelling and package licences. It SHALL run on the edited file after each Claude Code edit, on the staged files before each commit, and on every file in CI, which SHALL fail on any finding.

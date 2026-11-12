@@ -19,6 +19,8 @@
       "Bash(scripts/bootstrap)",
       "Bash(node scripts/rules.mjs *)",
       "Bash(node scripts/spec-coverage.mjs *)",
+      "Bash(node scripts/slice-state.mjs)",
+      "Bash(node scripts/harness-metrics.mjs *)",
       "Bash(node --test scripts/*)",
       "Bash(openspec *)",
       "Bash(codegraph *)",
@@ -99,6 +101,17 @@
           {
             "type": "command",
             "command": "node \"${CLAUDE_PROJECT_DIR}/.claude/hooks/guard.mjs\""
+          }
+        ]
+      }
+    ],
+    "SessionStart": [
+      {
+        "matcher": "compact|resume",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "node \"${CLAUDE_PROJECT_DIR}/scripts/slice-state.mjs\""
           }
         ]
       }

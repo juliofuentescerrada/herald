@@ -1,7 +1,16 @@
 # agent-harness Specification
 
 ## Purpose
-TBD - created by archiving change harness-engineering. Update Purpose after archive.
+Herald's harness is everything around the model that guides, limits and checks the agent's work, so that an unattended slice is as trustworthy as an attended one. It has six parts:
+
+- **Context:** the folder `CLAUDE.md` files, the `herald-*` skills, CodeGraph, and the slice's state given back after a compaction or a resume.
+- **Persisted state:** the change's `tasks.md`, the checkpoint pushed for each task, and the metrics carried by the commits.
+- **Tools by phase:** the phase guard, which keeps production code closed until a change is approved, and the read-only reviewer.
+- **Isolation:** the cloud container and the commands the permissions deny.
+- **Verification:** the repository rules (`repository-rules`), scenario traceability (`spec-traceability`), the tests and CI.
+- **Human approval:** the change's approval, the decision register and the maintainer's merge.
+
+This specification covers the harness's environment, review, measurement, observation and resumption. The two specifications named above cover its checks.
 ## Requirements
 ### Requirement: One bootstrap prepares every environment
 `scripts/bootstrap` SHALL install the toolchain and dependencies the repository declares and enable the repository's git hooks, idempotently. The cloud environment's setup script SHALL call it, and a maintainer's new machine SHALL be ready after running it.
@@ -25,11 +34,15 @@ A `herald-reviewer` subagent with read-only tools SHALL review a slice's diff ag
 - **THEN** the reviewer has only reading tools, and the procedure requires its review and its findings in the pull request before each slice's pull request opens
 
 ### Requirement: The harness measures each session
-The loop guard SHALL append, at the end of each turn, the turn's tool calls, failures, pushes and duration to a per-session file outside version control, and the agent SHALL summarise a slice's sessions in its pull request.
+The loop guard SHALL append, at the end of each turn, the turn's tool calls, failures, pushes and duration to a per-session file outside version control. A commit made by an agent session SHALL carry, as a `Harness-Metrics` trailer, the counters not yet recorded in an earlier trailer. The agent SHALL summarise a slice's metrics in its pull request from the trailers of the slice's branch and the turns not yet committed.
 
 #### Scenario: A slice pull request
 - **WHEN** the agent opens a slice's pull request
 - **THEN** its description states the tool calls, failures, pushes and time the slice took
+
+#### Scenario: A slice that spanned several containers
+- **WHEN** the branch carries commits with metrics trailers from sessions whose containers no longer exist
+- **THEN** the branch's metrics summary includes their counters with the current session's
 
 ### Requirement: The agent observes and exercises the running application
 The agent SHALL have Aspire's MCP server to read resources, logs and traces of a running AppHost, and each slice SHALL include an executable test script that runs against the local application with seeded data and produces the screenshots attached to its pull request.
@@ -37,4 +50,37 @@ The agent SHALL have Aspire's MCP server to read resources, logs and traces of a
 #### Scenario: Checking a slice before the maintainer's test round
 - **WHEN** a slice is implemented
 - **THEN** its test script has run against the local application, and the pull request carries its screenshots
+
+### Requirement: Each completed task is a pushed checkpoint
+When the agent completes a task of a change's `tasks.md`, it SHALL commit the task's work with the task checked and push it to the slice's branch. Pushes made before the session opens or updates a pull request SHALL NOT count towards the guard's push rounds.
+
+#### Scenario: Pushing checkpoints before the pull request
+- **WHEN** a session pushes more checkpoints than the push rounds allow, and it has not opened or updated a pull request
+- **THEN** the guard allows each push
+
+#### Scenario: Pushing after the pull request opens
+- **WHEN** a session has opened a pull request and reaches the push rounds since the maintainer's last message
+- **THEN** the guard refuses the next push
+
+### Requirement: An interrupted slice resumes from its last checkpoint
+`scripts/slice-state.mjs` SHALL print the branch, each active change with its approval and next unchecked tasks, the last checkpoint and the slice procedure steps still ahead. A `SessionStart` hook SHALL run it when the context is compacted and when a session resumes. A session that resumes a slice SHALL continue from the first unchecked task.
+
+#### Scenario: The context is compacted during a slice
+- **WHEN** a session's context is compacted while a change is in progress on its branch
+- **THEN** the agent receives the change, its next unchecked tasks and the remaining procedure steps
+
+#### Scenario: Reading the state of a branch with checkpoints
+- **WHEN** `scripts/slice-state.mjs` runs on a branch where an approved change has some tasks checked
+- **THEN** it names that change, its first unchecked task and the last checkpoint commit
+
+### Requirement: Production code needs an approved change
+The loop guard SHALL refuse edits by the agent's file tools to `src/`, `web/projects/` or `tools/` when no active change in `openspec/changes/` records its approval for implementation in its proposal.
+
+#### Scenario: Editing production code before approval
+- **WHEN** the agent edits a file under `src/` and no active change is approved for implementation
+- **THEN** the guard refuses the edit and says that an approved change is needed
+
+#### Scenario: Editing production code with an approved change
+- **WHEN** the agent edits a file under `src/` and an active change records "Approved for implementation"
+- **THEN** the guard allows the edit
 

@@ -4,10 +4,16 @@
 //   node scripts/harness-metrics.mjs                          the most recently active session
 //   node scripts/harness-metrics.mjs <session> [<session>…]   those sessions, summed (a slice can span several)
 //   node scripts/harness-metrics.mjs --list                   sessions with metrics, most recent first
+//   node scripts/harness-metrics.mjs --branch [--markdown]    the slice's branch: its commits' trailers and the
+//                                                             turns not yet committed (harness-resumption D-3)
+//   node scripts/harness-metrics.mjs --trailer                the latest session's counters since its last trailer
+//                                                             (.githooks/prepare-commit-msg)
+//   node scripts/harness-metrics.mjs --recorded '<value>'     marks a committed trailer as recorded (.githooks/post-commit)
 //   node scripts/harness-metrics.mjs … --markdown             as a table for the pull request description
 // The turn still in progress counts too, so the summary written while opening the pull request includes it.
 
-import { existsSync, readdirSync, readFileSync, statSync } from 'node:fs';
+import { execFileSync } from 'node:child_process';
+import { existsSync, readdirSync, readFileSync, statSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, resolve } from 'node:path';
 import { fileURLToPath } from 'node:url';
@@ -35,17 +41,102 @@ export function turnsOf(session, dir = directory(), now = Date.now()) {
   return turns;
 }
 
-export function summarise(lines) {
+const counters = ['turns', 'maintainer', 'tools', 'failures', 'pushes', 'ms'];
+
+// Raw counters of a list of turns, the unit of a trailer.
+export function count(lines) {
   const turns = lines.map((line) => JSON.parse(line));
   const sum = (key) => turns.reduce((total, turn) => total + (turn[key] ?? 0), 0);
   return {
     turns: turns.length,
-    maintainerTurns: turns.filter((turn) => turn.maintainer).length,
+    maintainer: turns.filter((turn) => turn.maintainer).length,
     tools: sum('tools'),
     failures: sum('failures'),
     pushes: sum('pushes'),
-    minutes: Math.round(sum('durationMs') / 60000),
+    ms: sum('durationMs'),
   };
+}
+
+const toTotals = (raw) => ({
+  turns: raw.turns,
+  maintainerTurns: raw.maintainer,
+  tools: raw.tools,
+  failures: raw.failures,
+  pushes: raw.pushes,
+  minutes: Math.round(raw.ms / 60000),
+});
+
+export const summarise = (lines) => toTotals(count(lines));
+
+// The session's counters not yet written to a trailer.
+export function unrecorded(session, dir = directory(), now = Date.now()) {
+  const all = count(turnsOf(session, dir, now));
+  const state = join(dir, `${session}.json`);
+  const recorded = existsSync(state) ? (JSON.parse(readFileSync(state, 'utf8')).recorded ?? {}) : {};
+  return Object.fromEntries(counters.map((key) => [key, Math.max(0, all[key] - (recorded[key] ?? 0))]));
+}
+
+// The trailer value for the latest session's counters not yet recorded; null when nothing is new. It writes nothing:
+// prepare-commit-msg asks for it before the commit exists, and post-commit records what the commit carries.
+export function pendingTrailer(dir = directory(), now = Date.now()) {
+  const [session] = sessions(dir);
+  if (!session) return null;
+  const delta = unrecorded(session, dir, now);
+  if (delta.tools === 0 && delta.turns === 0) return null;
+  return `${counters.map((key) => `${key}=${delta[key]}`).join(' ')} sessions=${session}`;
+}
+
+// Adds a committed trailer's counters to its session's recorded mark, so the next trailer starts after them.
+export function recordTrailer(value, dir = directory()) {
+  const { raw, sessions: [session] } = parseTrailer(value);
+  const file = session ? join(dir, `${session}.json`) : null;
+  if (!file || !existsSync(file)) return false;
+  const state = JSON.parse(readFileSync(file, 'utf8'));
+  const recorded = Object.fromEntries(counters.map((key) => [key, (state.recorded?.[key] ?? 0) + raw[key]]));
+  writeFileSync(file, JSON.stringify({ ...state, recorded }));
+  return true;
+}
+
+export function parseTrailer(value) {
+  const fields = Object.fromEntries(
+    String(value).trim().split(/\s+/).map((pair) => pair.split('=')).filter((pair) => pair.length === 2),
+  );
+  return {
+    raw: Object.fromEntries(counters.map((key) => [key, Number.parseInt(fields[key] ?? '0', 10) || 0])),
+    sessions: (fields.sessions ?? '').split(',').filter(Boolean),
+  };
+}
+
+// Sums trailer values and an optional uncommitted delta into pull request totals.
+export function branchTotals(trailers, pending = null, pendingSession = null) {
+  const sum = Object.fromEntries(counters.map((key) => [key, 0]));
+  const names = new Set();
+  for (const value of trailers) {
+    const { raw, sessions: ids } = parseTrailer(value);
+    for (const key of counters) sum[key] += raw[key];
+    ids.forEach((id) => names.add(id));
+  }
+  if (pending && (pending.tools > 0 || pending.turns > 0)) {
+    for (const key of counters) sum[key] += pending[key];
+    if (pendingSession) names.add(pendingSession);
+  }
+  return { sessions: [...names], totals: toTotals(sum) };
+}
+
+// The Harness-Metrics trailers of the branch's commits since it left main.
+export function branchTrailers(cwd = process.cwd()) {
+  const git = (...args) => execFileSync('git', args, { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
+  const base = ['origin/main', 'main'].find((ref) => {
+    try {
+      git('rev-parse', '--verify', '--quiet', ref);
+      return true;
+    } catch {
+      return false;
+    }
+  });
+  if (!base) return [];
+  const log = git('log', `${base}..HEAD`, '--format=%(trailers:key=Harness-Metrics,valueonly,separator=%x0A)');
+  return log.split('\n').map((line) => line.trim()).filter(Boolean);
 }
 
 export function markdown(names, totals) {
@@ -64,6 +155,22 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
   const args = process.argv.slice(2);
   if (args.includes('--list')) {
     for (const session of sessions()) console.log(session);
+    process.exit(0);
+  }
+  if (args.includes('--trailer')) {
+    const trailer = pendingTrailer();
+    if (trailer) console.log(trailer);
+    process.exit(0);
+  }
+  if (args.includes('--recorded')) {
+    const value = args[args.indexOf('--recorded') + 1];
+    if (value) recordTrailer(value);
+    process.exit(0);
+  }
+  if (args.includes('--branch')) {
+    const [session] = sessions();
+    const { sessions: names, totals } = branchTotals(branchTrailers(), session ? unrecorded(session) : null, session);
+    console.log(args.includes('--markdown') ? markdown(names, totals) : JSON.stringify({ sessions: names, ...totals }));
     process.exit(0);
   }
   const named = args.filter((arg) => !arg.startsWith('--'));

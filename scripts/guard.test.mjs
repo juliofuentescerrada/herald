@@ -1,7 +1,7 @@
 // The loop guard's limits and metrics with synthetic hook inputs (ADR 0018, harness-engineering D-12).
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { after, test } from 'node:test';
@@ -78,4 +78,96 @@ test('The summary adds the turns of a session up for the pull request', () => {
   ]);
   assert.deepEqual(totals, { turns: 2, maintainerTurns: 1, tools: 15, failures: 1, pushes: 2, minutes: 3 });
   assert.match(markdown(['s', 't'], totals), /\| Tool calls \| 15 \|/);
+});
+
+// covers: agent-harness: Pushing checkpoints before the pull request
+test('Checkpoint pushes before a pull request opens do not use the push rounds', () => {
+  hook('p1', 'UserPromptSubmit', { prompt: 'Implement the slice' });
+  for (let task = 0; task < 5; task++) {
+    const push = hook('p1', 'PreToolUse', bash('git push -u origin slice'));
+    assert.doesNotMatch(push.stdout, /"permissionDecision":"deny"/);
+    hook('p1', 'PostToolUse', bash('git push -u origin slice'));
+  }
+  hook('p1', 'Stop');
+  assert.equal(metrics('p1')[0].pushes, 5);
+});
+
+// covers: agent-harness: Pushing after the pull request opens
+test('Once the session opens a pull request, its pushes count towards the rounds', () => {
+  hook('p2', 'UserPromptSubmit', { prompt: 'Implement the slice' });
+  hook('p2', 'PreToolUse', bash('git push -u origin slice'));
+  hook('p2', 'PostToolUse', bash('git push -u origin slice'));
+  hook('p2', 'PreToolUse', { tool_name: 'mcp__github__create_pull_request', tool_input: {} });
+  hook('p2', 'PostToolUse', { tool_name: 'mcp__github__create_pull_request', tool_input: {} });
+  for (let round = 0; round < 3; round++) {
+    assert.doesNotMatch(hook('p2', 'PreToolUse', bash('git push')).stdout, /deny/, 'the push before the pull request did not count');
+    hook('p2', 'PostToolUse', bash('git push'));
+  }
+  assert.match(hook('p2', 'PreToolUse', bash('git push')).stdout, /"permissionDecision":"deny"/);
+});
+
+test('A session started by a merge event still pushes its checkpoints freely', () => {
+  hook('p4', 'UserPromptSubmit', { prompt: '<wake reason="external-event"><event source="github">pull request merged</event></wake>' });
+  for (let task = 0; task < 5; task++) {
+    assert.doesNotMatch(hook('p4', 'PreToolUse', bash('git push -u origin slice')).stdout, /deny/);
+    hook('p4', 'PostToolUse', bash('git push -u origin slice'));
+  }
+});
+
+test('Opening the pull request with gh also starts counting', () => {
+  hook('p5', 'UserPromptSubmit', { prompt: 'Implement the slice' });
+  hook('p5', 'PreToolUse', bash('gh pr create --fill'));
+  hook('p5', 'PostToolUse', bash('gh pr create --fill'));
+  for (let round = 0; round < 3; round++) {
+    hook('p5', 'PreToolUse', bash('git push'));
+    hook('p5', 'PostToolUse', bash('git push'));
+  }
+  assert.match(hook('p5', 'PreToolUse', bash('git push')).stdout, /"permissionDecision":"deny"/);
+});
+
+test('A GitHub wake-up after the first turn means the session has a pull request', () => {
+  hook('p3', 'UserPromptSubmit', { prompt: 'Implement the slice' });
+  hook('p3', 'Stop');
+  hook('p3', 'UserPromptSubmit', { prompt: '<wake reason="external-event"><event source="github">review</event></wake>' });
+  for (let round = 0; round < 3; round++) {
+    hook('p3', 'PreToolUse', bash('git push'));
+    hook('p3', 'PostToolUse', bash('git push'));
+  }
+  assert.match(hook('p3', 'PreToolUse', bash('git push')).stdout, /"permissionDecision":"deny"/);
+});
+
+// A repository root with one active change, approved or not.
+const repositoryWith = (name, proposal) => {
+  const dir = join(temp, name);
+  mkdirSync(join(dir, 'openspec', 'changes', 'a-change'), { recursive: true });
+  mkdirSync(join(dir, 'openspec', 'changes', 'archive', 'old'), { recursive: true });
+  writeFileSync(join(dir, 'openspec', 'changes', 'archive', 'old', 'proposal.md'), '**Approved for implementation on 1 January 2026**');
+  writeFileSync(join(dir, 'openspec', 'changes', 'a-change', 'proposal.md'), proposal);
+  return dir;
+};
+const edit = (path) => ({ tool_name: 'Edit', tool_input: { file_path: path } });
+
+// covers: agent-harness: Editing production code before approval
+test('Production code cannot be edited without an approved active change', () => {
+  const root = repositoryWith('pending', '## Status\n\nPending the maintainer\'s review.');
+  const env = { HERALD_GUARD_ROOT: root };
+  for (const path of [join(root, 'src/Herald.Host/Program.cs'), 'web/projects/admin/src/main.ts', join(root, 'tools/Herald.Seed/Scenarios.cs')]) {
+    const result = hook('f1', 'PreToolUse', edit(path), env);
+    assert.match(result.stdout, /"permissionDecision":"deny"/, path);
+    assert.match(result.stdout, /no approved change/);
+  }
+  for (const path of [join(root, 'tests/Some.Tests/A.cs'), join(root, 'e2e/journeys/a.spec.ts'), join(root, 'openspec/changes/a-change/tasks.md'), join(root, 'CLAUDE.md')]) {
+    assert.doesNotMatch(hook('f1', 'PreToolUse', edit(path), env).stdout, /deny/, path);
+  }
+});
+
+// covers: agent-harness: Editing production code with an approved change
+test('A proposal that only mentions the phrase is not an approval', () => {
+  const root = repositoryWith('mentions', '## Status\n\nPending.\n\nThe guard looks for "Approved for implementation" in a proposal.');
+  assert.match(hook('f3', 'PreToolUse', edit(join(root, 'src/A.cs')), { HERALD_GUARD_ROOT: root }).stdout, /deny/);
+});
+
+test('Production code can be edited once an active change is approved', () => {
+  const root = repositoryWith('approved', '## Status\n\n**Approved for implementation on 12 November 2026** (gate 1.1).');
+  assert.doesNotMatch(hook('f2', 'PreToolUse', edit(join(root, 'src/Herald.Host/Program.cs')), { HERALD_GUARD_ROOT: root }).stdout, /deny/);
 });

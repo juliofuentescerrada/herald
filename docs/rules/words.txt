@@ -71,3 +71,6 @@ Ruíz
 Ørsted
 # A fragment a test checks is absent
 ournament
+CLAUDECODE
+gpgsign
+valueonly
