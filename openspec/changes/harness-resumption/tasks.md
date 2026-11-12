@@ -1,6 +1,6 @@
 ## 1. Approval
 
-- [ ] 1.1 Maintainer review of the proposal, specs and design; record the approval in `proposal.md` (Q-1 to Q-3 answered on 12 November 2026)
+- [x] 1.1 Maintainer review of the proposal, specs and design; record the approval in `proposal.md` (Q-1 to Q-3 answered on 12 November 2026)
 
 ## 2. Checkpoints and metrics
 

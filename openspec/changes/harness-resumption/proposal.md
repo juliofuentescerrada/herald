@@ -1,6 +1,6 @@
 ## Status
 
-**Pending the maintainer's review** (gate 1.1). Proposed on 12 November 2026, after comparing Herald's harness with the six components that the harness-engineering literature names: context management, persisted state, tools by phase, isolation, verification loops and human approval. The maintainer answered the design's questions the same day (`design.md`).
+**Approved for implementation on 12 November 2026** (gate 1.1). Proposed the same day, after comparing Herald's harness with the six components that the harness-engineering literature names: context management, persisted state, tools by phase, isolation, verification loops and human approval. The maintainer answered the design's questions (`design.md`) and approved it the same day.
 
 ## Why
 
