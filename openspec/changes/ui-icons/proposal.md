@@ -1,3 +1,5 @@
+**Approved for implementation on 12 November 2026** (gate 1.1), by the maintainer, with the icon table and empty-state size reviewed below.
+
 **Reviewed on 12 November 2026:** the maintainer accepted design D-1's icon table and D-2's 32 px empty-state size, and added the drawers' back buttons (R-1).
 
 ## Why
