@@ -20,6 +20,11 @@
     <Project Path="tests/Herald.ModuleHosting.Tests/Herald.ModuleHosting.Tests.csproj" />
     <Project Path="tests/Herald.Organisations.Tests/Herald.Organisations.Tests.csproj" />
     <Project Path="tests/Herald.Registration.Tests/Herald.Registration.Tests.csproj" />
+    <Project Path="tests/Herald.Seed.Tests/Herald.Seed.Tests.csproj" />
+    <Project Path="tests/Herald.Testing/Herald.Testing.csproj" />
     <Project Path="tests/Herald.Tournaments.Tests/Herald.Tournaments.Tests.csproj" />
+  </Folder>
+  <Folder Name="/tools/">
+    <Project Path="tools/Herald.Seed/Herald.Seed.csproj" />
   </Folder>
 </Solution>

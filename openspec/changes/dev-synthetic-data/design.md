@@ -17,8 +17,8 @@ ADR 0019 (Proposed) decides that previews and local runs are populated with synt
 - **D-5 Idempotent by scenario.** Before running a scenario the tool asks `GET /api/me` for its persona; if the persona already owns the scenario's organisation, the scenario is skipped. A kept database (local volume, `main`) is never seeded twice; a reset recreates the database first.
 - **D-6 Never production.** The tool refuses to run when `Herald:Environment` (or the host environment) is `Production`, before connecting.
 - **D-7 Shared test support.** `HostFactory` and `TestTokens` move to `tests/Herald.Testing` (a class library), referenced by `Herald.Host.Tests` and `tools/Herald.Seed`. The factory gains the target connection string and the option to keep the database as it is.
-- **D-8 Aspire.** The AppHost adds the tool as a project resource that waits for the host and runs once, only when the persona parameters are set; otherwise the dashboard shows it as skipped with the reason.
-- **D-9 CI.** After the .NET tests, CI seeds a throwaway PostgreSQL database (the one Testcontainers already provides in the tests, or a service container) and fails if any scenario fails. `scripts/check dotnet` runs the same step.
+- **D-8 Aspire.** The AppHost adds the tool as a project resource that waits for the host and runs once. The main persona's object id is the user secret `seed-object-id`; its directory id is the tenant id already in `auth-authority`'s path, so only one value is added. Without it, the resource finishes after printing that seeding was skipped and why.
+- **D-9 CI.** `tests/Herald.Seed.Tests` seeds every scenario into throwaway databases on a Testcontainers PostgreSQL as part of the solution's tests, so CI and `scripts/check dotnet` fail when a scenario breaks, with no separate step.
 
 ## Maintainer answers (12 November 2026)
 

@@ -41,4 +41,5 @@ Docker is required for the tests and the AppHost. In a Claude Code cloud session
 - Build: `dotnet build Herald.slnx`
 - Format check (as CI): `dotnet format Herald.slnx --verify-no-changes`
 - All tests: `dotnet test --solution Herald.slnx`
+- Synthetic data: `tools/Herald.Seed` seeds scenarios through the endpoints (ADR 0019); Aspire runs it with `seed-object-id` set (`docs/operations/identity.md`). A change that alters a state the seeds use updates or adds its scenario in `tools/Herald.Seed/Scenarios.cs`.
 - After changing a handler or endpoint: `dotnet run --project src/Herald.Host -- codegen write`; after changing an endpoint, also `cd web && pnpm api:generate`. Commit both results, or CI fails.

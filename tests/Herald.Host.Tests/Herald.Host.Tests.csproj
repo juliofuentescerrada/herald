@@ -7,5 +7,9 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\..\src\Herald.Host\Herald.Host.csproj" />
+    <ProjectReference Include="..\Herald.Testing\Herald.Testing.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <Using Include="Herald.Testing" />
   </ItemGroup>
 </Project>

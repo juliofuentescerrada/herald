@@ -53,4 +53,18 @@ var publicApp = builder.AddJavaScriptApp("public", "../../web", "start:public")
 admin.WithEnvironment("HERALD_PUBLIC_URL", publicApp.GetEndpoint("http"));
 publicApp.WithEnvironment("HERALD_ADMIN_URL", admin.GetEndpoint("http"));
 
+// Synthetic data once the host is ready (dev-synthetic-data, ADR 0019). The main persona is the maintainer's own
+// account: its object id in user secrets (`seed-object-id`), its directory id from auth-authority's path. Without
+// them the seeding reports that it was skipped. It skips scenarios already present, so a kept volume is seeded once.
+var seedObjectId = builder.Configuration["Parameters:seed-object-id"];
+var seedDirectoryId = builder.Configuration["Parameters:auth-authority"]?.TrimEnd('/').Split('/')[^1];
+var seed = builder.AddProject<Projects.Herald_Seed>("seed")
+    .WithReference(database)
+    .WaitFor(host);
+if (!string.IsNullOrWhiteSpace(seedObjectId) && !string.IsNullOrWhiteSpace(seedDirectoryId))
+{
+    seed.WithEnvironment("Herald__Seed__Personas__Main__DirectoryId", seedDirectoryId)
+        .WithEnvironment("Herald__Seed__Personas__Main__ObjectId", seedObjectId);
+}
+
 builder.Build().Run();
