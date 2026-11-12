@@ -1,6 +1,6 @@
 ## Status
 
-**Draft, pending the maintainer's review.** Direction agreed on 12 November 2026 in ADR 0019 (Proposed). Open questions for the maintainer are listed in `design.md`.
+**Pending the maintainer's approval.** Direction agreed on 12 November 2026 in ADR 0019 (Proposed); the maintainer answered the design's questions the same day (`design.md`).
 
 ## Why
 

@@ -20,11 +20,11 @@ ADR 0019 (Proposed) decides that previews and local runs are populated with synt
 - **D-8 Aspire.** The AppHost adds the tool as a project resource that waits for the host and runs once, only when the persona parameters are set; otherwise the dashboard shows it as skipped with the reason.
 - **D-9 CI.** After the .NET tests, CI seeds a throwaway PostgreSQL database (the one Testcontainers already provides in the tests, or a service container) and fails if any scenario fails. `scripts/check dotnet` runs the same step.
 
-## Open questions for the maintainer
+## Maintainer answers (12 November 2026)
 
-- **Q-1** Should the local main persona be your own directory account (you see the seeded organisation after signing in), or a fixed test identity you never sign in as? D-3 assumes your account.
-- **Q-2** `tools/` is a new top-level folder; the alternative is `src/Herald.Seed`, which the architecture tests would then have to exempt from the module rules. D-7 and the proposal assume `tools/`.
-- **Q-3** Any scenario you want from the start beyond those listed (for example, a tournament at capacity with a long waiting queue)?
+- **Q-1 Local main persona:** the maintainer's own directory account, so signing in shows the seeded organisation (D-3 as written).
+- **Q-2 Location:** `tools/Herald.Seed`, a new top-level `tools/` folder outside the module rules (D-7 as written).
+- **Q-3 Scenarios:** the list in the proposal, nothing more for now.
 
 ## Risks / Trade-offs
 
