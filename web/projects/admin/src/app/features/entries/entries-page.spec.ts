@@ -37,6 +37,7 @@ const tournament = (over: Partial<TournamentDetails> = {}): TournamentDetails =>
   registrationChangedAt: null,
   admittedEntries: 0,
   waitingEntries: 0,
+  checkedInEntries: 0,
   ...over,
 });
 
@@ -67,6 +68,7 @@ const field = (entries: EntryDetails[], terms: Partial<FieldDetails['terms']> = 
   termsReceivedAt: '2026-11-11T09:10:00Z',
   admitted: entries.filter((e) => e.state === 'admitted').length,
   waiting: entries.filter((e) => e.state === 'waiting').length,
+  checkedIn: 0,
   overCapacityBy: 0,
   kindMismatch: false,
   entries,
@@ -136,7 +138,7 @@ describe('The entries page', () => {
 
     expect(text('h1')).toBe('Entries · Saturday Open');
     expect(texts('herald-status-label')).toEqual(['Published', 'Registration open', 'Preparing']);
-    expect(texts('.summary .help')).toEqual(['Automatic admission · 0 waiting for a slot', 'Entry terms updated 11 November 2026, 10:10 · Europe/Madrid']);
+    expect(texts('.summary .help')).toEqual(['Automatic admission · 0 waiting for a slot', 'Check-in optional', 'Entry terms updated 11 November 2026, 10:10 · Europe/Madrid']);
     expect(text('#empty-heading')).toBe('No entries yet');
     expect(texts('.group h2')).toEqual(['Admitted · 0', 'Waiting · 0']);
     // No history, no cancelled group.
@@ -345,7 +347,7 @@ describe('The entries page', () => {
     const { page, button, text, texts, settle, heading, toasts } = await open({ getField: () => of(full()), cancelEntry });
     await vi.waitFor(() => expect(page().querySelectorAll('ul[aria-labelledby="admitted-heading"] li')).toHaveLength(2));
 
-    const trigger = page().querySelector<HTMLButtonElement>('ul[aria-labelledby="admitted-heading"] button')!;
+    const trigger = page().querySelector<HTMLButtonElement>('ul[aria-labelledby="admitted-heading"] button[aria-label^="Cancel entry"]')!;
     trigger.click();
     await settle();
     expect(heading()).toBe('Cancel Robin Vale’s entry?');
@@ -377,7 +379,7 @@ describe('The entries page', () => {
     const cancelEntry = answers(() => pending, () => of(field([entry('Sam Reed'), entry('Ellis Stone'), cancelled('Robin Vale')])));
     const { page, button, text, settle, dialog, toasts } = await open({ getField: () => of(full()), cancelEntry });
     await vi.waitFor(() => expect(page().querySelectorAll('ul[aria-labelledby="admitted-heading"] li')).toHaveLength(2));
-    page().querySelector<HTMLButtonElement>('ul[aria-labelledby="admitted-heading"] button')!.click();
+    page().querySelector<HTMLButtonElement>('ul[aria-labelledby="admitted-heading"] button[aria-label^="Cancel entry"]')!.click();
     await settle();
     button('Confirm cancellation')!.click();
     await settle();
@@ -402,7 +404,7 @@ describe('The entries page', () => {
     const closed = field([entry('Robin Vale'), entry('Sam Reed'), waiting('Ellis Stone', 1)], { registration: 'closed' });
     const { page, text, settle } = await open({ getField: () => of(closed) }, tournament({ registration: 'closed' }));
     await vi.waitFor(() => expect(page().querySelectorAll('ul[aria-labelledby="admitted-heading"] li')).toHaveLength(2));
-    page().querySelector<HTMLButtonElement>('ul[aria-labelledby="admitted-heading"] button')!.click();
+    page().querySelector<HTMLButtonElement>('ul[aria-labelledby="admitted-heading"] button[aria-label^="Cancel entry"]')!.click();
     await settle();
     expect(text('[role=dialog] herald-notice')).toContain('No waiting entry will be admitted automatically because registration is closed.');
   });
@@ -412,7 +414,7 @@ describe('The entries page', () => {
     const cancelEntry = () => throwError(() => problem(409, { type: 'entry-revision-conflict', currentRevision: 2 }));
     const { page, button, text, texts, settle } = await open({ getField, cancelEntry });
     await vi.waitFor(() => expect(page().querySelectorAll('ul[aria-labelledby="admitted-heading"] li')).toHaveLength(2));
-    page().querySelector<HTMLButtonElement>('ul[aria-labelledby="admitted-heading"] button')!.click();
+    page().querySelector<HTMLButtonElement>('ul[aria-labelledby="admitted-heading"] button[aria-label^="Cancel entry"]')!.click();
     await settle();
     button('Confirm cancellation')!.click();
 
@@ -434,7 +436,7 @@ describe('The entries page', () => {
     expect(button('Add player')?.disabled).toBe(true);
     expect(text('#add-reason')).toBe('Field is over capacity. Cancel an admitted entry before adding or admitting.');
     expect(text('ol li p:last-of-type')).toBe('Field is over capacity. Cancel an admitted entry first.');
-    expect(page().querySelector<HTMLButtonElement>('ul[aria-labelledby="admitted-heading"] button')!.disabled).toBe(false);
+    expect(page().querySelector<HTMLButtonElement>('ul[aria-labelledby="admitted-heading"] button[aria-label^="Cancel entry"]')!.disabled).toBe(false);
   });
 
   it('says it is loading the field without counts or rows', async () => {
@@ -800,5 +802,165 @@ describe('The roster of a team entry', () => {
     expect(document.querySelector('.members')).toBeNull();
     harness.button('Try again')!.click();
     await vi.waitFor(() => expect(harness.texts('.members .member-name')).toEqual(['Robin Vale', 'Sam Reed']));
+  });
+});
+
+describe('Check-in on the entries page', () => {
+  afterEach(() => {
+    TestBed.resetTestingModule();
+    document.querySelectorAll('herald-dialog, herald-drawer').forEach((element) => element.remove());
+  });
+
+  const pending = (name: string, over: Partial<EntryDetails> = {}) => entry(name, { checkIn: 'pending', checkInRevision: 0, ...over });
+  const confirmed = (name: string, at = '2026-11-12T09:42:00Z', over: Partial<EntryDetails> = {}) =>
+    entry(name, { checkIn: 'confirmed', checkInRevision: 1, checkInChangedAt: at, ...over });
+  const mandatory = tournament({ configuration: { ...tournament().configuration, capacity: 4, checkIn: 'mandatory' } });
+  const desk = (...entries: EntryDetails[]) =>
+    field(entries, { capacity: 4 }, { checkedIn: entries.filter((e) => e.state === 'admitted' && e.checkIn === 'confirmed').length });
+  const row = (page: () => HTMLElement, name: string) =>
+    [...page().querySelectorAll<HTMLLIElement>('ul[aria-labelledby="admitted-heading"] li')].find((li) => li.querySelector('h3')?.textContent?.trim() === name)!;
+  const action = (page: () => HTMLElement, label: string) => page().querySelector<HTMLButtonElement>(`button[aria-label="${label}"]`)!;
+
+  it('shows each admitted entry’s check-in beside its name, its last confirmation and the count with the policy', async () => {
+    const { page, text, texts } = await open({ getField: () => of(desk(confirmed('Robin Vale'), pending('Sam Reed'))) }, mandatory);
+    await vi.waitFor(() => expect(text('#summary-heading')).toBe('2 of 4 individual entries'));
+
+    expect(texts('.summary .help')[1]).toBe('Check-in mandatory · 1 of 2 checked in');
+    expect(texts('ul[aria-labelledby="admitted-heading"] herald-status-label')).toEqual(['Checked in', 'Check-in pending']);
+    expect(row(page, 'Robin Vale').querySelector('herald-status-label')?.getAttribute('data-tone')).toBe('success');
+    expect(row(page, 'Sam Reed').querySelector('herald-status-label')?.getAttribute('data-tone')).toBe('neutral');
+    expect(row(page, 'Robin Vale').textContent).toContain('Checked in 12 November 2026, 10:42 · Europe/Madrid');
+    // The check-in action comes before cancelling.
+    expect([...row(page, 'Sam Reed').querySelectorAll('button')].map((b) => b.textContent?.trim())).toEqual(['Check in', 'Cancel entry']);
+    expect(action(page, 'Undo check-in: Robin Vale')).toBeTruthy();
+    expect(await violations(page())).toEqual([]);
+  });
+
+  it('says an optional policy, and the policy without a count while nothing is admitted', { meta: { type: 'covers', description: 'entrant-check-in: Optional check-in is shown as information' } }, async () => {
+    const optional = await open({ getField: () => of(desk(pending('Sam Reed'))) });
+    await vi.waitFor(() => expect(optional.texts('.summary .help')[1]).toBe('Check-in optional · 0 of 1 checked in'));
+    TestBed.resetTestingModule();
+
+    const empty = await open({ getField: () => of(desk()) }, mandatory);
+    await vi.waitFor(() => expect(empty.texts('.summary .help')[1]).toBe('Check-in mandatory'));
+  });
+
+  it('checks in at once with a toast, keeping the row’s other actions blocked only while in progress', { meta: { type: 'covers', description: 'entrant-check-in: An owner checks in from the entries page' } }, async () => {
+    const answer = new Subject<FieldDetails>();
+    const checkIn = vi.fn(() => answer);
+    const { page, button, toasts, settle } = await open({ getField: () => of(desk(pending('Sam Reed'), pending('Jamie Brook'))), checkIn }, mandatory);
+    await vi.waitFor(() => expect(action(page, 'Check in: Jamie Brook')).toBeTruthy());
+
+    action(page, 'Check in: Jamie Brook').click();
+    await settle();
+    expect(checkIn).toHaveBeenCalledWith(organisation, tournamentId, 'e-Jamie-Brook', { expectedRevision: 0 });
+    const working = row(page, 'Jamie Brook');
+    expect(working.getAttribute('aria-busy')).toBe('true');
+    expect(working.querySelector('button')?.textContent?.trim()).toBe('Checking in…');
+    expect(working.querySelector('button')?.getAttribute('aria-busy')).toBe('true');
+    expect(action(page, 'Cancel entry: Jamie Brook').disabled).toBe(true);
+    expect(working.querySelector('[role=status]')?.textContent).toBe('Checking in. Please wait; do not submit again.');
+    // Other rows and adding stay usable.
+    expect(action(page, 'Check in: Sam Reed').disabled).toBe(false);
+    expect(button('Add player')?.disabled).toBe(false);
+    action(page, 'Checking in: Jamie Brook').click();
+    expect(checkIn).toHaveBeenCalledTimes(1);
+
+    answer.next(desk(pending('Sam Reed'), confirmed('Jamie Brook')));
+    answer.complete();
+    await vi.waitFor(() => expect(toasts()).toEqual(['Jamie Brook checked in.']));
+    expect(row(page, 'Jamie Brook').querySelector('herald-status-label')?.textContent).toBe('Checked in');
+    expect(page().querySelector('.summary .help:nth-of-type(2)')?.textContent).toBe('Check-in mandatory · 1 of 2 checked in');
+  });
+
+  it('undoes a check-in with its revision, removing the confirmation time', async () => {
+    const undoCheckIn = vi.fn(() => of(desk(pending('Robin Vale', { checkInRevision: 2, checkInChangedAt: '2026-11-12T09:50:00Z' }))));
+    const { page, toasts } = await open({ getField: () => of(desk(confirmed('Robin Vale'))), undoCheckIn }, mandatory);
+    await vi.waitFor(() => expect(action(page, 'Undo check-in: Robin Vale')).toBeTruthy());
+
+    action(page, 'Undo check-in: Robin Vale').click();
+
+    await vi.waitFor(() => expect(toasts()).toEqual(['Robin Vale’s check-in undone.']));
+    expect(undoCheckIn).toHaveBeenCalledWith(organisation, tournamentId, 'e-Robin-Vale', { expectedRevision: 1 });
+    expect(row(page, 'Robin Vale').textContent).not.toContain('Checked in 12 November');
+    expect(action(page, 'Check in: Robin Vale')).toBeTruthy();
+  });
+
+  it('says a failed check-in under its row, with no toast, and retries with the same action', { meta: { type: 'covers', description: 'entrant-check-in: A failed check-in leaves the row unchanged' } }, async () => {
+    const checkIn = answers<FieldDetails>(() => throwError(() => problem(500)), () => of(desk(confirmed('Jamie Brook'))));
+    const { page, toasts } = await open({ getField: () => of(desk(pending('Jamie Brook'))), checkIn }, mandatory);
+    await vi.waitFor(() => expect(action(page, 'Check in: Jamie Brook')).toBeTruthy());
+
+    action(page, 'Check in: Jamie Brook').click();
+
+    await vi.waitFor(() => expect(row(page, 'Jamie Brook').querySelector('.row-error')?.textContent?.trim())
+      .toBe('Check-in was not recorded. The request failed. Nothing changed; try “Check in” again.'));
+    expect(toasts()).toEqual([]);
+    expect(await violations(page())).toEqual([]);
+    action(page, 'Check in: Jamie Brook').click();
+    await vi.waitFor(() => expect(toasts()).toEqual(['Jamie Brook checked in.']));
+    expect(row(page, 'Jamie Brook').querySelector('.row-error')).toBeNull();
+  });
+
+  it('says a check-in changed elsewhere, blocks row writes and reloads the latest field', async () => {
+    const getField = answers(() => of(desk(pending('Jamie Brook'))), () => of(desk(confirmed('Jamie Brook'))));
+    const checkIn = () => throwError(() => problem(409, { type: 'check-in-revision-conflict', currentRevision: 1 }));
+    const { page, button, texts } = await open({ getField, checkIn }, mandatory);
+    await vi.waitFor(() => expect(action(page, 'Check in: Jamie Brook')).toBeTruthy());
+
+    action(page, 'Check in: Jamie Brook').click();
+
+    await vi.waitFor(() => expect(texts('herald-notice strong')).toContain('This entry changed elsewhere'));
+    expect(action(page, 'Check in: Jamie Brook').disabled).toBe(true);
+    expect(action(page, 'Cancel entry: Jamie Brook').disabled).toBe(true);
+    button('Reload latest')!.click();
+    await vi.waitFor(() => expect(action(page, 'Undo check-in: Jamie Brook')?.disabled).toBe(false));
+    expect(texts('herald-notice strong')).not.toContain('This entry changed elsewhere');
+  });
+
+  it('reports a rule the API applied and brings the field up to date', async () => {
+    const getField = answers(() => of(desk(pending('Jamie Brook'))), () => of(desk()));
+    const checkIn = () => throwError(() => problem(400, { errors: { entry: ['cancelled'] } }));
+    const { page, text } = await open({ getField, checkIn }, mandatory);
+    await vi.waitFor(() => expect(action(page, 'Check in: Jamie Brook')).toBeTruthy());
+
+    action(page, 'Check in: Jamie Brook').click();
+
+    await vi.waitFor(() => expect(text('#summary-heading')).toBe('0 of 4 individual entries'));
+    expect(getField).toHaveBeenCalledTimes(2);
+  });
+
+  it('keeps a cancelled entry’s last confirmation read-only and out of the count', async () => {
+    const parker = confirmed('Parker Snow', '2026-11-12T09:35:00Z', { state: 'cancelled', cancelledAt: '2026-11-12T09:50:00Z' });
+    const { page, text, texts } = await open({ getField: () => of(desk(confirmed('Robin Vale'), pending('Sam Reed'), parker)) }, mandatory);
+    await vi.waitFor(() => expect(texts('.summary .help')[1]).toBe('Check-in mandatory · 1 of 2 checked in'));
+
+    expect(text('details.cancelled herald-status-label')).toBe('Checked in');
+    expect(text('details.cancelled li')).toContain('Checked in 12 November 2026, 10:35 · Europe/Madrid · Read-only');
+    expect(page().querySelector('details.cancelled button')).toBeNull();
+  });
+
+  it('keeps a team’s check-in apart from its roster readiness', { meta: { type: 'covers', description: 'entrant-check-in: A team row keeps check-in and roster apart' } }, async () => {
+    const teams = field(
+      [
+        confirmed('River Falcons', undefined, { rosterSize: 2, rosterRevision: 2, rosterReadiness: 'incomplete' }),
+        pending('Team A', { rosterSize: 4, rosterRevision: 4, rosterReadiness: 'complete' }),
+      ],
+      { entryKind: 'team', capacity: 4, minimumRosterSize: 3, maximumRosterSize: 5 },
+      { checkedIn: 1 },
+    );
+    const { page } = await open(
+      { getField: () => of(teams) },
+      tournament({ configuration: { ...tournament().configuration, entryKind: 'team', capacity: 4, checkIn: 'mandatory' } }),
+    );
+    await vi.waitFor(() => expect(row(page, 'River Falcons')).toBeTruthy());
+
+    const falcons = row(page, 'River Falcons');
+    expect(falcons.querySelector('herald-status-label')?.textContent).toBe('Checked in');
+    expect(falcons.querySelector('.readiness')?.textContent).toBe('2 of 3–5 players · incomplete');
+    expect(row(page, 'Team A').querySelector('herald-status-label')?.textContent).toBe('Check-in pending');
+    // Roster first, then check-in, then cancelling.
+    expect([...falcons.querySelectorAll('button')].map((b) => b.textContent?.trim())).toEqual(['Roster', 'Undo check-in', 'Cancel entry']);
+    expect(await violations(page())).toEqual([]);
   });
 });

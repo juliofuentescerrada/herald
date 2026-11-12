@@ -49,6 +49,7 @@
         <div>
           <h2 id="summary-heading" tabindex="-1" #summaryHeading>{{ summary() }}</h2>
           <p class="help">{{ policy() }}</p>
+          <p class="help">{{ checkInSummary() }}</p>
           <p class="help">{{ termsUpdated() }}</p>
         </div>
         <div class="summary-action">
@@ -95,22 +96,38 @@
         @if (admitted().length) {
           <ul class="rows" aria-labelledby="admitted-heading">
             @for (entry of admitted(); track entry.id) {
-              <li>
+              @let confirmed = entry.checkIn === 'confirmed';
+              @let working = checkingIn().has(entry.id);
+              <li [attr.aria-busy]="working || null">
                 <div>
                   <div class="name-line">
                     <h3>{{ entry.guestName }}</h3>
+                    <herald-status-label [tone]="confirmed ? 'success' : 'neutral'">{{ confirmed ? 'Checked in' : 'Check-in pending' }}</herald-status-label>
                     @if (teams()) {
                       <span class="readiness" [class.readiness-warning]="entry.rosterReadiness !== 'complete'">{{ readiness(entry) }}</span>
                     }
                   </div>
                   <p class="help">Admitted</p>
+                  @if (confirmed) {
+                    <p class="help">Checked in {{ zoned(entry.checkInChangedAt) }}</p>
+                  }
+                  @if (rowFailure()?.entryId === entry.id) {
+                    <p class="row-error" role="alert"><herald-icon name="alert-circle" size="metadata" />{{ rowFailure()!.text }}</p>
+                  }
+                  @if (working) {
+                    <p class="help" role="status">{{ confirmed ? 'Undoing check-in' : 'Checking in' }}. Please wait; do not submit again.</p>
+                  }
                 </div>
                 <div class="row-actions">
                   @if (teams()) {
-                    <button herald-button type="button" [disabled]="state() !== 'ready'" (click)="openRoster(entry, $any($event.currentTarget))"
+                    <button herald-button type="button" [disabled]="state() !== 'ready' || working" (click)="openRoster(entry, $any($event.currentTarget))"
                       [attr.aria-label]="'Roster: ' + entry.guestName">Roster</button>
                   }
-                  <button herald-button type="button" [disabled]="state() !== 'ready'" (click)="askCancel(entry, $any($event.currentTarget))"
+                  <button herald-button type="button" [loading]="working" [disabled]="state() !== 'ready'" (click)="toggleCheckIn(entry)"
+                    [attr.aria-label]="(working ? (confirmed ? 'Undoing check-in' : 'Checking in') : confirmed ? 'Undo check-in' : 'Check in') + ': ' + entry.guestName">
+                    {{ working ? (confirmed ? 'Undoing…' : 'Checking in…') : confirmed ? 'Undo check-in' : 'Check in' }}
+                  </button>
+                  <button herald-button type="button" [disabled]="state() !== 'ready' || working" (click)="askCancel(entry, $any($event.currentTarget))"
                     [attr.aria-label]="'Cancel entry: ' + entry.guestName">Cancel entry</button>
                 </div>
               </li>
@@ -164,7 +181,17 @@
           <ul aria-label="Cancelled entries">
             @for (entry of cancelled(); track entry.id) {
               <li>
-                <span><span class="name">{{ entry.guestName }}</span><span class="help">{{ ' · Cancelled ' + zoned(entry.cancelledAt) }}</span></span>
+                <div>
+                  <span class="name-line">
+                    <span><span class="name">{{ entry.guestName }}</span><span class="help">{{ ' · Cancelled ' + zoned(entry.cancelledAt) }}</span></span>
+                    @if (entry.checkIn === 'confirmed') {
+                      <herald-status-label tone="success">Checked in</herald-status-label>
+                    }
+                  </span>
+                  @if (entry.checkIn === 'confirmed') {
+                    <p class="help">Checked in {{ zoned(entry.checkInChangedAt) }} · Read-only</p>
+                  }
+                </div>
                 @if (teams()) {
                   <button herald-button type="button" (click)="openRoster(entry, $any($event.currentTarget))" [attr.aria-label]="'Roster: ' + entry.guestName">Roster</button>
                 }

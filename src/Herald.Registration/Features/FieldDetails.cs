@@ -8,7 +8,7 @@ using Wolverine;
 namespace Herald.Registration.Features;
 
 // One entry as the owner sees it. The admission reason is private and not returned (EN-7).
-// The roster values are set for a team tournament only.
+// The roster values are set for a team tournament only; the check-in values for an entry that was admitted.
 public sealed record EntryDetails(
     Guid Id,
     int Revision,
@@ -24,7 +24,16 @@ public sealed record EntryDetails(
     DateTimeOffset? CancelledAt,
     int? RosterSize = null,
     int? RosterRevision = null,
-    RosterReadiness? RosterReadiness = null);
+    RosterReadiness? RosterReadiness = null,
+    CheckInState? CheckIn = null,
+    int? CheckInRevision = null,
+    DateTimeOffset? CheckInChangedAt = null);
+
+public enum CheckInState
+{
+    Pending,
+    Confirmed,
+}
 
 // What every entry write and the field read answer with: admitted, then waiting in order, then cancelled.
 public sealed record FieldDetails(
@@ -34,6 +43,7 @@ public sealed record FieldDetails(
     DateTimeOffset TermsReceivedAt,
     int Admitted,
     int Waiting,
+    int CheckedIn,
     int OverCapacityBy,
     bool KindMismatch,
     IReadOnlyList<EntryDetails> Entries)
@@ -61,7 +71,10 @@ public sealed record FieldDetails(
             entry.CancelledAt,
             field.Terms.EntryKind == EntryKind.Team ? entry.Members.Count : null,
             field.Terms.EntryKind == EntryKind.Team ? entry.RosterRevision : null,
-            field.ReadinessOf(entry));
+            field.ReadinessOf(entry),
+            entry.HasCheckIn ? entry.IsCheckedIn ? CheckInState.Confirmed : CheckInState.Pending : null,
+            entry.HasCheckIn ? entry.CheckInRevision : null,
+            entry.CheckInChanges is [.., var last] ? last.ChangedAt : null);
 
         var admitted = field.Entries.Where(entry => entry.State == EntryState.Admitted).OrderBy(entry => entry.AdmittedAt).ThenBy(entry => entry.Sequence);
         var cancelled = field.Entries.Where(entry => entry.State == EntryState.Cancelled).OrderByDescending(entry => entry.CancelledAt);
@@ -72,6 +85,7 @@ public sealed record FieldDetails(
             field.TermsReceivedAt,
             field.Admitted,
             field.Waiting,
+            field.CheckedIn,
             field.OverCapacityBy,
             field.HasKindMismatch,
             [.. admitted.Concat(queue).Concat(cancelled).Select(Of)]);
@@ -79,12 +93,13 @@ public sealed record FieldDetails(
 
     // The counts Tournaments keeps for its own rules and reads (design D-2).
     public static TournamentFieldChanged Changed(Guid organisationId, Field field) =>
-        new(organisationId, field.Id.Value, field.Revision, field.Admitted, field.Waiting);
+        new(organisationId, field.Id.Value, field.Revision, field.Admitted, field.Waiting, field.CheckedIn);
 }
 
 internal static class FieldResults
 {
     public const string EntryRevisionConflict = "entry-revision-conflict";
+    public const string CheckInRevisionConflict = "check-in-revision-conflict";
 
     // Lost races on the same field are tried again: the owner's write is not stale, another one was first.
     private const int Attempts = 3;
@@ -103,7 +118,8 @@ internal static class FieldResults
         Guid tournamentId,
         EntryId? existingEntry,
         Func<Field, WriteResult> write,
-        CancellationToken cancellationToken)
+        CancellationToken cancellationToken,
+        bool checkIn = false)
     {
         var id = new TournamentId(tournamentId);
         for (var attempt = 1; ; attempt++)
@@ -123,8 +139,8 @@ internal static class FieldResults
                     return Results.Problem(
                         statusCode: StatusCodes.Status409Conflict,
                         title: "Conflict",
-                        type: EntryRevisionConflict,
-                        extensions: new Dictionary<string, object?> { ["currentRevision"] = field.Find(existingEntry!.Value)!.Revision });
+                        type: checkIn ? CheckInRevisionConflict : EntryRevisionConflict,
+                        extensions: new Dictionary<string, object?> { ["currentRevision"] = CurrentRevision(field.Find(existingEntry!.Value)!, checkIn) });
                 case WriteOutcome.Applied:
                     try
                     {
@@ -144,4 +160,7 @@ internal static class FieldResults
             return Results.Ok(await FieldDetails.OfAsync(field, db, cancellationToken));
         }
     }
+
+    // Check-in writes state their own revision, apart from the entry's (h1-check-in D-2).
+    private static int CurrentRevision(Entry entry, bool checkIn) => checkIn ? entry.CheckInRevision : entry.Revision;
 }

@@ -1,0 +1,607 @@
+{
+  "description": "Deterministic check-in documentation captures; review material approves no product default.",
+  "captureMethod": "Playwright with installed Google Chrome, headless, direct file://, device scale 1, en-GB, Europe/Madrid, reduced motion, local assets and system sans-serif fallback.",
+  "captures": [
+    {
+      "state": "check-in-mandatory",
+      "label": "check in mandatory",
+      "file": "check-in-check-in-mandatory-desktop.png",
+      "source": "prototypes/frontend/check-in-states.html?state=check-in-mandatory",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/check-in-states.html?state=check-in-mandatory&capture=1",
+      "viewport": [
+        1440,
+        1000
+      ],
+      "fullPage": true,
+      "sha256": "1b9f35a89749d40de048a5075516addf2dfe16b1fc16039d6f2aa49935d60135",
+      "checks": {
+        "state": "check-in-mandatory",
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "targetsUnder44px": [],
+        "heading": "Entries · Saturday Open",
+        "modalFocusInside": null,
+        "focusOutline": null,
+        "primaryCovered": false,
+        "contentWidth": 1120,
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "check-in-mandatory",
+      "label": "check in mandatory",
+      "file": "check-in-check-in-mandatory-mobile.png",
+      "source": "prototypes/frontend/check-in-states.html?state=check-in-mandatory",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/check-in-states.html?state=check-in-mandatory&capture=1",
+      "viewport": [
+        390,
+        1100
+      ],
+      "fullPage": true,
+      "sha256": "b1237394f097417136c730ca8fa3c9d8527ff42d576dcae9343d516a476e173d",
+      "checks": {
+        "state": "check-in-mandatory",
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "targetsUnder44px": [],
+        "heading": "Entries · Saturday Open",
+        "modalFocusInside": null,
+        "focusOutline": null,
+        "primaryCovered": false,
+        "contentWidth": 358,
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "check-in-optional",
+      "label": "check in optional",
+      "file": "check-in-check-in-optional-desktop.png",
+      "source": "prototypes/frontend/check-in-states.html?state=check-in-optional",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/check-in-states.html?state=check-in-optional&capture=1",
+      "viewport": [
+        1440,
+        1000
+      ],
+      "fullPage": true,
+      "sha256": "a2ad44b6f5f5949813c1eff8dd62c7ae66c320523eb154c3f58f4ec46c324837",
+      "checks": {
+        "state": "check-in-optional",
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "targetsUnder44px": [],
+        "heading": "Entries · Saturday Open",
+        "modalFocusInside": null,
+        "focusOutline": null,
+        "primaryCovered": false,
+        "contentWidth": 1120,
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "check-in-optional",
+      "label": "check in optional",
+      "file": "check-in-check-in-optional-mobile.png",
+      "source": "prototypes/frontend/check-in-states.html?state=check-in-optional",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/check-in-states.html?state=check-in-optional&capture=1",
+      "viewport": [
+        390,
+        1100
+      ],
+      "fullPage": true,
+      "sha256": "4d2196a3ce2716fae77658d2f2f0fb15f17012988643f7eb747f219e6db37b66",
+      "checks": {
+        "state": "check-in-optional",
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "targetsUnder44px": [],
+        "heading": "Entries · Saturday Open",
+        "modalFocusInside": null,
+        "focusOutline": null,
+        "primaryCovered": false,
+        "contentWidth": 358,
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "no-admitted",
+      "label": "no admitted",
+      "file": "check-in-no-admitted-desktop.png",
+      "source": "prototypes/frontend/check-in-states.html?state=no-admitted",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/check-in-states.html?state=no-admitted&capture=1",
+      "viewport": [
+        1440,
+        1000
+      ],
+      "fullPage": true,
+      "sha256": "fedaf4a372be15e51ef93ec92eee0654ea35e292deaa3a768306f7a033ca19b1",
+      "checks": {
+        "state": "no-admitted",
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "targetsUnder44px": [],
+        "heading": "Entries · Saturday Open",
+        "modalFocusInside": null,
+        "focusOutline": null,
+        "primaryCovered": false,
+        "contentWidth": 1120,
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "no-admitted",
+      "label": "no admitted",
+      "file": "check-in-no-admitted-mobile.png",
+      "source": "prototypes/frontend/check-in-states.html?state=no-admitted",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/check-in-states.html?state=no-admitted&capture=1",
+      "viewport": [
+        390,
+        1100
+      ],
+      "fullPage": true,
+      "sha256": "ff57ca545fda726a6b05b24ac8e05f50274bed2307fd2ee194c95ea7d8ddac7f",
+      "checks": {
+        "state": "no-admitted",
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "targetsUnder44px": [],
+        "heading": "Entries · Saturday Open",
+        "modalFocusInside": null,
+        "focusOutline": null,
+        "primaryCovered": false,
+        "contentWidth": 358,
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "checking-in",
+      "label": "checking in",
+      "file": "check-in-checking-in-desktop.png",
+      "source": "prototypes/frontend/check-in-states.html?state=checking-in",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/check-in-states.html?state=checking-in&capture=1",
+      "viewport": [
+        1440,
+        1000
+      ],
+      "fullPage": true,
+      "sha256": "a6adb56c75d0e3c2c0d3ae75aebded26f1b9be470adc6c305afbcb7b77524591",
+      "checks": {
+        "state": "checking-in",
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "targetsUnder44px": [],
+        "heading": "Entries · Saturday Open",
+        "modalFocusInside": null,
+        "focusOutline": null,
+        "primaryCovered": false,
+        "contentWidth": 1120,
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "checking-in",
+      "label": "checking in",
+      "file": "check-in-checking-in-mobile.png",
+      "source": "prototypes/frontend/check-in-states.html?state=checking-in",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/check-in-states.html?state=checking-in&capture=1",
+      "viewport": [
+        390,
+        1100
+      ],
+      "fullPage": true,
+      "sha256": "4db3bcfe9b61e56f988faac66b71a87226cfd9dac80026e2ce157d2dec4adb22",
+      "checks": {
+        "state": "checking-in",
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "targetsUnder44px": [],
+        "heading": "Entries · Saturday Open",
+        "modalFocusInside": null,
+        "focusOutline": null,
+        "primaryCovered": false,
+        "contentWidth": 358,
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "checked-in-toast",
+      "label": "checked in toast",
+      "file": "check-in-checked-in-toast-desktop.png",
+      "source": "prototypes/frontend/check-in-states.html?state=checked-in-toast",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/check-in-states.html?state=checked-in-toast&capture=1",
+      "viewport": [
+        1440,
+        1000
+      ],
+      "fullPage": true,
+      "sha256": "7881ef8beaf8a5ae4b42b0e2af799b49eea7afffd38dc91df6c333314136de51",
+      "checks": {
+        "state": "checked-in-toast",
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "targetsUnder44px": [],
+        "heading": "Entries · Saturday Open",
+        "modalFocusInside": null,
+        "focusOutline": null,
+        "primaryCovered": false,
+        "contentWidth": 1120,
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "checked-in-toast",
+      "label": "checked in toast",
+      "file": "check-in-checked-in-toast-mobile.png",
+      "source": "prototypes/frontend/check-in-states.html?state=checked-in-toast",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/check-in-states.html?state=checked-in-toast&capture=1",
+      "viewport": [
+        390,
+        1100
+      ],
+      "fullPage": true,
+      "sha256": "6f2cc4d2e5b48b58bdf32d55c768b4eb9d76688361fb2fb3c8db43fe6a8c9a5b",
+      "checks": {
+        "state": "checked-in-toast",
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "targetsUnder44px": [],
+        "heading": "Entries · Saturday Open",
+        "modalFocusInside": null,
+        "focusOutline": null,
+        "primaryCovered": false,
+        "contentWidth": 358,
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "undo",
+      "label": "undo",
+      "file": "check-in-undo-desktop.png",
+      "source": "prototypes/frontend/check-in-states.html?state=undo",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/check-in-states.html?state=undo&capture=1",
+      "viewport": [
+        1440,
+        1000
+      ],
+      "fullPage": true,
+      "sha256": "dc96f27de16d1ef7707b32be039e642b83eea67f68d1cf331f8769ffc579d03f",
+      "checks": {
+        "state": "undo",
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "targetsUnder44px": [],
+        "heading": "Entries · Saturday Open",
+        "modalFocusInside": null,
+        "focusOutline": null,
+        "primaryCovered": false,
+        "contentWidth": 1120,
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "undo",
+      "label": "undo",
+      "file": "check-in-undo-mobile.png",
+      "source": "prototypes/frontend/check-in-states.html?state=undo",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/check-in-states.html?state=undo&capture=1",
+      "viewport": [
+        390,
+        1100
+      ],
+      "fullPage": true,
+      "sha256": "d50a55dc33ef6d304a89d28c3af1823d0ef8dfdeabf56bd280af14afd7367201",
+      "checks": {
+        "state": "undo",
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "targetsUnder44px": [],
+        "heading": "Entries · Saturday Open",
+        "modalFocusInside": null,
+        "focusOutline": null,
+        "primaryCovered": false,
+        "contentWidth": 358,
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "check-in-failed",
+      "label": "check in failed",
+      "file": "check-in-check-in-failed-desktop.png",
+      "source": "prototypes/frontend/check-in-states.html?state=check-in-failed",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/check-in-states.html?state=check-in-failed&capture=1",
+      "viewport": [
+        1440,
+        1000
+      ],
+      "fullPage": true,
+      "sha256": "68340927fe6523b7968a5430a79fa667b114079b173c975e646a02d000c15809",
+      "checks": {
+        "state": "check-in-failed",
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "targetsUnder44px": [],
+        "heading": "Entries · Saturday Open",
+        "modalFocusInside": null,
+        "focusOutline": null,
+        "primaryCovered": false,
+        "contentWidth": 1120,
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "check-in-failed",
+      "label": "check in failed",
+      "file": "check-in-check-in-failed-mobile.png",
+      "source": "prototypes/frontend/check-in-states.html?state=check-in-failed",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/check-in-states.html?state=check-in-failed&capture=1",
+      "viewport": [
+        390,
+        1100
+      ],
+      "fullPage": true,
+      "sha256": "f41ca52c8f1e9ff91ba3bf96946493eef2ae5933ae508ceb669ef2551f1e8fd0",
+      "checks": {
+        "state": "check-in-failed",
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "targetsUnder44px": [],
+        "heading": "Entries · Saturday Open",
+        "modalFocusInside": null,
+        "focusOutline": null,
+        "primaryCovered": false,
+        "contentWidth": 358,
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "check-in-conflict",
+      "label": "check in conflict",
+      "file": "check-in-check-in-conflict-desktop.png",
+      "source": "prototypes/frontend/check-in-states.html?state=check-in-conflict",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/check-in-states.html?state=check-in-conflict&capture=1",
+      "viewport": [
+        1440,
+        1000
+      ],
+      "fullPage": true,
+      "sha256": "240ebc9958f3c928cfa108019b14b2a0eea82bbb744d56ee8a1052a778cf5f34",
+      "checks": {
+        "state": "check-in-conflict",
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "targetsUnder44px": [],
+        "heading": "Entries · Saturday Open",
+        "modalFocusInside": null,
+        "focusOutline": null,
+        "primaryCovered": false,
+        "contentWidth": 1120,
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "check-in-conflict",
+      "label": "check in conflict",
+      "file": "check-in-check-in-conflict-mobile.png",
+      "source": "prototypes/frontend/check-in-states.html?state=check-in-conflict",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/check-in-states.html?state=check-in-conflict&capture=1",
+      "viewport": [
+        390,
+        1100
+      ],
+      "fullPage": true,
+      "sha256": "0385976bc269b24c5d2b83f4bb7c5674c61a78c3d1b747bfb58a98bcb72d08ad",
+      "checks": {
+        "state": "check-in-conflict",
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "targetsUnder44px": [],
+        "heading": "Entries · Saturday Open",
+        "modalFocusInside": null,
+        "focusOutline": null,
+        "primaryCovered": false,
+        "contentWidth": 358,
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "cancelled-checked-in",
+      "label": "cancelled checked in",
+      "file": "check-in-cancelled-checked-in-desktop.png",
+      "source": "prototypes/frontend/check-in-states.html?state=cancelled-checked-in",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/check-in-states.html?state=cancelled-checked-in&capture=1",
+      "viewport": [
+        1440,
+        1000
+      ],
+      "fullPage": true,
+      "sha256": "9906a02641bc3887417b8bd3d2e27e9547067e7d23c3cfc486fd3495aa6b46c3",
+      "checks": {
+        "state": "cancelled-checked-in",
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "targetsUnder44px": [],
+        "heading": "Entries · Saturday Open",
+        "modalFocusInside": null,
+        "focusOutline": null,
+        "primaryCovered": false,
+        "contentWidth": 1120,
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "cancelled-checked-in",
+      "label": "cancelled checked in",
+      "file": "check-in-cancelled-checked-in-mobile.png",
+      "source": "prototypes/frontend/check-in-states.html?state=cancelled-checked-in",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/check-in-states.html?state=cancelled-checked-in&capture=1",
+      "viewport": [
+        390,
+        1100
+      ],
+      "fullPage": true,
+      "sha256": "ec784228064dd1e6957a271a7d76c340b9637be76af5ce43d8103cff78cb3533",
+      "checks": {
+        "state": "cancelled-checked-in",
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "targetsUnder44px": [],
+        "heading": "Entries · Saturday Open",
+        "modalFocusInside": null,
+        "focusOutline": null,
+        "primaryCovered": false,
+        "contentWidth": 358,
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "team-check-in",
+      "label": "team check in",
+      "file": "check-in-team-check-in-desktop.png",
+      "source": "prototypes/frontend/check-in-states.html?state=team-check-in",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/check-in-states.html?state=team-check-in&capture=1",
+      "viewport": [
+        1440,
+        1000
+      ],
+      "fullPage": true,
+      "sha256": "f9dc9ee25db3d8390a85cc08bc48be796e4022dfee9de58aedf0d10aa3c0e09d",
+      "checks": {
+        "state": "team-check-in",
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "targetsUnder44px": [],
+        "heading": "Entries · Saturday Team League",
+        "modalFocusInside": null,
+        "focusOutline": null,
+        "primaryCovered": false,
+        "contentWidth": 1120,
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "team-check-in",
+      "label": "team check in",
+      "file": "check-in-team-check-in-mobile.png",
+      "source": "prototypes/frontend/check-in-states.html?state=team-check-in",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/check-in-states.html?state=team-check-in&capture=1",
+      "viewport": [
+        390,
+        1100
+      ],
+      "fullPage": true,
+      "sha256": "34c71551b06793d65554753a1c29c9840819eb95a78ba7652d59a1ff0f01c5a9",
+      "checks": {
+        "state": "team-check-in",
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "targetsUnder44px": [],
+        "heading": "Entries · Saturday Team League",
+        "modalFocusInside": null,
+        "focusOutline": null,
+        "primaryCovered": false,
+        "contentWidth": 358,
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "check-in-locked",
+      "label": "check in locked",
+      "file": "check-in-check-in-locked-desktop.png",
+      "source": "prototypes/frontend/check-in-states.html?state=check-in-locked",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/check-in-states.html?state=check-in-locked&capture=1",
+      "viewport": [
+        1440,
+        1000
+      ],
+      "fullPage": true,
+      "sha256": "c82f7d48879c35d22f118c6fe72e8f963ff985946a1a987c3f6aa0001342ccc8",
+      "checks": {
+        "state": "check-in-locked",
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "targetsUnder44px": [],
+        "heading": "Saturday Open",
+        "modalFocusInside": null,
+        "focusOutline": null,
+        "primaryCovered": false,
+        "contentWidth": 1120,
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    },
+    {
+      "state": "check-in-locked",
+      "label": "check in locked",
+      "file": "check-in-check-in-locked-mobile.png",
+      "source": "prototypes/frontend/check-in-states.html?state=check-in-locked",
+      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/check-in-states.html?state=check-in-locked&capture=1",
+      "viewport": [
+        390,
+        1100
+      ],
+      "fullPage": true,
+      "sha256": "7bcd5c739ea0080e734efaee4f936d6bf56812b19f3c2ef8e1b581ea52074a07",
+      "checks": {
+        "state": "check-in-locked",
+        "horizontalOverflow": false,
+        "unlabelledControls": [],
+        "duplicateIds": [],
+        "targetsUnder44px": [],
+        "heading": "Saturday Open",
+        "modalFocusInside": null,
+        "focusOutline": null,
+        "primaryCovered": false,
+        "contentWidth": 358,
+        "pageErrors": [],
+        "networkRequests": []
+      }
+    }
+  ],
+  "interactionChecks": [
+    "Check-in and undo apply immediately, update count, retain row focus and announce their outcome without a dialog",
+    "Busy row is isolated; failed check-in retries from unchanged state; conflict shows current field and reloads",
+    "Cancelled check-in is read-only; empty field retains policy without count; only entry kind, admission and check-in policy are locked",
+    "Roster opens and returns focus; full-width layouts checked at 699, 700 and 1920 px; keyboard focus is visible"
+  ],
+  "limitations": "Static review fixtures: no backend, persistence, real concurrency or production accessibility certification. Busy states deliberately remain in progress. Capture toasts remain visible until dismissed for deterministic review."
+}

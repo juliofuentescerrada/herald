@@ -55,6 +55,10 @@ public sealed class Admin(Seeding seeding, Persona persona)
         await WriteAsync($"cancel entry {entry}", async () =>
             await _client.PostAsJsonAsync($"{Path(organisation, tournament)}/entries/{entry}/cancellation", new { expectedRevision = await EntryRevisionAsync(organisation, tournament, entry) }));
 
+    public async Task CheckInAsync(Guid organisation, Guid tournament, Guid entry) =>
+        await WriteAsync($"check in entry {entry}", async () =>
+            await _client.PutAsJsonAsync($"{Path(organisation, tournament)}/entries/{entry}/check-in", new { expectedRevision = await EntryRevisionAsync(organisation, tournament, entry, "checkInRevision") }));
+
     public async Task AddRosterMemberAsync(Guid organisation, Guid tournament, Guid entry, Guid player)
     {
         var roster = $"{Path(organisation, tournament)}/entries/{entry}/roster";
@@ -70,10 +74,10 @@ public sealed class Admin(Seeding seeding, Persona persona)
     private async Task<int> RevisionAsync(Guid organisation, Guid tournament) =>
         (await ReadAsync(await _client.GetAsync(Path(organisation, tournament)), "read a tournament")).GetProperty("revision").GetInt32();
 
-    private async Task<int> EntryRevisionAsync(Guid organisation, Guid tournament, Guid entry) =>
+    private async Task<int> EntryRevisionAsync(Guid organisation, Guid tournament, Guid entry, string revision = "revision") =>
         (await ReadAsync(await _client.GetAsync($"{Path(organisation, tournament)}/entries"), "read a field"))
             .GetProperty("entries").EnumerateArray().Single(candidate => candidate.GetProperty("id").GetGuid() == entry)
-            .GetProperty("revision").GetInt32();
+            .GetProperty(revision).GetInt32();
 
     private async Task WriteAsync(string step, Func<Task<HttpResponseMessage>> request)
     {

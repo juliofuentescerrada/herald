@@ -32,7 +32,8 @@ public enum WriteOutcome
 }
 
 // The tournament's entries as Registration last reported them (design D-3); none before the first report.
-public readonly record struct EntryCounts(int Admitted, int Waiting)
+// CheckedIn: confirmed check-ins among the admitted entries; 0 in a report sent before check-in existed.
+public readonly record struct EntryCounts(int Admitted, int Waiting, int CheckedIn = 0)
 {
     public static readonly EntryCounts None = new(0, 0);
 
@@ -222,6 +223,7 @@ public sealed class Tournament : AggregateRoot<TournamentId>
     }
 
     // Entries keep their slots and their kind: capacity cannot fall below the admitted, and kind and admission wait until none is active (EN-10).
+    // The check-in policy waits until no admitted entry has checked in (h1-check-in R-7).
     private List<BrokenRule> LockedByEntries(TournamentConfiguration configuration, EntryCounts entries)
     {
         var broken = new List<BrokenRule>();
@@ -238,6 +240,11 @@ public sealed class Tournament : AggregateRoot<TournamentId>
         if (entries.Active > 0 && configuration.Admission != Configuration.Admission)
         {
             broken.Add(new("admission", "locked-by-entries"));
+        }
+
+        if (entries.CheckedIn > 0 && configuration.CheckIn != Configuration.CheckIn)
+        {
+            broken.Add(new("checkIn", "locked-by-check-ins"));
         }
 
         return broken;

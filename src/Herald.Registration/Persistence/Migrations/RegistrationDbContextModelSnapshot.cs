@@ -53,6 +53,9 @@ namespace Herald.Registration.Persistence.Migrations
                     b.Property<Guid?>("CancelledBy")
                         .HasColumnType("uuid");
 
+                    b.Property<int>("CheckInRevision")
+                        .HasColumnType("integer");
+
                     b.Property<DateTimeOffset>("EnteredAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -66,6 +69,9 @@ namespace Herald.Registration.Persistence.Migrations
                         .IsRequired()
                         .HasMaxLength(20)
                         .HasColumnType("character varying(20)");
+
+                    b.Property<bool>("IsCheckedIn")
+                        .HasColumnType("boolean");
 
                     b.Property<int>("Revision")
                         .HasColumnType("integer");
@@ -290,6 +296,36 @@ namespace Herald.Registration.Persistence.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.OwnsMany("Herald.Registration.Domain.CheckInChange", "CheckInChanges", b1 =>
+                        {
+                            b1.Property<Guid>("TournamentId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<Guid>("EntryId")
+                                .HasColumnType("uuid");
+
+                            b1.Property<int>("CheckInRevision")
+                                .HasColumnType("integer");
+
+                            b1.Property<DateTimeOffset>("ChangedAt")
+                                .HasColumnType("timestamp with time zone");
+
+                            b1.Property<Guid>("ChangedBy")
+                                .HasColumnType("uuid");
+
+                            b1.Property<string>("Kind")
+                                .IsRequired()
+                                .HasMaxLength(20)
+                                .HasColumnType("character varying(20)");
+
+                            b1.HasKey("TournamentId", "EntryId", "CheckInRevision");
+
+                            b1.ToTable("CheckInChanges", "registration");
+
+                            b1.WithOwner()
+                                .HasForeignKey("TournamentId", "EntryId");
+                        });
+
                     b.OwnsMany("Herald.Registration.Domain.RosterChange", "RosterChanges", b1 =>
                         {
                             b1.Property<Guid>("TournamentId")
@@ -347,6 +383,8 @@ namespace Herald.Registration.Persistence.Migrations
                             b1.WithOwner()
                                 .HasForeignKey("TournamentId", "EntryId");
                         });
+
+                    b.Navigation("CheckInChanges");
 
                     b.Navigation("Members");
 

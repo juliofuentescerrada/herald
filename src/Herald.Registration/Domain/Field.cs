@@ -56,6 +56,10 @@ public sealed record RosterMemberAdded(TournamentId TournamentId, EntryId EntryI
 
 public sealed record RosterMemberRemoved(TournamentId TournamentId, EntryId EntryId, GuestId GuestId, int RosterRevision, Guid RemovedBy, DateTimeOffset RemovedAt) : IDomainEvent;
 
+public sealed record EntryCheckedIn(TournamentId TournamentId, EntryId EntryId, int CheckInRevision, Guid CheckedInBy, DateTimeOffset CheckedInAt) : IDomainEvent;
+
+public sealed record EntryCheckInUndone(TournamentId TournamentId, EntryId EntryId, int CheckInRevision, Guid UndoneBy, DateTimeOffset UndoneAt) : IDomainEvent;
+
 // The entries of one tournament. Every admission rule is decided here, under one concurrency token,
 // so two writes cannot both take the last slot (EN-9) and a freed slot is filled in the same change.
 public sealed class Field : AggregateRoot<TournamentId>
@@ -94,6 +98,8 @@ public sealed class Field : AggregateRoot<TournamentId>
     public int Admitted => _entries.Count(entry => entry.State == EntryState.Admitted);
 
     public int Waiting => _entries.Count(entry => entry.State == EntryState.Waiting);
+
+    public int CheckedIn => _entries.Count(entry => entry.State == EntryState.Admitted && entry.IsCheckedIn);
 
     // Crossed changes are reported, never repaired (EN-12).
     public int OverCapacityBy => Math.Max(0, Admitted - Terms.Capacity);
@@ -340,6 +346,40 @@ public sealed class Field : AggregateRoot<TournamentId>
 
         entry.RemoveMember(player, actor, at);
         Raise(new RosterMemberRemoved(Id, id, player, entry.RosterRevision, actor, at));
+        Revision++;
+        return WriteOutcome.Applied;
+    }
+
+    // The owner confirms, or undoes, an admitted entry's check-in until start, whatever the registration (R-1, R-3).
+    public WriteResult SetCheckIn(EntryId id, bool checkedIn, int expectedCheckInRevision, Guid actor, DateTimeOffset at)
+    {
+        var entry = Find(id) ?? throw new KeyNotFoundException($"No entry {id.Value} in field {Id.Value}.");
+
+        // The state first: a cancelled entry keeps its check-in read only, even one matching the request.
+        if (entry.State == EntryState.Cancelled)
+        {
+            return WriteResult.Reject("entry", "cancelled");
+        }
+
+        if (entry.State != EntryState.Admitted)
+        {
+            return WriteResult.Reject("entry", "not-admitted");
+        }
+
+        if (entry.IsCheckedIn == checkedIn)
+        {
+            return WriteOutcome.Repeated;
+        }
+
+        if (expectedCheckInRevision != entry.CheckInRevision)
+        {
+            return WriteOutcome.Stale;
+        }
+
+        entry.SetCheckIn(checkedIn, actor, at);
+        Raise(checkedIn
+            ? new EntryCheckedIn(Id, id, entry.CheckInRevision, actor, at)
+            : new EntryCheckInUndone(Id, id, entry.CheckInRevision, actor, at));
         Revision++;
         return WriteOutcome.Applied;
     }

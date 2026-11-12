@@ -15,6 +15,7 @@ public partial class NotifiableFactsTests
         ["RosterMember"] = "Its addition is the roster change the inventory names as RosterChange.",
         ["Organisation"] = "Creating an organisation is not a notifiable fact in F-10.",
         ["Guest"] = "Creating a guest is not a notifiable fact in F-10.",
+        ["CheckInChange"] = "Check-in is not a notifiable fact in F-10 (h1-check-in R-8).",
         ["Tournament"] = "Publication and registration opening or closing join the inventory when their owning change confirms what is recorded (ADR 0017).",
     };
 

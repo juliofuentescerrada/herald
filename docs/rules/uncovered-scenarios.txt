@@ -240,16 +240,12 @@ tournament-setup: An owner switches a draft to team
 tournament-setup: An unknown time zone is sent
 tournament-setup: Another organisation's owner reads a tournament by its identifier
 tournament-setup: Another organisation's owner writes a tournament by its identifier
-tournament-setup: Capacity below the admitted entries
 tournament-setup: Capacity is below two
-tournament-setup: Entry kind after every entry was cancelled
-tournament-setup: Entry kind with active entries
 tournament-setup: Publication fails
 tournament-setup: Registration closes after the planned start
 tournament-setup: Registration closes at the planned start
 tournament-setup: Registration dates are absent
 tournament-setup: The draft changed after the review was opened
-tournament-setup: The form explains the locked fields
 tournament-setup: The list fails to load
 tournament-setup: The organisation has no tournaments
 tournament-setup: The response to a creation is lost
