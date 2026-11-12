@@ -3,6 +3,7 @@
 # and the end of that step's log. Full logs stay in the printed directory.
 # Usage: scripts/check [dotnet|web|all]   (default: all)
 set -uo pipefail
+export NO_COLOR=1 FORCE_COLOR=0
 cd "$(dirname "$0")/.."
 target="${1:-all}"
 logs="$(mktemp -d "${TMPDIR:-/tmp}/herald-check.XXXXXX")"
@@ -17,7 +18,8 @@ step() {
   else
     failed=1
     printf 'FAIL  %-28s %4ss  %s\n' "$name" $((SECONDS - start)) "$log"
-    grep -E -i '(^|[^a-z])(error|failed|fail|✘|×|assert)' "$log" | grep -v -i 'warn' | sort -u | head -n 30 | cut -c1-300
+    sed -i 's/\x1b\[[0-9;]*m//g' "$log"
+    grep -E -i -B1 '(^|[^a-z])(error|failed|fail|✘|×|assert)' "$log" | grep -v -i -E 'warn|^--$' | awk '!seen[$0]++' | head -n 30 | cut -c1-300
     echo '  ...'
     tail -n 15 "$log" | cut -c1-300
   fi
