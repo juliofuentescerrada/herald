@@ -6,8 +6,9 @@
 //   node scripts/harness-metrics.mjs --list                   sessions with metrics, most recent first
 //   node scripts/harness-metrics.mjs --branch [--markdown]    the slice's branch: its commits' trailers and the
 //                                                             turns not yet committed (harness-resumption D-3)
-//   node scripts/harness-metrics.mjs --trailer                the latest session's counters since its last trailer,
-//                                                             marked as recorded (used by .githooks/prepare-commit-msg)
+//   node scripts/harness-metrics.mjs --trailer                the latest session's counters since its last trailer
+//                                                             (.githooks/prepare-commit-msg)
+//   node scripts/harness-metrics.mjs --recorded '<value>'     marks a committed trailer as recorded (.githooks/post-commit)
 //   node scripts/harness-metrics.mjs … --markdown             as a table for the pull request description
 // The turn still in progress counts too, so the summary written while opening the pull request includes it.
 
@@ -75,17 +76,25 @@ export function unrecorded(session, dir = directory(), now = Date.now()) {
   return Object.fromEntries(counters.map((key) => [key, Math.max(0, all[key] - (recorded[key] ?? 0))]));
 }
 
-// The trailer value for the latest session, and the mark that its counters are recorded; null when nothing is new.
-export function recordTrailer(dir = directory(), now = Date.now()) {
+// The trailer value for the latest session's counters not yet recorded; null when nothing is new. It writes nothing:
+// prepare-commit-msg asks for it before the commit exists, and post-commit records what the commit carries.
+export function pendingTrailer(dir = directory(), now = Date.now()) {
   const [session] = sessions(dir);
   if (!session) return null;
   const delta = unrecorded(session, dir, now);
   if (delta.tools === 0 && delta.turns === 0) return null;
-  const file = join(dir, `${session}.json`);
-  const state = JSON.parse(readFileSync(file, 'utf8'));
-  const all = count(turnsOf(session, dir, now));
-  writeFileSync(file, JSON.stringify({ ...state, recorded: all }));
   return `${counters.map((key) => `${key}=${delta[key]}`).join(' ')} sessions=${session}`;
+}
+
+// Adds a committed trailer's counters to its session's recorded mark, so the next trailer starts after them.
+export function recordTrailer(value, dir = directory()) {
+  const { raw, sessions: [session] } = parseTrailer(value);
+  const file = session ? join(dir, `${session}.json`) : null;
+  if (!file || !existsSync(file)) return false;
+  const state = JSON.parse(readFileSync(file, 'utf8'));
+  const recorded = Object.fromEntries(counters.map((key) => [key, (state.recorded?.[key] ?? 0) + raw[key]]));
+  writeFileSync(file, JSON.stringify({ ...state, recorded }));
+  return true;
 }
 
 export function parseTrailer(value) {
@@ -149,8 +158,13 @@ if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.ur
     process.exit(0);
   }
   if (args.includes('--trailer')) {
-    const trailer = recordTrailer();
+    const trailer = pendingTrailer();
     if (trailer) console.log(trailer);
+    process.exit(0);
+  }
+  if (args.includes('--recorded')) {
+    const value = args[args.indexOf('--recorded') + 1];
+    if (value) recordTrailer(value);
     process.exit(0);
   }
   if (args.includes('--branch')) {

@@ -86,15 +86,21 @@ const approvedChange = () => {
     return readdirSync(changes, { withFileTypes: true }).some((entry) => {
       if (!entry.isDirectory() || entry.name === 'archive') return false;
       const proposal = join(changes, entry.name, 'proposal.md');
-      return existsSync(proposal) && readFileSync(proposal, 'utf8').includes('Approved for implementation');
+      return existsSync(proposal) && /\*\*Approved for implementation on /.test(readFileSync(proposal, 'utf8'));
     });
   } catch {
     return false;
   }
 };
 
-const pullRequestTools = new Set(['mcp__github__create_pull_request', 'mcp__github__update_pull_request']);
-const pullRequestEvent = (prompt) => /<event source="github"/.test(String(prompt ?? ''));
+// The session has a pull request once it opens or updates one, or subscribes to one (harness-resumption D-2).
+const pullRequestTools = new Set([
+  'mcp__github__create_pull_request',
+  'mcp__github__update_pull_request',
+  'mcp__claude-code-remote__subscribe_pr_activity',
+]);
+const opensPullRequest = (command) => /(^|[;&|]\s*)gh\s+pr\s+(create|edit)\b/.test(command);
+const githubEvent = (prompt) => /<event source="github"/.test(String(prompt ?? ''));
 
 // The rules script is loaded only after an edit; a failure to run it never blocks the edit.
 const editedFileFindings = async (path) => {
@@ -126,8 +132,9 @@ let exitCode = 0;
 switch (input.hook_event_name) {
   case 'UserPromptSubmit':
     state.turn = { ...newTurn(), number: state.turn.number + 1, maintainer: fromMaintainer(input.prompt) };
-    // A GitHub event reaches a session only through a pull request it is subscribed to.
-    if (pullRequestEvent(input.prompt)) state.pullRequest = true;
+    // A GitHub event after the session's first turn comes from a pull request it subscribed to; the first turn's event
+    // is the trigger that started the session (a merge, a label), which says nothing about this session's pull request.
+    if (githubEvent(input.prompt) && state.turn.number > 1) state.pullRequest = true;
     if (fromMaintainer(input.prompt)) {
       state.tools = 0;
       state.pushes = 0;
@@ -171,7 +178,7 @@ switch (input.hook_event_name) {
         state.turn.pushes += 1;
       }
     }
-    if (pullRequestTools.has(input.tool_name)) state.pullRequest = true;
+    if (pullRequestTools.has(input.tool_name) || opensPullRequest(command)) state.pullRequest = true;
     // Repository rules on the file just edited (harness-engineering D-1): the agent sees a finding in the same turn.
     if (editTools.has(input.tool_name) && input.tool_input?.file_path) {
       const findings = await editedFileFindings(input.tool_input.file_path);

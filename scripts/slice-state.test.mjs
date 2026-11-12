@@ -40,6 +40,15 @@ test('The state names the approved change, its first unchecked task and the last
   assert.doesNotMatch(state, /old/, 'archived changes are not active');
 });
 
+test('A fresh clone on the base points to the remote branch that holds the checkpoints', () => {
+  const origin = repository('origin', { approved: true });
+  const clone = join(temp, 'clone');
+  execFileSync('git', ['clone', '-q', '--branch', 'main', origin, clone], { encoding: 'utf8' });
+  const state = sliceState(clone);
+  assert.match(state, /Last checkpoint: none on this branch since origin\/main/);
+  assert.match(state, /Checkpoints on origin\/slice \(last: [0-9a-f]+ feat\(some-slice\): 2\.1 first\)/);
+});
+
 test('A change without approval is shown as such', () => {
   assert.match(sliceState(repository('pending', { approved: false })), /Change some-slice: NOT approved yet/);
 });

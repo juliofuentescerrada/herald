@@ -100,13 +100,34 @@ test('Once the session opens a pull request, its pushes count towards the rounds
   hook('p2', 'PreToolUse', { tool_name: 'mcp__github__create_pull_request', tool_input: {} });
   hook('p2', 'PostToolUse', { tool_name: 'mcp__github__create_pull_request', tool_input: {} });
   for (let round = 0; round < 3; round++) {
-    hook('p2', 'PreToolUse', bash('git push'));
+    assert.doesNotMatch(hook('p2', 'PreToolUse', bash('git push')).stdout, /deny/, 'the push before the pull request did not count');
     hook('p2', 'PostToolUse', bash('git push'));
   }
   assert.match(hook('p2', 'PreToolUse', bash('git push')).stdout, /"permissionDecision":"deny"/);
 });
 
-test('A GitHub wake-up means the session has a pull request', () => {
+test('A session started by a merge event still pushes its checkpoints freely', () => {
+  hook('p4', 'UserPromptSubmit', { prompt: '<wake reason="external-event"><event source="github">pull request merged</event></wake>' });
+  for (let task = 0; task < 5; task++) {
+    assert.doesNotMatch(hook('p4', 'PreToolUse', bash('git push -u origin slice')).stdout, /deny/);
+    hook('p4', 'PostToolUse', bash('git push -u origin slice'));
+  }
+});
+
+test('Opening the pull request with gh also starts counting', () => {
+  hook('p5', 'UserPromptSubmit', { prompt: 'Implement the slice' });
+  hook('p5', 'PreToolUse', bash('gh pr create --fill'));
+  hook('p5', 'PostToolUse', bash('gh pr create --fill'));
+  for (let round = 0; round < 3; round++) {
+    hook('p5', 'PreToolUse', bash('git push'));
+    hook('p5', 'PostToolUse', bash('git push'));
+  }
+  assert.match(hook('p5', 'PreToolUse', bash('git push')).stdout, /"permissionDecision":"deny"/);
+});
+
+test('A GitHub wake-up after the first turn means the session has a pull request', () => {
+  hook('p3', 'UserPromptSubmit', { prompt: 'Implement the slice' });
+  hook('p3', 'Stop');
   hook('p3', 'UserPromptSubmit', { prompt: '<wake reason="external-event"><event source="github">review</event></wake>' });
   for (let round = 0; round < 3; round++) {
     hook('p3', 'PreToolUse', bash('git push'));
@@ -141,6 +162,11 @@ test('Production code cannot be edited without an approved active change', () =>
 });
 
 // covers: agent-harness: Editing production code with an approved change
+test('A proposal that only mentions the phrase is not an approval', () => {
+  const root = repositoryWith('mentions', '## Status\n\nPending.\n\nThe guard looks for "Approved for implementation" in a proposal.');
+  assert.match(hook('f3', 'PreToolUse', edit(join(root, 'src/A.cs')), { HERALD_GUARD_ROOT: root }).stdout, /deny/);
+});
+
 test('Production code can be edited once an active change is approved', () => {
   const root = repositoryWith('approved', '## Status\n\n**Approved for implementation on 12 November 2026** (gate 1.1).');
   assert.doesNotMatch(hook('f2', 'PreToolUse', edit(join(root, 'src/Herald.Host/Program.cs')), { HERALD_GUARD_ROOT: root }).stdout, /deny/);

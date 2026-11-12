@@ -1,11 +1,11 @@
 // Metrics that travel with the slice's commits (harness-resumption D-3): node --test scripts/harness-metrics.test.mjs
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { copyFileSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { appendFileSync, copyFileSync, mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { after, test } from 'node:test';
-import { branchTotals, parseTrailer, recordTrailer, unrecorded } from './harness-metrics.mjs';
+import { branchTotals, branchTrailers, parseTrailer, pendingTrailer, recordTrailer, unrecorded } from './harness-metrics.mjs';
 
 const temp = mkdtempSync(join(tmpdir(), 'herald-metrics-test-'));
 after(() => rmSync(temp, { recursive: true, force: true }));
@@ -20,14 +20,18 @@ const guardDir = (name, session, finished, current) => {
   return dir;
 };
 
-test('A trailer records the counters since the previous one', () => {
+test('A trailer holds the counters since the last recorded one, and only a recorded trailer advances the mark', () => {
   const now = 1_000_000;
   const dir = guardDir('t1', 's1', [{ turn: 1, maintainer: true, tools: 4, failures: 1, pushes: 1, durationMs: 60000 }], { number: 2, startedAt: now - 30000, tools: 2, failures: 0, pushes: 0, maintainer: false });
 
-  const first = parseTrailer(recordTrailer(dir, now));
+  const value = pendingTrailer(dir, now);
+  const first = parseTrailer(value);
   assert.deepEqual(first.raw, { turns: 2, maintainer: 1, tools: 6, failures: 1, pushes: 1, ms: 90000 });
   assert.deepEqual(first.sessions, ['s1']);
-  assert.equal(recordTrailer(dir, now), null, 'nothing new, no trailer');
+  assert.equal(pendingTrailer(dir, now), value, 'a commit that never happened leaves the counters pending');
+
+  assert.ok(recordTrailer(value, dir));
+  assert.equal(pendingTrailer(dir, now), null, 'nothing new, no trailer');
   assert.equal(unrecorded('s1', dir, now + 10000).ms, 10000, 'the turn in progress keeps running');
 });
 
@@ -42,20 +46,24 @@ test('The branch summary adds trailers from earlier containers to the current se
   assert.deepEqual(totals, { turns: 4, maintainerTurns: 1, tools: 50, failures: 2, pushes: 4, minutes: 12 });
 });
 
-test('An agent commit carries the trailer and a commit outside Claude Code does not', () => {
-  const repo = join(temp, 'repo');
+// A repository using the real hooks, with the metrics script, and a guard directory for its agent session.
+const hookedRepository = (name, tools) => {
+  const repo = join(temp, name);
   mkdirSync(join(repo, 'scripts'), { recursive: true });
   copyFileSync(here('./harness-metrics.mjs'), join(repo, 'scripts', 'harness-metrics.mjs'));
-  const tmp = join(temp, 'hook-temp');
-  guardDir('hook-temp', 'agent', [{ turn: 1, maintainer: true, tools: 3, failures: 0, pushes: 0, durationMs: 1000 }], { number: 1, startedAt: Date.now(), tools: 0, failures: 0, pushes: 0, maintainer: true });
-
+  const tmp = join(temp, `${name}-temp`);
+  const dir = guardDir(`${name}-temp`, 'agent', [{ turn: 1, maintainer: true, tools, failures: 0, pushes: 0, durationMs: 1000 }], { number: 1, startedAt: Date.now(), tools: 0, failures: 0, pushes: 0, maintainer: true });
   const git = (env, ...args) => execFileSync('git', args, { cwd: repo, encoding: 'utf8', env: { ...process.env, TMPDIR: tmp, ...env } });
   git({}, 'init', '-q', '-b', 'main');
   git({}, 'config', 'user.email', 'test@example.org');
   git({}, 'config', 'user.name', 'Test');
   git({}, 'config', 'core.hooksPath', here('../.githooks'));
   git({}, 'config', 'commit.gpgsign', 'false');
+  return { repo, dir, git };
+};
 
+test('An agent commit carries the trailer and a commit outside Claude Code does not', () => {
+  const { git } = hookedRepository('repo', 3);
   git({ CLAUDECODE: '' }, 'commit', '-q', '--allow-empty', '--no-verify', '-m', 'by hand');
   assert.doesNotMatch(git({}, 'log', '-1', '--format=%B'), /Harness-Metrics/);
 
@@ -63,4 +71,26 @@ test('An agent commit carries the trailer and a commit outside Claude Code does 
   const trailers = git({}, 'log', '-1', '--format=%(trailers:key=Harness-Metrics,valueonly)').trim();
   assert.match(trailers, /tools=3 .*sessions=agent/);
   assert.match(git({}, 'log', '-1', '--format=%(trailers:key=Co-Authored-By,valueonly)'), /Someone/, 'the existing trailers stay trailers');
+});
+
+test('The branch reads every trailer of its commits once, and the next commit carries only new counters', () => {
+  const { repo, dir, git } = hookedRepository('branch', 5);
+  git({ CLAUDECODE: '' }, 'commit', '-q', '--allow-empty', '--no-verify', '-m', 'start');
+  git({}, 'checkout', '-q', '-b', 'slice');
+  git({ CLAUDECODE: '1' }, 'commit', '-q', '--allow-empty', '--no-verify', '-m', 'task 2.1');
+  appendFileSync(join(dir, 'agent.jsonl'), `${JSON.stringify({ turn: 2, maintainer: false, tools: 7, failures: 1, pushes: 1, durationMs: 2000 })}\n`);
+  git({ CLAUDECODE: '1' }, 'commit', '-q', '--allow-empty', '--no-verify', '-m', 'task 2.2');
+
+  const trailers = branchTrailers(repo);
+  assert.equal(trailers.length, 2);
+  const { totals } = branchTotals(trailers);
+  assert.equal(totals.tools, 12, 'five then seven, nothing counted twice');
+  assert.equal(totals.failures, 1);
+});
+
+test('A corrupt guard state never stops a commit', () => {
+  const { dir, git } = hookedRepository('corrupt', 2);
+  writeFileSync(join(dir, 'agent.json'), '{ not json');
+  git({ CLAUDECODE: '1' }, 'commit', '-q', '--allow-empty', '--no-verify', '-m', 'still committed');
+  assert.match(git({}, 'log', '-1', '--format=%s'), /still committed/);
 });

@@ -1,0 +1,10 @@
+#!/bin/sh
+# Marks the metrics trailer the new commit carries as recorded (harness-resumption D-3): only a commit that exists
+# advances the mark, so a failed or aborted commit loses nothing. The last trailer is this commit's own; an amend
+# keeps the earlier ones above it. It never fails.
+[ "$CLAUDECODE" = "1" ] || exit 0
+value=$(git log -1 --format='%(trailers:key=Harness-Metrics,valueonly,separator=%x0A)' 2>/dev/null | tail -n 1)
+[ -n "$value" ] || exit 0
+root=$(git rev-parse --show-toplevel 2>/dev/null) || exit 0
+node "$root/scripts/harness-metrics.mjs" --recorded "$value" >/dev/null 2>&1
+exit 0

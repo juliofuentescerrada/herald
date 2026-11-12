@@ -24,5 +24,5 @@
 
 - [x] 5.1 `CLAUDE.md`: checkpoint per task, `--branch` metrics in the slice pull request, `scripts/slice-state.mjs`; the phase rule names its check
 - [x] 5.2 ADR 0018: resuming an in-progress slice with `agent:start`, the next-slice run's note on the batch issue, push rounds counted from the pull request
-- [ ] 5.3 `herald-reviewer` review of the diff; findings and outcomes in the pull request
+- [x] 5.3 `herald-reviewer` review of the diff; findings and outcomes in the pull request
 - [ ] 5.4 On archive: the Purpose of `agent-harness`, `repository-rules` and `spec-traceability` (D-7); the roadmap's current-state row (`herald-docs` skill); every new scenario covered
