@@ -7,6 +7,7 @@ namespace Herald.Tournaments.Tests.Contracts;
 public class TournamentFieldChangedTests
 {
     [Fact]
+    [Trait("covers", "entrant-check-in: An older field counts message is accepted")]
     public void A_version_1_message_sent_before_check_in_existed_reads_as_none_checked_in()
     {
         var organisation = Guid.NewGuid();

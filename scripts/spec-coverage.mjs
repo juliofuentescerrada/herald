@@ -8,6 +8,7 @@
 // Markers, each "<capability>: <scenario title>":
 //   .NET (xunit)      [Trait("covers", "team-rosters: An owner adds a player to a waiting team")]
 //   Playwright        test('…', { annotation: { type: 'covers', description: 'team-rosters: …' } }, …)
+//   Vitest            it('…', { meta: { type: 'covers', description: 'team-rosters: …' } }, …)  (typed by web/projects/admin/src/covers.d.ts)
 //   Node test files   // covers: team-rosters: …
 // The baseline, docs/rules/uncovered-scenarios.txt, holds the scenarios uncovered when traceability began; it only shrinks.
 

@@ -63,6 +63,8 @@ public class CheckInTests(OrganisationApi api)
         owner.Client.DeleteAsync($"{EntryPath(owner, tournament, entry)}/check-in?expectedRevision={revision ?? CheckInRevision(entry)}", Cancellation);
 
     [Fact]
+
+    [Trait("covers", "entrant-check-in: An owner checks in an admitted player")]
     public async Task An_owner_checks_in_an_admitted_player()
     {
         var owner = await OwnerAsync();
@@ -82,6 +84,8 @@ public class CheckInTests(OrganisationApi api)
     }
 
     [Fact]
+
+    [Trait("covers", "entrant-check-in: A waiting entry cannot check in")]
     public async Task A_waiting_entry_cannot_check_in()
     {
         var owner = await OwnerAsync();
@@ -96,6 +100,8 @@ public class CheckInTests(OrganisationApi api)
     }
 
     [Fact]
+
+    [Trait("covers", "entrant-check-in: A cancelled entry cannot check in")]
     public async Task A_cancelled_entry_cannot_check_in()
     {
         var owner = await OwnerAsync();
@@ -111,6 +117,8 @@ public class CheckInTests(OrganisationApi api)
     }
 
     [Fact]
+
+    [Trait("covers", "entrant-check-in: An owner undoes a check-in made by mistake")]
     public async Task An_owner_undoes_a_check_in_and_a_repeat_returns_the_field()
     {
         var owner = await OwnerAsync();
@@ -130,6 +138,8 @@ public class CheckInTests(OrganisationApi api)
     }
 
     [Fact]
+
+    [Trait("covers", "entrant-check-in: A stale check-in write is a conflict")]
     public async Task A_stale_check_in_write_is_a_conflict()
     {
         var owner = await OwnerAsync();
@@ -163,6 +173,8 @@ public class CheckInTests(OrganisationApi api)
     }
 
     [Fact]
+
+    [Trait("covers", "entrant-check-in: Cancelling keeps the evidence")]
     public async Task Cancelling_keeps_the_check_in_and_stops_counting_it()
     {
         var owner = await OwnerAsync();

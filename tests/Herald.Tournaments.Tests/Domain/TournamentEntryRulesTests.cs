@@ -33,6 +33,8 @@ public class TournamentEntryRulesTests
         Published().Change(CompleteIndividual with { Capacity = 5 }, 2, _owner, _at, new EntryCounts(5, 3)).Outcome.ShouldBe(WriteOutcome.Applied);
 
     [Fact]
+
+    [Trait("covers", "tournament-setup: Entry kind with active entries")]
     public void Entry_kind_and_admission_are_locked_while_an_entry_is_active()
     {
         var tournament = Published();
@@ -44,6 +46,8 @@ public class TournamentEntryRulesTests
     }
 
     [Fact]
+
+    [Trait("covers", "tournament-setup: Entry kind after every entry was cancelled")]
     public void Entry_kind_changes_once_every_entry_is_cancelled() =>
         Published().Change(CompleteTeam, 2, _owner, _at, EntryCounts.None).Outcome.ShouldBe(WriteOutcome.Applied);
 
@@ -53,6 +57,8 @@ public class TournamentEntryRulesTests
             .Outcome.ShouldBe(WriteOutcome.Applied);
 
     [Fact]
+
+    [Trait("covers", "tournament-setup: Check-in policy with confirmed check-ins")]
     public void The_check_in_policy_is_locked_while_an_entry_has_checked_in()
     {
         var tournament = Published();
@@ -64,6 +70,8 @@ public class TournamentEntryRulesTests
     }
 
     [Fact]
+
+    [Trait("covers", "tournament-setup: Check-in policy with admitted entries and no check-ins")]
     public void The_check_in_policy_changes_while_admitted_entries_have_not_checked_in() =>
         Published().Change(CompleteIndividual with { CheckIn = CheckIn.Optional }, 2, _owner, _at, new EntryCounts(3, 1))
             .Outcome.ShouldBe(WriteOutcome.Applied);

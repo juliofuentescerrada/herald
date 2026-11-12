@@ -28,7 +28,7 @@ Herald runs tournaments (league, knockout, single match) and is game-agnostic: g
 ## Working economically
 
 - Check with `scripts/check [rules|dotnet|web|all]`: CI's steps with one line each and only the errors on failure. A new machine or cloud session is prepared by `scripts/bootstrap`.
-- A test that proves a specified scenario carries its marker (`[Trait("covers", "<capability>: <scenario>")]`, a Playwright `covers` annotation or `// covers:`); `scripts/spec-coverage.mjs` fails on a new scenario without one. `docs/rules/uncovered-scenarios.txt` only shrinks: never add a line.
+- A test that proves a specified scenario carries its marker (`[Trait("covers", "<capability>: <scenario>")]`, a Playwright `covers` annotation, a Vitest `meta` of the same shape or `// covers:`); `scripts/spec-coverage.mjs` fails on a new scenario without one. `docs/rules/uncovered-scenarios.txt` only shrinks: never add a line.
 - Before opening a slice's pull request, write `git diff main...HEAD` to a file and have the `herald-reviewer` subagent review it with its change's name; the pull request records its findings and how each was resolved, and ends with `node scripts/harness-metrics.mjs <session ids> --markdown` for the sessions the slice took (`--list` shows them; without ids it takes the latest).
 - With an AppHost running, read its resources, logs and traces through Aspire's MCP server (`mcp__aspire__*`, `.mcp.json`) before guessing at a failure.
 - Each slice adds an executable test script in `e2e/scripts/` (`pnpm test:scripts` in `e2e/`, seeded data, the persona of `scriptPersona`) with a screenshot per step the maintainer will check; CI uploads them as the `test-script-screens` artefact, which the pull request links. Run it before asking for a test round.

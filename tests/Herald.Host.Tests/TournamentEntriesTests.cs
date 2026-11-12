@@ -121,6 +121,8 @@ public class TournamentEntriesTests(OrganisationApi api)
     }
 
     [Fact]
+
+    [Trait("covers", "tournament-setup: Capacity below the admitted entries")]
     public async Task Capacity_cannot_be_saved_below_the_admitted_entries()
     {
         var tournament = await OpenTournamentAsync(Configuration(capacity: 4));
@@ -150,6 +152,8 @@ public class TournamentEntriesTests(OrganisationApi api)
     }
 
     [Fact]
+
+    [Trait("covers", "tournament-setup: Check-in policy with confirmed check-ins")]
     public async Task The_check_in_policy_is_locked_by_a_check_in_from_registration_and_free_once_it_is_undone()
     {
         var tournament = await OpenTournamentAsync();

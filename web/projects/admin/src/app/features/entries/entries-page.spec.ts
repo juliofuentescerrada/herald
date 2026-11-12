@@ -836,7 +836,7 @@ describe('Check-in on the entries page', () => {
     expect(await violations(page())).toEqual([]);
   });
 
-  it('says an optional policy, and the policy without a count while nothing is admitted', async () => {
+  it('says an optional policy, and the policy without a count while nothing is admitted', { meta: { type: 'covers', description: 'entrant-check-in: Optional check-in is shown as information' } }, async () => {
     const optional = await open({ getField: () => of(desk(pending('Sam Reed'))) });
     await vi.waitFor(() => expect(optional.texts('.summary .help')[1]).toBe('Check-in optional · 0 of 1 checked in'));
     TestBed.resetTestingModule();
@@ -845,7 +845,7 @@ describe('Check-in on the entries page', () => {
     await vi.waitFor(() => expect(empty.texts('.summary .help')[1]).toBe('Check-in mandatory'));
   });
 
-  it('checks in at once with a toast, keeping the row’s other actions blocked only while in progress', async () => {
+  it('checks in at once with a toast, keeping the row’s other actions blocked only while in progress', { meta: { type: 'covers', description: 'entrant-check-in: An owner checks in from the entries page' } }, async () => {
     const answer = new Subject<FieldDetails>();
     const checkIn = vi.fn(() => answer);
     const { page, button, toasts, settle } = await open({ getField: () => of(desk(pending('Sam Reed'), pending('Jamie Brook'))), checkIn }, mandatory);
@@ -886,7 +886,7 @@ describe('Check-in on the entries page', () => {
     expect(action(page, 'Check in: Robin Vale')).toBeTruthy();
   });
 
-  it('says a failed check-in under its row, with no toast, and retries with the same action', async () => {
+  it('says a failed check-in under its row, with no toast, and retries with the same action', { meta: { type: 'covers', description: 'entrant-check-in: A failed check-in leaves the row unchanged' } }, async () => {
     const checkIn = answers<FieldDetails>(() => throwError(() => problem(500)), () => of(desk(confirmed('Jamie Brook'))));
     const { page, toasts } = await open({ getField: () => of(desk(pending('Jamie Brook'))), checkIn }, mandatory);
     await vi.waitFor(() => expect(action(page, 'Check in: Jamie Brook')).toBeTruthy());
@@ -940,7 +940,7 @@ describe('Check-in on the entries page', () => {
     expect(page().querySelector('details.cancelled button')).toBeNull();
   });
 
-  it('keeps a team’s check-in apart from its roster readiness', async () => {
+  it('keeps a team’s check-in apart from its roster readiness', { meta: { type: 'covers', description: 'entrant-check-in: A team row keeps check-in and roster apart' } }, async () => {
     const teams = field(
       [
         confirmed('River Falcons', undefined, { rosterSize: 2, rosterRevision: 2, rosterReadiness: 'incomplete' }),

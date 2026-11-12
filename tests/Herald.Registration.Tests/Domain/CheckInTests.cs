@@ -24,6 +24,8 @@ public class CheckInTests
     private WriteResult Undo(Field field, Entry entry) => field.SetCheckIn(entry.Id, checkedIn: false, entry.CheckInRevision, _owner, _at);
 
     [Fact]
+
+    [Trait("covers", "entrant-check-in: An owner checks in an admitted player")]
     public void An_owner_checks_in_an_admitted_player()
     {
         var field = Track();
@@ -54,6 +56,8 @@ public class CheckInTests
     }
 
     [Fact]
+
+    [Trait("covers", "entrant-check-in: Check-in works whatever the registration state")]
     public void Check_in_works_after_registration_closes()
     {
         var field = Track();
@@ -66,6 +70,8 @@ public class CheckInTests
     }
 
     [Fact]
+
+    [Trait("covers", "entrant-check-in: A waiting entry cannot check in")]
     public void A_waiting_entry_cannot_check_in()
     {
         var field = Track(_players with { Capacity = 1 });
@@ -79,6 +85,8 @@ public class CheckInTests
     }
 
     [Fact]
+
+    [Trait("covers", "entrant-check-in: A cancelled entry cannot check in")]
     public void A_cancelled_entry_cannot_check_in()
     {
         var field = Track();
@@ -92,6 +100,8 @@ public class CheckInTests
     }
 
     [Fact]
+
+    [Trait("covers", "entrant-check-in: A team checks in without a complete roster")]
     public void A_team_checks_in_without_a_complete_roster()
     {
         var field = Track(new(RegistrationState.Open, 4, EntryKind.Team, Admission.Automatic, MinimumRosterSize: 3, MaximumRosterSize: 5));
@@ -105,6 +115,8 @@ public class CheckInTests
     }
 
     [Fact]
+
+    [Trait("covers", "entrant-check-in: A promoted entry starts pending")]
     public void A_promoted_entry_starts_pending()
     {
         var field = Track(_players with { Capacity = 1 });
@@ -120,6 +132,8 @@ public class CheckInTests
     }
 
     [Fact]
+
+    [Trait("covers", "entrant-check-in: An owner undoes a check-in made by mistake")]
     public void An_owner_undoes_a_check_in_made_by_mistake()
     {
         var field = Track();
@@ -151,6 +165,8 @@ public class CheckInTests
     }
 
     [Fact]
+
+    [Trait("covers", "entrant-check-in: Every change is recorded")]
     public void Every_change_is_recorded()
     {
         var field = Track();
@@ -166,6 +182,8 @@ public class CheckInTests
     }
 
     [Fact]
+
+    [Trait("covers", "entrant-check-in: A stale check-in write is a conflict")]
     public void A_stale_check_in_write_is_a_conflict()
     {
         var field = Track();
@@ -194,6 +212,10 @@ public class CheckInTests
     }
 
     [Fact]
+
+    [Trait("covers", "entrant-check-in: Cancelling keeps the evidence")]
+
+    [Trait("covers", "entrant-check-in: The count follows check-ins and cancellations")]
     public void Cancelling_keeps_the_evidence_and_stops_counting()
     {
         var field = Track(_players with { Capacity = 4 });

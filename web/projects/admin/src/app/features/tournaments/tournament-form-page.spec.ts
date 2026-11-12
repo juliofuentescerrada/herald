@@ -284,7 +284,7 @@ describe('The tournament configuration form', () => {
     expect(page().querySelector('.summary.entries')).toBeNull();
   });
 
-  it('locks entry kind and admission while entries exist, saying why, and gives the lowest capacity allowed', async () => {
+  it('locks entry kind and admission while entries exist, saying why, and gives the lowest capacity allowed', { meta: { type: 'covers', description: 'tournament-setup: The form explains the locked fields' } }, async () => {
     const { page, control, text } = await render(`/${tournamentId}`, { reads: [() => of(details({ publication: 'published', admittedEntries: 3, waitingEntries: 1 }))] });
     for (const name of ['entryKind', 'admission']) {
       expect((control(name) as HTMLSelectElement).disabled).toBe(true);
@@ -298,7 +298,7 @@ describe('The tournament configuration form', () => {
     expect(violations.map((v) => v.id)).toEqual([]);
   });
 
-  it('locks the check-in policy while entries have checked in, saying why', async () => {
+  it('locks the check-in policy while entries have checked in, saying why', { meta: { type: 'covers', description: 'tournament-setup: The form explains the locked check-in policy' } }, async () => {
     const { page, control, text } = await render(`/${tournamentId}`, {
       reads: [() => of(details({ publication: 'published', admittedEntries: 4, waitingEntries: 1, checkedInEntries: 1 }))],
     });

@@ -115,3 +115,9 @@ Registration: migration `AddCheckIn` (check-in state, revision and last change o
 - None. The maintainer approved the implementation, A-1 included, on 12 November 2026 (gate 1.1).
 
 ## Implementation record
+
+**Covers markers (8.0).** Every `entrant-check-in` scenario and the modified `tournament-setup` scenarios carry a `covers` marker on the tests that prove them (Registration and Tournaments domain tests, the API tests and the admin Vitest specs); `Capacity below the admitted entries`, both entry kind scenarios and `The form explains the locked fields` left `docs/rules/uncovered-scenarios.txt`. These are the first Vitest markers: `it('…', { meta: { type: 'covers', description: '…' } }, …)`, the shape `spec-coverage.mjs` already reads, typed by `web/projects/admin/src/covers.d.ts` (augmenting Vitest's `TaskMeta`, excluded from the app build); the maintainer chose it over a `// covers:` comment form, which would have changed the script, on 12 November 2026. Journey 16 has no marker: the `end-to-end-journeys` requirement lists journeys without a scenario each.
+
+**Seeded check-in.** The `tournaments-by-state` scenario checks in Autumn League's first entrant (`Admin.CheckInAsync`), so the seeded data shows a confirmed check-in and a locked check-in policy; the test script `e2e/scripts/seeded-check-in.spec.ts` checks in and undoes another entrant there.
+
+**Full run (8.1).** `scripts/check all` passes: rules, spec coverage, `dotnet format --verify-no-changes`, build, `codegen write` and `pnpm api:generate` leave no difference, 334 .NET tests, web lint, the boundary fixtures (15 planted, 15 reported), `test:all` (admin 197, public 13, catalogue 7, ui 31, api-client 9), the SSR isolation check and `build:all`; the e2e suite passes (16 journeys) and so do both test scripts. The admin initial bundle's budget warning (900 kB) predates this change: 946.9 kB now.
