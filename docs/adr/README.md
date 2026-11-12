@@ -27,3 +27,4 @@ One significant decision per record: context, decision, alternatives and consequ
 | [0016](0016-integration-events-between-modules-through-durable-local-queues.md) | Integration events between modules of the host travel through durable local queues | Proposed |
 | [0017](0017-notifications-consume-fact-events.md) | Notifications consume fact events and live in their own module | Proposed |
 | [0018](0018-deliver-in-batches-tested-on-a-deployed-preview.md) | From H2, deliver in batches that the agent implements and the maintainer tests on a deployed preview | Proposed |
+| [0019](0019-preview-environments-and-synthetic-data.md) | Preview environments in fixed slots, with synthetic data seeded through the API | Proposed |
