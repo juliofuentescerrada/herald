@@ -151,6 +151,9 @@ namespace Herald.Tournaments.Persistence.Migrations
                     b.Property<int>("Admitted")
                         .HasColumnType("integer");
 
+                    b.Property<int>("CheckedIn")
+                        .HasColumnType("integer");
+
                     b.Property<int>("Revision")
                         .HasColumnType("integer");
 

@@ -19,7 +19,7 @@ public sealed class TournamentsDbContext(DbContextOptions<TournamentsDbContext> 
     // Registration's last report for the tournament, or none before its first.
     public async Task<EntryCounts> EntryCountsAsync(TournamentId id, CancellationToken cancellationToken) =>
         await FieldCounts.AsNoTracking().Where(counts => counts.TournamentId == id)
-            .Select(counts => new EntryCounts(counts.Admitted, counts.Waiting))
+            .Select(counts => new EntryCounts(counts.Admitted, counts.Waiting, counts.CheckedIn))
             .SingleOrDefaultAsync(cancellationToken);
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)

@@ -20,9 +20,9 @@
 
 ## 5. Tournaments
 
-- [ ] 5.1 `EntryCounts` keeps the checked-in count (migration `AddCheckedInCount`); `LockedByEntries` rejects a check-in policy change while confirmed check-ins exist; details expose the count
-- [ ] 5.2 Domain and API tests for the modified `tournament-setup` scenarios, including the lock arriving from a Registration check-in
-- [ ] 5.3 Regenerate Wolverine code (`codegen write`) and the OpenAPI documents and client (`pnpm api:generate`); CI drift checks pass
+- [x] 5.1 `EntryCounts` keeps the checked-in count (migration `AddCheckedInCount`); `LockedByEntries` rejects a check-in policy change while confirmed check-ins exist; details expose the count
+- [x] 5.2 Domain and API tests for the modified `tournament-setup` scenarios, including the lock arriving from a Registration check-in
+- [x] 5.3 Regenerate Wolverine code (`codegen write`) and the OpenAPI documents and client (`pnpm api:generate`); CI drift checks pass
 
 ## 6. Admin application
 

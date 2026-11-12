@@ -51,4 +51,20 @@ public class TournamentEntryRulesTests
     public void Other_values_change_while_entries_are_active() =>
         Published().Change(CompleteIndividual with { Title = "Sunday Open", Capacity = 12 }, 2, _owner, _at, new EntryCounts(5, 2))
             .Outcome.ShouldBe(WriteOutcome.Applied);
+
+    [Fact]
+    public void The_check_in_policy_is_locked_while_an_entry_has_checked_in()
+    {
+        var tournament = Published();
+
+        var result = tournament.Change(CompleteIndividual with { CheckIn = CheckIn.Optional }, 2, _owner, _at, new EntryCounts(Admitted: 3, Waiting: 0, CheckedIn: 1));
+
+        result.Broken.ShouldBe([new BrokenRule("checkIn", "locked-by-check-ins")]);
+        tournament.Configuration.CheckIn.ShouldBe(CheckIn.Mandatory);
+    }
+
+    [Fact]
+    public void The_check_in_policy_changes_while_admitted_entries_have_not_checked_in() =>
+        Published().Change(CompleteIndividual with { CheckIn = CheckIn.Optional }, 2, _owner, _at, new EntryCounts(3, 1))
+            .Outcome.ShouldBe(WriteOutcome.Applied);
 }

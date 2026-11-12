@@ -28,5 +28,6 @@ public static class TournamentFieldChangedHandler
         counts.Revision = message.Revision;
         counts.Admitted = message.Admitted;
         counts.Waiting = message.Waiting;
+        counts.CheckedIn = message.CheckedIn;
     }
 }

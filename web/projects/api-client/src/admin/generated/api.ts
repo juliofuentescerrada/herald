@@ -66,6 +66,14 @@ export const CheckIn = {
   mandatory: 'mandatory',
 } as const;
 
+export type CheckInState = typeof CheckInState[keyof typeof CheckInState] | null;
+
+
+export const CheckInState = {
+  pending: 'pending',
+  confirmed: 'confirmed',
+} as const;
+
 export interface CloseRegistration {
   expectedRevision: number;
 }
@@ -175,7 +183,7 @@ export const WaitingReason = {
   admissionPending: 'admissionPending',
 } as const;
 
-export type RosterReadiness = typeof RosterReadiness[keyof typeof RosterReadiness];
+export type RosterReadiness = typeof RosterReadiness[keyof typeof RosterReadiness] | null;
 
 
 export const RosterReadiness = {
@@ -207,6 +215,11 @@ export interface EntryDetails {
   /** @nullable */
   rosterRevision?: number | null;
   rosterReadiness?: null | RosterReadiness;
+  checkIn?: null | CheckInState;
+  /** @nullable */
+  checkInRevision?: number | null;
+  /** @nullable */
+  checkInChangedAt?: string | null;
 }
 
 export type RegistrationState = typeof RegistrationState[keyof typeof RegistrationState];
@@ -236,6 +249,7 @@ export interface FieldDetails {
   termsReceivedAt: string;
   admitted: number;
   waiting: number;
+  checkedIn: number;
   overCapacityBy: number;
   kindMismatch: boolean;
   entries: EntryDetails[];
@@ -389,6 +403,7 @@ export interface TournamentDetails {
   registrationChangedAt: string | null;
   admittedEntries: number;
   waitingEntries: number;
+  checkedInEntries: number;
 }
 
 export interface TournamentSummary {
@@ -412,6 +427,10 @@ export interface TournamentSummary {
   admittedEntries: number;
   waitingEntries: number;
 }
+
+export type UndoCheckInParams = {
+  expectedRevision?: number;
+};
 
 export type RemoveRosterMemberParams = {
   expectedRevision?: number;
@@ -949,6 +968,105 @@ export class HeraldHostAdminService {
   }
 
 /**
+ * DELETE_api_organisations_organisationId_tournaments_tournamentId_entries_entryId_check_in
+ * @summary DELETE_api_organisations_organisationId_tournaments_tournamentId_entries_entryId_check_in
+ */
+ undoCheckIn<TData = FieldDetails>(organisationId: string,
+    tournamentId: string,
+    entryId: string,
+    params?: UndoCheckInParams, options?: HttpClientBodyOptions): Observable<TData>;
+ undoCheckIn<TData = FieldDetails>(organisationId: string,
+    tournamentId: string,
+    entryId: string,
+    params?: UndoCheckInParams, options?: HttpClientEventOptions): Observable<HttpEvent<TData>>;
+ undoCheckIn<TData = FieldDetails>(organisationId: string,
+    tournamentId: string,
+    entryId: string,
+    params?: UndoCheckInParams, options?: HttpClientResponseOptions): Observable<AngularHttpResponse<TData>>;
+  undoCheckIn<TData = FieldDetails>(
+    organisationId: string,
+    tournamentId: string,
+    entryId: string,
+    params?: UndoCheckInParams, options?: HttpClientObserveOptions): Observable<TData | HttpEvent<TData> | AngularHttpResponse<TData>> {
+    const filteredParams = filterParams({...params, ...options?.params}, new Set<string>([]));
+
+    if (options?.observe === 'events') {
+      return this.http.delete<TData>(
+      `/api/organisations/${organisationId}/tournaments/${tournamentId}/entries/${entryId}/check-in`,{
+    ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'events',
+        params: filteredParams,}
+    );
+    }
+
+    if (options?.observe === 'response') {
+      return this.http.delete<TData>(
+      `/api/organisations/${organisationId}/tournaments/${tournamentId}/entries/${entryId}/check-in`,{
+    ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'response',
+        params: filteredParams,}
+    );
+    }
+
+    return this.http.delete<TData>(
+      `/api/organisations/${organisationId}/tournaments/${tournamentId}/entries/${entryId}/check-in`,{
+    ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'body',
+        params: filteredParams,}
+    );
+  }
+
+/**
+ * PUT_api_organisations_organisationId_tournaments_tournamentId_entries_entryId_check_in
+ * @summary PUT_api_organisations_organisationId_tournaments_tournamentId_entries_entryId_check_in
+ */
+ checkIn<TData = FieldDetails>(organisationId: string,
+    tournamentId: string,
+    entryId: string,
+    checkInBody: CheckIn, options?: HttpClientBodyOptions): Observable<TData>;
+ checkIn<TData = FieldDetails>(organisationId: string,
+    tournamentId: string,
+    entryId: string,
+    checkInBody: CheckIn, options?: HttpClientEventOptions): Observable<HttpEvent<TData>>;
+ checkIn<TData = FieldDetails>(organisationId: string,
+    tournamentId: string,
+    entryId: string,
+    checkInBody: CheckIn, options?: HttpClientResponseOptions): Observable<AngularHttpResponse<TData>>;
+  checkIn<TData = FieldDetails>(
+    organisationId: string,
+    tournamentId: string,
+    entryId: string,
+    checkInBody: CheckIn, options?: HttpClientObserveOptions): Observable<TData | HttpEvent<TData> | AngularHttpResponse<TData>> {
+    if (options?.observe === 'events') {
+      return this.http.put<TData>(
+      `/api/organisations/${organisationId}/tournaments/${tournamentId}/entries/${entryId}/check-in`,
+      checkInBody,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'events',
+      }
+    );
+    }
+
+    if (options?.observe === 'response') {
+      return this.http.put<TData>(
+      `/api/organisations/${organisationId}/tournaments/${tournamentId}/entries/${entryId}/check-in`,
+      checkInBody,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'response',
+      }
+    );
+    }
+
+    return this.http.put<TData>(
+      `/api/organisations/${organisationId}/tournaments/${tournamentId}/entries/${entryId}/check-in`,
+      checkInBody,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'body',
+      }
+    );
+  }
+
+/**
  * DELETE_api_organisations_organisationId_tournaments_tournamentId_entries_entryId_roster_members_guestId
  * @summary DELETE_api_organisations_organisationId_tournaments_tournamentId_entries_entryId_roster_members_guestId
  */
@@ -1386,6 +1504,8 @@ export type OpenRegistrationClientResult = NonNullable<TournamentDetails>
 export type ListTournamentsClientResult = NonNullable<TournamentSummary[]>
 export type CreateTournamentClientResult = NonNullable<IResult | TournamentDetails>
 export type CloseRegistrationClientResult = NonNullable<TournamentDetails>
+export type UndoCheckInClientResult = NonNullable<FieldDetails>
+export type CheckInClientResult = NonNullable<FieldDetails>
 export type RemoveRosterMemberClientResult = NonNullable<RosterDetails>
 export type AddRosterMemberClientResult = NonNullable<RosterDetails>
 export type GetRosterClientResult = NonNullable<RosterDetails>

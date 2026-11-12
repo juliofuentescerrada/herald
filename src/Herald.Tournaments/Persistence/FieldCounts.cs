@@ -15,5 +15,7 @@ public sealed class FieldCounts
 
     public int Waiting { get; set; }
 
-    public EntryCounts Counts => new(Admitted, Waiting);
+    public int CheckedIn { get; set; }
+
+    public EntryCounts Counts => new(Admitted, Waiting, CheckedIn);
 }

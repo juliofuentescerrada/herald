@@ -37,6 +37,7 @@ const tournament = (over: Partial<TournamentDetails> = {}): TournamentDetails =>
   registrationChangedAt: null,
   admittedEntries: 0,
   waitingEntries: 0,
+  checkedInEntries: 0,
   ...over,
 });
 
@@ -67,6 +68,7 @@ const field = (entries: EntryDetails[], terms: Partial<FieldDetails['terms']> = 
   termsReceivedAt: '2026-11-11T09:10:00Z',
   admitted: entries.filter((e) => e.state === 'admitted').length,
   waiting: entries.filter((e) => e.state === 'waiting').length,
+  checkedIn: 0,
   overCapacityBy: 0,
   kindMismatch: false,
   entries,
