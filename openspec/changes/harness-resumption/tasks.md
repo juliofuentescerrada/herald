@@ -18,7 +18,7 @@
 
 ## 4. Phase guard
 
-- [ ] 4.1 `guard.mjs` refuses file-tool edits under `src/`, `web/projects/` and `tools/` without an approved active change (D-6; not `tests/` or `e2e/`, Q-1); tests for both scenarios
+- [x] 4.1 `guard.mjs` refuses file-tool edits under `src/`, `web/projects/` and `tools/` without an approved active change (D-6; not `tests/` or `e2e/`, Q-1); tests for both scenarios
 
 ## 5. Documents and review
 

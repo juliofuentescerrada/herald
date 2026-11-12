@@ -1,7 +1,7 @@
 // The loop guard's limits and metrics with synthetic hook inputs (ADR 0018, harness-engineering D-12).
 import assert from 'node:assert/strict';
 import { spawnSync } from 'node:child_process';
-import { mkdtempSync, readFileSync, rmSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { after, test } from 'node:test';
@@ -113,4 +113,35 @@ test('A GitHub wake-up means the session has a pull request', () => {
     hook('p3', 'PostToolUse', bash('git push'));
   }
   assert.match(hook('p3', 'PreToolUse', bash('git push')).stdout, /"permissionDecision":"deny"/);
+});
+
+// A repository root with one active change, approved or not.
+const repositoryWith = (name, proposal) => {
+  const dir = join(temp, name);
+  mkdirSync(join(dir, 'openspec', 'changes', 'a-change'), { recursive: true });
+  mkdirSync(join(dir, 'openspec', 'changes', 'archive', 'old'), { recursive: true });
+  writeFileSync(join(dir, 'openspec', 'changes', 'archive', 'old', 'proposal.md'), '**Approved for implementation on 1 January 2026**');
+  writeFileSync(join(dir, 'openspec', 'changes', 'a-change', 'proposal.md'), proposal);
+  return dir;
+};
+const edit = (path) => ({ tool_name: 'Edit', tool_input: { file_path: path } });
+
+// covers: agent-harness: Editing production code before approval
+test('Production code cannot be edited without an approved active change', () => {
+  const root = repositoryWith('pending', '## Status\n\nPending the maintainer\'s review.');
+  const env = { HERALD_GUARD_ROOT: root };
+  for (const path of [join(root, 'src/Herald.Host/Program.cs'), 'web/projects/admin/src/main.ts', join(root, 'tools/Herald.Seed/Scenarios.cs')]) {
+    const result = hook('f1', 'PreToolUse', edit(path), env);
+    assert.match(result.stdout, /"permissionDecision":"deny"/, path);
+    assert.match(result.stdout, /no approved change/);
+  }
+  for (const path of [join(root, 'tests/Some.Tests/A.cs'), join(root, 'e2e/journeys/a.spec.ts'), join(root, 'openspec/changes/a-change/tasks.md'), join(root, 'CLAUDE.md')]) {
+    assert.doesNotMatch(hook('f1', 'PreToolUse', edit(path), env).stdout, /deny/, path);
+  }
+});
+
+// covers: agent-harness: Editing production code with an approved change
+test('Production code can be edited once an active change is approved', () => {
+  const root = repositoryWith('approved', '## Status\n\n**Approved for implementation on 12 November 2026** (gate 1.1).');
+  assert.doesNotMatch(hook('f2', 'PreToolUse', edit(join(root, 'src/Herald.Host/Program.cs')), { HERALD_GUARD_ROOT: root }).stdout, /deny/);
 });

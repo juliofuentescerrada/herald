@@ -7,17 +7,20 @@
 // - Repeated failure: the same Bash command failing several times in a row is refused.
 // - Push rounds: several pushes since the maintainer's last message are refused, counted only once the session has
 //   opened or updated a pull request; earlier pushes are the slice's checkpoints (harness-resumption D-2).
+// - Phase: the file tools cannot edit production code (src/, web/projects/, tools/) while no active change in
+//   openspec/changes/ is approved for implementation (harness-resumption D-6).
 //
 // Messages that wake the session from GitHub or a schedule are not the maintainer and reset nothing.
 // - Metrics: each turn's tool calls, failures, pushes and duration, appended at Stop to
 //   <tmp>/herald-guard/<session>.jsonl (harness-engineering D-12); scripts/harness-metrics.mjs sums them.
 //
 // Limits: HERALD_GUARD_MAX_TOOLS (400), HERALD_GUARD_MAX_FAILURES (3), HERALD_GUARD_MAX_PUSHES (3).
-// HERALD_GUARD=off disables every guard.
+// HERALD_GUARD=off disables every guard. HERALD_GUARD_ROOT names another repository root (the guard's tests).
 
-import { appendFileSync, mkdirSync, readFileSync, writeFileSync } from 'node:fs';
+import { appendFileSync, existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { join, relative, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 
 const limit = (name, fallback) => {
   const value = Number.parseInt(process.env[name] ?? '', 10);
@@ -68,6 +71,28 @@ const fromMaintainer = (prompt) =>
   !/<wake\b|reason="external-event"|<event source=|<task-notification>|<webhook-payload>/.test(String(prompt ?? ''));
 
 const editTools = new Set(['Edit', 'Write', 'MultiEdit', 'NotebookEdit']);
+const repositoryRoot = process.env.HERALD_GUARD_ROOT || fileURLToPath(new URL('../../', import.meta.url));
+const productionPaths = ['src/', 'web/projects/', 'tools/'];
+
+const isProduction = (path) => {
+  const inRepository = relative(repositoryRoot, resolve(repositoryRoot, String(path))).split('\\').join('/');
+  return productionPaths.some((prefix) => inRepository.startsWith(prefix));
+};
+
+// An active change (any folder of openspec/changes/ but the archive) whose proposal records its approval.
+const approvedChange = () => {
+  const changes = join(repositoryRoot, 'openspec', 'changes');
+  try {
+    return readdirSync(changes, { withFileTypes: true }).some((entry) => {
+      if (!entry.isDirectory() || entry.name === 'archive') return false;
+      const proposal = join(changes, entry.name, 'proposal.md');
+      return existsSync(proposal) && readFileSync(proposal, 'utf8').includes('Approved for implementation');
+    });
+  } catch {
+    return false;
+  }
+};
+
 const pullRequestTools = new Set(['mcp__github__create_pull_request', 'mcp__github__update_pull_request']);
 const pullRequestEvent = (prompt) => /<event source="github"/.test(String(prompt ?? ''));
 
@@ -116,8 +141,14 @@ switch (input.hook_event_name) {
     state.turn.tools += 1;
     state.totalTools += 1;
     const escape = isGit(command) || String(input.tool_name).startsWith('mcp__github__');
+    const editedPath = editTools.has(input.tool_name) ? (input.tool_input?.file_path ?? input.tool_input?.notebook_path) : null;
     if (state.tools > maxTools && !escape) {
       deny(`Herald guard: ${maxTools} tool calls since the maintainer's last message. ${stopAdvice}`);
+    } else if (editedPath && isProduction(editedPath) && !approvedChange()) {
+      deny(
+        'Herald guard: no approved change. Production code (src/, web/projects/, tools/) needs an active OpenSpec change ' +
+          "approved for implementation: propose one (/opsx:propose) and wait for the maintainer's approval.",
+      );
     } else if (command && (state.failures[command] ?? 0) >= maxFailures) {
       deny(
         `Herald guard: this command has failed ${maxFailures} times in a row. Retrying it will not help. ` +
