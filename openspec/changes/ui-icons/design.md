@@ -96,3 +96,10 @@ Full run on 12 November 2026 (task 4.2):
 - `scripts/check all`: rules, the web steps and 339 of 340 .NET tests pass. The one failure, `LocalSeedingTests.Without_an_object_id_…`, comes from the machine: the AppHost's user secrets set `seed-object-id`, which the test expects unset. It does not touch this change, and CI has no such secret.
 - e2e suite: 16 passed; test scripts: 3 passed.
 - Admin initial bundle (`ng build admin`, production): 946.89 kB raw, 233.46 kB transfer on `main` before the change; 950.56 kB raw, 234.28 kB transfer after it. The icons add 3.67 kB raw (0.82 kB transfer); the 900 kB budget warning was already exceeded before.
+
+Captures after the change (task 4.3), compared with task 3.0's at 1440 and 390 px for every screen of the Visual input table except the `ui` catalogue:
+
+- Desktop: icons appear where D-1's table puts them, and no row, header or drawer changes its layout; the status labels grow by the icon and the gap and stay on one line.
+- Mobile (390 px): the rail's links carry their icons without wrapping. Status labels wrap more often: on the tournament list "Registration not open" moves to its own line (three rows of labels instead of two), and on the team entries page a long team name pushes its check-in label below the name. Labels still read in order and nothing overflows.
+- The `ui` catalogue's controls page was not captured before and after; its specs (task 2.2) cover the new inputs.
+- The maintainer accepted the extra wrapping on mobile on 12 November 2026.
