@@ -88,3 +88,11 @@ None. Answered by the maintainer on 12 November 2026:
 
 - R-1: the drawers' "Back to entries" and "Back to roster" buttons get the back arrow (D-1's table).
 - R-2: the icon table and D-2's 32 px empty-state size are accepted.
+
+## Validation
+
+Full run on 12 November 2026 (task 4.2):
+
+- `scripts/check all`: rules, the web steps and 339 of 340 .NET tests pass. The one failure, `LocalSeedingTests.Without_an_object_id_…`, comes from the machine: the AppHost's user secrets set `seed-object-id`, which the test expects unset. It does not touch this change, and CI has no such secret.
+- e2e suite: 16 passed; test scripts: 3 passed.
+- Admin initial bundle (`ng build admin`, production): 946.89 kB raw, 233.46 kB transfer on `main` before the change; 950.56 kB raw, 234.28 kB transfer after it. The icons add 3.67 kB raw (0.82 kB transfer); the 900 kB budget warning was already exceeded before.
