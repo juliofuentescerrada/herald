@@ -57,3 +57,19 @@ pnpm exec playwright show-trace test-results/<test>/trace.zip
 
 It shows each step with the page, the console and the network. For the servers' output, run with
 `DEBUG=pw:webserver`.
+
+## Test scripts
+
+`scripts/` holds each slice's executable test script (harness-engineering D-14): the steps the maintainer will take
+on its preview, which the agent runs first against the local application. Unlike the journeys, they start from
+seeded data: `scripts/seed.ts` runs `tools/Herald.Seed` once the host is up, for the persona in
+`environment.ts` (`scriptPersona`), and the script signs in as it. `screen(page, info, step)` saves a full-page
+screenshot at device scale factor 2 under `test-results/screens/<script>/`.
+
+```sh
+pnpm test:scripts
+```
+
+CI runs them on every pull request and uploads the screenshots as the `test-script-screens` artefact. Where the
+preinstalled Chromium does not match the pinned Playwright (cloud sessions), `HERALD_CHROMIUM` names it.
+A script is promoted to `journeys/` only if its flow becomes a critical path.

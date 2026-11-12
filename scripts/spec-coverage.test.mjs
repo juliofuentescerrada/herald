@@ -22,6 +22,11 @@ test('Markers in .NET, Playwright and Node tests are read as capability and scen
   assert.deepEqual([...markers.keys()].sort(), ['repository-rules: A marked rule', 'sign-in: Signing in', 'team-rosters: An owner adds a player to a waiting team']);
 });
 
+test('A Playwright marker in double quotes keeps an apostrophe in its title', () => {
+  const file = `test('x', { annotation: { type: 'covers', description: "agent-harness: Checking a slice before the maintainer's test round" } }, async () => {});`;
+  assert.deepEqual([...markersOf(['e2e/scripts/x.spec.ts'], () => file).keys()], ["agent-harness: Checking a slice before the maintainer's test round"]);
+});
+
 test('Scenarios take their capability from the spec folder', () => {
   const scenarios = scenariosOf(['openspec/specs/team-rosters/spec.md'], () => spec(['One', 'Two']));
   assert.deepEqual([...scenarios], ['team-rosters: One', 'team-rosters: Two']);

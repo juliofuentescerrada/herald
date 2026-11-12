@@ -17,3 +17,10 @@ export const urls = {
   admin: `http://localhost:${ports.admin}`,
   public: `http://localhost:${ports.public}`,
 } as const;
+
+// The persona the test scripts sign in as: Herald.Seed seeds its organisations before they run (harness-engineering D-14).
+export const scriptPersona = {
+  oid: '0198f5ee-0000-7000-8000-0000000e2e01',
+  name: 'Avery Quinn',
+  roles: ['Organiser'],
+} as const;

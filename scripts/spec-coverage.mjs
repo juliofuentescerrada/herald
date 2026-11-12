@@ -33,7 +33,8 @@ export function scenariosOf(specFiles, read = (file) => readFileSync(join(root, 
 // One marker form per kind of test file, so an example inside another kind's string is not read as a marker.
 const markerPatterns = [
   [/\.cs$/, /\[Trait\(\s*"covers"\s*,\s*"([^"]+)"\s*\)\]/g],
-  [/\.ts$/, /type:\s*['"]covers['"]\s*,\s*description:\s*['"]([^'"]+)['"]/g],
+  // The closing quote matches the opening one, so a title may contain the other kind (an apostrophe).
+  [/\.ts$/, /type:\s*['"]covers['"]\s*,\s*description:\s*(?:"([^"]+)"|'([^']+)')/g],
   [/\.mjs$/, /^\s*\/\/\s*covers:\s*(.+?)\s*$/gm],
 ];
 
@@ -44,7 +45,10 @@ export function markersOf(testFiles, read = (file) => readFileSync(join(root, fi
     const text = read(file);
     for (const [kind, pattern] of markerPatterns) {
       if (!kind.test(file)) continue;
-      for (const [, marker] of text.matchAll(pattern)) markers.set(marker.trim(), [...(markers.get(marker.trim()) ?? []), file]);
+      for (const [, ...groups] of text.matchAll(pattern)) {
+        const marker = groups.find((group) => group !== undefined).trim();
+        markers.set(marker, [...(markers.get(marker) ?? []), file]);
+      }
     }
   }
   return markers;
