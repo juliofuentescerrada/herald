@@ -19,7 +19,7 @@
 - [x] 4.1 Test script in `e2e/scripts/` (seeded data, `scriptPersona`) with a screenshot of the shell, the tournament list and the entries page with their icons
 - [x] 4.2 Full run (`scripts/check all`, e2e suite), the admin bundle size before and after; record in design.md
 - [x] 4.3 Capture the same screens after the change and compare with 3.0; maintainer run through Aspire; record differences in design.md
-- [ ] 4.4 Update `docs/herald-visual-direction.md` §4 (empty-state size) and §9.3, `docs/roadmap.md` and `README.md`; acceptance review in design.md
+- [x] 4.4 Update `docs/herald-visual-direction.md` §4 (empty-state size) and §9.3, `docs/roadmap.md` and `README.md`; acceptance review in design.md
 
 ## Workflow follow-up
 

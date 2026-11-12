@@ -103,3 +103,14 @@ Captures after the change (task 4.3), compared with task 3.0's at 1440 and 390 p
 - Mobile (390 px): the rail's links carry their icons without wrapping. Status labels wrap more often: on the tournament list "Registration not open" moves to its own line (three rows of labels instead of two), and on the team entries page a long team name pushes its check-in label below the name. Labels still read in order and nothing overflows.
 - The `ui` catalogue's controls page was not captured before and after; its specs (task 2.2) cover the new inputs.
 - The maintainer accepted the extra wrapping on mobile on 12 November 2026.
+
+**Acceptance review (4.4)** against the change's specification:
+
+| Specification | Requirement | Evidence |
+|---|---|---|
+| `interface-icons` | Admin navigation shows an icon with each item | `app.spec.ts` (rail); `NavLink` spec; test script `seeded-icons` |
+| `interface-icons` | Status labels show an icon for their meaning | `tournament-list-page.spec.ts` (lifecycle); `entries-page.spec.ts` (check-in); `StatusLabel` spec; test script `seeded-icons` |
+| `interface-icons` | Links to another page show an icon | `tournament-form-page.spec.ts` (back and entries links); test script `seeded-icons` |
+| `interface-icons` | Empty panels show an icon | `tournament-list-page.spec.ts` (empty list); `entries-page.spec.ts` (empty field); `Icon` spec (`empty` size); test script `seeded-icons` |
+
+Every page spec runs axe; the icons are hidden from assistive technology and the labels' text is unchanged. Visual direction §4 gains the 32 px empty-state size and where the admin application uses icons; §9.3 records the slice.
