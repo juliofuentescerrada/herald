@@ -24,10 +24,11 @@
 
 ## 4. Pull request 3: the agent tests the running application
 
-- [x] 4.1 `aspire agent mcp` in `.mcp.json` through `scripts/aspire-mcp`, with the AppHost's Aspire version; verified from Claude Code without a running AppHost (`list_apphosts`, `doctor`); a running AppHost is checked in the maintainer's next Aspire run
+- [ ] 4.1 `aspire agent mcp` in `.mcp.json` through `scripts/aspire-mcp`, with the AppHost's Aspire version: connected and answering from Claude Code without a running AppHost (`list_apphosts`, `doctor`); still to show it reading a running AppHost's resources and logs, in the maintainer's next Aspire run (5.2)
 - [x] 4.2 `e2e/scripts/` structure, a runner on the E2E environment with seeded data, screenshots at scale factor 2
 - [x] 4.3 A first test script for an existing flow (`seeded-entries`), its screenshots linked from pull request 3 as CI's `test-script-screens` artefact
 
 ## 5. Close
 
-- [ ] 5.1 `openspec validate harness-engineering`; status documents per the `herald-docs` skill; archive after pull request 3
+- [ ] 5.1 `openspec validate harness-engineering`; status documents per the `herald-docs` skill; archive after pull request 3 and 5.2
+- [ ] 5.2 The maintainer's Aspire run: Aspire's MCP server reads the running AppHost's resources and logs (closes 4.1)

@@ -34,11 +34,11 @@ pnpm_version=$(node -p "require('./web/package.json').packageManager.split('@')[
 pnpm --version 2>/dev/null | grep -qx "$pnpm_version" || npm install -g "pnpm@${pnpm_version}"
 
 # Aspire's CLI bundle, at the AppHost's Aspire version.
-aspire_version=$(grep -oP 'Aspire.Hosting.PostgreSQL" Version="\K[^"]+' Directory.Packages.props)
+aspire_version=$(sed -n 's/.*Aspire.Hosting.PostgreSQL" Version="\([^"]*\)".*/\1/p' Directory.Packages.props)
 dnx --yes "aspire.cli@${aspire_version}" -- setup --install-path "${HOME}/.aspire" >/dev/null
 
 # The OpenSpec CLI the skills were generated with, and CodeGraph.
-openspec_version=$(grep -oP 'generatedBy: "\K[^"]+' .claude/skills/openspec-propose/SKILL.md)
+openspec_version=$(sed -n 's/.*generatedBy: "\([^"]*\)".*/\1/p' .claude/skills/openspec-propose/SKILL.md)
 openspec --version 2>/dev/null | grep -qx "$openspec_version" || npm install -g "@fission-ai/openspec@${openspec_version}"
 command -v codegraph >/dev/null || npm install -g @colbymchenry/codegraph@1.6.2
 

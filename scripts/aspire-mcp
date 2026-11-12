@@ -3,5 +3,5 @@
 # read resources, logs and traces of a running AppHost. Declared in .mcp.json; installed on first use by dnx.
 set -euo pipefail
 cd "$(dirname "$0")/.."
-version=$(grep -oP 'Aspire.Hosting.PostgreSQL" Version="\K[^"]+' Directory.Packages.props)
+version=$(sed -n 's/.*Aspire.Hosting.PostgreSQL" Version="\([^"]*\)".*/\1/p' Directory.Packages.props)
 exec dnx --yes "aspire.cli@${version}" -- agent mcp --nologo --non-interactive "$@"
