@@ -121,3 +121,12 @@ Registration: migration `AddCheckIn` (check-in state, revision and last change o
 **Seeded check-in.** The `tournaments-by-state` scenario checks in Autumn League's first entrant (`Admin.CheckInAsync`), so the seeded data shows a confirmed check-in and a locked check-in policy; the test script `e2e/scripts/seeded-check-in.spec.ts` checks in and undoes another entrant there.
 
 **Full run (8.1).** `scripts/check all` passes: rules, spec coverage, `dotnet format --verify-no-changes`, build, `codegen write` and `pnpm api:generate` leave no difference, 334 .NET tests, web lint, the boundary fixtures (15 planted, 15 reported), `test:all` (admin 197, public 13, catalogue 7, ui 31, api-client 9), the SSR isolation check and `build:all`; the e2e suite passes (16 journeys) and so do both test scripts. The admin initial bundle's budget warning (900 kB) predates this change: 946.9 kB now.
+
+**Visual comparison (8.2).** Each Visual input state was captured at 1440 and 390 px from the running application (real data entered through the UI; `page.route` holds a check-in for `checking-in` and fakes the 500 and the 409 for `check-in-failed` and `check-in-conflict`) and compared with `docs/assets/mockups/check-in/`. The rows, labels, summary, actions and their order, the stacked mobile actions, the team row and the locked policy match. Differences, none changing a decision:
+
+- The house components replace the prototype's drawing: the row failure is the danger text with its icon (as roster failures), the in-progress action shows the button's spinner, and disabled row actions during a conflict use the button's disabled style rather than a grey fill.
+- The expanded Cancelled row puts the "Checked in" label after "· Cancelled …" on the name line, where the mockup puts it beside the name with the cancellation time below; the facts and the read-only last confirmation are the same.
+- `no-admitted` also shows the existing "No entries yet" panel above the empty groups, which the entries page already had (h1-entries).
+- Data only: the captures use an online tournament ("Online" for "Madrid"), the real times, and undo Jamie Brook rather than Robin Vale; consecutive toasts stack.
+
+The maintainer's run through Aspire is pending.
