@@ -46,7 +46,13 @@ dotnet user-secrets set "Parameters:auth-admin-client-id" "<herald-admin client 
 dotnet run --project src/Herald.AppHost
 ```
 
-Without them, the Aspire dashboard asks for the missing parameter. A host started without its sign-in configuration stops at start-up with the missing key's name. An admin without `runtime-config.json` (written by `start:admin` from these values) says that its sign-in configuration is missing.
+To start with synthetic data (ADR 0019, `dev-synthetic-data`), also set your own object id in the directory (*Users* → your account → *Object ID*). The AppHost's `seed` resource then seeds the scenarios once, after the host is ready, with you as the owner of the seeded organisations; the directory id comes from `auth-authority`. Without it, `seed` finishes saying it was skipped. A kept data volume is not seeded twice; to start again, delete the volume.
+
+```bash
+dotnet user-secrets set "Parameters:seed-object-id" "<your object id>" --project src/Herald.AppHost
+```
+
+Without the sign-in values, the Aspire dashboard asks for the missing parameter. A host started without its sign-in configuration stops at start-up with the missing key's name. An admin without `runtime-config.json` (written by `start:admin` from these values) says that its sign-in configuration is missing.
 
 ## 4. Give a person access
 

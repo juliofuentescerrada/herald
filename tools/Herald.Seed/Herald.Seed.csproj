@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Seeds synthetic data through Herald's own endpoints, hosting Herald in this process (ADR 0019, dev-synthetic-data).
+       A development tool: never part of the host's deployed image. -->
+  <PropertyGroup>
+    <OutputType>Exe</OutputType>
+  </PropertyGroup>
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+  <ItemGroup>
+    <!-- Its build targets tell the factory where the host's content root is. -->
+    <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
+  </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\..\src\Herald.Host\Herald.Host.csproj" />
+    <ProjectReference Include="..\..\tests\Herald.Testing\Herald.Testing.csproj" />
+  </ItemGroup>
+  <ItemGroup>
+    <InternalsVisibleTo Include="Herald.Seed.Tests" />
+  </ItemGroup>
+</Project>

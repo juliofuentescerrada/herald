@@ -4,7 +4,7 @@ using System.Security.Cryptography;
 using Herald.ModuleHosting;
 using Microsoft.IdentityModel.Tokens;
 
-namespace Herald.Host.Tests;
+namespace Herald.Testing;
 
 // Tokens shaped like the directory's, signed with a key only the tests know: no test reaches the directory.
 public static class TestTokens

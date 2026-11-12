@@ -7,7 +7,7 @@ using Microsoft.IdentityModel.Protocols;
 using Microsoft.IdentityModel.Protocols.OpenIdConnect;
 using Wolverine;
 
-namespace Herald.Host.Tests;
+namespace Herald.Testing;
 
 public sealed class HostFactory(string connectionString, string environment = "Development") : WebApplicationFactory<Program>
 {

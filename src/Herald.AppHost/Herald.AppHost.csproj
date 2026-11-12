@@ -11,5 +11,6 @@
   </ItemGroup>
   <ItemGroup>
     <ProjectReference Include="..\Herald.Host\Herald.Host.csproj" />
+    <ProjectReference Include="..\..\tools\Herald.Seed\Herald.Seed.csproj" />
   </ItemGroup>
 </Project>
