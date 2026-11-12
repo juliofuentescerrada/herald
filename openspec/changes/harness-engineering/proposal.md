@@ -1,6 +1,6 @@
 ## Status
 
-**Draft, pending the maintainer's review.** Scope agreed on 12 November 2026: the seven harness practices in one change, delivered in three pull requests and archived after the last.
+**Pending the maintainer's approval.** Scope agreed on 12 November 2026: the seven harness practices in one change, delivered in three pull requests and archived after the last. The maintainer answered the design's questions the same day (`design.md`).
 
 ## Why
 
@@ -11,7 +11,7 @@ ADR 0018 moves Herald towards unattended implementation: the maintainer will rea
 **Pull request 1: rules, traceability, bootstrap and permissions**
 
 - **Repository rules in three layers:** one script, `scripts/rules [files…]`, checks:
-  - forbidden terms: "tenant", game names in `Domain`, Wizards of the Coast content;
+  - forbidden terms: "tenant", game names (Magic, Pauper) and Wizards of the Coast products in code, and the sibling projects' names in code outside what Herald shares with them;
   - British spelling, with cspell and its en-GB dictionary;
   - the licences of .NET and web packages against an allowed list.
 

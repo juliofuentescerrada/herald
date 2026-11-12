@@ -16,10 +16,14 @@ One rules script SHALL check forbidden terms, British spelling and package licen
 - **THEN** the CI run fails and names the file, line and rule
 
 ### Requirement: Forbidden terms and exceptions are data
-Forbidden terms, the paths they apply to and their messages SHALL be listed in `docs/rules/`, with explicit exceptions that carry a reason. Game names SHALL be forbidden in modules' `Domain` folders, and Wizards of the Coast product names SHALL be forbidden in the whole repository.
+Forbidden terms, the paths they apply to and their messages SHALL be listed in `docs/rules/`, with explicit exceptions that carry a reason. Game names and Wizards of the Coast product names SHALL be forbidden in code, and the sibling projects' names SHALL be forbidden in code except where an exception names what Herald shares with them. Documentation MAY mention them as examples or shared infrastructure.
 
 #### Scenario: A game name in a domain type
-- **WHEN** a file under `src/Herald.Tournaments/Domain/` names a listed game
+- **WHEN** a file under `src/Herald.Tournaments/Domain/` names Magic or Pauper
+- **THEN** the check fails with the rule's message
+
+#### Scenario: A sibling project in code
+- **WHEN** a file under `web/projects/` names PauperPilot
 - **THEN** the check fails with the rule's message
 
 #### Scenario: An external name that must stay
