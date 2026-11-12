@@ -1,6 +1,6 @@
 ## 1. Approval
 
-- [ ] 1.1 Maintainer review of the proposal, specs and design, with answers to Q-1 to Q-3; record the approval in `proposal.md`
+- [x] 1.1 Maintainer review of the proposal, specs and design, with answers to Q-1 to Q-3; record the approval in `proposal.md`
 
 ## 2. Shared test support
 

@@ -1,6 +1,6 @@
 ## Status
 
-**Pending the maintainer's approval.** Direction agreed on 12 November 2026 in ADR 0019 (Proposed); the maintainer answered the design's questions the same day (`design.md`).
+**Approved for implementation on 12 November 2026** (gate 1.1). Direction agreed the same day in ADR 0019 (Proposed); the maintainer answered the design's questions (`design.md`) and chose to implement it in a pull request of its own, after the documentation's.
 
 ## Why
 
