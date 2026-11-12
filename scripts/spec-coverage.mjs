@@ -18,7 +18,11 @@ import { fileURLToPath } from 'node:url';
 
 export const root = resolve(dirname(fileURLToPath(import.meta.url)), '..');
 const baselinePath = 'docs/rules/uncovered-scenarios.txt';
-const tracked = () => execFileSync('git', ['ls-files', '--cached', '--others', '--exclude-standard'], { cwd: root, encoding: 'utf8' }).split('\n').filter(Boolean);
+// Tracked and new files that exist: a file moved but not yet staged (an archived change) is still in the index.
+const tracked = () =>
+  execFileSync('git', ['ls-files', '--cached', '--others', '--exclude-standard'], { cwd: root, encoding: 'utf8' })
+    .split('\n')
+    .filter((file) => file && existsSync(join(root, file)));
 
 // "<capability>: <title>" for every scenario of the given spec files.
 export function scenariosOf(specFiles, read = (file) => readFileSync(join(root, file), 'utf8')) {

@@ -14,6 +14,7 @@
   </Folder>
   <Folder Name="/tests/">
     <Project Path="tests/Herald.ApiFixtures/Herald.ApiFixtures.csproj" />
+    <Project Path="tests/Herald.AppHost.Tests/Herald.AppHost.Tests.csproj" />
     <Project Path="tests/Herald.Architecture.Tests/Herald.Architecture.Tests.csproj" />
     <Project Path="tests/Herald.Host.Tests/Herald.Host.Tests.csproj" />
     <Project Path="tests/Herald.Messaging.Tests/Herald.Messaging.Tests.csproj" />
