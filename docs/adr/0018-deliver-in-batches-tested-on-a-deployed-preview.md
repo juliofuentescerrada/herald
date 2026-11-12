@@ -1,0 +1,54 @@
+# 0018. From H2, deliver in batches that the agent implements and the maintainer tests on a deployed preview
+
+- Status: Proposed
+- Date: 2026-11-12
+
+## Context
+
+H1 is delivered one OpenSpec change at a time, and each change stops for the maintainer several times: mockups requested for every affected screen, approval of the proposal, a run through Aspire on the maintainer's machine, visual corrections, the acceptance review and a separate pull request that archives the change. The git history up to `h1-team-rosters` shows the implementation itself takes one to two hours of wall-clock time per slice (`h1-registration-window` about 1 h 10, `h1-entries` about 2 h 15, `h1-team-rosters` about 1 h 40, from proposal commit to archive merge). Most of the elapsed time is spent waiting at those stops. Documentation accounts for 30–70 % of each slice's added lines, and the status of every slice is repeated in `README.md`, `docs/roadmap.md`, `CLAUDE.md` and `openspec/config.yaml`.
+
+The remaining milestones add up to roughly five or six times H1's size (H2 portal 1.0–1.3 H1, H3 0.5–0.7, H4 0.8–1.1, H5 0.9–1.2, H6 0.6–0.8, H7 0.3–0.5, M4 0.3–0.5; an estimate from 12 November 2026, not a commitment). At the current number of stops per slice, the maintainer's attention, not implementation, sets the pace.
+
+The repository already has the guardrails that make unattended implementation reviewable: architecture tests, the import matrix, format, generated-code and OpenAPI drift checks, use-case and API tests against real PostgreSQL and the Playwright journeys (ADR 0010, ADR 0015). What it lacks is an environment where the maintainer can try a change without running it locally: M4 has not started, and the E2E environment with its fake identity provider is refused in deployments on purpose (ADR 0015).
+
+The maintainer wants to give feedback on the deployed application rather than on code, and to run the agent remotely with the Claude subscription, not through the API.
+
+## Decision
+
+H1 finishes with the current process. M4 follows H1 and comes before H2. From H2 on:
+
+- **Batches.** A milestone is delivered in batches of three to five slices that share decisions and screens and together form a testable part of a journey. The batch is the unit of the maintainer's attention.
+- **The batch issue is the high-level definition.** Goal, acceptance journey and candidate decision-register rows; the agent may draft it from the functional discovery and the maintainer adjusts it.
+- **Explore with the maintainer, propose without.** The decision session is the batch's only interactive step: the maintainer and the agent explore the batch (`/opsx:explore`) and close its decision-register rows (functional discovery §15) and acceptance scenarios, which the agent records in the discovery. The agent then proposes every OpenSpec change of the batch unattended, validates them (`openspec validate`) and opens **one proposals pull request for the batch**. **The agent generates the screens as navigable prototypes** in `prototypes/frontend/`, following visual direction §4 and §7.2, instead of asking for mockups. A rule the session did not settle becomes an open question on that pull request, not a decision. The maintainer reviews proposals and prototypes there once; merging it approves the batch. This replaces the per-change mockup request and approval in `CLAUDE.md` for batched work.
+- **Unattended implementation.** The agent works through the batch's changes in a Claude Code cloud session (Claude Code on the web), one pull request per slice. Each pull request contains the implementation, its tests and journey, a self-review, a screenshot comparison against the prototype, the specification sync **and the archive of the change**; no separate archive pull request. The agent stops only at a rule that the decision register does not settle: it records the question in the pull request and its issue and does not decide it.
+- **A preview per pull request.** Each pull request is deployed to a preview environment with seeded data and a test account per persona (owner, player, captain, referee) in the External ID directory, assigned to Herald's application (D-21). The pull request description includes a test script derived from the specification's scenarios: which persona, which data, what to do and what to expect.
+- **Feedback on the application.** The maintainer tries the preview and comments on the pull request. The session is subscribed to the pull request's activity, applies the feedback, redeploys and answers. A batch is accepted when its journey passes on the preview; the maintainer merges every pull request.
+- **Tracking in GitHub Issues.** One GitHub milestone per Herald milestone; one issue per batch (label `batch`) with its decision checklist, prototypes and acceptance journey; one sub-issue per slice (label `slice`) linked to its OpenSpec change and closed by its pull request. Status labels (`needs-decision`, `in-progress`, `ready-to-test`, `feedback`) drive a GitHub Project board. **Issues hold state and feedback, never content:** specifications, decisions and ADRs stay in the repository (ADR 0001) and issues link to them.
+- **Status in one place.** From H2, the issues and the board track progress. `docs/roadmap.md` keeps milestones and their exit criteria, and `README.md` and `CLAUDE.md` point to the board instead of restating each slice's status.
+
+The maintainer keeps the decisions, ADR acceptance and the merge. Nothing here lets the agent merge, approve or decide a product rule.
+
+## Alternatives considered
+
+- **Keep one change at a time with the current stops**: it works and keeps the maintainer close to the code, but at five or six H1s of remaining work it leaves the maintainer's availability as the limit.
+- **GitHub Actions running Claude Code on GitHub's runners**: it can run on the subscription, but adds workflow configuration and token handling while offering less than a cloud session, which already holds the repository, Docker, pull request subscriptions and scheduled tasks.
+- **A preview inside the cloud session** (the host in an environment like E2E, behind one port shown in the session's preview pane): it needs no Azure resources and stays as the fallback if M4 is late, but it is ephemeral, depends on the session staying alive and would need a non-deployment environment with the fake identity provider to be reachable through one origin.
+- **Jira for tracking**: another tool with a connector to maintain, while the loop already lives in GitHub pull requests.
+- **Keep status in the documents only**: it is what H1 does, and it produces the per-slice status edits this decision removes.
+
+## Consequences
+
+- Positive: the maintainer's stops drop from about five per slice to a decision session and a proposals review per batch, a test round per pull request and the merge. Feedback refers to observable behaviour on a deployed application. One pull request per slice instead of two, and status recorded once.
+- Positive: M4 is delivered with a real consumer, the preview environments, before the participant portal needs remote testing.
+- Negative: long unattended runs consume the subscription's usage limits; a batch may have to pause until the limit resets.
+- Negative: the maintainer reads less code. Correctness depends on the guardrails and the self-review, so a weak test or a missing journey is caught later.
+- Negative: agent-generated prototypes may be weaker visual input than mockups produced separately; the decision session is the only visual review before implementation.
+- Negative: M4 becomes the critical path to H2, and M4 waits for the shared platform (ADR 0012). The platform has to be designed while H1 finishes, or the pilot environment ADR 0012 already allows has to be planned and reviewed.
+- Negative: preview environments cost money while they exist; they are torn down when their pull request closes and their idle cost is measured with M4's.
+- Follow-ups:
+  - M4's exit criteria include preview environments per pull request with seeded data and persona test accounts (`docs/roadmap.md`).
+  - A `herald` cloud environment whose setup script installs the .NET SDK and the workspaces' dependencies, so cloud sessions can build and test.
+  - Playwright journeys also run on pull requests, so the agent verifies its work before asking for a test round (today they run after merges to `main`, about three minutes).
+  - On acceptance, before H2's first batch: revise `CLAUDE.md`, `openspec/config.yaml` and `.github/pull_request_template.md` (mockup rule, archive in the same pull request, status pointers, test script); create the milestones, labels, project board and the H2 batch issues.
+
+Direction proposed by the maintainer on 12 November 2026; the details above remain Proposed. H1's remaining slices keep the current process. Nothing is implemented yet except the issue templates.

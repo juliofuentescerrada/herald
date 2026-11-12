@@ -1,0 +1,44 @@
+name: Batch
+description: A batch of three to five slices that share decisions and screens and form a testable part of a journey (ADR 0018).
+title: "Batch: "
+labels: ["batch", "needs-decision"]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        A batch issue tracks state and feedback only. Rules, decisions and specifications stay in the repository (ADR 0001): link to them, do not copy them.
+  - type: textarea
+    id: goal
+    attributes:
+      label: Goal
+      description: The part of the journey this batch makes work, in one or two sentences.
+    validations:
+      required: true
+  - type: textarea
+    id: decisions
+    attributes:
+      label: Decisions to close
+      description: Decision-register rows (functional discovery §15) the batch depends on, as a checklist. Each is closed in the decision session, in the repository.
+      placeholder: |
+        - [ ] D-10 Competitor confirmation
+    validations:
+      required: true
+  - type: textarea
+    id: slices
+    attributes:
+      label: Slices
+      description: One sub-issue per slice, in order. Add them as sub-issues; list them here for reading.
+      placeholder: |
+        - [ ] #… self-service registration
+  - type: textarea
+    id: prototypes
+    attributes:
+      label: Prototypes
+      description: Screens and states the agent prototypes in prototypes/frontend/ for review in the decision session.
+  - type: textarea
+    id: journey
+    attributes:
+      label: Acceptance journey
+      description: The journey that, passing on the preview, accepts the batch. Persona, starting data and steps.
+    validations:
+      required: true
