@@ -8,79 +8,31 @@ context: |
   transport), EF Core on PostgreSQL, .NET Aspire, Angular with TanStack Query, Azure Container
   Apps, Key Vault, Entra ID, OpenTofu, GitHub Actions.
 
-  Conventions:
-  - UI sharing (ADR 0011): an internal ui library from M0, consumed by both shells,
-    separate from api-client; feature and app-local shared presentation remain in their app.
-    ui supports SSR and has no app/API/query-cache/session/permission/routing dependencies.
-    api-client owns no UI, navigation or business state. Add a
-    component/state catalogue as development tooling with the first controls, not a third product app.
-  - Frontend (ADR 0011): one Angular workspace, admin (CSR) and public/participant (hybrid)
-    apps; SSG for corporate pages, SSR for dynamic public entry pages, CSR for personal
-    workflows and live updates. Shared UI/tokens/API client, isolated SSR request state
-    and public-only shared caches. Hosting includes an SSR runtime (ADR 0012).
-  - Frontend features own related routes, UI, forms, queries/mutations and tests. Features do not
-    import other features or the other app; app composition imports their explicit entry points.
-    App platform owns session/organisation context and API configuration without feature imports.
-    Enforce the import matrix in CI; define server/local-state ownership and invalidation on
-    context changes. Feature boundaries do not require NgModules or one library per feature.
-  - Everything in English. Keep one source per responsibility (ADR 0001): README for status,
-    functional-discovery for rules/journeys/decisions, roadmap for delivery, ADRs for architecture,
-    visual-direction for tokens and screen/state coverage. Design notes and measurements go in
-    the change's design.md. Proposed ADRs may be refined; accepted decisions normally supersede.
-    The maintainer authorised in-place pre-development consolidation on 2026-11-07; preserve
-    confirmed/proposed/implemented distinctions. PPT, mockups and prototypes are explanatory
-    supports, not production or independent rules. Apply Refactoring UI with square corners and
-    the documented scale. The earlier round-management PNG is superseded for semantics.
-  - openspec/specs describes what is implemented. Active deltas describe target changes;
-    archived changes and dated reviews remain historical. m0-solution-skeleton, m0-messaging
-    and m0-web-shell are done, as are the documentation consolidation and the static journey
-    prototype, h1-organisation-access (ADR 0014, accepted) and e2e-critical-paths (ADR 0015).
-    h1-tournament-setup (first F-02 slice: draft, configuration, review, publication, list) is
-    done too, as is h1-registration-window (open, close and reopen registration by hand).
-    h1-entries (guest entries, admission, waiting queue, cancellation, first integration events)
-    is done too. h1-team-rosters (team rosters within bounds, one team per player, readiness,
-    history) is implemented and archived; check-in, roster freeze, competition and
-    public reads do not exist.
-    ui-feedback-and-layout (dialogs, drawer, toasts, full-width admin pages; visual direction §4, §5,
-    §7.2, §8.1) is implemented and archived; later screens follow those rules.
-  - Modular monolith: one module per bounded context, with Domain at the centre and vertical slices
-    (Features: one namespace per use case, one file or cohesive folder; Persistence at the edge);
-    features never depend on other features. Shared business rules belong in Domain; technical
-    reuse belongs with its responsibility, not automatically in Domain. The set evolves with the design
-    (today Organisations, Tournaments, Registration, Competition, Standings) and a change that
-    moves a boundary explains it in its design.md; modules talk only through integration events
-    in Herald.Contracts (ADR 0004). ModuleHosting is technical composition only; modules
-    register through it inside the host's UseWolverine. Cross-module
-    transitions identify an owner, authoritative conditions and reviewed revisions. Domain is
-    independent of infrastructure; one schema per module for its state and no cross-schema joins;
-    Wolverine's messages share one wolverine schema (Wolverine 6.62.0 cannot keep them per module).
-  - Organisation, never "tenant", for the organising entity; British spelling (ADR 0003).
-  - CQRS: commands through aggregates, returning identities/receipts/outcome or revision metadata
-    and typed errors; queries as no-tracking projections (ADR 0005). An acknowledgement is not
-    proof that a derived projection is current. Preserve operation identity on retries.
-  - DDD: aggregates own the rules and raise domain events; integration events leave through
-    the transactional outbox and, between modules of the host, durable local queues (Service
-    Bus only when a party leaves the process); consumers are idempotent (state events are
-    revisioned snapshots); contract changes are backwards compatible or versioned (ADRs 0006,
-    0008, 0016).
-  - Notifications (ADR 0017): a future Notifications module consumes integration events; no
-    module sends notices. F-10's notifiable facts become fact events (subject, subject revision,
-    actor, time, reason code; no private text or wording), published only once a consumer exists.
-    Every proposal lists the notifiable facts it introduces, persists them so later publication
-    needs no data migration, and adds them to ADR 0017's inventory.
-  - Durable business history is owned by the relevant module (ADR 0007): preserve predecessor
-    revisions, actor/time/reason and participation evidence with the effective state change.
-    Logs and message retention are not the competitive audit trail. Only effective results score.
-  - Tests read as sentences; use-case and API tests run against real PostgreSQL (ADR 0010).
-  - Original work only: nothing taken from other codebases.
-  - On every /opsx:propose, identify screens to create or modify and explicitly ask the user
-    for mockups of each affected screen and its relevant states. Reuse supplied mockups
-    when they cover the change and reference them in the change's design.md. Missing
-    mockups keep the proposal pending visual input, not ready for implementation.
-    For changes without screen impact, state that mockups are not applicable.
-    Mockups are not regenerated when implementation revises them; the change's design and
-    the visual direction supersede them. Prompts for new mockups state the current layout
-    rules (visual direction §4, §7.2): admin pages full width with no maximum; one column,
-    secondary content stacked, no aside; one 700 px breakpoint; panels and notices fill their
-    container, running text about 75 characters per line; status labels beside the title;
-    summary actions right of their text; read-only history after the actionable groups.
+  The rules live in one place each; read the ones the change touches before writing an artifact:
+  - CLAUDE.md: language, original work, game-agnostic core, licences, OpenSpec workflow.
+  - src/CLAUDE.md: modules and vertical slices, CQRS, integration and fact events,
+    notifications (ADR 0017 inventory), durable history. tests/CLAUDE.md: tests.
+  - web/CLAUDE.md: UI sharing, rendering modes, feature boundaries and the import matrix.
+  - herald-screens skill: screens, states, layout rules and mockups.
+  - herald-docs skill: documentation sources, ADRs, decisions, archiving and status.
+  - docs/herald-functional-discovery.md: product rules, journeys and the decision register (§15);
+    read the sections the change needs, not the whole file.
+  - docs/roadmap.md: delivery order and what is implemented. openspec/specs: implemented behaviour.
+
+rules:
+  proposal:
+    - Name the decision-register rows the change depends on and their status; an undecided rule
+      is an open question for the maintainer, never a decision taken in the proposal.
+    - List every screen created or modified and its states, or state that mockups are not
+      applicable (herald-screens skill).
+    - List the notifiable facts the change introduces, or state that it introduces none (ADR 0017).
+  design:
+    - Reference the mockups or prototypes of each affected screen; a proposal with missing
+      mockups stays pending visual input (herald-screens skill).
+    - Explain any change to a module boundary, cross-module transition or integration contract,
+      with its owner, authoritative conditions and revisions.
+    - Measurements, visual comparisons and acceptance reviews are recorded here.
+  tasks:
+    - Include regenerating Wolverine's code and the OpenAPI client when handlers or endpoints change,
+      a Playwright journey for each new user-visible flow, and the documentation updates the
+      herald-docs skill requires on archive.
