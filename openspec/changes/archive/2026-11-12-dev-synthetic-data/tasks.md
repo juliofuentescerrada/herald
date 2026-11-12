@@ -23,5 +23,5 @@
 ## 5. Documents and review
 
 - [x] 5.1 `docs/operations/identity.md` and `CLAUDE.md`: the seeding command and the persona user secrets
-- [ ] 5.2 Maintainer run through Aspire: signing in shows the seeded organisation; record it in `design.md`
+- [x] 5.2 Maintainer run through Aspire: signing in shows the seeded organisation; record it in `design.md`
 - [ ] 5.3 `openspec validate dev-synthetic-data`; status documents per the `herald-docs` skill

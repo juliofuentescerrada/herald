@@ -96,6 +96,7 @@ public class SyntheticDataTests(SeededDatabases databases)
 
     [Fact]
     [Trait("covers", "synthetic-data: Seeding a database that is already seeded")]
+    [Trait("covers", "local-environment: Starting the AppHost again on a kept volume")]
     public async Task Seeding_a_seeded_database_skips_every_scenario_and_changes_nothing()
     {
         var database = await databases.NewDatabaseAsync();
@@ -106,6 +107,31 @@ public class SyntheticDataTests(SeededDatabases databases)
 
         again.ShouldAllBe(result => result.Outcome == ScenarioOutcome.AlreadyPresent);
         (await SeededDatabases.CountAsync(database, """select count(*) from registration."Entries" """)).ShouldBe(entries);
+    }
+
+    [Fact]
+    [Trait("covers", "synthetic-data: An endpoint change breaks a scenario")]
+    public async Task A_step_the_endpoints_reject_fails_the_seeding_and_names_its_scenario_and_step()
+    {
+        var database = await databases.NewDatabaseAsync();
+        Scenario[] broken = [new("broken", Personas.Main, "Broken Club", (admin, organisation, _) => admin.PublishAsync(organisation, Guid.NewGuid()))];
+
+        var failure = await Should.ThrowAsync<InvalidOperationException>(() => Seeder.RunAsync(database, SeededDatabases.Personas, SeededDatabases.Now, broken));
+
+        failure.Message.ShouldContain("Scenario 'broken' failed");
+        failure.Message.ShouldContain("Could not read a tournament: 404");
+    }
+
+    [Fact]
+    [Trait("covers", "local-environment: Starting the AppHost without personas")]
+    public async Task Without_a_main_persona_the_seeding_reports_that_it_was_skipped_and_succeeds()
+    {
+        var configuration = new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?> { ["ConnectionStrings:herald"] = "Host=unreachable.invalid" }).Build();
+        using var output = new StringWriter();
+        using var error = new StringWriter();
+
+        (await SeedCommand.RunAsync(configuration, output, error)).ShouldBe(0);
+        output.ToString().ShouldContain("Seeding skipped: no main persona is configured");
     }
 
     [Fact]

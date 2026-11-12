@@ -73,20 +73,37 @@ export function checkSpelling(files) {
     });
 }
 
+// The licence findings for packages already read: web licences as pnpm lists them, .NET packages with the
+// licence expression their nuspec declares (undefined when it declares none).
+export function licenceFindings({ web = {}, dotnet = [] }, config = read('docs/rules/licences.json')) {
+  const findings = [];
+  const allowed = (licence) => Object.hasOwn(config.allowed, licence);
+  for (const [workspace, listing] of Object.entries(web)) {
+    for (const [licence, packages] of Object.entries(listing)) {
+      if (allowed(licence)) continue;
+      for (const item of packages) findings.push(`${workspace}/pnpm-lock.yaml  licence: ${item.name} ${item.versions.join(', ')} is ${licence}, not on the allowed list.`);
+    }
+  }
+  for (const { id, version, licence } of dotnet) {
+    const reviewed = config.packages[id];
+    if (reviewed && allowed(reviewed.licence)) continue;
+    if (!licence) findings.push(`Directory.Packages.props  licence: ${id} ${version} declares no licence expression; review it and add it to docs/rules/licences.json.`);
+    else if (!allowed(licence)) findings.push(`Directory.Packages.props  licence: ${id} ${version} is ${licence}, not on the allowed list.`);
+  }
+  return findings;
+}
+
 // Licences (D-5): every web and .NET package, direct and transitive, against docs/rules/licences.json.
 export function checkLicences(config = read('docs/rules/licences.json')) {
   const findings = [];
-  const allowed = (licence) => Object.hasOwn(config.allowed, licence);
+  const web = {};
   for (const workspace of ['web', 'e2e']) {
     const listed = spawnSync('pnpm', ['licenses', 'list', '--json'], { cwd: join(root, workspace), encoding: 'utf8', maxBuffer: 64 * 1024 * 1024 });
     if (listed.status !== 0) {
       findings.push(`${workspace}/  licences: pnpm could not list them (${listed.stderr.trim().split('\n')[0]}); run pnpm install there.`);
       continue;
     }
-    for (const [licence, packages] of Object.entries(JSON.parse(listed.stdout))) {
-      if (allowed(licence)) continue;
-      for (const item of packages) findings.push(`${workspace}/pnpm-lock.yaml  licence: ${item.name} ${item.versions.join(', ')} is ${licence}, not on the allowed list.`);
-    }
+    web[workspace] = JSON.parse(listed.stdout);
   }
 
   let listing;
@@ -104,15 +121,12 @@ export function checkLicences(config = read('docs/rules/licences.json')) {
     }
   }
   const cache = process.env.NUGET_PACKAGES ?? join(homedir(), '.nuget', 'packages');
-  for (const { id, resolvedVersion } of packages.values()) {
-    const reviewed = config.packages[id];
-    if (reviewed && allowed(reviewed.licence)) continue;
+  const dotnet = [...packages.values()].map(({ id, resolvedVersion }) => {
     const nuspec = join(cache, id.toLowerCase(), resolvedVersion.toLowerCase(), `${id.toLowerCase()}.nuspec`);
     const licence = existsSync(nuspec) ? readFileSync(nuspec, 'utf8').match(/<license type="expression">([^<]+)<\/license>/)?.[1] : undefined;
-    if (!licence) findings.push(`Directory.Packages.props  licence: ${id} ${resolvedVersion} declares no licence expression; review it and add it to docs/rules/licences.json.`);
-    else if (!allowed(licence)) findings.push(`Directory.Packages.props  licence: ${id} ${resolvedVersion} is ${licence}, not on the allowed list.`);
-  }
-  return findings;
+    return { id, version: resolvedVersion, licence };
+  });
+  return [...findings, ...licenceFindings({ web, dotnet }, config)];
 }
 
 export function run(args) {

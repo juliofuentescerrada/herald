@@ -1,9 +1,9 @@
 // The repository-rules spec for scripts/rules.mjs: node --test scripts/
 import assert from 'node:assert/strict';
-import { mkdirSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { after, test } from 'node:test';
-import { checkSpelling, checkTerms, root } from './rules.mjs';
+import { checkSpelling, checkTerms, licenceFindings, root } from './rules.mjs';
 
 const folder = 'scripts/.rules-test';
 mkdirSync(join(root, folder, 'src/Herald.Tournaments/Domain'), { recursive: true });
@@ -64,4 +64,30 @@ test('An American spelling in Markdown prose is reported with its British form e
 test('An American spelling inside inline code in Markdown is left alone', () => {
   const path = file('code.md', 'The HTML attribute `autocomplete="organization"` stays.\n');
   assert.deepEqual(checkSpelling([path]), []);
+});
+
+// covers: repository-rules: A package with a new licence
+test('A package whose licence is not on the allowed list is reported with its name, version and licence', () => {
+  const licences = { allowed: { MIT: 'Permissive.' }, packages: { Reviewed: { licence: 'MIT', reason: 'Read by hand.' } } };
+  const findings = licenceFindings(
+    {
+      web: { web: { MIT: [{ name: 'fine', versions: ['1.0.0'] }], 'GPL-3.0': [{ name: 'copyleft', versions: ['2.1.0'] }] } },
+      dotnet: [
+        { id: 'Allowed', version: '1.0.0', licence: 'MIT' },
+        { id: 'Unknown', version: '3.0.0', licence: undefined },
+        { id: 'Reviewed', version: '4.0.0', licence: undefined },
+      ],
+    },
+    licences,
+  );
+  assert.deepEqual(findings, [
+    'web/pnpm-lock.yaml  licence: copyleft 2.1.0 is GPL-3.0, not on the allowed list.',
+    'Directory.Packages.props  licence: Unknown 3.0.0 declares no licence expression; review it and add it to docs/rules/licences.json.',
+  ]);
+});
+
+// covers: repository-rules: A bypassed hook is caught in CI
+test('CI runs the rules on every file, so a commit made without the hooks still fails', () => {
+  const workflow = readFileSync(join(root, '.github/workflows/ci.yml'), 'utf8');
+  assert.match(workflow, /^\s+run: node scripts\/rules\.mjs\s*$/m);
 });
