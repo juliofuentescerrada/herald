@@ -5,10 +5,10 @@
 ## 2. Checkpoints and metrics
 
 - [x] 2.1 `guard.mjs`: push rounds counted only after the session opens or updates a pull request (D-2); tests with synthetic hook inputs
-- [ ] 2.2 `guard.mjs`: a `recorded` mark of counters already written to a trailer (D-3)
-- [ ] 2.3 `.githooks/prepare-commit-msg` adding the `Harness-Metrics` trailer for agent commits, never failing a commit; enabled by `scripts/bootstrap` with the existing hooks
-- [ ] 2.4 `scripts/harness-metrics.mjs --branch [--markdown]` summing the trailers of `main..HEAD` and unrecorded turns; tests
-- [ ] 2.5 Mark the change's metrics and checkpoint scenarios with `// covers:`
+- [x] 2.2 `guard.mjs`: a `recorded` mark of counters already written to a trailer (D-3)
+- [x] 2.3 `.githooks/prepare-commit-msg` adding the `Harness-Metrics` trailer for agent commits, never failing a commit; enabled by `scripts/bootstrap` with the existing hooks
+- [x] 2.4 `scripts/harness-metrics.mjs --branch [--markdown]` summing the trailers of `main..HEAD` and unrecorded turns; tests
+- [x] 2.5 Mark the change's metrics and checkpoint scenarios with `// covers:`
 
 ## 3. State and resumption
 

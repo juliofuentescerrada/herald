@@ -1,0 +1,10 @@
+#!/bin/sh
+# Adds the agent session's metrics since its last trailer to a commit made by Claude Code (harness-resumption D-3),
+# so a slice's metrics survive its container. Enabled by scripts/bootstrap with the other hooks.
+# It never fails a commit: whatever goes wrong, the commit goes ahead without a trailer.
+[ "$CLAUDECODE" = "1" ] || exit 0
+[ "$2" = "merge" ] && exit 0
+root=$(git rev-parse --show-toplevel 2>/dev/null) || exit 0
+trailer=$(node "$root/scripts/harness-metrics.mjs" --trailer 2>/dev/null) || exit 0
+[ -n "$trailer" ] && git interpret-trailers --in-place --if-exists add --trailer "Harness-Metrics: $trailer" "$1" 2>/dev/null
+exit 0
