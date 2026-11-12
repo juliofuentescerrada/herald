@@ -129,4 +129,18 @@ Registration: migration `AddCheckIn` (check-in state, revision and last change o
 - `no-admitted` also shows the existing "No entries yet" panel above the empty groups, which the entries page already had (h1-entries).
 - Data only: the captures use an online tournament ("Online" for "Madrid"), the real times, and undo Jamie Brook rather than Robin Vale; consecutive toasts stack.
 
-The maintainer's run through Aspire is pending.
+The maintainer ran the slice through Aspire on 12 November 2026 with no differences to correct, and accepted these as adjustments: a mockup is a reference, not a copy to match (icons, which the mockups do not draw, come in a separate change).
+
+**Acceptance review (8.3)** against the change's specifications:
+
+| Specification | Requirement | Evidence |
+|---|---|---|
+| `entrant-check-in` | An owner checks in an admitted entry (admitted player, after closure, waiting and cancelled refused, team without a complete roster, promoted entry pending) | Registration `CheckInTests`; Host `CheckInTests` (`An_owner_checks_in_an_admitted_player`, `A_waiting_entry_cannot_check_in`, `A_cancelled_entry_cannot_check_in`, another organisation's generic 404) |
+| `entrant-check-in` | An owner undoes a check-in (repeats return the current entry) | Registration `CheckInTests`; Host `An_owner_undoes_a_check_in_and_a_repeat_returns_the_field` |
+| `entrant-check-in` | Check-in keeps its history (three changes recorded, stale revision conflicts, admission does not conflict, cancellation keeps evidence) | Registration `CheckInTests`; Host `A_stale_check_in_write_is_a_conflict`, `An_admission_in_another_tab_does_not_conflict_with_a_check_in`, `Cancelling_keeps_the_check_in_and_stops_counting_it` |
+| `entrant-check-in` | The field reports how many admitted entries have checked in (count, older message) | Registration `Cancelling_keeps_the_evidence_and_stops_counting`; `TournamentFieldChangedTests` |
+| `entrant-check-in` | The admin application shows and manages check-in | `entries-page.spec.ts` (check-in tests, axe); visual comparison (8.2); journey 16; test script `seeded-check-in`; maintainer run (12 November 2026) |
+| `tournament-setup` | Entries constrain the tournament's configuration (check-in policy locked by confirmed check-ins, free without them, the form explains it) | `TournamentEntryRulesTests`; Host `The_check_in_policy_is_locked_by_a_check_in_from_registration_and_free_once_it_is_undone`; `tournament-form-page.spec.ts` |
+| `end-to-end-journeys` | Journey 16 | `e2e/journeys/entries.spec.ts` |
+
+Status documents updated: `docs/herald-visual-direction.md` §9.3 (check-in row), `docs/roadmap.md` and `README.md`. `CLAUDE.md` and `openspec/config.yaml` no longer carry status (they link to the roadmap), so they are unchanged.
