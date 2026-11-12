@@ -5,7 +5,7 @@
 
 ## 2. Contract
 
-- [ ] 2.1 `TournamentFieldChanged` gains optional `CheckedIn`; a test deserialises a v1 message without it as 0
+- [x] 2.1 `TournamentFieldChanged` gains optional `CheckedIn`; a test deserialises a v1 message without it as 0
 
 ## 3. Registration domain
 
