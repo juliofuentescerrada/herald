@@ -28,6 +28,7 @@ Herald runs tournaments (league, knockout, single match) and is game-agnostic: g
 ## Working economically
 
 - Check with `scripts/check [dotnet|web|all]`: CI's steps with one line each and only the errors on failure.
+- Use CodeGraph (`codegraph_explore`, configured in `.mcp.json`) before reading code files: one call returns the relevant source, its callers and the tests affected. A fresh clone needs `codegraph init` once; the index then follows file changes.
 - Read large documents by section (`grep` for the D-, F- or § reference, then read those lines), never whole: the discovery alone is about 37,000 tokens.
 - Stop and ask instead of retrying when the same CI failure returns after one fix, when a flaky journey fails again after one retry, or when a slice clearly outgrows its `tasks.md` (propose splitting it). Never skip or disable a test to get green.
 - Schedule only one-off wake-ups; no recurring schedule that starts sessions without a limit.
