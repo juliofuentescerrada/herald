@@ -24,7 +24,7 @@ Original Herald compositions, rendered from local HTML/CSS/JavaScript with Playw
 
 Sources, read before drawing:
 
-- [Check-in proposal](../../../../openspec/changes/h1-check-in/proposal.md), [design](../../../../openspec/changes/h1-check-in/design.md) R-1–R-9, D-4/D-5 and A-1–A-4, [entrant check-in specification](../../../../openspec/changes/h1-check-in/specs/entrant-check-in/spec.md) and [configuration specification](../../../../openspec/changes/h1-check-in/specs/tournament-setup/spec.md).
+- [Check-in proposal](../../../../openspec/changes/archive/2026-11-12-h1-check-in/proposal.md), [design](../../../../openspec/changes/archive/2026-11-12-h1-check-in/design.md) R-1–R-9, D-4/D-5 and A-1–A-4, [entrant check-in specification](../../../../openspec/changes/archive/2026-11-12-h1-check-in/specs/entrant-check-in/spec.md) and [configuration specification](../../../../openspec/changes/archive/2026-11-12-h1-check-in/specs/tournament-setup/spec.md).
 - [Functional discovery](../../../herald-functional-discovery.md), F-05 and TM-09. The active change supplies the narrower operator-only scope: no window, start review, member attendance or representative flow is drawn.
 - [Visual direction](../../../herald-visual-direction.md), especially §§4, 5, 7.2 and 9.3. Implemented refinements supersede old captures.
 - Current [entries template](../../../../web/projects/admin/src/app/features/entries/entries-page.html) and styles; [configuration template](../../../../web/projects/admin/src/app/features/tournaments/tournament-form-page.html), field definitions and registration area; the ui Drawer, Dialog, Notice, Toast and StatusLabel components.
