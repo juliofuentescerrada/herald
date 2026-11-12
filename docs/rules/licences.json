@@ -16,9 +16,9 @@
     "Python-2.0": "Permissive in practice for the bundled helper using it; accepted by the maintainer.",
     "(Apache-2.0 AND BSD-3-Clause)": "Both permissive.",
     "(MIT OR CC0-1.0)": "Either permissive.",
-    "Unlicense": "Public domain dedication (tweetnacl, in the end-to-end suite). Proposed in harness-engineering; the maintainer confirms it in review.",
-    "WTFPL": "Permissive (a cspell dictionary, development only). Proposed in harness-engineering; the maintainer confirms it in review.",
-    "CC BY-SA 4.0": "Share-alike data (cspell's common-misspellings list, development only, not distributed). Proposed in harness-engineering; the maintainer confirms it in review."
+    "Unlicense": "Public domain dedication (tweetnacl, in the end-to-end suite). Accepted by the maintainer on 12 November 2026.",
+    "WTFPL": "Permissive (a cspell dictionary, development only). Accepted by the maintainer on 12 November 2026.",
+    "CC BY-SA 4.0": "Share-alike data (cspell's common-misspellings list, development only, not distributed). Accepted by the maintainer on 12 November 2026."
   },
   "packages": {
     "Fractions": {

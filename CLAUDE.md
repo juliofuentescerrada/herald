@@ -29,6 +29,7 @@ Herald runs tournaments (league, knockout, single match) and is game-agnostic: g
 
 - Check with `scripts/check [rules|dotnet|web|all]`: CI's steps with one line each and only the errors on failure. A new machine or cloud session is prepared by `scripts/bootstrap`.
 - A test that proves a specified scenario carries its marker (`[Trait("covers", "<capability>: <scenario>")]`, a Playwright `covers` annotation or `// covers:`); `scripts/spec-coverage.mjs` fails on a new scenario without one. `docs/rules/uncovered-scenarios.txt` only shrinks: never add a line.
+- Before opening a slice's pull request, write `git diff main...HEAD` to a file and have the `herald-reviewer` subagent review it with its change's name; the pull request records its findings and how each was resolved, and ends with `node scripts/harness-metrics.mjs --markdown`.
 - Use CodeGraph (`codegraph_explore`, configured in `.mcp.json`) before reading code files: one call returns the relevant source, its callers and the tests affected. A fresh clone needs `codegraph init` once; the index then follows file changes.
 - Read large documents by section (`grep` for the D-, F- or § reference, then read those lines), never whole: the discovery alone is about 37,000 tokens.
 - Stop and ask instead of retrying when the same CI failure returns after one fix, when a flaky journey fails again after one retry, or when a slice clearly outgrows its `tasks.md` (propose splitting it). Never skip or disable a test to get green.
