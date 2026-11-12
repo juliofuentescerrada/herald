@@ -1,7 +1,7 @@
 # spec-traceability Specification
 
 ## Purpose
-TBD - created by archiving change harness-engineering. Update Purpose after archive.
+The verification part of Herald's harness (see `agent-harness`) that links each specified scenario to the test that proves it. No new scenario reaches the specifications without a test, and the baseline of older uncovered scenarios only shrinks.
 ## Requirements
 ### Requirement: Tests declare the scenarios they cover
 .NET tests SHALL declare covered scenarios with a `covers` trait naming the capability and the scenario title, Playwright journeys with a `covers` annotation, and the scripts' tests with a `covers` comment. A test MAY cover several scenarios.
