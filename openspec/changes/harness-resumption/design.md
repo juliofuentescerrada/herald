@@ -107,3 +107,11 @@ The `herald-reviewer` subagent reviewed the diff against this change. Findings a
 - **Q-1 Tests and journeys:** the phase guard does not cover `tests/` or `e2e/` (D-6 as written).
 - **Q-2 CI check for the phase:** not needed; the Bash route is an accepted risk (see Risks).
 - **Q-3 Checkpoint granularity:** one checkpoint per task (D-1 as written).
+
+## Resumption trial (12 November 2026, task 3.3)
+
+- **A clean clone with an empty temporary directory**, standing in for a reclaimed container:
+  - on the slice branch, `slice-state.mjs` named the change, its first unchecked task (3.3) and the last checkpoint, and `harness-metrics.mjs --branch` recovered the slice's metrics from the commit trailers alone;
+  - on `main`, it pointed to `origin/ccr-bf2a3097-we9i2y` as the branch holding the checkpoints.
+- **This session, resumed by the maintainer after pull request #30 opened:** the `SessionStart` hook with the `resume` matcher ran and gave the agent the change, 12 of 14 tasks done, the next tasks (3.3, 5.4) and the last checkpoint. The agent continued from 3.3 and redid nothing.
+- **Not covered:** a new session, as opposed to a resumed one, starts with the `startup` matcher, which D-4 leaves out. It relies on `CLAUDE.md`'s instruction to run `slice-state.mjs`. ADR 0018's first trial batch will show whether that instruction is enough.
