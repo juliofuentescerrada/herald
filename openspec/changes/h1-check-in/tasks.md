@@ -14,9 +14,9 @@
 
 ## 4. Registration persistence and features
 
-- [ ] 4.1 Mapping and migration `AddCheckIn`; the field counts message carries `CheckedIn`
-- [ ] 4.2 Features `CheckIn` and `UndoCheckIn`; `GetField` gains each entry's check-in and the checked-in count (design D-4)
-- [ ] 4.3 API tests against PostgreSQL for the `entrant-check-in` scenarios, including another organisation's generic 404s and an admission in another tab not conflicting with a check-in
+- [x] 4.1 Mapping and migration `AddCheckIn`; the field counts message carries `CheckedIn`
+- [x] 4.2 Features `CheckIn` and `UndoCheckIn`; `GetField` gains each entry's check-in and the checked-in count (design D-4)
+- [x] 4.3 API tests against PostgreSQL for the `entrant-check-in` scenarios, including another organisation's generic 404s and an admission in another tab not conflicting with a check-in
 
 ## 5. Tournaments
 

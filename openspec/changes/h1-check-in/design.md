@@ -75,7 +75,7 @@ Check-in writes state the check-in revision, not the entry revision, so an admis
 | `checkIn` | `PUT /check-in` (expected check-in revision) |
 | `undoCheckIn` | `DELETE /check-in` (expected check-in revision) |
 
-Both return the field, as admission and cancellation do. `getField` gains per entry `checkIn` (`pending`, `confirmed` or absent for waiting entries), `checkInRevision`, `checkInChangedBy` and `checkInChangedAt`, and the field gains `checkedIn`. Errors: 400 rule codes `entry-not-admitted` (waiting) and `entry-cancelled`; 404 generic; 409 conflict with the current field. Tournaments' details gain the checked-in count, which the configuration form uses for the lock.
+Both return the field, as admission and cancellation do. `getField` gains per entry `checkIn` (`pending`, `confirmed` or absent for an entry never admitted), `checkInRevision` and `checkInChangedAt`, and the field gains `checkedIn`. The actor is recorded in the history but not returned: H1 has one owner per organisation, so the row meta shows only the time. Errors: 400 rule codes `entry-not-admitted` (waiting) and `entry-cancelled`; 404 generic; 409 conflict of type `check-in-revision-conflict` with the current check-in revision. Tournaments' details gain the checked-in count, which the configuration form uses for the lock.
 
 ### D-5 Admin application
 
