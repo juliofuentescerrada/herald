@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+# Runs CI's checks with short output: one line per step, and on failure only the error lines
+# and the end of that step's log. Full logs stay in the printed directory.
+# Usage: scripts/check [dotnet|web|all]   (default: all)
+set -uo pipefail
+cd "$(dirname "$0")/.."
+target="${1:-all}"
+logs="$(mktemp -d "${TMPDIR:-/tmp}/herald-check.XXXXXX")"
+failed=0
+
+step() {
+  local name="$1"; shift
+  local log="$logs/$(echo "$name" | tr -c 'a-zA-Z0-9' '-').log"
+  local start=$SECONDS
+  if (eval "$@") >"$log" 2>&1; then
+    printf 'ok    %-28s %4ss\n' "$name" $((SECONDS - start))
+  else
+    failed=1
+    printf 'FAIL  %-28s %4ss  %s\n' "$name" $((SECONDS - start)) "$log"
+    grep -E -i '(^|[^a-z])(error|failed|fail|✘|×|assert)' "$log" | grep -v -i 'warn' | sort -u | head -n 30 | cut -c1-300
+    echo '  ...'
+    tail -n 15 "$log" | cut -c1-300
+  fi
+}
+
+unchanged() {
+  local changes
+  changes="$(git status --porcelain -- "$@")"
+  [ -z "$changes" ] || { echo "Generated files are stale; commit them:"; echo "$changes"; return 1; }
+}
+
+if [ "$target" = dotnet ] || [ "$target" = all ]; then
+  docker info >/dev/null 2>&1 || echo "note: Docker is not running; the tests need it (see CLAUDE.md)."
+  step "dotnet restore" dotnet restore Herald.slnx
+  step "dotnet format" dotnet format Herald.slnx --verify-no-changes --no-restore
+  step "dotnet build" dotnet build Herald.slnx -c Release --no-restore
+  step "wolverine codegen current" "dotnet run --project src/Herald.Host -c Release --no-build -- codegen delete && dotnet run --project src/Herald.Host -c Release --no-build -- codegen write && unchanged src/Herald.Host/Internal/Generated"
+  step "dotnet test" dotnet test --solution Herald.slnx -c Release --no-build
+fi
+
+if [ "$target" = web ] || [ "$target" = all ]; then
+  step "pnpm install" "cd web && pnpm install --frozen-lockfile"
+  step "openapi client current" "cd web && pnpm api:generate && cd .. && unchanged web/projects/api-client"
+  step "lint" "cd web && pnpm lint"
+  step "lint boundaries" "cd web && pnpm lint:boundaries"
+  step "test" "cd web && pnpm test:all"
+  step "ssr isolation" "cd web && pnpm test:ssr"
+  step "build" "cd web && pnpm build:all"
+fi
+
+[ "$failed" = 0 ] && echo "all checks passed (logs: $logs)"
+exit "$failed"

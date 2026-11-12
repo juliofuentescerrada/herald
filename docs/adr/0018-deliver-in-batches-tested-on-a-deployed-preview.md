@@ -26,6 +26,8 @@ H1 finishes with the current process. M4 follows H1 and comes before H2. From H2
 - **Tracking in GitHub Issues.** One GitHub milestone per Herald milestone; one issue per batch (label `batch`) with its decision checklist, prototypes and acceptance journey; one sub-issue per slice (label `slice`) linked to its OpenSpec change and closed by its pull request. Status labels (`needs-decision`, `in-progress`, `ready-to-test`, `feedback`) drive a GitHub Project board. **Issues hold state and feedback, never content:** specifications, decisions and ADRs stay in the repository (ADR 0001) and issues link to them.
 - **Status in one place.** From H2, the issues and the board track progress. `docs/roadmap.md` keeps milestones and their exit criteria, and `README.md` points to the board instead of restating each slice's status.
 
+- **Guards against loops.** Unattended work cannot be watched, so hooks enforce limits rather than instructions alone. `.claude/hooks/guard.mjs` counts tool calls since the maintainer's last message (a warning at 80 % of 400, then only git and GitHub tools), refuses a Bash command after three identical failures in a row, and refuses a fourth push since the maintainer's last message. Wake-ups from GitHub or a schedule are not the maintainer and reset nothing. The limits are starting values, configurable through `HERALD_GUARD_*` variables, and are calibrated with the first measured slice. `CLAUDE.md` adds the stops that need judgement: the same CI failure after one fix, a flaky journey after one retry, a slice that outgrows its tasks.
+
 The maintainer keeps the decisions, ADR acceptance and the merge. Nothing here lets the agent merge, approve or decide a product rule.
 
 ## Alternatives considered

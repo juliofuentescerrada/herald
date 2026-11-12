@@ -25,6 +25,14 @@ Herald runs tournaments (league, knockout, single match) and is game-agnostic: g
 - Licences: a dependency must be free for an open-source personal project; check the licence of the exact version before adding it (ADR 0009 records why MediatR and MassTransit were left out).
 - M4 waits for the shared platform (ADR 0012): never add Herald resources to Arcana's state.
 
+## Working economically
+
+- Check with `scripts/check [dotnet|web|all]`: CI's steps with one line each and only the errors on failure.
+- Read large documents by section (`grep` for the D-, F- or § reference, then read those lines), never whole: the discovery alone is about 37,000 tokens.
+- Stop and ask instead of retrying when the same CI failure returns after one fix, when a flaky journey fails again after one retry, or when a slice clearly outgrows its `tasks.md` (propose splitting it). Never skip or disable a test to get green.
+- Schedule only one-off wake-ups; no recurring schedule that starts sessions without a limit.
+- `.claude/hooks/guard.mjs` enforces a tool budget since the maintainer's last message, refuses a command after repeated identical failures and limits pushes (ADR 0018). When it refuses, report where you stopped and end the turn; do not work around it.
+
 ## Commands
 
 Docker is required for the tests and the AppHost. In a Claude Code cloud session the daemon is installed but not running: start it with `dockerd > /tmp/dockerd.log 2>&1 &` first.
