@@ -27,7 +27,8 @@ public static class Scenarios
         await admin.CreateTournamentAsync(organisation, announced, Configuration(clock, "Spring Open", opens: 7, closes: 14, starts: 15));
         await admin.PublishAsync(organisation, announced);
 
-        // Open with a full field and a waiting queue; one cancellation promoted the first waiting entry.
+        // Open with a full field and a waiting queue; one cancellation promoted the first waiting entry; the first entrant
+        // has checked in, which locks the check-in policy.
         var open = Ids.For("tournament", "open");
         await admin.CreateTournamentAsync(organisation, open, Configuration(clock, "Autumn League", opens: -1, closes: 5, starts: 7, capacity: 4));
         await admin.PublishAsync(organisation, open);
@@ -39,6 +40,7 @@ public static class Scenarios
         }
 
         await admin.CancelAsync(organisation, open, entries[1]);
+        await admin.CheckInAsync(organisation, open, entries[0]);
 
         // Registration closed by hand before the start.
         var closed = Ids.For("tournament", "closed");

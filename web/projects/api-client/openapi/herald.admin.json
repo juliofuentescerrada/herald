@@ -643,6 +643,184 @@
         }
       }
     },
+    "/api/organisations/{organisationId}/tournaments/{tournamentId}/entries/{entryId}/check-in": {
+      "delete": {
+        "tags": [
+          "Herald.Registration.Features.UndoCheckIn.UndoCheckInEndpoint"
+        ],
+        "summary": "DELETE_api_organisations_organisationId_tournaments_tournamentId_entries_entryId_check_in",
+        "description": "DELETE_api_organisations_organisationId_tournaments_tournamentId_entries_entryId_check_in",
+        "operationId": "undoCheckIn",
+        "parameters": [
+          {
+            "name": "organisationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "tournamentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "entryId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "expectedRevision",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FieldDetails"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Herald.Registration.Features.CheckIn.CheckInEndpoint"
+        ],
+        "summary": "PUT_api_organisations_organisationId_tournaments_tournamentId_entries_entryId_check_in",
+        "description": "PUT_api_organisations_organisationId_tournaments_tournamentId_entries_entryId_check_in",
+        "operationId": "checkIn",
+        "parameters": [
+          {
+            "name": "organisationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "tournamentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "entryId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CheckInEntry"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FieldDetails"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/organisations/{organisationId}/tournaments/{tournamentId}/entries/{entryId}/roster/members/{guestId}": {
       "delete": {
         "tags": [
@@ -1422,6 +1600,25 @@
           null
         ]
       },
+      "CheckInEntry": {
+        "required": [
+          "expectedRevision"
+        ],
+        "type": "object",
+        "properties": {
+          "expectedRevision": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "CheckInState": {
+        "enum": [
+          "pending",
+          "confirmed",
+          null
+        ]
+      },
       "CloseRegistration": {
         "required": [
           "expectedRevision"
@@ -1633,6 +1830,30 @@
                 "$ref": "#/components/schemas/RosterReadiness"
               }
             ]
+          },
+          "checkIn": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/CheckInState"
+              }
+            ]
+          },
+          "checkInRevision": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "checkInChangedAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
           }
         }
       },
@@ -1696,6 +1917,7 @@
           "termsReceivedAt",
           "admitted",
           "waiting",
+          "checkedIn",
           "overCapacityBy",
           "kindMismatch",
           "entries"
@@ -1722,6 +1944,10 @@
             "format": "int32"
           },
           "waiting": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "checkedIn": {
             "type": "integer",
             "format": "int32"
           },
@@ -2112,7 +2338,8 @@
           "awaitingTerms",
           "incomplete",
           "complete",
-          "aboveMaximum"
+          "aboveMaximum",
+          null
         ]
       },
       "RosterTeam": {
@@ -2306,7 +2533,8 @@
           "missingForRegistration",
           "registrationChangedAt",
           "admittedEntries",
-          "waitingEntries"
+          "waitingEntries",
+          "checkedInEntries"
         ],
         "type": "object",
         "properties": {
@@ -2357,6 +2585,10 @@
             "format": "int32"
           },
           "waitingEntries": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "checkedInEntries": {
             "type": "integer",
             "format": "int32"
           }
@@ -2506,6 +2738,12 @@
     },
     {
       "name": "Herald.Tournaments.Features.CloseRegistration.CloseRegistrationEndpoint"
+    },
+    {
+      "name": "Herald.Registration.Features.UndoCheckIn.UndoCheckInEndpoint"
+    },
+    {
+      "name": "Herald.Registration.Features.CheckIn.CheckInEndpoint"
     },
     {
       "name": "Herald.Registration.Features.RemoveRosterMember.RemoveRosterMemberEndpoint"

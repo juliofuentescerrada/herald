@@ -63,3 +63,7 @@ form herald-notice { display: flex; margin-top: var(--herald-space-4); }
 .readiness-warning { color: var(--herald-color-feedback-warning-text); }
 .cancelled li { display: flex; align-items: center; justify-content: space-between; gap: var(--herald-space-4); }
 
+
+/* A check-in failure stays on its row; toasts never carry errors (visual direction §5). */
+.row-error { display: flex; align-items: flex-start; gap: var(--herald-space-2); color: var(--herald-color-feedback-danger); font-weight: 700; margin: var(--herald-space-1) 0 0; }
+.name-line herald-status-label { align-self: center; }

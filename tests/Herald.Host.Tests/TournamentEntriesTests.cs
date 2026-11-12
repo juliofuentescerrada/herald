@@ -16,7 +16,7 @@ public class TournamentEntriesTests(OrganisationApi api)
         public string Path => $"{Organisation}/tournaments/{Id}";
     }
 
-    private static object Configuration(int capacity = 2, string admission = "automatic", string entryKind = "individual") => new
+    private static object Configuration(int capacity = 2, string admission = "automatic", string entryKind = "individual", string checkIn = "optional") => new
     {
         title = "Saturday Open",
         gameVariant = "Example strategy · Standard variant",
@@ -28,7 +28,7 @@ public class TournamentEntriesTests(OrganisationApi api)
         timeZone = "Europe/Madrid",
         location = "online",
         admission,
-        checkIn = "optional",
+        checkIn,
         visibility = "public",
         minimumRosterSize = entryKind == "team" ? 5 : (int?)null,
         maximumRosterSize = entryKind == "team" ? 7 : (int?)null,
@@ -121,6 +121,7 @@ public class TournamentEntriesTests(OrganisationApi api)
     }
 
     [Fact]
+    [Trait("covers", "tournament-setup: Capacity below the admitted entries")]
     public async Task Capacity_cannot_be_saved_below_the_admitted_entries()
     {
         var tournament = await OpenTournamentAsync(Configuration(capacity: 4));
@@ -146,6 +147,27 @@ public class TournamentEntriesTests(OrganisationApi api)
         var free = await SaveAsync(tournament, Configuration(admission: "manual", entryKind: "team"));
 
         Errors(await JsonAsync(locked), "entryKind").ShouldBe(["locked-by-entries"]);
+        free.StatusCode.ShouldBe(HttpStatusCode.OK);
+    }
+
+    [Fact]
+    [Trait("covers", "tournament-setup: Check-in policy with confirmed check-ins")]
+    public async Task The_check_in_policy_is_locked_by_a_check_in_from_registration_and_free_once_it_is_undone()
+    {
+        var tournament = await OpenTournamentAsync();
+        var entry = EntryOf(await EnterAsync(tournament, "Robin Vale"), "Robin Vale");
+        var checkIn = $"{tournament.Path}/entries/{entry.GetProperty("id").GetGuid()}/check-in";
+
+        var beforeCheckIn = await SaveAsync(tournament, Configuration(checkIn: "mandatory"));
+        (await SettledAsync(() => tournament.Client.PutAsJsonAsync(checkIn, new { expectedRevision = 0 }, Cancellation))).StatusCode.ShouldBe(HttpStatusCode.OK);
+        var checkedIn = await ReadAsync(tournament);
+        var locked = await SaveAsync(tournament, Configuration(checkIn: "optional"));
+        (await SettledAsync(() => tournament.Client.DeleteAsync($"{checkIn}?expectedRevision=1", Cancellation))).StatusCode.ShouldBe(HttpStatusCode.OK);
+        var free = await SaveAsync(tournament, Configuration(checkIn: "optional"));
+
+        beforeCheckIn.StatusCode.ShouldBe(HttpStatusCode.OK);
+        checkedIn.GetProperty("checkedInEntries").GetInt32().ShouldBe(1);
+        Errors(await JsonAsync(locked), "checkIn").ShouldBe(["locked-by-check-ins"]);
         free.StatusCode.ShouldBe(HttpStatusCode.OK);
     }
 

@@ -78,6 +78,15 @@ public sealed class RegistrationDbContext(DbContextOptions<RegistrationDbContext
                 change.HasKey("TournamentId", "EntryId", nameof(RosterChange.RosterRevision));
             });
             entry.Navigation(e => e.RosterChanges).HasField("_rosterChanges").UsePropertyAccessMode(PropertyAccessMode.Field);
+            entry.OwnsMany(e => e.CheckInChanges, change =>
+            {
+                change.ToTable("CheckInChanges");
+                change.WithOwner().HasForeignKey("TournamentId", "EntryId");
+                change.Property(c => c.Kind).HasConversion<string>().HasMaxLength(20);
+                change.Property(c => c.CheckInRevision).ValueGeneratedNever();
+                change.HasKey("TournamentId", "EntryId", nameof(CheckInChange.CheckInRevision));
+            });
+            entry.Navigation(e => e.CheckInChanges).HasField("_checkInChanges").UsePropertyAccessMode(PropertyAccessMode.Field);
         });
     }
 }

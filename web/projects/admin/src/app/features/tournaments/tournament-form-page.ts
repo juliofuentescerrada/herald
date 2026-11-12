@@ -93,6 +93,7 @@ const ruleText = (field: string, rule: string): string => {
     case 'unknown': return 'Choose a time zone from the list.';
     case 'below-admitted': return 'Capacity cannot be lower than the admitted entries.';
     case 'locked-by-entries': return 'This cannot change while the tournament has entries.';
+    case 'locked-by-check-ins': return 'This cannot change while entries have checked in.';
     case 'skipped-hour': return 'This time does not exist in the reference time zone: the clocks go forward.';
     default: return 'Check this value.';
   }
@@ -164,10 +165,14 @@ export class TournamentFormPage {
     return c?.plannedStartAt ? `${dateTimeText(c.plannedStartAt)} · ${c.timeZone}` : '';
   });
 
-  /** Registration's last report: entries lock the entry kind and admission, and admitted ones bound the capacity (EN-10). */
+  /** Registration's last report: entries lock the entry kind and admission, admitted ones bound the capacity (EN-10), check-ins lock the policy. */
   protected readonly entries = computed(() => {
     const stored = this.stored();
-    return { admitted: stored?.admittedEntries ?? 0, active: (stored?.admittedEntries ?? 0) + (stored?.waitingEntries ?? 0) };
+    return {
+      admitted: stored?.admittedEntries ?? 0,
+      active: (stored?.admittedEntries ?? 0) + (stored?.waitingEntries ?? 0),
+      checkedIn: stored?.checkedInEntries ?? 0,
+    };
   });
   protected readonly entriesText = computed(() => {
     const stored = this.stored()!;
@@ -178,7 +183,7 @@ export class TournamentFormPage {
   protected readonly sections = computed(() => {
     const d = this.draft();
     const team = d.entryKind === 'team';
-    const { admitted, active } = this.entries();
+    const { admitted, active, checkedIn } = this.entries();
     const lockedHelp = 'Locked while the tournament has entries. Cancel every entry to change it.';
     const atLeast = admitted ? ` At least ${admitted}: the admitted entries.` : '';
     const zoneOptions = [...new Set([...zones(), ...(d.timeZone ? [d.timeZone] : [])])].sort().map((zone) => [zone, zone] as const);
@@ -235,7 +240,10 @@ export class TournamentFormPage {
             options: [['automatic', 'Automatic'], ['manual', 'Manual']],
             locked: active > 0,
           }),
-          field('checkIn', 'select', 'Whether admitted entrants must check in.', { options: [['optional', 'Optional'], ['mandatory', 'Mandatory']] }),
+          field('checkIn', 'select', checkedIn ? 'Entries have checked in. Undo every check-in to change it.' : 'Whether admitted entrants must check in.', {
+            options: [['optional', 'Optional'], ['mandatory', 'Mandatory']],
+            locked: checkedIn > 0,
+          }),
           field('visibility', 'select', 'Public: listed. Unlisted: readable by link. Private: owner-only access.', {
             options: [['public', 'Public'], ['unlisted', 'Unlisted'], ['private', 'Private']],
             wide: true,

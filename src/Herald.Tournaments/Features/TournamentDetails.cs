@@ -22,7 +22,8 @@ public sealed record TournamentDetails(
     IReadOnlyList<string> MissingForRegistration,
     DateTimeOffset? RegistrationChangedAt,
     int AdmittedEntries,
-    int WaitingEntries)
+    int WaitingEntries,
+    int CheckedInEntries)
 {
     // A constant until its slice exists: nothing can start competition yet.
     public const string CompetitionPreparation = "preparation";
@@ -43,7 +44,8 @@ public sealed record TournamentDetails(
         // The person is stored but not returned: Tournaments cannot name them (design W-1).
         tournament.RegistrationChangedAt,
         entries.Admitted,
-        entries.Waiting);
+        entries.Waiting,
+        entries.CheckedIn);
 }
 
 internal static class TournamentResults

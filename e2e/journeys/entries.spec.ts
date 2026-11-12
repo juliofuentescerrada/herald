@@ -170,3 +170,30 @@ test('An owner builds a team’s roster to its minimum, is stopped from adding a
   await expect(north.getByText('3 of 3–5 players', { exact: true })).toBeVisible();
   await expect(admitted.getByRole('listitem').filter({ hasText: 'River Falcons' }).getByText('0 of 3–5 players · incomplete')).toBeVisible();
 });
+
+test('An owner checks in two admitted players, undoes one check-in, and sees 1 of 2 checked in', async ({ page, signIn, expectAccessible }) => {
+  await signIn();
+  await createOrganisation(page);
+  await openForEntries(page, 'Thursday Open', { team: false, capacity: 2, admission: 'Automatic' });
+  await addNew(page, 'player', 'Robin Vale');
+  await addNew(page, 'player', 'Sam Reed');
+  await expect(page.getByText('Check-in optional · 0 of 2 checked in')).toBeVisible();
+  const admitted = page.getByRole('list', { name: 'Admitted · 2' });
+  await expect(admitted.getByText('Check-in pending')).toHaveCount(2);
+
+  for (const player of ['Robin Vale', 'Sam Reed']) {
+    await admitted.getByRole('button', { name: `Check in: ${player}` }).click();
+    await expect(page.getByText(`${player} checked in.`)).toBeVisible();
+  }
+  await expect(page.getByText('Check-in optional · 2 of 2 checked in')).toBeVisible();
+  await expect(admitted.getByText('Checked in', { exact: true })).toHaveCount(2);
+  await expectAccessible();
+
+  await admitted.getByRole('button', { name: 'Undo check-in: Sam Reed' }).click();
+  await expect(page.getByText('Sam Reed’s check-in undone.')).toBeVisible();
+  await expect(page.getByText('Check-in optional · 1 of 2 checked in')).toBeVisible();
+  const sam = admitted.getByRole('listitem').filter({ hasText: 'Sam Reed' });
+  await expect(sam.getByText('Check-in pending')).toBeVisible();
+  await expect(sam.getByRole('button', { name: 'Check in: Sam Reed' })).toBeVisible();
+  await expect(admitted.getByRole('listitem').filter({ hasText: 'Robin Vale' }).getByText(/^Checked in .* · Europe\/Madrid$/)).toBeVisible();
+});

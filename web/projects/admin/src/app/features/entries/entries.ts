@@ -52,6 +52,7 @@ export const ruleText = (field: string, rule: string): string => {
     case 'field/mismatch': return 'The field has a mismatch to resolve first.';
     case 'capacity/full': return 'No slot is free.';
     case 'entry/cancelled': return 'This entry was cancelled.';
+    case 'entry/not-admitted': return 'Only an admitted entry can check in.';
     case 'reason/required': return 'Enter a private reason.';
     case 'reason/too-long': return 'Use at most 500 characters.';
     case 'name/required': return 'Enter a name.';

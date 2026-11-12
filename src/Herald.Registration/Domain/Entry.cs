@@ -30,6 +30,15 @@ public enum RosterChangeKind
     Removed,
 }
 
+public enum CheckInChangeKind
+{
+    Confirmed,
+    Undone,
+}
+
+// One confirmation or undo of an entry's check-in, kept for good (ADR 0007): the check-in revision it produced, who and when.
+public sealed record CheckInChange(int CheckInRevision, CheckInChangeKind Kind, Guid ChangedBy, DateTimeOffset ChangedAt);
+
 // A player on a team entry's tournament roster, kept in the order added (A-3).
 public sealed record RosterMember(GuestId GuestId, Guid AddedBy, DateTimeOffset AddedAt);
 
@@ -41,6 +50,7 @@ public sealed class Entry : Entity<EntryId>
 {
     private readonly List<RosterMember> _members = [];
     private readonly List<RosterChange> _rosterChanges = [];
+    private readonly List<CheckInChange> _checkInChanges = [];
 
     // For EF Core.
     private Entry(EntryId id)
@@ -97,7 +107,18 @@ public sealed class Entry : Entity<EntryId>
 
     public IReadOnlyList<RosterChange> RosterChanges => _rosterChanges;
 
+    // Pending until confirmed; kept after cancellation as evidence (h1-check-in R-3).
+    public bool IsCheckedIn { get; private set; }
+
+    // Starts at 0 and grows by one with each confirmation or undo; check-in writes state it (h1-check-in D-2).
+    public int CheckInRevision { get; private set; }
+
+    public IReadOnlyList<CheckInChange> CheckInChanges => _checkInChanges;
+
     public bool IsActive => State != EntryState.Cancelled;
+
+    // Only an entry that was admitted has a check-in, pending or confirmed (A-1).
+    public bool HasCheckIn => AdmittedAt is not null;
 
     public bool HasMember(GuestId guest) => _members.Exists(member => member.GuestId == guest);
 
@@ -111,6 +132,12 @@ public sealed class Entry : Entity<EntryId>
     {
         _members.RemoveAll(member => member.GuestId == guest);
         _rosterChanges.Add(new(++RosterRevision, guest, RosterChangeKind.Removed, actor, at));
+    }
+
+    internal void SetCheckIn(bool checkedIn, Guid actor, DateTimeOffset at)
+    {
+        IsCheckedIn = checkedIn;
+        _checkInChanges.Add(new(++CheckInRevision, checkedIn ? CheckInChangeKind.Confirmed : CheckInChangeKind.Undone, actor, at));
     }
 
     internal void Wait(WaitingReason reason)
