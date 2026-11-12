@@ -15,11 +15,11 @@
 - **THEN** the command is refused by the settings before it runs
 
 ### Requirement: A reviewer with a clean context reviews each slice
-A `herald-reviewer` subagent with read-only tools SHALL review a slice's diff against its OpenSpec change, the ADRs it cites and the rules of the folders touched, and SHALL report findings with file, line, rule and failure scenario without editing.
+A `herald-reviewer` subagent with read-only tools SHALL review a slice's diff against its OpenSpec change, the ADRs it cites and the rules of the folders touched, and SHALL report findings with file, line, rule and failure scenario without editing. The slice procedure in `CLAUDE.md` SHALL require that review before each slice's pull request and its findings, with how each was resolved, in the pull request description.
 
-#### Scenario: Reviewing before the pull request
-- **WHEN** a slice is ready for its pull request
-- **THEN** the reviewer's findings and how each was resolved appear in the pull request description
+#### Scenario: The slice procedure requires a read-only review
+- **WHEN** the reviewer's definition and the slice procedure are read
+- **THEN** the reviewer has only reading tools, and the procedure requires its review and its findings in the pull request before each slice's pull request opens
 
 ### Requirement: The harness measures each session
 The loop guard SHALL append, at the end of each turn, the turn's tool calls, failures, pushes and duration to a per-session file outside version control, and the agent SHALL summarise a slice's sessions in its pull request.
