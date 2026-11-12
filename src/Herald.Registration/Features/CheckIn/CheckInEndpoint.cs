@@ -10,7 +10,7 @@ using Wolverine.Http;
 namespace Herald.Registration.Features.CheckIn;
 
 // The entry's check-in revision on the owner's screen.
-public sealed record CheckIn(int ExpectedRevision);
+public sealed record CheckInEntry(int ExpectedRevision);
 
 public static class CheckInEndpoint
 {
@@ -25,7 +25,7 @@ public static class CheckInEndpoint
         Guid organisationId,
         Guid tournamentId,
         Guid entryId,
-        CheckIn command,
+        CheckInEntry command,
         OrganisationContext context,
         RegistrationDbContext db,
         IMessageBus bus,

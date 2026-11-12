@@ -5,7 +5,7 @@
 
 ## 2. Contract
 
-- [x] 2.1 `TournamentFieldChanged` gains optional `CheckedIn`; a test deserialises a v1 message without it as 0
+- [x] 2.1 `TournamentFieldChanged` gains optional `CheckedIn`; a test reads a v1 message without it as 0
 
 ## 3. Registration domain
 
@@ -26,16 +26,18 @@
 
 ## 6. Admin application
 
-- [ ] 6.1 `entries` feature: status label, row meta, check in and undo with toast, failure in place, conflict, cancelled read-only, summary with policy and count, team rows with check-in apart from readiness, every state of design.md's Visual input
-- [ ] 6.2 `tournaments` feature: the check-in policy locked with its reason in the configuration form
-- [ ] 6.3 Vitest for each Visual input state and `axe-core`; lint and boundary checks pass
+- [x] 6.1 `entries` feature: status label, row meta, check in and undo with toast, failure in place, conflict, cancelled read-only, summary with policy and count, team rows with check-in apart from readiness, every state of design.md's Visual input
+- [x] 6.2 `tournaments` feature: the check-in policy locked with its reason in the configuration form
+- [x] 6.3 Vitest for each Visual input state and `axe-core`; lint and boundary checks pass
 
 ## 7. End-to-end journey
 
 - [ ] 7.1 Journey 16: two admitted players checked in, one undone, the count 1 of 2; the suite passes
+- [ ] 7.2 Test script in `e2e/scripts/` (seeded data, `scriptPersona`) with a screenshot per step of checking in, undoing and the locked check-in policy, for the maintainer's test round
 
 ## 8. Validation and completion
 
+- [ ] 8.0 `covers` markers on the tests proving each scenario of `entrant-check-in`, the modified `tournament-setup` and journey 16; `node scripts/spec-coverage.mjs` passes
 - [ ] 8.1 Full run: format, build, all .NET tests, web lint/tests/boundaries/builds, codegen and API drift checks, e2e suite; record in design.md
 - [ ] 8.2 Capture the Visual input states at 1440 and 390 px and compare with the mockups; maintainer run through Aspire; record differences in design.md
 - [ ] 8.3 Update `docs/herald-visual-direction.md` §9.3, `docs/roadmap.md`, `README.md`, `CLAUDE.md` status and `openspec/config.yaml`; acceptance review against the specs in design.md

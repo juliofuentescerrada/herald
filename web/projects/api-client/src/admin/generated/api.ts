@@ -66,6 +66,10 @@ export const CheckIn = {
   mandatory: 'mandatory',
 } as const;
 
+export interface CheckInEntry {
+  expectedRevision: number;
+}
+
 export type CheckInState = typeof CheckInState[keyof typeof CheckInState] | null;
 
 
@@ -1023,24 +1027,24 @@ export class HeraldHostAdminService {
  checkIn<TData = FieldDetails>(organisationId: string,
     tournamentId: string,
     entryId: string,
-    checkInBody: CheckIn, options?: HttpClientBodyOptions): Observable<TData>;
+    checkInEntry: CheckInEntry, options?: HttpClientBodyOptions): Observable<TData>;
  checkIn<TData = FieldDetails>(organisationId: string,
     tournamentId: string,
     entryId: string,
-    checkInBody: CheckIn, options?: HttpClientEventOptions): Observable<HttpEvent<TData>>;
+    checkInEntry: CheckInEntry, options?: HttpClientEventOptions): Observable<HttpEvent<TData>>;
  checkIn<TData = FieldDetails>(organisationId: string,
     tournamentId: string,
     entryId: string,
-    checkInBody: CheckIn, options?: HttpClientResponseOptions): Observable<AngularHttpResponse<TData>>;
+    checkInEntry: CheckInEntry, options?: HttpClientResponseOptions): Observable<AngularHttpResponse<TData>>;
   checkIn<TData = FieldDetails>(
     organisationId: string,
     tournamentId: string,
     entryId: string,
-    checkInBody: CheckIn, options?: HttpClientObserveOptions): Observable<TData | HttpEvent<TData> | AngularHttpResponse<TData>> {
+    checkInEntry: CheckInEntry, options?: HttpClientObserveOptions): Observable<TData | HttpEvent<TData> | AngularHttpResponse<TData>> {
     if (options?.observe === 'events') {
       return this.http.put<TData>(
       `/api/organisations/${organisationId}/tournaments/${tournamentId}/entries/${entryId}/check-in`,
-      checkInBody,{
+      checkInEntry,{
         ...(options as Omit<NonNullable<typeof options>, 'observe'>),
         observe: 'events',
       }
@@ -1050,7 +1054,7 @@ export class HeraldHostAdminService {
     if (options?.observe === 'response') {
       return this.http.put<TData>(
       `/api/organisations/${organisationId}/tournaments/${tournamentId}/entries/${entryId}/check-in`,
-      checkInBody,{
+      checkInEntry,{
         ...(options as Omit<NonNullable<typeof options>, 'observe'>),
         observe: 'response',
       }
@@ -1059,7 +1063,7 @@ export class HeraldHostAdminService {
 
     return this.http.put<TData>(
       `/api/organisations/${organisationId}/tournaments/${tournamentId}/entries/${entryId}/check-in`,
-      checkInBody,{
+      checkInEntry,{
         ...(options as Omit<NonNullable<typeof options>, 'observe'>),
         observe: 'body',
       }

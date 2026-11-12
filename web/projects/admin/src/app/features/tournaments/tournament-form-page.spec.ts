@@ -292,6 +292,19 @@ describe('The tournament configuration form', () => {
     }
     expect(text('#t-capacity-help')).toBe('How many entries the tournament admits. At least 3: the admitted entries.');
     expect((control('capacity') as HTMLInputElement).readOnly).toBe(false);
+    // Admitted entries without check-ins leave the policy free (h1-check-in R-7).
+    expect((control('checkIn') as HTMLSelectElement).disabled).toBe(false);
+    const { violations } = await axe.run(page(), { rules: { 'color-contrast': { enabled: false } } });
+    expect(violations.map((v) => v.id)).toEqual([]);
+  });
+
+  it('locks the check-in policy while entries have checked in, saying why', async () => {
+    const { page, control, text } = await render(`/${tournamentId}`, {
+      reads: [() => of(details({ publication: 'published', admittedEntries: 4, waitingEntries: 1, checkedInEntries: 1 }))],
+    });
+    expect((control('checkIn') as HTMLSelectElement).disabled).toBe(true);
+    expect(text('#t-checkIn-help')).toBe('Entries have checked in. Undo every check-in to change it.');
+    expect(text('.summary.entries p')).toBe('4 of 16 individual entries admitted · 1 waiting');
     const { violations } = await axe.run(page(), { rules: { 'color-contrast': { enabled: false } } });
     expect(violations.map((v) => v.id)).toEqual([]);
   });

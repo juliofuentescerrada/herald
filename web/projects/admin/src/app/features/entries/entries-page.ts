@@ -38,6 +38,12 @@ interface Failure {
   readonly text: string;
 }
 
+/** A check-in write's failure, said under its row (design D-5). */
+interface RowFailure {
+  readonly entryId: string;
+  readonly text: string;
+}
+
 /** A published tournament's entries: added as guests, admitted and cancelled by the owner (EN-1 to EN-12). */
 @Component({
   selector: 'app-entries-page',
@@ -80,6 +86,9 @@ export class EntriesPage {
   protected readonly panel = signal<Panel>(null);
   protected readonly state = signal<'ready' | 'busy' | 'conflict'>('ready');
   protected readonly failure = signal<Failure | null>(null);
+  /** Check-in writes are per row: other rows and adding stay usable meanwhile (design D-5). */
+  protected readonly checkingIn = signal<ReadonlySet<string>>(new Set());
+  protected readonly rowFailure = signal<RowFailure | null>(null);
 
   // The add panel: choosing an existing guest or creating one, and the possible duplicates of a creation.
   protected readonly mode = signal<'existing' | 'new'>('existing');
@@ -132,6 +141,12 @@ export class EntriesPage {
     const reason = manual ? 'admissionPending' : 'capacityFull';
     const count = this.waiting().filter((entry) => entry.waitingReason === reason).length;
     return manual ? `Manual admission · ${count} pending your decision` : `Automatic admission · ${count} waiting for a slot`;
+  });
+  /** The policy always; the count once an entry is admitted (A-4). */
+  protected readonly checkInSummary = computed(() => {
+    const policy = this.tournament.data()?.configuration.checkIn === 'mandatory' ? 'Check-in mandatory' : 'Check-in optional';
+    const admitted = this.admitted().length;
+    return admitted ? `${policy} · ${this.field.data()!.checkedIn} of ${admitted} checked in` : policy;
   });
   protected readonly termsUpdated = computed(() => `Entry terms updated ${instantText(this.field.data()!.termsReceivedAt, this.zone())} · ${this.zone()}`);
 
@@ -188,6 +203,30 @@ export class EntriesPage {
     this.name.set(value);
     this.matches.set(null);
     this.nameError.set(null);
+  }
+
+  /** Writes at once, no dialog: the action is reversible (design D-5). */
+  protected async toggleCheckIn(entry: EntryDetails): Promise<void> {
+    if (this.state() === 'conflict' || this.checkingIn().has(entry.id)) return;
+    const confirm = entry.checkIn !== 'confirmed';
+    const revision = entry.checkInRevision ?? 0;
+    this.checkingIn.update((ids) => new Set([...ids, entry.id]));
+    if (this.rowFailure()?.entryId === entry.id) this.rowFailure.set(null);
+    try {
+      const field = await firstValueFrom(
+        confirm
+          ? this.api.checkIn<FieldDetails>(this.organisation, this.tournamentId, entry.id, { expectedRevision: revision })
+          : this.api.undoCheckIn<FieldDetails>(this.organisation, this.tournamentId, entry.id, { expectedRevision: revision }),
+      );
+      // Answers to concurrent rows may arrive out of order: only a newer field replaces the one shown.
+      if (field.revision >= (this.field.data()?.revision ?? 0)) this.queries.setQueryData(fieldKey(this.organisation, this.tournamentId), field);
+      void this.queries.invalidateQueries({ queryKey: tournamentKey(this.organisation, this.tournamentId) });
+      this.toasts.show(confirm ? `${entry.guestName} checked in.` : `${entry.guestName}’s check-in undone.`);
+    } catch (error) {
+      this.failCheckIn(entry, confirm, error);
+    } finally {
+      this.checkingIn.update((ids) => new Set([...ids].filter((id) => id !== entry.id)));
+    }
   }
 
   protected openRoster(entry: EntryDetails, trigger: HTMLElement): void {
@@ -258,6 +297,7 @@ export class EntriesPage {
     await Promise.all([this.field.refetch(), this.tournament.refetch()]);
     this.state.set('ready');
     this.failure.set(null);
+    this.rowFailure.set(null);
     this.close();
   }
 
@@ -329,6 +369,24 @@ export class EntriesPage {
       void open.closed.then(() => this.summaryHeading()?.nativeElement.focus());
     } else {
       setTimeout(() => this.summaryHeading()?.nativeElement.focus());
+    }
+  }
+
+  private failCheckIn(entry: EntryDetails, confirm: boolean, error: unknown): void {
+    if (this.access.problem()) return;
+    const status = error instanceof HttpErrorResponse ? error.status : 0;
+    if (status === 409 && problemOf<{ type?: string }>(error)?.type === 'check-in-revision-conflict') {
+      this.state.set('conflict');
+      return;
+    }
+    const [field, rules] = Object.entries((status === 400 ? problemOf<HttpValidationProblemDetails>(error)?.errors : null) ?? {})[0] ?? [];
+    const heading = confirm ? 'Check-in was not recorded.' : 'Undo was not recorded.';
+    if (field) {
+      // The entry changed since it was read: what the owner sees is brought up to date.
+      this.rowFailure.set({ entryId: entry.id, text: `${heading} ${ruleText(field, rules[0])} Nothing changed.` });
+      void this.field.refetch();
+    } else {
+      this.rowFailure.set({ entryId: entry.id, text: `${heading} The request failed. Nothing changed; try “${confirm ? 'Check in' : 'Undo check-in'}” again.` });
     }
   }
 

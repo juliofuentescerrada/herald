@@ -771,7 +771,7 @@
           "content": {
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/CheckIn"
+                "$ref": "#/components/schemas/CheckInEntry"
               }
             }
           },
@@ -1599,6 +1599,18 @@
           "mandatory",
           null
         ]
+      },
+      "CheckInEntry": {
+        "required": [
+          "expectedRevision"
+        ],
+        "type": "object",
+        "properties": {
+          "expectedRevision": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
       },
       "CheckInState": {
         "enum": [

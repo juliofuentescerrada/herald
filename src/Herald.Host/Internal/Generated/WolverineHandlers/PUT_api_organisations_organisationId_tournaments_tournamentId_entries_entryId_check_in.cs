@@ -84,7 +84,7 @@ namespace Internal.Generated.WolverineHandlers
                 }
 
                 // Reading the request body via JSON deserialization
-                var (command, jsonContinue) = await ReadJsonAsync<Herald.Registration.Features.CheckIn.CheckIn>(httpContext);
+                var (command, jsonContinue) = await ReadJsonAsync<Herald.Registration.Features.CheckIn.CheckInEntry>(httpContext);
                 if (jsonContinue == Wolverine.HandlerContinuation.Stop) return;
                 
                 // The actual HTTP request handler execution

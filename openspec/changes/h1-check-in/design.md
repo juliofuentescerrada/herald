@@ -66,7 +66,7 @@ Check-in writes state the check-in revision, not the entry revision, so an admis
 
 ### D-3 Contract extension, still version 1
 
-`TournamentFieldChanged` gains `int CheckedIn = 0` at the end of the record: confirmed check-ins among admitted entries. A message written before the change deserialises with 0, which locks nothing (R-7). Optional members are backwards compatible (ADR 0008, ADR 0016), so no version 2. Tournaments' `EntryCounts` gains the count and `LockedByEntries` the rule `checkIn`/`locked-by-check-ins`. Every check-in write increments the field revision and publishes the counts, as admission does.
+`TournamentFieldChanged` gains `int CheckedIn = 0` at the end of the record: confirmed check-ins among admitted entries. A message written before the change reads as 0, which locks nothing (R-7). Optional members are backwards compatible (ADR 0008, ADR 0016), so no version 2. Tournaments' `EntryCounts` gains the count and `LockedByEntries` the rule `checkIn`/`locked-by-check-ins`. Every check-in write increments the field revision and publishes the counts, as admission does.
 
 ### D-4 API (Admin group)
 
