@@ -13,7 +13,7 @@
 ## 3. State and resumption
 
 - [x] 3.1 `scripts/slice-state.mjs` (D-4) with tests on a temporary repository with an approved change and checked tasks
-- [ ] 3.2 `SessionStart` hook with the `compact` and `resume` matchers in `.claude/settings.json`
+- [x] 3.2 `SessionStart` hook with the `compact` and `resume` matchers in `.claude/settings.json`
 - [ ] 3.3 Resume a slice by hand: interrupt this change's own implementation between two tasks, start a fresh session on the branch, and record in `design.md` whether it continued from the first unchecked task
 
 ## 4. Phase guard
