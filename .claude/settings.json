@@ -1,7 +1,51 @@
 {
   "permissions": {
     "allow": [
-      "mcp__codegraph__*"
+      "mcp__codegraph__*",
+      "Bash(dotnet build *)",
+      "Bash(dotnet test *)",
+      "Bash(dotnet format *)",
+      "Bash(dotnet restore *)",
+      "Bash(dotnet run *)",
+      "Bash(dotnet list *)",
+      "Bash(pnpm install *)",
+      "Bash(pnpm test *)",
+      "Bash(pnpm lint *)",
+      "Bash(pnpm build *)",
+      "Bash(pnpm run *)",
+      "Bash(pnpm exec *)",
+      "Bash(scripts/check *)",
+      "Bash(scripts/bootstrap)",
+      "Bash(node scripts/rules.mjs *)",
+      "Bash(node scripts/spec-coverage.mjs *)",
+      "Bash(node --test scripts/*)",
+      "Bash(openspec *)",
+      "Bash(codegraph *)",
+      "Bash(git status *)",
+      "Bash(git diff *)",
+      "Bash(git log *)",
+      "Bash(git show *)",
+      "Bash(git add *)",
+      "Bash(git commit *)",
+      "Bash(git fetch *)",
+      "Bash(git branch *)"
+    ],
+    "deny": [
+      "Bash(git push --force *)",
+      "Bash(git push -f *)",
+      "Bash(git push * --force)",
+      "Bash(git push * --force *)",
+      "Bash(git push * -f)",
+      "Bash(git push * -f *)",
+      "Bash(git reset --hard origin*)",
+      "Bash(tofu apply *)",
+      "Bash(tofu destroy *)",
+      "Bash(terraform apply *)",
+      "Bash(terraform destroy *)",
+      "Bash(az * delete *)",
+      "Bash(azd down *)",
+      "Edit(/**/.env*)",
+      "Edit(/**/*.tfvars)"
     ]
   },
   "hooks": {

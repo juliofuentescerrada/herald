@@ -17,7 +17,7 @@ Findings that shape the design (12 November 2026):
 
 ## Decisions
 
-- **D-1 One rules script, three callers.**
+- **D-1 One rules script, three callers.** (Implemented as `scripts/rules.mjs`; the Claude hook runs inside the loop guard's `PostToolUse`.)
   - `scripts/rules` (Node, no dependency beyond cspell) checks every file with no arguments and the named files with arguments.
   - The callers are a Claude Code `PostToolUse` hook (matcher `Edit|Write`, the edited path from `tool_input.file_path`; findings exit 2 so the agent sees them in the same turn), `.githooks/pre-commit` (staged files) and CI (every file).
   - CI stays the backstop, because hooks can be bypassed (`--no-verify`, a machine without them, edits on GitHub). The Claude hook shares the guard's process start where possible, to pay one Node start per tool call.
@@ -30,21 +30,23 @@ Findings that shape the design (12 November 2026):
   - Exceptions are explicit: the `tid` claim and external names such as Entra's `TenantId` are listed with a reason.
   - The game-name list covers well-known game titles and Wizards of the Coast product names. It applies to `src/*/Domain/` for games and to the whole repository for Wizards of the Coast content.
 - **D-4 Spelling with cspell.**
-  - cspell with its en-GB dictionary (MIT; the exact versions are checked before adding them).
+  - cspell 10.4.1 with `@cspell/dict-en-gb-mit` 3.1.32, both MIT. The usual `@cspell/dict-en-gb` is LGPL-3.0, so the MIT variant is used.
+  - Code is checked for unknown words only: its American forms are external API names (CSS `color`, `Normalize`, MSAL's `initialize`, `autocomplete="organization"`). Markdown prose must be British: a list of American forms is flagged there, outside inline and fenced code.
   - A project word list, `docs/rules/words.txt`.
   - It checks code identifiers split into words, comments and Markdown.
   - *Alternative:* codespell, rejected for its GPL-2.0 licence and weaker British variant handling.
 - **D-5 Licences against an allowed list.**
-  - `docs/rules/licences.txt` starts from the licences in use, with a note for each non-permissive one (MPL-2.0, CC-BY-4.0, Python-2.0) on why it is acceptable for a development or bundled dependency.
+  - `docs/rules/licences.json` starts from the licences in use, with a note for each non-permissive one (MPL-2.0, CC-BY-4.0, Python-2.0) on why it is acceptable for a development or bundled dependency.
   - A package with a licence outside the list, or with none, fails with its name and version, and the decision is the maintainer's (CLAUDE.md, ADR 0009).
 - **D-6 ADR 0017 inventory test.**
   - A test in `Herald.Architecture.Tests` finds domain types with an actor and time pair (`<X>By` and `<X>At`) or a name ending in `Change`.
   - Each must be named in the inventory table of `docs/adr/0017-notifications-consume-fact-events.md`, or listed in the test's exemptions with a reason (for example, a configuration audit that is not a notifiable fact).
 - **D-7 Scenario markers.**
-  - In .NET, `[Covers("<capability>", "<scenario title>")]` from `tests/Herald.Testing`, repeatable on a test.
-  - In Playwright, `test.info().annotations` of type `covers` with `"<capability>: <title>"`.
-  - In Angular unit tests, the same annotation as a helper call where a scenario is covered at that level.
-  - Titles are matched exactly after trimming, so a renamed scenario breaks its markers visibly.
+  - In .NET, xunit's own `[Trait("covers", "<capability>: <scenario title>")]`, repeatable on a test. A custom attribute would need a shared project in every test project; the trait needs nothing.
+  - In Playwright, an annotation `{ type: 'covers', description: '<capability>: <title>' }`.
+  - In Node test files (the scripts' own tests), a line comment `// covers: <capability>: <title>`.
+  - Each form is read only in its kind of file, so an example inside another kind's string is not a marker.
+  - Titles are matched exactly after trimming, so a renamed scenario breaks its markers visibly. Markers may also name scenarios of active changes, which reach `openspec/specs/` when archived.
 - **D-8 Baseline that only shrinks.**
   - `docs/rules/uncovered-scenarios.txt` lists today's uncovered scenarios.
   - `scripts/spec-coverage` fails if any of these happens: a scenario is uncovered and not in the baseline; a baseline entry is now covered but still listed (the entry must be removed); a marker names an unknown scenario.
@@ -53,7 +55,7 @@ Findings that shape the design (12 November 2026):
   - `scripts/bootstrap` holds the steps of the current cloud setup script (the .NET SDK from the distribution's packages when absent, Node from `.nvmrc`, pnpm from `packageManager`, Aspire's bundle, the OpenSpec CLI matching the skills, CodeGraph and its index, restores and installs).
   - It also runs `git config core.hooksPath .githooks`.
   - It never uses `sudo` on its own: system installs run only when it runs as root (cloud, CI).
-  - CI keeps `setup-dotnet` and `setup-node` for caching and calls `bootstrap` for the rest.
+  - CI keeps its setup actions, which cache, and needs none of what `bootstrap` adds (Aspire's bundle, OpenSpec, CodeGraph), so it does not call it.
 - **D-10 Permissions.** `.claude/settings.json` gains:
   - **allow:** `dotnet build/test/format/run`, `pnpm` in `web/` and `e2e/`, `scripts/*`, `openspec`, `codegraph`, and read-only and commit git commands;
   - **deny:** `git push --force*`, `git push -f*`, `git reset --hard origin*`, `tofu apply*`, `tofu destroy*`, `az * delete*`, and writing `.env*` or `*.tfvars`.

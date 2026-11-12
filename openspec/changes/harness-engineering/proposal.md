@@ -1,6 +1,6 @@
 ## Status
 
-**Pending the maintainer's approval.** Scope agreed on 12 November 2026: the seven harness practices in one change, delivered in three pull requests and archived after the last. The maintainer answered the design's questions the same day (`design.md`).
+**Approved for implementation on 12 November 2026** (gate 1.1). Scope agreed the same day: the seven harness practices in one change, delivered in three pull requests and archived after the last; the maintainer answered the design's questions (`design.md`). The first pull request carries this proposal with its implementation.
 
 ## Why
 
@@ -18,7 +18,7 @@ ADR 0018 moves Herald towards unattended implementation: the maintainer will rea
   It runs at three points: after each edit by Claude Code (a `PostToolUse` hook on the edited file), before each commit (a git `pre-commit` hook on the staged files), and in CI (every file).
 - **ADR 0017 inventory as a test:** an architecture test fails when a domain type records an actor and time (`<X>By` with `<X>At`), or is a `*Change` history record, and is neither named in ADR 0017's inventory nor listed as an exemption.
 - **Spec traceability:**
-  - .NET tests (`[Covers("<spec>", "<scenario>")]`) and Playwright journeys (a `covers` annotation) declare which scenarios they cover.
+  - .NET tests (`[Trait("covers", "<spec>: <scenario>")]`), Playwright journeys (a `covers` annotation) and the scripts' tests (a `// covers:` comment) declare which scenarios they cover.
   - `scripts/spec-coverage` lists scenarios without a test, and markers that point to no scenario.
   - The 269 current scenarios start in a baseline that may only shrink: a new scenario without a test, or a dangling marker, fails.
 - **One bootstrap:** `scripts/bootstrap` installs the toolchain and dependencies idempotently and enables the git hooks. The cloud environment's setup script calls it, the maintainer runs it on a new machine, and CI uses it for what the setup actions do not cover.
@@ -54,7 +54,7 @@ None. CI gains steps, described in `repository-rules` and `spec-traceability`.
 
 ## Impact
 
-- New: `scripts/rules`, `scripts/spec-coverage`, `scripts/bootstrap`, `.githooks/pre-commit`, `.claude/agents/herald-reviewer.md`, `docs/rules/` (terms, words, licences, baseline), a `Covers` attribute in `tests/Herald.Testing`.
+- New: `scripts/rules`, `scripts/spec-coverage`, `scripts/bootstrap`, `.githooks/pre-commit`, `.claude/agents/herald-reviewer.md`, `docs/rules/` (terms, words, licences, baseline), `scripts/rules.mjs`, `scripts/spec-coverage.mjs` and their tests.
 - Changed: `.claude/settings.json` (hooks, permissions), `.claude/hooks/guard.mjs` (metrics), `.mcp.json` (Aspire), `.github/workflows/ci.yml`, `scripts/check`, `tests/Herald.Architecture.Tests` (inventory test), `e2e/` (annotation, test scripts), `CLAUDE.md`, the cloud environment's setup script.
-- Development dependencies to add after checking each exact version's licence: cspell and its en-GB dictionary (MIT, to confirm). No production dependency.
+- Development dependencies to add after checking each exact version's licence: cspell 10.4.1 and `@cspell/dict-en-gb-mit` 3.1.32 (both MIT; they bring WTFPL and CC BY-SA 4.0 dictionaries, proposed for the allowed list). No production dependency.
 - No change to the host, modules, contracts or web applications.

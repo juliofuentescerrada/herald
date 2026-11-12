@@ -1,10 +1,10 @@
 ## ADDED Requirements
 
 ### Requirement: Tests declare the scenarios they cover
-.NET tests SHALL declare covered scenarios with a `Covers` attribute naming the capability and the scenario title, and Playwright journeys SHALL declare them with a `covers` annotation. A test MAY cover several scenarios.
+.NET tests SHALL declare covered scenarios with a `covers` trait naming the capability and the scenario title, Playwright journeys with a `covers` annotation, and the scripts' tests with a `covers` comment. A test MAY cover several scenarios.
 
 #### Scenario: A marked test
-- **WHEN** a test carries `Covers("team-rosters", "An owner adds a player to a waiting team")`
+- **WHEN** a test carries `[Trait("covers", "team-rosters: An owner adds a player to a waiting team")]`
 - **THEN** the coverage report lists that scenario as covered by that test
 
 ### Requirement: No new scenario without a test

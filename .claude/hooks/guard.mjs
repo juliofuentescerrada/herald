@@ -58,6 +58,18 @@ const isGit = (command) => /^git\s/.test(command);
 const fromMaintainer = (prompt) =>
   !/<wake\b|reason="external-event"|<event source=|<task-notification>|<webhook-payload>/.test(String(prompt ?? ''));
 
+const editTools = new Set(['Edit', 'Write', 'MultiEdit', 'NotebookEdit']);
+
+// The rules script is loaded only after an edit; a failure to run it never blocks the edit.
+const editedFileFindings = async (path) => {
+  try {
+    const { run } = await import(new URL('../../scripts/rules.mjs', import.meta.url));
+    return run([path]);
+  } catch (error) {
+    return [`(the rules could not run: ${String(error?.message ?? error).split('\n')[0]})`];
+  }
+};
+
 const deny = (reason) => {
   process.stdout.write(
     JSON.stringify({
@@ -108,6 +120,14 @@ switch (input.hook_event_name) {
     if (command) {
       delete state.failures[command];
       if (isPush(command)) state.pushes += 1;
+    }
+    // Repository rules on the file just edited (harness-engineering D-1): the agent sees a finding in the same turn.
+    if (editTools.has(input.tool_name) && input.tool_input?.file_path) {
+      const findings = await editedFileFindings(input.tool_input.file_path);
+      if (findings.length > 0) {
+        process.stderr.write(`Herald rules on the file you edited:\n${findings.join('\n')}\n`);
+        exitCode = 2;
+      }
     }
     if (state.tools >= warnAt && !state.warned) {
       state.warned = true;

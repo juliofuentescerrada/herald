@@ -1,0 +1,271 @@
+# Scenarios without a test when traceability began (harness-engineering, 12 November 2026).
+# This list only shrinks: cover a scenario, then remove its line. Never add a line to it.
+api-description: A Wolverine endpoint appears in the document
+api-description: An endpoint without a group is rejected
+continuous-integration: A clean change
+continuous-integration: A failing test
+continuous-integration: A journey breaks
+continuous-integration: A pull request is opened
+continuous-integration: The suite passes
+continuous-integration: Two quick pushes to a pull request
+continuous-integration: Unformatted code
+documentation-baseline: A proposed product rule closes a documentation gap
+documentation-baseline: A reader moves from a mockup to its rules
+documentation-baseline: A reviewer follows a team journey
+documentation-baseline: A reviewer starts a new result
+documentation-baseline: Target slices coexist with the skeleton
+end-to-end-journeys: A persona signs in
+end-to-end-journeys: An inaccessible state
+end-to-end-journeys: Each journey checks what the person sees
+end-to-end-journeys: Journeys do not share data
+end-to-end-journeys: One command runs the suite
+end-to-end-journeys: The fake provider stays out of production
+feedback-and-confirmation: A confirmation is in progress
+feedback-and-confirmation: A confirmation needs a reason
+feedback-and-confirmation: A conflict
+feedback-and-confirmation: A person keeps the record
+feedback-and-confirmation: A toast is read slowly
+feedback-and-confirmation: Adding a player
+feedback-and-confirmation: Admitting in order
+feedback-and-confirmation: An action in a dialog fails
+feedback-and-confirmation: An action succeeds
+feedback-and-confirmation: The organisation changes
+frontend-boundaries: A client receives transport acknowledgement
+frontend-boundaries: A common control imports an API query
+frontend-boundaries: A feature imports another feature
+frontend-boundaries: A forbidden edge uses a lazy import
+frontend-boundaries: A new feature is covered automatically
+frontend-boundaries: A valid workspace passes
+frontend-boundaries: Access is lost during work
+frontend-boundaries: Access is revoked or the user signs out
+frontend-boundaries: An app deep-imports a shared library
+frontend-boundaries: An app imports the component foundation directly
+frontend-boundaries: Another tab holds the old context
+frontend-boundaries: Composition accesses a feature entry point
+frontend-boundaries: Local shared presentation imports feature internals
+frontend-boundaries: Operational context changes
+frontend-boundaries: Platform imports a feature store
+frontend-shells: A developer starts the AppHost
+frontend-shells: A feature sends credentials during server rendering
+frontend-shells: A server-rendered fixture uses the selected runtime
+frontend-shells: A shell state lacks a reviewed reference
+frontend-shells: A visitor opens the M0 public page
+frontend-shells: An unknown public URL is requested
+frontend-shells: Both apps use a common control
+frontend-shells: Both shells build
+frontend-shells: Concurrent requests have different contexts
+frontend-shells: Desktop and narrow compositions are reviewed
+frontend-shells: Fixtures stay out of production
+frontend-shells: Initial content is available without JavaScript
+frontend-shells: Keyboard and error recovery are exercised
+frontend-shells: Protected fixture data reaches a cache boundary
+frontend-shells: Server data reaches hydration once
+frontend-shells: The admin shell has a session
+frontend-shells: The catalogue renders every control on the server
+frontend-shells: The public page hydrates
+generated-api-client: A representative contract is generated
+generated-api-client: An API change leaves stale client code
+generated-api-client: An error or revision is returned
+generated-api-client: Browser and server contexts use the client
+generated-api-client: Committed artifacts match the contract
+generated-api-client: Export needs no running services
+generated-api-client: Regeneration is stable
+generated-api-client: The frontend contract work is integrated
+generated-api-client: The host contract is exported
+generated-api-client: The public app imports the admin client
+guest-entries: A cancellation after closure
+guest-entries: A cancellation promotes exactly one entry
+guest-entries: A cancelled entry is cancelled again
+guest-entries: A failed addition keeps the drawer open
+guest-entries: A guest player is created
+guest-entries: A new guest with the same name is confirmed
+guest-entries: A player is entered
+guest-entries: A possible duplicate
+guest-entries: A team takes one slot
+guest-entries: Admitted entries exceed the capacity
+guest-entries: An owner adds a possible duplicate
+guest-entries: An owner admits a pending entry
+guest-entries: An owner cancels an admitted entry with someone waiting
+guest-entries: An owner enters players until the field is full
+guest-entries: An owner skips the queue
+guest-entries: Another organisation's guests
+guest-entries: Another organisation's owner changes an entry
+guest-entries: Capacity is raised
+guest-entries: Manual admission
+guest-entries: No slot is free
+guest-entries: Pending decisions under manual admission
+guest-entries: Registration is closed
+guest-entries: Registration is not open
+guest-entries: Same name, different kind
+guest-entries: The entry changed before the action
+guest-entries: The field fills up
+guest-entries: The guest is already entered
+guest-entries: The kind does not match
+guest-entries: The name is missing or too long
+guest-entries: The page fails to load
+guest-entries: The response to an entry is lost
+guest-entries: Two entries race for the last slot
+handler-code-generation: A handler changed without regenerating
+handler-code-generation: Development
+handler-code-generation: Production
+local-environment: Health with the database available
+local-environment: Health with the database unavailable
+local-environment: Starting the AppHost
+local-environment: The host creates no broker topology
+local-environment: The host starts with all modules registered
+module-boundaries: A domain type using an infrastructure library fails the checks
+module-boundaries: A feature using another feature fails the checks
+module-boundaries: A module referencing another module fails the build checks
+module-boundaries: A nested feature cannot bypass the dependency rule
+module-boundaries: A permitted slice dependency passes
+module-boundaries: A shared project referencing a module fails the checks
+module-boundaries: An unlisted technical dependency cannot bypass domain purity
+module-boundaries: An unused cross-module project reference is rejected
+module-boundaries: Every module is checked
+module-boundaries: Persistence cannot invoke a feature
+organisation-access: A newcomer creates an organisation
+organisation-access: A person has unsaved input when switching
+organisation-access: A person owns several organisations
+organisation-access: A person without organisations signs in
+organisation-access: A verified person is relinked
+organisation-access: An identifier is reused with different content
+organisation-access: The name is missing or too long
+organisation-access: The new identity already has a person
+organisation-access: The response to a creation is lost
+organisation-access: Two organisations share a name
+organisation-isolation: A new row is saved
+organisation-isolation: A query without a filter in the handler
+organisation-isolation: A request has no organisation context
+organisation-isolation: Another organisation's owner reads by direct identifier
+organisation-isolation: Another organisation's owner writes by direct identifier
+organisation-isolation: Membership is removed between requests
+organisation-isolation: The experiment concludes
+page-layout: A narrow screen
+page-layout: A short task
+page-layout: An operational page on a wide screen
+page-layout: History is collapsed
+page-layout: No history
+page-layout: The entries page
+page-layout: The public home on a wide screen
+page-layout: The tournament configuration
+registration-window: A closed registration lost a date
+registration-window: A draft has no registration area
+registration-window: An owner closes and reopens registration
+registration-window: An owner opens registration from the tournament page
+registration-window: Another organisation's owner changes the window
+registration-window: Closing keeps the entries
+registration-window: Registration is closed
+registration-window: Registration is opened
+registration-window: Registration is reopened
+registration-window: Registration was never opened
+registration-window: Reopening fills free slots
+registration-window: The announced opening has not arrived
+registration-window: The change fails
+registration-window: The closure date passes
+registration-window: The configuration has unsaved changes
+registration-window: The dates are missing
+registration-window: The list shows the registration state
+registration-window: The opening date passes
+registration-window: The registration dates are missing
+registration-window: The response to an opening is lost
+registration-window: The tournament changed before the action
+registration-window: The tournament changed elsewhere
+registration-window: The tournament is a draft
+sign-in: A person's email changes at the provider
+sign-in: A signed-in person lacks the organiser role
+sign-in: A token without the assignment role
+sign-in: An admin endpoint without a token
+sign-in: An assigned person signs in
+sign-in: An endpoint without an authorisation decision
+sign-in: An unassigned person signs in
+sign-in: Provider recovery fails
+sign-in: Sign-in fails or is cancelled
+sign-in: The person signs out
+sign-in: The session expires during work
+sign-in: Two people share a display name
+static-journey-preview: Open a private tournament as a spectator
+static-journey-preview: Review a narrow viewport
+static-journey-preview: Review an individual operator journey
+static-journey-preview: Review stale finalisation
+static-journey-preview: Review team readiness
+static-journey-preview: Start a new result
+team-rosters: A cancelled team releases its players
+team-rosters: A cancelled team's roster is fixed
+team-rosters: A failed addition keeps the drawer open
+team-rosters: A guest team cannot be a member
+team-rosters: A player already plays for another team
+team-rosters: A player on another team
+team-rosters: A removal is kept in the history
+team-rosters: An incomplete roster is allowed
+team-rosters: An individual tournament
+team-rosters: An older message without bounds
+team-rosters: An owner adds a player to a waiting team
+team-rosters: An owner completes a roster
+team-rosters: Another organisation's owner changes a roster
+team-rosters: Bounds reach the field
+team-rosters: Individual entries have no roster
+team-rosters: Rosters work after registration closes
+team-rosters: The maximum is lowered
+team-rosters: The roster changed in another tab
+team-rosters: The roster is full
+team-rosters: Two guests share a name
+tournament-setup: A complete draft is published
+tournament-setup: A draft is created with a title only
+tournament-setup: A draft is not ready to publish
+tournament-setup: A draft reports what it lacks
+tournament-setup: A partial draft is saved
+tournament-setup: A public tournament is published
+tournament-setup: A published team tournament is listed
+tournament-setup: A published tournament reports what opening registration lacks
+tournament-setup: A published tournament's capacity changes
+tournament-setup: A registration date is removed while registration is closed
+tournament-setup: A save conflicts
+tournament-setup: A save fails
+tournament-setup: A save is rejected
+tournament-setup: A save succeeds
+tournament-setup: A save would make a published tournament incomplete
+tournament-setup: A save would remove a registration date while registration is open
+tournament-setup: A stale review is published
+tournament-setup: A team tournament lacks its structure
+tournament-setup: A tournament changes from team to individual
+tournament-setup: A tournament with entries is listed
+tournament-setup: A tournament with open registration is listed
+tournament-setup: An identifier is reused with different content
+tournament-setup: An incomplete draft is published
+tournament-setup: An organisation has no tournaments
+tournament-setup: An owner leaves with unsaved input
+tournament-setup: An owner publishes from the review
+tournament-setup: An owner reviews a team tournament
+tournament-setup: An owner switches a draft to team
+tournament-setup: An unknown time zone is sent
+tournament-setup: Another organisation's owner reads a tournament by its identifier
+tournament-setup: Another organisation's owner writes a tournament by its identifier
+tournament-setup: Capacity below the admitted entries
+tournament-setup: Capacity is below two
+tournament-setup: Entry kind after every entry was cancelled
+tournament-setup: Entry kind with active entries
+tournament-setup: Publication fails
+tournament-setup: Registration closes after the planned start
+tournament-setup: Registration closes at the planned start
+tournament-setup: Registration dates are absent
+tournament-setup: The draft changed after the review was opened
+tournament-setup: The form explains the locked fields
+tournament-setup: The list fails to load
+tournament-setup: The organisation has no tournaments
+tournament-setup: The response to a creation is lost
+tournament-setup: The response to a publication is lost
+tournament-setup: The response to a save is lost
+tournament-setup: The roster cannot field a side
+tournament-setup: The title is missing or too long
+tournament-setup: Two organisations each have tournaments
+tournament-setup: Two tabs edit the same draft
+transactional-messaging: A handler that always fails
+transactional-messaging: A message between modules passes through the shared store
+transactional-messaging: A module is hosted
+transactional-messaging: A redelivered message
+transactional-messaging: A redelivery after the host restarts
+transactional-messaging: An event reaches the other module without a broker
+transactional-messaging: An older event arrives after a newer one
+transactional-messaging: Nothing is delivered again after a restart
+transactional-messaging: The handler fails
+transactional-messaging: The handler succeeds

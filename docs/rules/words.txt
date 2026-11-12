@@ -1,0 +1,73 @@
+# Words cspell does not know that Herald uses on purpose (harness-engineering D-4). One per line.
+# Product and library names
+AADSTS
+ASPNETCORE
+Blazor
+CONTENTROOT
+ciamlogin
+codegen
+codegraph
+MSAL
+navikt
+Netty
+Npgsql
+openspec
+opsx
+orval
+Shouldly
+slnx
+Tabler
+WCAG
+# Tools and APIs named in code or documents
+ACMR
+codespell
+fulfill
+grayscale
+nologo
+xunit
+vendored
+# Identity and web terms
+accesstoken
+refreshtoken
+describedby
+labelledby
+PKCE
+# Domain and product language
+handoff
+lineup
+lineups
+mockup
+mockups
+padel
+prerendered
+prerendering
+redeliveries
+revisioned
+subresults
+submatch
+submatches
+tiebreak
+unfinalised
+unsatisfiable
+unstarted
+unstub
+wordmark
+wifi
+nonexistent
+dialog
+dialogs
+# Invented names in tests, seeds and examples
+Cleo
+Faure
+Kira
+Lior
+Northside
+Odile
+Overwatch
+Saltmarsh
+Valé
+Róbin
+Ruíz
+Ørsted
+# A fragment a test checks is absent
+ournament

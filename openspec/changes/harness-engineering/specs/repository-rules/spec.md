@@ -8,7 +8,7 @@ One rules script SHALL check forbidden terms, British spelling and package licen
 - **THEN** the hook reports the file, line and rule in the same turn, before any other tool runs
 
 #### Scenario: A commit with a spelling in American English
-- **WHEN** a staged Markdown file contains "organization"
+- **WHEN** a staged Markdown file contains `organization`
 - **THEN** the pre-commit hook refuses the commit and names the file, line and British form
 
 #### Scenario: A bypassed hook is caught in CI

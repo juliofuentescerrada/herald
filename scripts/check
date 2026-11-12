@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Runs CI's checks with short output: one line per step, and on failure only the error lines
 # and the end of that step's log. Full logs stay in the printed directory.
-# Usage: scripts/check [dotnet|web|all]   (default: all)
+# Usage: scripts/check [rules|dotnet|web|all]   (default: all)
 set -uo pipefail
 export NO_COLOR=1 FORCE_COLOR=0
 cd "$(dirname "$0")/.."
@@ -30,6 +30,12 @@ unchanged() {
   changes="$(git status --porcelain -- "$@")"
   [ -z "$changes" ] || { echo "Generated files are stale; commit them:"; echo "$changes"; return 1; }
 }
+
+if [ "$target" = rules ] || [ "$target" = all ]; then
+  step "rules" node scripts/rules.mjs
+  step "spec coverage" node scripts/spec-coverage.mjs
+  step "rules tests" "node --test scripts/*.test.mjs"
+fi
 
 if [ "$target" = dotnet ] || [ "$target" = all ]; then
   docker info >/dev/null 2>&1 || echo "note: Docker is not running; the tests need it (see CLAUDE.md)."

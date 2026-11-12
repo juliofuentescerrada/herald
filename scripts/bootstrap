@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+# Prepares a machine to build, test and run Herald (harness-engineering D-9). Idempotent: run it again at any time.
+# The cloud environment's setup script calls it; a maintainer runs it on a new machine. System installs (the .NET SDK
+# from the distribution's packages, Node) happen only when run as root; otherwise it says what is missing.
+set -euo pipefail
+cd "$(dirname "$0")/.."
+root_user() { [ "$(id -u)" = 0 ]; }
+
+# .NET SDK: global.json allows the latest patch of its feature band.
+if ! command -v dotnet >/dev/null; then
+  if root_user && command -v apt-get >/dev/null; then
+    apt-get update -qq
+    DEBIAN_FRONTEND=noninteractive apt-get install -y -qq dotnet-sdk-10.0
+  else
+    echo "Install the .NET SDK named in global.json, then run this again." >&2; exit 1
+  fi
+fi
+
+# Node from web/.nvmrc.
+node_major=$(cat web/.nvmrc)
+if ! node --version 2>/dev/null | grep -q "^v${node_major}\."; then
+  if root_user; then
+    version=$(curl -fsS https://nodejs.org/dist/index.json | python3 -c "import json,sys;print(next(r['version'] for r in json.load(sys.stdin) if r['version'].startswith('v${node_major}.')))")
+    curl -fsSL "https://nodejs.org/dist/${version}/node-${version}-linux-x64.tar.xz" | tar -xJ -C /usr/local --strip-components=1
+    current=$(command -v node || true)
+    if [ -n "$current" ] && [ "$current" != /usr/local/bin/node ]; then ln -sf /usr/local/bin/node "$current"; fi
+  else
+    echo "Install Node ${node_major} (web/.nvmrc), then run this again." >&2; exit 1
+  fi
+fi
+
+# pnpm from web/package.json's packageManager.
+pnpm_version=$(node -p "require('./web/package.json').packageManager.split('@')[1]")
+pnpm --version 2>/dev/null | grep -qx "$pnpm_version" || npm install -g "pnpm@${pnpm_version}"
+
+# Aspire's CLI bundle, at the AppHost's Aspire version.
+aspire_version=$(grep -oP 'Aspire.Hosting.PostgreSQL" Version="\K[^"]+' Directory.Packages.props)
+dnx --yes "aspire.cli@${aspire_version}" -- setup --install-path "${HOME}/.aspire" >/dev/null
+
+# The OpenSpec CLI the skills were generated with, and CodeGraph.
+openspec_version=$(grep -oP 'generatedBy: "\K[^"]+' .claude/skills/openspec-propose/SKILL.md)
+openspec --version 2>/dev/null | grep -qx "$openspec_version" || npm install -g "@fission-ai/openspec@${openspec_version}"
+command -v codegraph >/dev/null || npm install -g @colbymchenry/codegraph@1.6.2
+
+# Dependencies, CodeGraph's index and the repository's git hooks.
+dotnet restore Herald.slnx
+(cd web && pnpm install --frozen-lockfile)
+(cd e2e && pnpm install --frozen-lockfile)
+CODEGRAPH_TELEMETRY=0 codegraph init >/dev/null
+git config core.hooksPath .githooks
+
+echo "Herald is ready: scripts/check runs what CI runs."
