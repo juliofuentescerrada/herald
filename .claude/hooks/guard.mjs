@@ -5,7 +5,8 @@
 // - Tool budget: tool calls since the maintainer's last message. A warning at 80 %, then
 //   everything is refused except git and GitHub tools, so the agent can record where it stopped.
 // - Repeated failure: the same Bash command failing several times in a row is refused.
-// - Push rounds: several pushes since the maintainer's last message are refused.
+// - Push rounds: several pushes since the maintainer's last message are refused, counted only once the session has
+//   opened or updated a pull request; earlier pushes are the slice's checkpoints (harness-resumption D-2).
 //
 // Messages that wake the session from GitHub or a schedule are not the maintainer and reset nothing.
 // - Metrics: each turn's tool calls, failures, pushes and duration, appended at Stop to
@@ -67,6 +68,8 @@ const fromMaintainer = (prompt) =>
   !/<wake\b|reason="external-event"|<event source=|<task-notification>|<webhook-payload>/.test(String(prompt ?? ''));
 
 const editTools = new Set(['Edit', 'Write', 'MultiEdit', 'NotebookEdit']);
+const pullRequestTools = new Set(['mcp__github__create_pull_request', 'mcp__github__update_pull_request']);
+const pullRequestEvent = (prompt) => /<event source="github"/.test(String(prompt ?? ''));
 
 // The rules script is loaded only after an edit; a failure to run it never blocks the edit.
 const editedFileFindings = async (path) => {
@@ -98,6 +101,8 @@ let exitCode = 0;
 switch (input.hook_event_name) {
   case 'UserPromptSubmit':
     state.turn = { ...newTurn(), number: state.turn.number + 1, maintainer: fromMaintainer(input.prompt) };
+    // A GitHub event reaches a session only through a pull request it is subscribed to.
+    if (pullRequestEvent(input.prompt)) state.pullRequest = true;
     if (fromMaintainer(input.prompt)) {
       state.tools = 0;
       state.pushes = 0;
@@ -118,7 +123,7 @@ switch (input.hook_event_name) {
         `Herald guard: this command has failed ${maxFailures} times in a row. Retrying it will not help. ` +
           `Find the cause another way or ${stopAdvice.charAt(0).toLowerCase()}${stopAdvice.slice(1)}`,
       );
-    } else if (isPush(command) && state.pushes >= maxPushes) {
+    } else if (isPush(command) && state.pullRequest && state.pushes >= maxPushes) {
       deny(
         `Herald guard: ${maxPushes} pushes since the maintainer's last message. ` +
           'Further fixes need the maintainer: describe the remaining failure on the pull request and end your turn.',
@@ -131,10 +136,11 @@ switch (input.hook_event_name) {
     if (command) {
       delete state.failures[command];
       if (isPush(command)) {
-        state.pushes += 1;
+        if (state.pullRequest) state.pushes += 1;
         state.turn.pushes += 1;
       }
     }
+    if (pullRequestTools.has(input.tool_name)) state.pullRequest = true;
     // Repository rules on the file just edited (harness-engineering D-1): the agent sees a finding in the same turn.
     if (editTools.has(input.tool_name) && input.tool_input?.file_path) {
       const findings = await editedFileFindings(input.tool_input.file_path);

@@ -79,3 +79,38 @@ test('The summary adds the turns of a session up for the pull request', () => {
   assert.deepEqual(totals, { turns: 2, maintainerTurns: 1, tools: 15, failures: 1, pushes: 2, minutes: 3 });
   assert.match(markdown(['s', 't'], totals), /\| Tool calls \| 15 \|/);
 });
+
+// covers: agent-harness: Pushing checkpoints before the pull request
+test('Checkpoint pushes before a pull request opens do not use the push rounds', () => {
+  hook('p1', 'UserPromptSubmit', { prompt: 'Implement the slice' });
+  for (let task = 0; task < 5; task++) {
+    const push = hook('p1', 'PreToolUse', bash('git push -u origin slice'));
+    assert.doesNotMatch(push.stdout, /"permissionDecision":"deny"/);
+    hook('p1', 'PostToolUse', bash('git push -u origin slice'));
+  }
+  hook('p1', 'Stop');
+  assert.equal(metrics('p1')[0].pushes, 5);
+});
+
+// covers: agent-harness: Pushing after the pull request opens
+test('Once the session opens a pull request, its pushes count towards the rounds', () => {
+  hook('p2', 'UserPromptSubmit', { prompt: 'Implement the slice' });
+  hook('p2', 'PreToolUse', bash('git push -u origin slice'));
+  hook('p2', 'PostToolUse', bash('git push -u origin slice'));
+  hook('p2', 'PreToolUse', { tool_name: 'mcp__github__create_pull_request', tool_input: {} });
+  hook('p2', 'PostToolUse', { tool_name: 'mcp__github__create_pull_request', tool_input: {} });
+  for (let round = 0; round < 3; round++) {
+    hook('p2', 'PreToolUse', bash('git push'));
+    hook('p2', 'PostToolUse', bash('git push'));
+  }
+  assert.match(hook('p2', 'PreToolUse', bash('git push')).stdout, /"permissionDecision":"deny"/);
+});
+
+test('A GitHub wake-up means the session has a pull request', () => {
+  hook('p3', 'UserPromptSubmit', { prompt: '<wake reason="external-event"><event source="github">review</event></wake>' });
+  for (let round = 0; round < 3; round++) {
+    hook('p3', 'PreToolUse', bash('git push'));
+    hook('p3', 'PostToolUse', bash('git push'));
+  }
+  assert.match(hook('p3', 'PreToolUse', bash('git push')).stdout, /"permissionDecision":"deny"/);
+});
