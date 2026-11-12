@@ -1,0 +1,29 @@
+## 1. Approval
+
+- [ ] 1.1 Maintainer review of the proposal, specs and design, with answers to Q-1 to Q-3; record the approval in `proposal.md`
+
+## 2. Checkpoints and metrics
+
+- [ ] 2.1 `guard.mjs`: push rounds counted only after the session opens or updates a pull request (D-2); tests with synthetic hook inputs
+- [ ] 2.2 `guard.mjs`: a `recorded` mark of counters already written to a trailer (D-3)
+- [ ] 2.3 `.githooks/prepare-commit-msg` adding the `Harness-Metrics` trailer for agent commits, never failing a commit; enabled by `scripts/bootstrap` with the existing hooks
+- [ ] 2.4 `scripts/harness-metrics.mjs --branch [--markdown]` summing the trailers of `main..HEAD` and unrecorded turns; tests
+- [ ] 2.5 Mark the change's metrics and checkpoint scenarios with `// covers:`
+
+## 3. State and resumption
+
+- [ ] 3.1 `scripts/slice-state.mjs` (D-4) with tests on a temporary repository with an approved change and checked tasks
+- [ ] 3.2 `SessionStart` hook with the `compact` and `resume` matchers in `.claude/settings.json`
+- [ ] 3.3 Resume a slice by hand: interrupt this change's own implementation between two tasks, start a fresh session on the branch, and record in `design.md` whether it continued from the first unchecked task
+
+## 4. Phase guard
+
+- [ ] 4.1 `guard.mjs` refuses file-tool edits under `src/`, `web/projects/` and `tools/` without an approved active change (D-6, and Q-1's answer); tests for both scenarios
+- [ ] 4.2 If Q-2 is accepted: the CI check for the phase, as a step of `scripts/check rules`
+
+## 5. Documents and review
+
+- [ ] 5.1 `CLAUDE.md`: checkpoint per task, `--branch` metrics in the slice pull request, `scripts/slice-state.mjs`; the phase rule names its check
+- [ ] 5.2 ADR 0018: resuming an in-progress slice with `agent:start`, the next-slice run's note on the batch issue, push rounds counted from the pull request
+- [ ] 5.3 `herald-reviewer` review of the diff; findings and outcomes in the pull request
+- [ ] 5.4 On archive: the Purpose of `agent-harness`, `repository-rules` and `spec-traceability` (D-7); the roadmap's current-state row (`herald-docs` skill); every new scenario covered
