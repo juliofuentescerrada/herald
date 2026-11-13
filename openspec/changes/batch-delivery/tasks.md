@@ -4,7 +4,7 @@
 
 ## 2. Decision and procedure
 
-- [ ] 2.1 ADR 0018 revised (D-1 to D-3): scope from H1's remaining slices, the local test round until M4, two slices in progress with declared dependencies, serial test rounds and merges, the follow-ups; its status as Q-1 decides
+- [x] 2.1 ADR 0018 revised (D-1 to D-3): scope from H1's remaining slices, the local test round until M4, two slices in progress with declared dependencies, serial test rounds and merges, the follow-ups; its status as Q-1 decides
 - [ ] 2.2 `CLAUDE.md`: the batch steps of the slice procedure (merge `main` and regenerate before a test round; at most two slices in progress)
 
 ## 3. Tracking
