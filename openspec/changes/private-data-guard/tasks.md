@@ -5,7 +5,7 @@
 ## 2. Private-data rule
 
 - [x] 2.1 `docs/rules/private-data.json` (patterns, allowed domains and placeholders, exceptions with reasons) and `checkPrivateData` in `scripts/rules.mjs`, in its three layers
-- [ ] 2.2 Tests for the four rule scenarios with `// covers:` markers
+- [x] 2.2 Tests for the four rule scenarios with `// covers:` markers
 - [ ] 2.3 First full run: redact the personal paths and the tenant domain (D-5, Q-1), or list justified exceptions
 
 ## 3. Gitleaks
