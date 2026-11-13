@@ -18,7 +18,7 @@ The documentation baseline was consolidated on 7 November 2026. Detailed product
 
 ## Reading order
 
-1. [Functional baseline and journeys](docs/herald-functional-discovery.md): vocabulary, scope, rules, decisions and acceptance examples.
+1. [Functional baseline and journeys](docs/herald-functional-discovery.md): vocabulary, scope, rules, decisions and acceptance examples. Its [H2 functional extension](docs/herald-h2-functional-discovery.md) defines participant self-service and bounded automation, with confirmed decisions and defaults for review.
 2. [Roadmap](docs/roadmap.md): delivery order, implementation status and decision gates.
 3. [Architecture decisions](docs/adr/README.md): rationale and target boundaries, especially [backend slices](docs/adr/0004-modular-monolith-with-vertical-slices.md) and [frontend features](docs/adr/0011-angular-front-end-and-generated-api-contract.md).
 4. [Visual direction and state coverage](docs/herald-visual-direction.md): shared UI contracts, authoritative visual references and required review states.

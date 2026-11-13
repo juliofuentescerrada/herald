@@ -26,13 +26,17 @@ Each milestone ends with something that works end to end. From M0 on, every mile
 
 The two audit notes are historical evidence. Their [consolidation record](../openspec/changes/archive/2026-11-08-documentation-consolidation/design.md) maps findings to the maintained sources and distinguishes documentation closure from product approval and implementation.
 
+## H2 functional refinement — 13 November 2026
+
+The [H2 functional discovery](herald-h2-functional-discovery.md) now defines the participant/representative milestone, bounded automation and target acceptance scenarios. Confirmed direction and author-defined defaults are distinguished in the [single decision register](herald-functional-discovery.md#15-decision-register-and-development-gates), D-30–38. This is documentation work (`h2-functional-discovery`), not an implemented H2 slice. M4 still precedes H2. H1 manual registration-window actions remain the implemented contract; H2 adds operative dates and minimum-field cancellation.
+
 ## Target delivery
 
 | Milestone | Delivers | Exit criteria |
 |---|---|---|
 | **M0 Foundations** | .NET solution (`Herald.slnx`) with the AppHost, service defaults, building blocks, contracts, the initial empty modules (ADR 0004) and the host; Wolverine wired to PostgreSQL and the broker; architecture tests; CI; one Angular workspace with admin (CSR) and public/participant (hybrid) shells | CI green on format, build and tests; `dotnet run` on the AppHost starts PostgreSQL, the broker, the host and both web apps; representative public prerendering and hydration verified; the ADR 0005, 0008 and 0009 follow-ups answered |
 | **H1 Operator league** | Individual and direct-team league through web/API; identity and organisation isolation; guests, admission, check-in, roster/lineup readiness, operator outcomes and safe corrections | UJ-01–03 and UJ-06–08; four entries produce six matches; retry-safe results; private data protected; reviewed current final standings |
-| **H2 Participant portal** | Discovery, self-service registration/check-in, team representation, competitor reports/confirmation/disputes and history | UJ-04/05 complete; pending results do not affect points; scoped collaboration |
+| **H2 Participant portal** | [Detailed H2 scope](herald-h2-functional-discovery.md): open participant access with restricted administration, discovery/self-service, teams, reporting, history/notices and bounded automation | UJ-04/05 and H2 acceptance scenarios complete; minimum-field cancellation with notices; no pending-result points or private-data leaks |
 | **H3 More competition systems** | Elimination, single match and richer result profiles | Individual/team brackets, byes and profile validation |
 | **H4 Swiss and connected consumer** | Specified Swiss policy and a real external consumer | Reproducible pairings/standings; recovery without duplicate effects |
 | **H5 Stages and live ecosystem** | Combined stages, live following, email and webhooks | Unambiguous cuts; revision-aware consumer reconciliation |

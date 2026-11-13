@@ -8,7 +8,7 @@ Herald runs tournaments (league, knockout, single match) and is game-agnostic: g
 
 - `src/CLAUDE.md`: modules, CQRS, events, notifications, durable history and backend commands. `tests/CLAUDE.md`: tests. `web/CLAUDE.md`: frontend. They load when you work in those folders.
 - The `herald-screens` skill: screens, UI states, layout and mockups, including on every proposal.
-- The `herald-docs` skill: documentation sources, ADRs, decisions, archiving and status.
+- The `herald-docs` skill: documentation sources, ADRs, decisions, archiving and status. The detailed H2 extension is `docs/herald-h2-functional-discovery.md`; the shared baseline retains the single decision register (§15).
 - `openspec/config.yaml`: the context and per-artifact rules OpenSpec gives proposals.
 
 ## Working with OpenSpec
