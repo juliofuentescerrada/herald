@@ -41,6 +41,14 @@ The complete `scripts/check rules` run could not finish its licence inventory: t
 
 The repository-required independent reviewer found one minor ambiguity: the unconditional winner-to-successor rule would require a destination for the final. Resolved in H3-AV-01, the Bo3 wording/acceptance, D-41 and the shared elimination summary: only non-final winners feed a declared successor; the final enables review. No blocking or should-fix findings were reported; the independent recheck found no remaining findings. Harness metrics have no instrumented guard sessions in this Codex environment; the generated zero table does not measure actual effort.
 
+### H4-first merge reconciliation
+
+After H4 PR #57 merged, merge `origin/main` at `e08ba0e` into the H3 branch rather than reverting H4 or replacing either side wholesale. Resolve eight shared-document conflicts by retaining both extensions, baseline v0.9, the proposed D-39–47 and D-48–56 rows, roadmap delivery guidance, source conventions and visual inventories (§9.5 H3 and §9.6 H4, preserving H4's explicit anchor). Replace H4's temporary H3 reservation/references with maintained local links while preserving its historical baseline snapshot. No product policy is changed.
+
+Verification: all D-01–56 occur exactly once and match their owning branch byte-for-byte; the H3 definition is unchanged and H4 changes only its historical/current H3 reference. Changed-file/staged rules, both strict OpenSpec validations, 36 added/changed local Markdown links/anchors, whitespace and secret scans pass. Implemented-spec coverage remains 91/356 with 265 existing baseline. Harness tests pass 74 with one existing opt-in bootstrap skip. CI classifies the final diff as documentation only. No runtime code, implemented specification or event inventory changes; no product scenario executed.
+
+The repository-required independent read-only `herald-reviewer` checked the complete reconciled diff against updated main and reported no findings. Both milestones' content, source responsibilities, decision statuses and stable visual links are preserved. The PR remains for review, without merging.
+
 ## Open Questions
 
 H3 §13 names the proposed policy gates, including exceptional positions and the supported field maximum. These do not prevent preparing the documentation change; they prevent declaring its later product slices ready for implementation.
