@@ -340,6 +340,26 @@ The [H4 discovery](herald-h4-functional-discovery.md) owns functional rules/acce
 
 For each relevant surface explore desktop/mobile, keyboard and screen-reader meaning, empty/loading, permission denial/revocation, failure with retained input and stale/uncertain-save recovery. Follow §4/5/7.2/8.1 for layout and feedback. Future screen slices require reviewed prototypes/mockups and executable scenarios; the existing league concepts do not approve Swiss explanations or connected execution controls.
 
+<a id="h5-screen-state-inventory"></a>
+
+### 9.7 H5 screen/state inventory
+
+The [H5 discovery](herald-h5-functional-discovery.md) owns functional detail and target acceptance. These are future surfaces for later reviewed slices, not approved mockups or implemented screens. This documentation change creates no UI.
+
+| Surface | States and comparisons to explore |
+| --- | --- |
+| Stage plan/configuration | Draft/invalid quotas, balanced and uneven groups, two-template choice, terminal selector disclosure, reviewed/published/fixed plan, incompatible successor profile, individual form without team fields |
+| Source closure and cut review | Provisional/closed source, pending/disputed result, lagging standings, shared boundary/seed-only tie, draw evidence, selected/excluded reasons, seed/crossing preview, eligibility blocker, unavailable/ready/committing/committed/invalidated/superseded cut |
+| Successor operations | Planned source versus fixed entrant, unpublished/published/started dependency, readiness incident, understrength team, cancellation, final review, prior-final revision; group rank/cut priority/final position shown separately |
+| Correction impact/history | Source and destination provenance, previous/new selector/cut, safe reopen and invalidated destination, published/started blocker, race conflict, failed input retained, unknown response and receipt reconciliation |
+| Public/participant live detail | Stage navigation and group tables/bracket, provisional/final and updating labels, connecting/following/reconnecting/offline, fallback refresh, expired cursor/resynchronisation, access lost and cleared content, unlisted/no-discovery, individual/team history without private roster leakage |
+| Email preference/address | Unverified/verifying/verified/address changed, category choice, channel disabled, bounced/suppressed/unknown delivery, reverification, represented-team access revoked, guest organiser-managed route; in-app notice remains separate |
+| Application/grant/credential management | Registered inactive/enabled/suspended/revoked, no grant/requested/approved/expired/revoked scope, delegated authority lost, explicit result-source permission, rotation overlap/expiry and secret shown once; redacted audit |
+| Subscription and delivery operations | Endpoint verification/failure/change, unsafe destination, active/paused/revoked, queued/attempting/retry/acknowledged/exhausted/suppressed, authentic callback failure, current-authority replay, retention expired/full resynchronisation, in-flight revocation explanation |
+| Consumer documentation and limits | Version supported/retiring/unsupported, visible sunset/retry guidance, unsupported team profile, quota/burst/concurrency error, current snapshot versus incomplete history |
+
+For every applicable surface include desktop/mobile, keyboard/focus, loading/empty/denied, long aliases and accessible explanations independent of colour. Keep focus/scroll stable during live updates, avoid unsolicited focus movement and excessive live-region announcements, and provide an accessible list alternative to the bracket. Review large-group/cut navigation at the agreed maximum; numbers and delivery status must not imply inbox reading or guaranteed instant freshness. Follow §4/§5/§7.2/§8.1 composition and the `herald-screens` process; H5 §13 supplies behavioural acceptance, not screenshots of executed tests.
+
 ## 10. Accessibility and semantic acceptance
 
 - Target WCAG 2.2 AA. Verify normal text at least 4.5:1 and large text at least 3:1. Validate control boundaries, focus visibility, non-text contrast and states separately before implementation.
