@@ -14,16 +14,16 @@ The review uses **Refactoring UI** as its primary visual framework, with the rep
 
 ## Reviewed baseline and evidence
 
-The reviewed source checkout is `/home/julio/Code/herald` at HEAD `08c3308dcf775bc03add59a768303d7d07cd1bc0`, **including its existing uncommitted documentation and prototype changes**. The report lives in a separate worktree created from HEAD. Those source changes were neither copied into this worktree nor modified. Consequently, evidence below refers to the source checkout, not the older tracked copies beside this report.
+The reviewed source checkout is `<repository>` at HEAD `08c3308dcf775bc03add59a768303d7d07cd1bc0`, **including its existing uncommitted documentation and prototype changes**. The report lives in a separate worktree created from HEAD. Those source changes were neither copied into this worktree nor modified. Consequently, evidence below refers to the source checkout, not the older tracked copies beside this report.
 
 | Key | Source | Review method |
 | --- | --- | --- |
-| D | [Functional discovery v0.6](/home/julio/Code/herald/docs/herald-functional-discovery.md) | Full requirements, decision and journey review |
-| V | [Visual direction](/home/julio/Code/herald/docs/herald-visual-direction.md) | Tokens, states, compositions and acceptance requirements |
-| R | [Roadmap](/home/julio/Code/herald/docs/roadmap.md), [ADR 0013](/home/julio/Code/herald/docs/adr/0013-functional-delivery-scope.md), [README](/home/julio/Code/herald/README.md) | Scope and decision-status comparison; supporting ADRs consulted |
-| P | [Domain presentation](/home/julio/Code/herald/docs/herald-domain-overview.pptx) | All 12 slides, speaker notes and rendered pages |
-| M | [Round management](/home/julio/Code/herald/docs/assets/mockups/herald-round-management.png), [outcomes and standings](/home/julio/Code/herald/docs/assets/mockups/herald-match-outcomes-and-standings.png), [discovery](/home/julio/Code/herald/docs/assets/mockups/herald-tournament-discovery.png) | Direct visual inspection of all three PNGs |
-| X | [Prototype review notes](/home/julio/Code/herald/openspec/changes/frontend-visual-prototype/design.md), [frontend prototype](/home/julio/Code/herald/prototypes/frontend/index.html) | Current exploratory implementation and declared limitations |
+| D | [Functional discovery v0.6](docs/herald-functional-discovery.md) | Full requirements, decision and journey review |
+| V | [Visual direction](docs/herald-visual-direction.md) | Tokens, states, compositions and acceptance requirements |
+| R | [Roadmap](docs/roadmap.md), [ADR 0013](docs/adr/0013-functional-delivery-scope.md), [README](README.md) | Scope and decision-status comparison; supporting ADRs consulted |
+| P | [Domain presentation](docs/herald-domain-overview.pptx) | All 12 slides, speaker notes and rendered pages |
+| M | [Round management](docs/assets/mockups/herald-round-management.png), [outcomes and standings](docs/assets/mockups/herald-match-outcomes-and-standings.png), [discovery](docs/assets/mockups/herald-tournament-discovery.png) | Direct visual inspection of all three PNGs |
+| X | [Prototype review notes](openspec/changes/frontend-visual-prototype/design.md), [frontend prototype](prototypes/frontend/index.html) | Current exploratory implementation and declared limitations |
 
 Line references such as `D:595` identify lines in this reviewed snapshot. PPT references use slide numbers; notes are explicitly identified. Known gaps G-01–06 are consolidated below rather than counted again as new discoveries.
 

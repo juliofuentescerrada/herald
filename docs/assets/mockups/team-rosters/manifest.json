@@ -7,7 +7,7 @@
       "label": "team readiness",
       "file": "team-rosters-team-readiness-desktop.png",
       "source": "prototypes/frontend/team-rosters-states.html?state=team-readiness",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=team-readiness&capture=1",
+      "sourceUrl": "prototypes/frontend/team-rosters-states.html?state=team-readiness&capture=1",
       "viewport": [
         1440,
         1000
@@ -34,7 +34,7 @@
       "label": "team readiness",
       "file": "team-rosters-team-readiness-mobile.png",
       "source": "prototypes/frontend/team-rosters-states.html?state=team-readiness",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=team-readiness&capture=1",
+      "sourceUrl": "prototypes/frontend/team-rosters-states.html?state=team-readiness&capture=1",
       "viewport": [
         390,
         844
@@ -61,7 +61,7 @@
       "label": "roster empty",
       "file": "team-rosters-roster-empty-desktop.png",
       "source": "prototypes/frontend/team-rosters-states.html?state=roster-empty",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=roster-empty&capture=1",
+      "sourceUrl": "prototypes/frontend/team-rosters-states.html?state=roster-empty&capture=1",
       "viewport": [
         1440,
         1000
@@ -92,7 +92,7 @@
       "label": "roster empty",
       "file": "team-rosters-roster-empty-mobile.png",
       "source": "prototypes/frontend/team-rosters-states.html?state=roster-empty",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=roster-empty&capture=1",
+      "sourceUrl": "prototypes/frontend/team-rosters-states.html?state=roster-empty&capture=1",
       "viewport": [
         390,
         844
@@ -123,7 +123,7 @@
       "label": "roster incomplete",
       "file": "team-rosters-roster-incomplete-desktop.png",
       "source": "prototypes/frontend/team-rosters-states.html?state=roster-incomplete",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=roster-incomplete&capture=1",
+      "sourceUrl": "prototypes/frontend/team-rosters-states.html?state=roster-incomplete&capture=1",
       "viewport": [
         1440,
         1000
@@ -154,7 +154,7 @@
       "label": "roster incomplete",
       "file": "team-rosters-roster-incomplete-mobile.png",
       "source": "prototypes/frontend/team-rosters-states.html?state=roster-incomplete",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=roster-incomplete&capture=1",
+      "sourceUrl": "prototypes/frontend/team-rosters-states.html?state=roster-incomplete&capture=1",
       "viewport": [
         390,
         844
@@ -185,7 +185,7 @@
       "label": "roster complete",
       "file": "team-rosters-roster-complete-desktop.png",
       "source": "prototypes/frontend/team-rosters-states.html?state=roster-complete",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=roster-complete&capture=1",
+      "sourceUrl": "prototypes/frontend/team-rosters-states.html?state=roster-complete&capture=1",
       "viewport": [
         1440,
         1000
@@ -216,7 +216,7 @@
       "label": "roster complete",
       "file": "team-rosters-roster-complete-mobile.png",
       "source": "prototypes/frontend/team-rosters-states.html?state=roster-complete",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=roster-complete&capture=1",
+      "sourceUrl": "prototypes/frontend/team-rosters-states.html?state=roster-complete&capture=1",
       "viewport": [
         390,
         844
@@ -247,7 +247,7 @@
       "label": "roster full",
       "file": "team-rosters-roster-full-desktop.png",
       "source": "prototypes/frontend/team-rosters-states.html?state=roster-full",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=roster-full&capture=1",
+      "sourceUrl": "prototypes/frontend/team-rosters-states.html?state=roster-full&capture=1",
       "viewport": [
         1440,
         1000
@@ -278,7 +278,7 @@
       "label": "roster full",
       "file": "team-rosters-roster-full-mobile.png",
       "source": "prototypes/frontend/team-rosters-states.html?state=roster-full",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=roster-full&capture=1",
+      "sourceUrl": "prototypes/frontend/team-rosters-states.html?state=roster-full&capture=1",
       "viewport": [
         390,
         844
@@ -309,7 +309,7 @@
       "label": "roster above maximum",
       "file": "team-rosters-roster-above-maximum-desktop.png",
       "source": "prototypes/frontend/team-rosters-states.html?state=roster-above-maximum",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=roster-above-maximum&capture=1",
+      "sourceUrl": "prototypes/frontend/team-rosters-states.html?state=roster-above-maximum&capture=1",
       "viewport": [
         1440,
         1000
@@ -340,7 +340,7 @@
       "label": "roster above maximum",
       "file": "team-rosters-roster-above-maximum-mobile.png",
       "source": "prototypes/frontend/team-rosters-states.html?state=roster-above-maximum",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=roster-above-maximum&capture=1",
+      "sourceUrl": "prototypes/frontend/team-rosters-states.html?state=roster-above-maximum&capture=1",
       "viewport": [
         390,
         844
@@ -371,7 +371,7 @@
       "label": "add existing",
       "file": "team-rosters-add-existing-desktop.png",
       "source": "prototypes/frontend/team-rosters-states.html?state=add-existing",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=add-existing&capture=1",
+      "sourceUrl": "prototypes/frontend/team-rosters-states.html?state=add-existing&capture=1",
       "viewport": [
         1440,
         1000
@@ -402,7 +402,7 @@
       "label": "add existing",
       "file": "team-rosters-add-existing-mobile.png",
       "source": "prototypes/frontend/team-rosters-states.html?state=add-existing",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=add-existing&capture=1",
+      "sourceUrl": "prototypes/frontend/team-rosters-states.html?state=add-existing&capture=1",
       "viewport": [
         390,
         844
@@ -433,7 +433,7 @@
       "label": "add new",
       "file": "team-rosters-add-new-desktop.png",
       "source": "prototypes/frontend/team-rosters-states.html?state=add-new",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=add-new&capture=1",
+      "sourceUrl": "prototypes/frontend/team-rosters-states.html?state=add-new&capture=1",
       "viewport": [
         1440,
         1000
@@ -464,7 +464,7 @@
       "label": "add new",
       "file": "team-rosters-add-new-mobile.png",
       "source": "prototypes/frontend/team-rosters-states.html?state=add-new",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=add-new&capture=1",
+      "sourceUrl": "prototypes/frontend/team-rosters-states.html?state=add-new&capture=1",
       "viewport": [
         390,
         844
@@ -495,7 +495,7 @@
       "label": "add duplicate",
       "file": "team-rosters-add-duplicate-desktop.png",
       "source": "prototypes/frontend/team-rosters-states.html?state=add-duplicate",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=add-duplicate&capture=1",
+      "sourceUrl": "prototypes/frontend/team-rosters-states.html?state=add-duplicate&capture=1",
       "viewport": [
         1440,
         1000
@@ -526,7 +526,7 @@
       "label": "add duplicate",
       "file": "team-rosters-add-duplicate-mobile.png",
       "source": "prototypes/frontend/team-rosters-states.html?state=add-duplicate",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=add-duplicate&capture=1",
+      "sourceUrl": "prototypes/frontend/team-rosters-states.html?state=add-duplicate&capture=1",
       "viewport": [
         390,
         844
@@ -557,7 +557,7 @@
       "label": "adding",
       "file": "team-rosters-adding-desktop.png",
       "source": "prototypes/frontend/team-rosters-states.html?state=adding",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=adding&capture=1",
+      "sourceUrl": "prototypes/frontend/team-rosters-states.html?state=adding&capture=1",
       "viewport": [
         1440,
         1000
@@ -588,7 +588,7 @@
       "label": "adding",
       "file": "team-rosters-adding-mobile.png",
       "source": "prototypes/frontend/team-rosters-states.html?state=adding",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=adding&capture=1",
+      "sourceUrl": "prototypes/frontend/team-rosters-states.html?state=adding&capture=1",
       "viewport": [
         390,
         844
@@ -619,7 +619,7 @@
       "label": "add failed",
       "file": "team-rosters-add-failed-desktop.png",
       "source": "prototypes/frontend/team-rosters-states.html?state=add-failed",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=add-failed&capture=1",
+      "sourceUrl": "prototypes/frontend/team-rosters-states.html?state=add-failed&capture=1",
       "viewport": [
         1440,
         1000
@@ -650,7 +650,7 @@
       "label": "add failed",
       "file": "team-rosters-add-failed-mobile.png",
       "source": "prototypes/frontend/team-rosters-states.html?state=add-failed",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=add-failed&capture=1",
+      "sourceUrl": "prototypes/frontend/team-rosters-states.html?state=add-failed&capture=1",
       "viewport": [
         390,
         844
@@ -681,7 +681,7 @@
       "label": "remove",
       "file": "team-rosters-remove-desktop.png",
       "source": "prototypes/frontend/team-rosters-states.html?state=remove",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=remove&capture=1",
+      "sourceUrl": "prototypes/frontend/team-rosters-states.html?state=remove&capture=1",
       "viewport": [
         1440,
         1000
@@ -712,7 +712,7 @@
       "label": "remove",
       "file": "team-rosters-remove-mobile.png",
       "source": "prototypes/frontend/team-rosters-states.html?state=remove",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=remove&capture=1",
+      "sourceUrl": "prototypes/frontend/team-rosters-states.html?state=remove&capture=1",
       "viewport": [
         390,
         844
@@ -743,7 +743,7 @@
       "label": "possible duplicate member",
       "file": "team-rosters-possible-duplicate-member-desktop.png",
       "source": "prototypes/frontend/team-rosters-states.html?state=possible-duplicate-member",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=possible-duplicate-member&capture=1",
+      "sourceUrl": "prototypes/frontend/team-rosters-states.html?state=possible-duplicate-member&capture=1",
       "viewport": [
         1440,
         1000
@@ -774,7 +774,7 @@
       "label": "possible duplicate member",
       "file": "team-rosters-possible-duplicate-member-mobile.png",
       "source": "prototypes/frontend/team-rosters-states.html?state=possible-duplicate-member",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=possible-duplicate-member&capture=1",
+      "sourceUrl": "prototypes/frontend/team-rosters-states.html?state=possible-duplicate-member&capture=1",
       "viewport": [
         390,
         844
@@ -805,7 +805,7 @@
       "label": "history expanded",
       "file": "team-rosters-history-expanded-desktop.png",
       "source": "prototypes/frontend/team-rosters-states.html?state=history-expanded",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=history-expanded&capture=1",
+      "sourceUrl": "prototypes/frontend/team-rosters-states.html?state=history-expanded&capture=1",
       "viewport": [
         1440,
         1000
@@ -836,7 +836,7 @@
       "label": "history expanded",
       "file": "team-rosters-history-expanded-mobile.png",
       "source": "prototypes/frontend/team-rosters-states.html?state=history-expanded",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=history-expanded&capture=1",
+      "sourceUrl": "prototypes/frontend/team-rosters-states.html?state=history-expanded&capture=1",
       "viewport": [
         390,
         844
@@ -867,7 +867,7 @@
       "label": "cancelled read only",
       "file": "team-rosters-cancelled-read-only-desktop.png",
       "source": "prototypes/frontend/team-rosters-states.html?state=cancelled-read-only",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=cancelled-read-only&capture=1",
+      "sourceUrl": "prototypes/frontend/team-rosters-states.html?state=cancelled-read-only&capture=1",
       "viewport": [
         1440,
         1000
@@ -898,7 +898,7 @@
       "label": "cancelled read only",
       "file": "team-rosters-cancelled-read-only-mobile.png",
       "source": "prototypes/frontend/team-rosters-states.html?state=cancelled-read-only",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=cancelled-read-only&capture=1",
+      "sourceUrl": "prototypes/frontend/team-rosters-states.html?state=cancelled-read-only&capture=1",
       "viewport": [
         390,
         844
@@ -929,7 +929,7 @@
       "label": "awaiting terms",
       "file": "team-rosters-awaiting-terms-desktop.png",
       "source": "prototypes/frontend/team-rosters-states.html?state=awaiting-terms",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=awaiting-terms&capture=1",
+      "sourceUrl": "prototypes/frontend/team-rosters-states.html?state=awaiting-terms&capture=1",
       "viewport": [
         1440,
         1000
@@ -960,7 +960,7 @@
       "label": "awaiting terms",
       "file": "team-rosters-awaiting-terms-mobile.png",
       "source": "prototypes/frontend/team-rosters-states.html?state=awaiting-terms",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=awaiting-terms&capture=1",
+      "sourceUrl": "prototypes/frontend/team-rosters-states.html?state=awaiting-terms&capture=1",
       "viewport": [
         390,
         844
@@ -991,7 +991,7 @@
       "label": "conflict",
       "file": "team-rosters-conflict-desktop.png",
       "source": "prototypes/frontend/team-rosters-states.html?state=conflict",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=conflict&capture=1",
+      "sourceUrl": "prototypes/frontend/team-rosters-states.html?state=conflict&capture=1",
       "viewport": [
         1440,
         1000
@@ -1022,7 +1022,7 @@
       "label": "conflict",
       "file": "team-rosters-conflict-mobile.png",
       "source": "prototypes/frontend/team-rosters-states.html?state=conflict",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=conflict&capture=1",
+      "sourceUrl": "prototypes/frontend/team-rosters-states.html?state=conflict&capture=1",
       "viewport": [
         390,
         844
@@ -1053,7 +1053,7 @@
       "label": "loading",
       "file": "team-rosters-loading-desktop.png",
       "source": "prototypes/frontend/team-rosters-states.html?state=loading",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=loading&capture=1",
+      "sourceUrl": "prototypes/frontend/team-rosters-states.html?state=loading&capture=1",
       "viewport": [
         1440,
         1000
@@ -1084,7 +1084,7 @@
       "label": "loading",
       "file": "team-rosters-loading-mobile.png",
       "source": "prototypes/frontend/team-rosters-states.html?state=loading",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=loading&capture=1",
+      "sourceUrl": "prototypes/frontend/team-rosters-states.html?state=loading&capture=1",
       "viewport": [
         390,
         844
@@ -1115,7 +1115,7 @@
       "label": "failed",
       "file": "team-rosters-failed-desktop.png",
       "source": "prototypes/frontend/team-rosters-states.html?state=failed",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=failed&capture=1",
+      "sourceUrl": "prototypes/frontend/team-rosters-states.html?state=failed&capture=1",
       "viewport": [
         1440,
         1000
@@ -1146,7 +1146,7 @@
       "label": "failed",
       "file": "team-rosters-failed-mobile.png",
       "source": "prototypes/frontend/team-rosters-states.html?state=failed",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/team-rosters-states.html?state=failed&capture=1",
+      "sourceUrl": "prototypes/frontend/team-rosters-states.html?state=failed&capture=1",
       "viewport": [
         390,
         844

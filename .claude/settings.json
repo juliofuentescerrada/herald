@@ -48,7 +48,14 @@
       "Bash(az * delete *)",
       "Bash(azd down *)",
       "Edit(/**/.env*)",
-      "Edit(/**/*.tfvars)"
+      "Edit(/**/*.tfvars)",
+      "Bash(dotnet user-secrets list *)",
+      "Bash(dotnet user-secrets * list *)",
+      "Bash(*.microsoft/*)",
+      "Bash(*AppData*Microsoft*UserSecrets*)",
+      "Bash(*secrets.json*)",
+      "Read(~/.microsoft/usersecrets/**)",
+      "Read(//**/AppData/Roaming/Microsoft/UserSecrets/**)"
     ]
   },
   "hooks": {

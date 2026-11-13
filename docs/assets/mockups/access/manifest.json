@@ -13,7 +13,7 @@
         "label": "Public navigation · signed out",
         "file": "access-public-signed-out-desktop.png",
         "source": "prototypes/frontend/access-states.html?state=public-signed-out",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=public-signed-out",
+        "sourceUrl": "prototypes/frontend/access-states.html?state=public-signed-out",
         "viewport": [
           1440,
           1000
@@ -33,7 +33,7 @@
         "label": "Public navigation · signed out",
         "file": "access-public-signed-out-mobile.png",
         "source": "prototypes/frontend/access-states.html?state=public-signed-out",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=public-signed-out",
+        "sourceUrl": "prototypes/frontend/access-states.html?state=public-signed-out",
         "viewport": [
           390,
           844
@@ -53,7 +53,7 @@
         "label": "Public navigation · signed in",
         "file": "access-public-signed-in-desktop.png",
         "source": "prototypes/frontend/access-states.html?state=public-signed-in",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=public-signed-in",
+        "sourceUrl": "prototypes/frontend/access-states.html?state=public-signed-in",
         "viewport": [
           1440,
           1000
@@ -73,7 +73,7 @@
         "label": "Public navigation · signed in",
         "file": "access-public-signed-in-mobile.png",
         "source": "prototypes/frontend/access-states.html?state=public-signed-in",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=public-signed-in",
+        "sourceUrl": "prototypes/frontend/access-states.html?state=public-signed-in",
         "viewport": [
           390,
           844
@@ -93,7 +93,7 @@
         "label": "Sign-in · redirecting",
         "file": "access-sign-in-redirecting-desktop.png",
         "source": "prototypes/frontend/access-states.html?state=sign-in-redirecting",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=sign-in-redirecting",
+        "sourceUrl": "prototypes/frontend/access-states.html?state=sign-in-redirecting",
         "viewport": [
           1440,
           1000
@@ -113,7 +113,7 @@
         "label": "Sign-in · redirecting",
         "file": "access-sign-in-redirecting-mobile.png",
         "source": "prototypes/frontend/access-states.html?state=sign-in-redirecting",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=sign-in-redirecting",
+        "sourceUrl": "prototypes/frontend/access-states.html?state=sign-in-redirecting",
         "viewport": [
           390,
           844
@@ -133,7 +133,7 @@
         "label": "Sign-in · returning",
         "file": "access-sign-in-returning-desktop.png",
         "source": "prototypes/frontend/access-states.html?state=sign-in-returning",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=sign-in-returning",
+        "sourceUrl": "prototypes/frontend/access-states.html?state=sign-in-returning",
         "viewport": [
           1440,
           1000
@@ -153,7 +153,7 @@
         "label": "Sign-in · returning",
         "file": "access-sign-in-returning-mobile.png",
         "source": "prototypes/frontend/access-states.html?state=sign-in-returning",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=sign-in-returning",
+        "sourceUrl": "prototypes/frontend/access-states.html?state=sign-in-returning",
         "viewport": [
           390,
           844
@@ -173,7 +173,7 @@
         "label": "Sign-in · failed",
         "file": "access-sign-in-failed-desktop.png",
         "source": "prototypes/frontend/access-states.html?state=sign-in-failed",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=sign-in-failed",
+        "sourceUrl": "prototypes/frontend/access-states.html?state=sign-in-failed",
         "viewport": [
           1440,
           1000
@@ -193,7 +193,7 @@
         "label": "Sign-in · failed",
         "file": "access-sign-in-failed-mobile.png",
         "source": "prototypes/frontend/access-states.html?state=sign-in-failed",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=sign-in-failed",
+        "sourceUrl": "prototypes/frontend/access-states.html?state=sign-in-failed",
         "viewport": [
           390,
           844
@@ -213,7 +213,7 @@
         "label": "Sign-in · cancelled",
         "file": "access-sign-in-cancelled-desktop.png",
         "source": "prototypes/frontend/access-states.html?state=sign-in-cancelled",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=sign-in-cancelled",
+        "sourceUrl": "prototypes/frontend/access-states.html?state=sign-in-cancelled",
         "viewport": [
           1440,
           1000
@@ -233,7 +233,7 @@
         "label": "Sign-in · cancelled",
         "file": "access-sign-in-cancelled-mobile.png",
         "source": "prototypes/frontend/access-states.html?state=sign-in-cancelled",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=sign-in-cancelled",
+        "sourceUrl": "prototypes/frontend/access-states.html?state=sign-in-cancelled",
         "viewport": [
           390,
           844
@@ -253,7 +253,7 @@
         "label": "Account not assigned to Herald",
         "file": "access-not-assigned-desktop.png",
         "source": "prototypes/frontend/access-states.html?state=not-assigned",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=not-assigned",
+        "sourceUrl": "prototypes/frontend/access-states.html?state=not-assigned",
         "viewport": [
           1440,
           1000
@@ -273,7 +273,7 @@
         "label": "Account not assigned to Herald",
         "file": "access-not-assigned-mobile.png",
         "source": "prototypes/frontend/access-states.html?state=not-assigned",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=not-assigned",
+        "sourceUrl": "prototypes/frontend/access-states.html?state=not-assigned",
         "viewport": [
           390,
           844
@@ -293,7 +293,7 @@
         "label": "Create organisation · empty",
         "file": "access-onboarding-desktop.png",
         "source": "prototypes/frontend/access-states.html?state=onboarding",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=onboarding",
+        "sourceUrl": "prototypes/frontend/access-states.html?state=onboarding",
         "viewport": [
           1440,
           1000
@@ -313,7 +313,7 @@
         "label": "Create organisation · empty",
         "file": "access-onboarding-mobile.png",
         "source": "prototypes/frontend/access-states.html?state=onboarding",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=onboarding",
+        "sourceUrl": "prototypes/frontend/access-states.html?state=onboarding",
         "viewport": [
           390,
           844
@@ -333,7 +333,7 @@
         "label": "Create organisation · name required",
         "file": "access-name-required-desktop.png",
         "source": "prototypes/frontend/access-states.html?state=name-required",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=name-required",
+        "sourceUrl": "prototypes/frontend/access-states.html?state=name-required",
         "viewport": [
           1440,
           1000
@@ -353,7 +353,7 @@
         "label": "Create organisation · name required",
         "file": "access-name-required-mobile.png",
         "source": "prototypes/frontend/access-states.html?state=name-required",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=name-required",
+        "sourceUrl": "prototypes/frontend/access-states.html?state=name-required",
         "viewport": [
           390,
           844
@@ -373,7 +373,7 @@
         "label": "Create organisation · name too long",
         "file": "access-name-too-long-desktop.png",
         "source": "prototypes/frontend/access-states.html?state=name-too-long",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=name-too-long",
+        "sourceUrl": "prototypes/frontend/access-states.html?state=name-too-long",
         "viewport": [
           1440,
           1000
@@ -393,7 +393,7 @@
         "label": "Create organisation · name too long",
         "file": "access-name-too-long-mobile.png",
         "source": "prototypes/frontend/access-states.html?state=name-too-long",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=name-too-long",
+        "sourceUrl": "prototypes/frontend/access-states.html?state=name-too-long",
         "viewport": [
           390,
           844
@@ -413,7 +413,7 @@
         "label": "Create organisation · submitting",
         "file": "access-creating-desktop.png",
         "source": "prototypes/frontend/access-states.html?state=creating",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=creating",
+        "sourceUrl": "prototypes/frontend/access-states.html?state=creating",
         "viewport": [
           1440,
           1000
@@ -433,7 +433,7 @@
         "label": "Create organisation · submitting",
         "file": "access-creating-mobile.png",
         "source": "prototypes/frontend/access-states.html?state=creating",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=creating",
+        "sourceUrl": "prototypes/frontend/access-states.html?state=creating",
         "viewport": [
           390,
           844
@@ -453,7 +453,7 @@
         "label": "Create organisation · failed save",
         "file": "access-create-failed-desktop.png",
         "source": "prototypes/frontend/access-states.html?state=create-failed",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=create-failed",
+        "sourceUrl": "prototypes/frontend/access-states.html?state=create-failed",
         "viewport": [
           1440,
           1000
@@ -473,7 +473,7 @@
         "label": "Create organisation · failed save",
         "file": "access-create-failed-mobile.png",
         "source": "prototypes/frontend/access-states.html?state=create-failed",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=create-failed",
+        "sourceUrl": "prototypes/frontend/access-states.html?state=create-failed",
         "viewport": [
           390,
           844
@@ -493,7 +493,7 @@
         "label": "Organisation created · owner context",
         "file": "access-created-desktop.png",
         "source": "prototypes/frontend/access-states.html?state=created",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=created",
+        "sourceUrl": "prototypes/frontend/access-states.html?state=created",
         "viewport": [
           1440,
           1000
@@ -513,7 +513,7 @@
         "label": "Organisation created · owner context",
         "file": "access-created-mobile.png",
         "source": "prototypes/frontend/access-states.html?state=created",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=created",
+        "sourceUrl": "prototypes/frontend/access-states.html?state=created",
         "viewport": [
           390,
           844
@@ -533,7 +533,7 @@
         "label": "Admin shell · active session",
         "file": "access-admin-session-desktop.png",
         "source": "prototypes/frontend/access-states.html?state=admin-session",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=admin-session",
+        "sourceUrl": "prototypes/frontend/access-states.html?state=admin-session",
         "viewport": [
           1440,
           1000
@@ -553,7 +553,7 @@
         "label": "Admin shell · active session",
         "file": "access-admin-session-mobile.png",
         "source": "prototypes/frontend/access-states.html?state=admin-session",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=admin-session",
+        "sourceUrl": "prototypes/frontend/access-states.html?state=admin-session",
         "viewport": [
           390,
           844
@@ -573,7 +573,7 @@
         "label": "One organisation · no selector",
         "file": "access-one-organisation-desktop.png",
         "source": "prototypes/frontend/access-states.html?state=one-organisation",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=one-organisation",
+        "sourceUrl": "prototypes/frontend/access-states.html?state=one-organisation",
         "viewport": [
           1440,
           1000
@@ -593,7 +593,7 @@
         "label": "One organisation · no selector",
         "file": "access-one-organisation-mobile.png",
         "source": "prototypes/frontend/access-states.html?state=one-organisation",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=one-organisation",
+        "sourceUrl": "prototypes/frontend/access-states.html?state=one-organisation",
         "viewport": [
           390,
           844
@@ -613,7 +613,7 @@
         "label": "Several organisations · selector",
         "file": "access-organisation-selector-desktop.png",
         "source": "prototypes/frontend/access-states.html?state=organisation-selector",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=organisation-selector",
+        "sourceUrl": "prototypes/frontend/access-states.html?state=organisation-selector",
         "viewport": [
           1440,
           1000
@@ -633,7 +633,7 @@
         "label": "Several organisations · selector",
         "file": "access-organisation-selector-mobile.png",
         "source": "prototypes/frontend/access-states.html?state=organisation-selector",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=organisation-selector",
+        "sourceUrl": "prototypes/frontend/access-states.html?state=organisation-selector",
         "viewport": [
           390,
           844
@@ -653,7 +653,7 @@
         "label": "Organisation · switching",
         "file": "access-switching-desktop.png",
         "source": "prototypes/frontend/access-states.html?state=switching",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=switching",
+        "sourceUrl": "prototypes/frontend/access-states.html?state=switching",
         "viewport": [
           1440,
           1000
@@ -673,7 +673,7 @@
         "label": "Organisation · switching",
         "file": "access-switching-mobile.png",
         "source": "prototypes/frontend/access-states.html?state=switching",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=switching",
+        "sourceUrl": "prototypes/frontend/access-states.html?state=switching",
         "viewport": [
           390,
           844
@@ -693,7 +693,7 @@
         "label": "Organisation · switched",
         "file": "access-switched-desktop.png",
         "source": "prototypes/frontend/access-states.html?state=switched",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=switched",
+        "sourceUrl": "prototypes/frontend/access-states.html?state=switched",
         "viewport": [
           1440,
           1000
@@ -713,7 +713,7 @@
         "label": "Organisation · switched",
         "file": "access-switched-mobile.png",
         "source": "prototypes/frontend/access-states.html?state=switched",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=switched",
+        "sourceUrl": "prototypes/frontend/access-states.html?state=switched",
         "viewport": [
           390,
           844
@@ -733,7 +733,7 @@
         "label": "Organisation changed in another tab",
         "file": "access-context-replaced-desktop.png",
         "source": "prototypes/frontend/access-states.html?state=context-replaced",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=context-replaced",
+        "sourceUrl": "prototypes/frontend/access-states.html?state=context-replaced",
         "viewport": [
           1440,
           1000
@@ -753,7 +753,7 @@
         "label": "Organisation changed in another tab",
         "file": "access-context-replaced-mobile.png",
         "source": "prototypes/frontend/access-states.html?state=context-replaced",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=context-replaced",
+        "sourceUrl": "prototypes/frontend/access-states.html?state=context-replaced",
         "viewport": [
           390,
           844
@@ -773,7 +773,7 @@
         "label": "Membership removed · landing",
         "file": "access-access-lost-desktop.png",
         "source": "prototypes/frontend/access-states.html?state=access-lost",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=access-lost",
+        "sourceUrl": "prototypes/frontend/access-states.html?state=access-lost",
         "viewport": [
           1440,
           1000
@@ -793,7 +793,7 @@
         "label": "Membership removed · landing",
         "file": "access-access-lost-mobile.png",
         "source": "prototypes/frontend/access-states.html?state=access-lost",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=access-lost",
+        "sourceUrl": "prototypes/frontend/access-states.html?state=access-lost",
         "viewport": [
           390,
           844
@@ -813,7 +813,7 @@
         "label": "Membership removed · rejected write",
         "file": "access-write-rejected-desktop.png",
         "source": "prototypes/frontend/access-states.html?state=write-rejected",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=write-rejected",
+        "sourceUrl": "prototypes/frontend/access-states.html?state=write-rejected",
         "viewport": [
           1440,
           1000
@@ -833,7 +833,7 @@
         "label": "Membership removed · rejected write",
         "file": "access-write-rejected-mobile.png",
         "source": "prototypes/frontend/access-states.html?state=write-rejected",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=write-rejected",
+        "sourceUrl": "prototypes/frontend/access-states.html?state=write-rejected",
         "viewport": [
           390,
           844
@@ -853,7 +853,7 @@
         "label": "Session expired during work",
         "file": "access-session-expired-desktop.png",
         "source": "prototypes/frontend/access-states.html?state=session-expired",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=session-expired",
+        "sourceUrl": "prototypes/frontend/access-states.html?state=session-expired",
         "viewport": [
           1440,
           1000
@@ -873,7 +873,7 @@
         "label": "Session expired during work",
         "file": "access-session-expired-mobile.png",
         "source": "prototypes/frontend/access-states.html?state=session-expired",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=session-expired",
+        "sourceUrl": "prototypes/frontend/access-states.html?state=session-expired",
         "viewport": [
           390,
           844
@@ -893,7 +893,7 @@
         "label": "Account recovery · support next action",
         "file": "access-recovery-desktop.png",
         "source": "prototypes/frontend/access-states.html?state=recovery",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=recovery",
+        "sourceUrl": "prototypes/frontend/access-states.html?state=recovery",
         "viewport": [
           1440,
           1000
@@ -913,7 +913,7 @@
         "label": "Account recovery · support next action",
         "file": "access-recovery-mobile.png",
         "source": "prototypes/frontend/access-states.html?state=recovery",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=recovery",
+        "sourceUrl": "prototypes/frontend/access-states.html?state=recovery",
         "viewport": [
           390,
           844
@@ -933,7 +933,7 @@
         "label": "Generic private denial",
         "file": "access-private-denied-desktop.png",
         "source": "prototypes/frontend/access-states.html?state=private-denied",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=private-denied",
+        "sourceUrl": "prototypes/frontend/access-states.html?state=private-denied",
         "viewport": [
           1440,
           1000
@@ -953,7 +953,7 @@
         "label": "Generic private denial",
         "file": "access-private-denied-mobile.png",
         "source": "prototypes/frontend/access-states.html?state=private-denied",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/access-states.html?state=private-denied",
+        "sourceUrl": "prototypes/frontend/access-states.html?state=private-denied",
         "viewport": [
           390,
           844

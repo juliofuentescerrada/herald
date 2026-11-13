@@ -9,7 +9,7 @@
       "batch": 1,
       "file": "feedback-layout-entries-wide-desktop.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=entries-wide",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=entries-wide&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=entries-wide&capture=1",
       "viewport": [
         1440,
         1000
@@ -38,7 +38,7 @@
       "batch": 1,
       "file": "feedback-layout-entries-wide-mobile.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=entries-wide",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=entries-wide&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=entries-wide&capture=1",
       "viewport": [
         390,
         844
@@ -67,7 +67,7 @@
       "batch": 1,
       "file": "feedback-layout-entries-wide-1920.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=entries-wide",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=entries-wide&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=entries-wide&capture=1",
       "viewport": [
         1920,
         1080
@@ -96,7 +96,7 @@
       "batch": 1,
       "file": "feedback-layout-entries-cancelled-expanded-desktop.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=entries-cancelled-expanded",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=entries-cancelled-expanded&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=entries-cancelled-expanded&capture=1",
       "viewport": [
         1440,
         1000
@@ -125,7 +125,7 @@
       "batch": 1,
       "file": "feedback-layout-entries-cancelled-expanded-mobile.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=entries-cancelled-expanded",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=entries-cancelled-expanded&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=entries-cancelled-expanded&capture=1",
       "viewport": [
         390,
         844
@@ -154,7 +154,7 @@
       "batch": 1,
       "file": "feedback-layout-entries-manual-pending-desktop.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=entries-manual-pending",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=entries-manual-pending&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=entries-manual-pending&capture=1",
       "viewport": [
         1440,
         1000
@@ -183,7 +183,7 @@
       "batch": 1,
       "file": "feedback-layout-entries-manual-pending-mobile.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=entries-manual-pending",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=entries-manual-pending&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=entries-manual-pending&capture=1",
       "viewport": [
         390,
         844
@@ -212,7 +212,7 @@
       "batch": 1,
       "file": "feedback-layout-entries-empty-desktop.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=entries-empty",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=entries-empty&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=entries-empty&capture=1",
       "viewport": [
         1440,
         1000
@@ -241,7 +241,7 @@
       "batch": 1,
       "file": "feedback-layout-entries-empty-mobile.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=entries-empty",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=entries-empty&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=entries-empty&capture=1",
       "viewport": [
         390,
         844
@@ -270,7 +270,7 @@
       "batch": 1,
       "file": "feedback-layout-cancel-dialog-desktop.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=cancel-dialog",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=cancel-dialog&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=cancel-dialog&capture=1",
       "viewport": [
         1440,
         1000
@@ -303,7 +303,7 @@
       "batch": 1,
       "file": "feedback-layout-cancel-dialog-mobile.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=cancel-dialog",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=cancel-dialog&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=cancel-dialog&capture=1",
       "viewport": [
         390,
         844
@@ -336,7 +336,7 @@
       "batch": 1,
       "file": "feedback-layout-cancel-dialog-closed-desktop.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=cancel-dialog-closed",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=cancel-dialog-closed&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=cancel-dialog-closed&capture=1",
       "viewport": [
         1440,
         1000
@@ -369,7 +369,7 @@
       "batch": 1,
       "file": "feedback-layout-cancel-dialog-closed-mobile.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=cancel-dialog-closed",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=cancel-dialog-closed&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=cancel-dialog-closed&capture=1",
       "viewport": [
         390,
         844
@@ -402,7 +402,7 @@
       "batch": 1,
       "file": "feedback-layout-cancel-dialog-busy-desktop.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=cancel-dialog-busy",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=cancel-dialog-busy&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=cancel-dialog-busy&capture=1",
       "viewport": [
         1440,
         1000
@@ -435,7 +435,7 @@
       "batch": 1,
       "file": "feedback-layout-cancel-dialog-busy-mobile.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=cancel-dialog-busy",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=cancel-dialog-busy&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=cancel-dialog-busy&capture=1",
       "viewport": [
         390,
         844
@@ -468,7 +468,7 @@
       "batch": 1,
       "file": "feedback-layout-cancel-dialog-failed-desktop.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=cancel-dialog-failed",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=cancel-dialog-failed&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=cancel-dialog-failed&capture=1",
       "viewport": [
         1440,
         1000
@@ -501,7 +501,7 @@
       "batch": 1,
       "file": "feedback-layout-cancel-dialog-failed-mobile.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=cancel-dialog-failed",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=cancel-dialog-failed&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=cancel-dialog-failed&capture=1",
       "viewport": [
         390,
         844
@@ -534,7 +534,7 @@
       "batch": 1,
       "file": "feedback-layout-admit-reason-dialog-desktop.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=admit-reason-dialog",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=admit-reason-dialog&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=admit-reason-dialog&capture=1",
       "viewport": [
         1440,
         1000
@@ -567,7 +567,7 @@
       "batch": 1,
       "file": "feedback-layout-admit-reason-dialog-mobile.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=admit-reason-dialog",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=admit-reason-dialog&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=admit-reason-dialog&capture=1",
       "viewport": [
         390,
         844
@@ -600,7 +600,7 @@
       "batch": 1,
       "file": "feedback-layout-admit-reason-typed-desktop.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=admit-reason-typed",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=admit-reason-typed&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=admit-reason-typed&capture=1",
       "viewport": [
         1440,
         1000
@@ -633,7 +633,7 @@
       "batch": 1,
       "file": "feedback-layout-admit-reason-typed-mobile.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=admit-reason-typed",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=admit-reason-typed&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=admit-reason-typed&capture=1",
       "viewport": [
         390,
         844
@@ -666,7 +666,7 @@
       "batch": 1,
       "file": "feedback-layout-add-drawer-search-desktop.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=add-drawer-search",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=add-drawer-search&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=add-drawer-search&capture=1",
       "viewport": [
         1440,
         1000
@@ -699,7 +699,7 @@
       "batch": 1,
       "file": "feedback-layout-add-drawer-search-mobile.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=add-drawer-search",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=add-drawer-search&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=add-drawer-search&capture=1",
       "viewport": [
         390,
         844
@@ -732,7 +732,7 @@
       "batch": 1,
       "file": "feedback-layout-add-drawer-create-desktop.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=add-drawer-create",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=add-drawer-create&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=add-drawer-create&capture=1",
       "viewport": [
         1440,
         1000
@@ -765,7 +765,7 @@
       "batch": 1,
       "file": "feedback-layout-add-drawer-create-mobile.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=add-drawer-create",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=add-drawer-create&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=add-drawer-create&capture=1",
       "viewport": [
         390,
         844
@@ -798,7 +798,7 @@
       "batch": 1,
       "file": "feedback-layout-add-drawer-duplicate-desktop.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=add-drawer-duplicate",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=add-drawer-duplicate&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=add-drawer-duplicate&capture=1",
       "viewport": [
         1440,
         1000
@@ -831,7 +831,7 @@
       "batch": 1,
       "file": "feedback-layout-add-drawer-duplicate-mobile.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=add-drawer-duplicate",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=add-drawer-duplicate&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=add-drawer-duplicate&capture=1",
       "viewport": [
         390,
         844
@@ -864,7 +864,7 @@
       "batch": 1,
       "file": "feedback-layout-add-drawer-adding-desktop.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=add-drawer-adding",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=add-drawer-adding&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=add-drawer-adding&capture=1",
       "viewport": [
         1440,
         1000
@@ -897,7 +897,7 @@
       "batch": 1,
       "file": "feedback-layout-add-drawer-adding-mobile.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=add-drawer-adding",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=add-drawer-adding&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=add-drawer-adding&capture=1",
       "viewport": [
         390,
         844
@@ -930,7 +930,7 @@
       "batch": 1,
       "file": "feedback-layout-add-drawer-failed-desktop.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=add-drawer-failed",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=add-drawer-failed&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=add-drawer-failed&capture=1",
       "viewport": [
         1440,
         1000
@@ -963,7 +963,7 @@
       "batch": 1,
       "file": "feedback-layout-add-drawer-failed-mobile.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=add-drawer-failed",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=add-drawer-failed&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=add-drawer-failed&capture=1",
       "viewport": [
         390,
         844
@@ -996,7 +996,7 @@
       "batch": 1,
       "file": "feedback-layout-toast-admitted-desktop.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=toast-admitted",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=toast-admitted&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=toast-admitted&capture=1",
       "viewport": [
         1440,
         1000
@@ -1025,7 +1025,7 @@
       "batch": 1,
       "file": "feedback-layout-toast-admitted-mobile.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=toast-admitted",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=toast-admitted&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=toast-admitted&capture=1",
       "viewport": [
         390,
         844
@@ -1054,7 +1054,7 @@
       "batch": 1,
       "file": "feedback-layout-toast-stack-desktop.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=toast-stack",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=toast-stack&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=toast-stack&capture=1",
       "viewport": [
         1440,
         1000
@@ -1086,7 +1086,7 @@
       "batch": 1,
       "file": "feedback-layout-toast-stack-mobile.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=toast-stack",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=toast-stack&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=toast-stack&capture=1",
       "viewport": [
         390,
         844
@@ -1118,7 +1118,7 @@
       "batch": 1,
       "file": "feedback-layout-entries-conflict-desktop.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=entries-conflict",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=entries-conflict&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=entries-conflict&capture=1",
       "viewport": [
         1440,
         1000
@@ -1147,7 +1147,7 @@
       "batch": 1,
       "file": "feedback-layout-entries-conflict-mobile.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=entries-conflict",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=entries-conflict&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=entries-conflict&capture=1",
       "viewport": [
         390,
         844
@@ -1176,7 +1176,7 @@
       "batch": 1,
       "file": "feedback-layout-entries-over-capacity-desktop.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=entries-over-capacity",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=entries-over-capacity&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=entries-over-capacity&capture=1",
       "viewport": [
         1440,
         1000
@@ -1205,7 +1205,7 @@
       "batch": 1,
       "file": "feedback-layout-entries-over-capacity-mobile.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=entries-over-capacity",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=entries-over-capacity&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=entries-over-capacity&capture=1",
       "viewport": [
         390,
         844
@@ -1234,7 +1234,7 @@
       "batch": 1,
       "file": "feedback-layout-entries-loading-desktop.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=entries-loading",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=entries-loading&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=entries-loading&capture=1",
       "viewport": [
         1440,
         1000
@@ -1262,7 +1262,7 @@
       "batch": 1,
       "file": "feedback-layout-entries-loading-mobile.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=entries-loading",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=entries-loading&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=entries-loading&capture=1",
       "viewport": [
         390,
         844
@@ -1290,7 +1290,7 @@
       "batch": 1,
       "file": "feedback-layout-entries-failed-desktop.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=entries-failed",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=entries-failed&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=entries-failed&capture=1",
       "viewport": [
         1440,
         1000
@@ -1318,7 +1318,7 @@
       "batch": 1,
       "file": "feedback-layout-entries-failed-mobile.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=entries-failed",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=entries-failed&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=entries-failed&capture=1",
       "viewport": [
         390,
         844
@@ -1346,7 +1346,7 @@
       "batch": 2,
       "file": "feedback-layout-config-published-desktop.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=config-published",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=config-published&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=config-published&capture=1",
       "viewport": [
         1440,
         1000
@@ -1375,7 +1375,7 @@
       "batch": 2,
       "file": "feedback-layout-config-published-mobile.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=config-published",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=config-published&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=config-published&capture=1",
       "viewport": [
         390,
         844
@@ -1404,7 +1404,7 @@
       "batch": 2,
       "file": "feedback-layout-config-saved-toast-desktop.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=config-saved-toast",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=config-saved-toast&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=config-saved-toast&capture=1",
       "viewport": [
         1440,
         1000
@@ -1433,7 +1433,7 @@
       "batch": 2,
       "file": "feedback-layout-config-saved-toast-mobile.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=config-saved-toast",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=config-saved-toast&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=config-saved-toast&capture=1",
       "viewport": [
         390,
         844
@@ -1462,7 +1462,7 @@
       "batch": 2,
       "file": "feedback-layout-config-rejected-desktop.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=config-rejected",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=config-rejected&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=config-rejected&capture=1",
       "viewport": [
         1440,
         1000
@@ -1491,7 +1491,7 @@
       "batch": 2,
       "file": "feedback-layout-config-rejected-mobile.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=config-rejected",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=config-rejected&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=config-rejected&capture=1",
       "viewport": [
         390,
         844
@@ -1520,7 +1520,7 @@
       "batch": 2,
       "file": "feedback-layout-config-conflict-desktop.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=config-conflict",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=config-conflict&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=config-conflict&capture=1",
       "viewport": [
         1440,
         1000
@@ -1549,7 +1549,7 @@
       "batch": 2,
       "file": "feedback-layout-config-conflict-mobile.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=config-conflict",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=config-conflict&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=config-conflict&capture=1",
       "viewport": [
         390,
         844
@@ -1578,7 +1578,7 @@
       "batch": 2,
       "file": "feedback-layout-config-reload-dialog-desktop.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=config-reload-dialog",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=config-reload-dialog&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=config-reload-dialog&capture=1",
       "viewport": [
         1440,
         1000
@@ -1611,7 +1611,7 @@
       "batch": 2,
       "file": "feedback-layout-config-reload-dialog-mobile.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=config-reload-dialog",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=config-reload-dialog&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=config-reload-dialog&capture=1",
       "viewport": [
         390,
         844
@@ -1644,7 +1644,7 @@
       "batch": 2,
       "file": "feedback-layout-config-leave-dialog-desktop.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=config-leave-dialog",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=config-leave-dialog&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=config-leave-dialog&capture=1",
       "viewport": [
         1440,
         1000
@@ -1677,7 +1677,7 @@
       "batch": 2,
       "file": "feedback-layout-config-leave-dialog-mobile.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=config-leave-dialog",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=config-leave-dialog&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=config-leave-dialog&capture=1",
       "viewport": [
         390,
         844
@@ -1710,7 +1710,7 @@
       "batch": 2,
       "file": "feedback-layout-config-draft-desktop.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=config-draft",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=config-draft&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=config-draft&capture=1",
       "viewport": [
         1440,
         1000
@@ -1738,7 +1738,7 @@
       "batch": 2,
       "file": "feedback-layout-config-draft-mobile.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=config-draft",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=config-draft&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=config-draft&capture=1",
       "viewport": [
         390,
         844
@@ -1766,7 +1766,7 @@
       "batch": 2,
       "file": "feedback-layout-list-wide-desktop.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=list-wide",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=list-wide&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=list-wide&capture=1",
       "viewport": [
         1440,
         1000
@@ -1794,7 +1794,7 @@
       "batch": 2,
       "file": "feedback-layout-list-wide-mobile.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=list-wide",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=list-wide&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=list-wide&capture=1",
       "viewport": [
         390,
         844
@@ -1822,7 +1822,7 @@
       "batch": 2,
       "file": "feedback-layout-list-wide-1920.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=list-wide",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=list-wide&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=list-wide&capture=1",
       "viewport": [
         1920,
         1080
@@ -1850,7 +1850,7 @@
       "batch": 2,
       "file": "feedback-layout-list-empty-desktop.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=list-empty",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=list-empty&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=list-empty&capture=1",
       "viewport": [
         1440,
         1000
@@ -1878,7 +1878,7 @@
       "batch": 2,
       "file": "feedback-layout-list-empty-mobile.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=list-empty",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=list-empty&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=list-empty&capture=1",
       "viewport": [
         390,
         844
@@ -1906,7 +1906,7 @@
       "batch": 2,
       "file": "feedback-layout-review-form-desktop.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=review-form",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=review-form&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=review-form&capture=1",
       "viewport": [
         1440,
         1000
@@ -1934,7 +1934,7 @@
       "batch": 2,
       "file": "feedback-layout-review-form-mobile.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=review-form",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=review-form&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=review-form&capture=1",
       "viewport": [
         390,
         844
@@ -1962,7 +1962,7 @@
       "batch": 2,
       "file": "feedback-layout-organisation-selector-desktop.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=organisation-selector",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=organisation-selector&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=organisation-selector&capture=1",
       "viewport": [
         1440,
         1000
@@ -1990,7 +1990,7 @@
       "batch": 2,
       "file": "feedback-layout-organisation-selector-mobile.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=organisation-selector",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=organisation-selector&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=organisation-selector&capture=1",
       "viewport": [
         390,
         844
@@ -2018,7 +2018,7 @@
       "batch": 2,
       "file": "feedback-layout-organisation-create-desktop.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=organisation-create",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=organisation-create&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=organisation-create&capture=1",
       "viewport": [
         1440,
         1000
@@ -2046,7 +2046,7 @@
       "batch": 2,
       "file": "feedback-layout-organisation-create-mobile.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=organisation-create",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=organisation-create&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=organisation-create&capture=1",
       "viewport": [
         390,
         844
@@ -2074,7 +2074,7 @@
       "batch": 2,
       "file": "feedback-layout-not-found-desktop.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=not-found",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=not-found&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=not-found&capture=1",
       "viewport": [
         1440,
         1000
@@ -2102,7 +2102,7 @@
       "batch": 2,
       "file": "feedback-layout-not-found-mobile.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=not-found",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=not-found&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=not-found&capture=1",
       "viewport": [
         390,
         844
@@ -2130,7 +2130,7 @@
       "batch": 3,
       "file": "feedback-layout-public-home-desktop.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=public-home",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=public-home&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=public-home&capture=1",
       "viewport": [
         1440,
         1000
@@ -2158,7 +2158,7 @@
       "batch": 3,
       "file": "feedback-layout-public-home-mobile.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=public-home",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=public-home&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=public-home&capture=1",
       "viewport": [
         390,
         844
@@ -2186,7 +2186,7 @@
       "batch": 3,
       "file": "feedback-layout-public-home-1920.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=public-home",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=public-home&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=public-home&capture=1",
       "viewport": [
         1920,
         1080
@@ -2214,7 +2214,7 @@
       "batch": 3,
       "file": "feedback-layout-catalogue-dialog-desktop.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=catalogue-dialog",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=catalogue-dialog&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=catalogue-dialog&capture=1",
       "viewport": [
         1440,
         1000
@@ -2241,7 +2241,7 @@
       "batch": 3,
       "file": "feedback-layout-catalogue-dialog-mobile.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=catalogue-dialog",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=catalogue-dialog&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=catalogue-dialog&capture=1",
       "viewport": [
         390,
         844
@@ -2268,7 +2268,7 @@
       "batch": 3,
       "file": "feedback-layout-catalogue-drawer-desktop.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=catalogue-drawer",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=catalogue-drawer&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=catalogue-drawer&capture=1",
       "viewport": [
         1440,
         1000
@@ -2295,7 +2295,7 @@
       "batch": 3,
       "file": "feedback-layout-catalogue-drawer-mobile.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=catalogue-drawer",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=catalogue-drawer&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=catalogue-drawer&capture=1",
       "viewport": [
         390,
         844
@@ -2322,7 +2322,7 @@
       "batch": 3,
       "file": "feedback-layout-catalogue-toast-desktop.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=catalogue-toast",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=catalogue-toast&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=catalogue-toast&capture=1",
       "viewport": [
         1440,
         1000
@@ -2349,7 +2349,7 @@
       "batch": 3,
       "file": "feedback-layout-catalogue-toast-mobile.png",
       "source": "prototypes/frontend/feedback-layout-states.html?state=catalogue-toast",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/feedback-layout-states.html?state=catalogue-toast&capture=1",
+      "sourceUrl": "prototypes/frontend/feedback-layout-states.html?state=catalogue-toast&capture=1",
       "viewport": [
         390,
         844

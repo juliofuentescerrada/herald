@@ -1,0 +1,49 @@
+{
+  "$comment": "Private data the public repository must not hold (private-data-guard D-1). Checked by scripts/rules.mjs in every text file, at the edit, before each commit and in CI. Each exception names a file (or * for any), the value and why it stays.",
+  "skip": [
+    {
+      "path": "pnpm-lock.yaml",
+      "reason": "Generated lockfiles hold package hashes and registry URLs, never project values, and are large."
+    }
+  ],
+  "emails": {
+    "allowedDomains": [
+      "example.org",
+      "example.com",
+      "example.net",
+      "example.test",
+      "users.noreply.github.com"
+    ],
+    "allowedAddresses": [
+      "noreply@anthropic.com",
+      "noreply@github.com",
+      "git@github.com"
+    ],
+    "message": "A real email address: use an example.org address, or add an exception with its reason."
+  },
+  "identifiers": {
+    "message": "A GUID that is not synthetic: real directory, client and object ids live in user secrets. Use a GUID with a zero group (0198f5ee-0000-\u2026), or add an exception with its reason."
+  },
+  "hosts": {
+    "pattern": "\\b[a-z0-9][a-z0-9-]*\\.(onmicrosoft|ciamlogin|b2clogin)\\.com\\b",
+    "allowed": [
+      "herald.ciamlogin.com",
+      "herald-test.ciamlogin.com"
+    ],
+    "message": "A real identity directory host: use a placeholder such as <subdomain>.ciamlogin.com."
+  },
+  "paths": {
+    "pattern": "(/home/(?!runner\\b|user\\b)[A-Za-z0-9._-]+(?=/|\\b)|/Users/[A-Za-z0-9._-]+/|[A-Za-z]:(?:\\\\\\\\|\\\\)[Uu][Ss][Ee][Rr][Ss](?:\\\\\\\\|\\\\)[A-Za-z0-9._-]+)",
+    "message": "A path on a personal machine: use a path relative to the repository."
+  },
+  "ips": {
+    "message": "A public IPv4 address: use a documentation range (192.0.2.0/24) or a private one."
+  },
+  "exceptions": [
+    {
+      "path": "*",
+      "value": "3fa85f64-5717-4562-b3fc-2c963f66afa6",
+      "reason": "The example GUID of the OpenAPI tooling, used in API client fixtures."
+    }
+  ]
+}

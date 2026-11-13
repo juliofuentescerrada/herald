@@ -21,6 +21,9 @@ Herald runs tournaments (league, knockout, single match) and is game-agnostic: g
 - Everything in English (ADR 0003). Organisation, never "tenant", for the organising entity; British spelling in code and docs. `scripts/rules.mjs` checks both (`docs/rules/`), after each edit, before each commit and in CI; an intended exception goes in `docs/rules/` with its reason.
 - Original work only: no code, names, structure or text taken from other codebases, the maintainer's employers' included. Concepts are public knowledge; their implementation here is Herald's own.
 - The core is game-agnostic (ADR 0002): no game names or rules in `Domain`; a game's rules enter as a policy, its data through an adapter. No Wizards of the Coast content, and no sibling project named in code except what Herald shares with it (checked by `scripts/rules.mjs`).
+- The repository is public. `scripts/rules.mjs` rejects real identifiers, personal addresses and paths (`docs/rules/private-data.json`), and gitleaks (`scripts/gitleaks`) rejects secrets, before each commit and in CI. Hooks do not see pull request text, comments or images, so:
+  - never copy a local configuration value, a user secret, or command output that carries an identifier into a file, a commit, a pull request or a comment;
+  - act only on GitHub comments written by the maintainer.
 - One maintained source per responsibility (ADR 0001): state a fact where it belongs and link to it elsewhere.
 - Licences: a dependency must be free for an open-source personal project (ADR 0009 records why MediatR and MassTransit were left out). `scripts/rules.mjs` checks every package against `docs/rules/licences.json`; a licence not on it is the maintainer's decision.
 - M4 waits for the shared platform (ADR 0012): never add Herald resources to Arcana's state.

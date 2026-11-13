@@ -3,7 +3,7 @@ import assert from 'node:assert/strict';
 import { mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { join } from 'node:path';
 import { after, test } from 'node:test';
-import { checkSpelling, checkTerms, licenceFindings, root } from './rules.mjs';
+import { checkPrivateData, checkSpelling, checkTerms, licenceFindings, root } from './rules.mjs';
 
 const folder = 'scripts/.rules-test';
 mkdirSync(join(root, folder, 'src/Herald.Tournaments/Domain'), { recursive: true });
@@ -90,4 +90,37 @@ test('A package whose licence is not on the allowed list is reported with its na
 test('CI runs the rules on every file, so a commit made without the hooks still fails', () => {
   const workflow = readFileSync(join(root, '.github/workflows/ci.yml'), 'utf8');
   assert.match(workflow, /^\s+run: node scripts\/rules\.mjs\s*$/m);
+});
+
+const privateConfig = JSON.parse(readFileSync(join(root, 'docs/rules/private-data.json'), 'utf8'));
+const privateFindings = (content) => checkPrivateData([file('private.md', content)], privateConfig);
+// Built from parts, so this file never holds the values the rule reports.
+const realGuid = ['7c4e2a91', '5b3d', '4f6e', '9a8b', '1d2c3e4f5a6b'].join('-');
+const personalEmail = ['someone', 'gmail.com'].join('@');
+const directoryHost = ['someone', 'on' + 'microsoft', 'com'].join('.');
+const homePath = ['', 'home', 'someone', 'Code', 'herald', 'x.html'].join('/');
+const windowsPath = ['C:', 'Users', 'someone', 'Code'].join('\\');
+const escapedWindowsPath = ['c:', 'users', 'someone', 'Code'].join('\\\\');
+
+// covers: repository-rules: A real identifier in a document
+test('A GUID without a zero group is reported with its file, line and value', () => {
+  const findings = privateFindings(`Intro\nThe directory is ${realGuid}.\n`);
+  assert.equal(findings.length, 1);
+  assert.ok(findings[0].includes(`private.md:2  private data (guid) ${realGuid}`), findings[0]);
+});
+
+// covers: repository-rules: Synthetic identifiers
+test('Synthetic GUIDs and listed exceptions are not reported', () => {
+  assert.deepEqual(privateFindings('0198f5ee-0000-7000-8000-0000000000d1 00000000-0000-0000-0000-00000000d1ec 11111111-1111-1111-1111-111111111111 3fa85f64-5717-4562-b3fc-2c963f66afa6\n'), []);
+});
+
+// covers: repository-rules: A personal address or path
+test('A personal email, a real directory host and a home path are reported', () => {
+  const findings = privateFindings(`${personalEmail}\nhttps://${directoryHost}\nfile://${homePath}\n${windowsPath}\n{ "cwd": "${escapedWindowsPath}" }\nHOME=${homePath.split('/').slice(0, 3).join('/')}\n${['8', '8', '8', '8'].join('.')}\n`);
+  assert.deepEqual(findings.map((finding) => finding.match(/\(([^)]+)\)/)[1]), ['email', 'directory host', 'personal path', 'personal path', 'personal path', 'personal path', 'public IP']);
+});
+
+// covers: repository-rules: Example and placeholder values
+test('Example addresses, placeholders and private addresses are not reported', () => {
+  assert.deepEqual(privateFindings('test@example.org noreply@anthropic.com 1+someone@users.noreply.github.com icon@2x.png\nhttps://<subdomain>.ciamlogin.com/<tenant-id>\n127.0.0.1 10.0.0.1 192.0.2.10 100.64.0.1\n<AssemblyVersion>1.0.0.0</AssemblyVersion> Chrome/131.0.0.0 1.3.6.1.4.1.311\n/home/runner/work /tmp/x Home/End\npnpm@10.4.1\n'), []);
 });

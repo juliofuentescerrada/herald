@@ -49,6 +49,69 @@ export function checkTerms(files, config = read('docs/rules/forbidden-terms.json
   return findings;
 }
 
+// Private data (private-data-guard D-1): identifiers, addresses, hosts, paths and IPs a public repository must not hold.
+const guidPattern = /\b[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}\b/gi;
+const emailPattern = /\b[A-Za-z0-9._%+-]+@(?:[A-Za-z0-9-]+\.)+[A-Za-z]{2,}\b/g;
+// Four dotted numbers not inside a longer dotted run, so version numbers and OIDs (1.3.6.1.4.1…) are not taken for IPs.
+const ipPattern = /(?<![\d.])(?:\d{1,3}\.){3}\d{1,3}(?![\d.]*\d)/g;
+// Image names with a density suffix (icon@2x.png) are not addresses.
+const fileExtension = /\.(png|jpe?g|gif|svg|webp|ico|avif)$/i;
+// Binary files are not read: a NUL byte, or a known binary extension.
+const binaryExtension = /\.(png|jpe?g|gif|webp|ico|avif|pdf|woff2?|ttf|otf|eot|zip|gz|tgz|dll|exe|so|dylib|nupkg|snk|pfx)$/i;
+
+// A GUID is synthetic when one of its groups is only zeros, or when it repeats one digit.
+export const syntheticGuid = (guid) => guid.split('-').some((group) => /^0+$/.test(group)) || /^(.)\1*$/.test(guid.replace(/-/g, '').toLowerCase());
+
+// Loopback, private, link-local, documentation and broadcast ranges are not public; anything outside 0-255 is no IP.
+export function publicIp(ip) {
+  const [a, b, c] = ip.split('.').map(Number);
+  if (ip.split('.').some((part) => Number(part) > 255)) return false;
+  if (a === 0 || a === 10 || a === 127 || a >= 224) return false;
+  if (a === 100 && b >= 64 && b <= 127) return false;
+  if (a === 198 && (b === 18 || b === 19)) return false;
+  // A network address ending in .0.0 is far more often a version number (Chrome/131.0.0.0, 1.0.0.0).
+  if (ip.endsWith('.0.0')) return false;
+  if (a === 172 && b >= 16 && b <= 31) return false;
+  if (a === 192 && b === 168) return false;
+  if (a === 169 && b === 254) return false;
+  if ((a === 192 && b === 0 && c === 2) || (a === 198 && b === 51 && c === 100) || (a === 203 && b === 0 && c === 113)) return false;
+  return true;
+}
+
+export function privateDataIn(line, config) {
+  const found = [];
+  for (const guid of line.match(guidPattern) ?? []) if (!syntheticGuid(guid)) found.push(['guid', guid, config.identifiers.message]);
+  for (const email of line.match(emailPattern) ?? []) {
+    const domain = email.split('@')[1].toLowerCase();
+    if (fileExtension.test(domain)) continue;
+    const allowed = config.emails.allowedAddresses.includes(email.toLowerCase()) || config.emails.allowedDomains.some((allowedDomain) => domain === allowedDomain || domain.endsWith(`.${allowedDomain}`));
+    if (!allowed) found.push(['email', email, config.emails.message]);
+  }
+  for (const host of line.match(new RegExp(config.hosts.pattern, 'gi')) ?? []) {
+    if (!config.hosts.allowed.includes(host.toLowerCase())) found.push(['directory host', host, config.hosts.message]);
+  }
+  for (const path of line.match(new RegExp(config.paths.pattern, config.paths.flags ?? 'g')) ?? []) found.push(['personal path', path, config.paths.message]);
+  for (const ip of line.match(ipPattern) ?? []) if (publicIp(ip)) found.push(['public IP', ip, config.ips.message]);
+  return found;
+}
+
+export function checkPrivateData(files, config = read('docs/rules/private-data.json')) {
+  const findings = [];
+  const excepted = (file, value) => config.exceptions.some((exception) => (exception.path === '*' || exception.path === file) && exception.value.toLowerCase() === value.toLowerCase());
+  const skipped = (file) => config.skip.some(({ path }) => file === path || file.endsWith(`/${path}`));
+  // Every tracked file that is not binary: private data is as harmful in a shell script or a .slnx as in code.
+  for (const file of files.filter((candidate) => !binaryExtension.test(candidate) && !skipped(candidate))) {
+    const content = readFileSync(join(root, file));
+    if (content.includes(0)) continue;
+    content.toString('utf8').split('\n').forEach((line, index) => {
+      for (const [kind, value, message] of privateDataIn(line, config)) {
+        if (!excepted(file, value)) findings.push(`${file}:${index + 1}  private data (${kind}) ${value}: ${message}`);
+      }
+    });
+  }
+  return findings;
+}
+
 // Spelling (D-4) through cspell, installed in the web workspace.
 export function checkSpelling(files) {
   const targets = files.filter((file) => spelled.test(file));
@@ -137,7 +200,7 @@ export function run(args) {
       ? execFileSync('git', ['diff', '--cached', '--name-only', '--diff-filter=ACMR'], { cwd: root, encoding: 'utf8' }).split('\n').filter(Boolean)
       : args;
   const targets = normalise(files);
-  const findings = [...checkTerms(targets), ...checkSpelling(targets)];
+  const findings = [...checkTerms(targets), ...checkPrivateData(targets), ...checkSpelling(targets)];
   if (all || targets.some((file) => licenceManifests.test(file))) findings.push(...checkLicences());
   return findings;
 }

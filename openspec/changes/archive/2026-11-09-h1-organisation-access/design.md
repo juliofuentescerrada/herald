@@ -5,7 +5,7 @@
 Decisions already taken by the maintainer (9 November 2026), recorded in [ADR 0014](../../../docs/adr/0014-identity-and-organisation-isolation.md) and the functional baseline:
 
 - D-21 confirmed: assigned-only sign-in, signed-in owner creation, one owner per organisation, `tid`+`oid` identity, Herald authorises, provider recovery plus a recorded support relink, owner-only private reads.
-- Provider: the External ID directory shared with Arcana (`arcanapoc.onmicrosoft.com`, managed by hand; not in any OpenTofu state).
+- Provider: the External ID directory shared with Arcana (`<directory>.onmicrosoft.com`, managed by hand; not in any OpenTofu state).
 - Isolation: EF Core global query filters on an organisation shadow property; PostgreSQL RLS if it fits.
 - D-04 confirmed in the same session; it has no effect on this change's code and is recorded here only because the baseline edit travels with it.
 
