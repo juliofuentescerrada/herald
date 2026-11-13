@@ -9,7 +9,7 @@
 
 ## 3. Workflows
 
-- [ ] 3.1 `ci.yml`: `ready_for_review`, the draft condition, the `changes` job and `needs`/`if` on `dotnet`, `web` and `test-scripts`
+- [x] 3.1 `ci.yml`: `ready_for_review`, the draft condition, the `changes` job and `needs`/`if` on `dotnet`, `web` and `test-scripts`
 - [ ] 3.2 `e2e.yml`: the `changes` job and the condition on the suite
 - [ ] 3.3 A test that reads both workflows and checks that the code jobs depend on `changes` and that every `ci.yml` job skips drafts; mark the draft, documentation-only and documentation-only-merge scenarios
 
