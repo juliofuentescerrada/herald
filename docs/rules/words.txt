@@ -74,3 +74,4 @@ ournament
 CLAUDECODE
 gpgsign
 valueonly
+AKIA

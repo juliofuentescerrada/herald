@@ -79,3 +79,7 @@ The rule's first full run found 323 personal paths in 14 files and the tenant do
 - the External ID domain became `<directory>.onmicrosoft.com`.
 
 The archived changes of 8 and 9 November 2026 hold these placeholders since this date (Q-1). Their findings are otherwise unchanged.
+
+## History scan (13 November 2026, task 3.3)
+
+`scripts/gitleaks git --log-opts="--all" .` over every ref (208 commits on `main`'s history, about 4.7 MB) and `gitleaks dir` over the working tree: **no leaks found**. The development placeholders (`SAS_KEY_VALUE`, the E2E database password) do not trip the default rules, which `scripts/gitleaks.test.mjs` keeps proving.

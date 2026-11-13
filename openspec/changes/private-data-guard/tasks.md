@@ -12,7 +12,7 @@
 
 - [x] 3.1 Check the licence and checksum of the exact gitleaks release; `.gitleaks.toml` extending the defaults with the development placeholders
 - [x] 3.2 `scripts/bootstrap` installs it; `.githooks/pre-commit` runs it on staged changes or says it is missing; the CI `rules` job downloads, verifies and runs it on the pull request's commits (Q-2)
-- [ ] 3.3 Tests for the two secret scenarios; a one-off scan of the whole history, recorded in `design.md`
+- [x] 3.3 Tests for the two secret scenarios; a one-off scan of the whole history, recorded in `design.md`
 
 ## 4. Permissions and written rules
 
