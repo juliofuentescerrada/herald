@@ -55,7 +55,7 @@ On 13 November 2026 the repository was assessed before being made public:
   - The `herald-screens` skill requires committed screenshots to come from the E2E environment's personas.
 - **D-5 Clean-up.**
   - The manifests' `sourceUrl` becomes a path relative to the repository (`prototypes/frontend/…`).
-  - In archived files, the personal path and the tenant domain are replaced with placeholders, with a note that the values were redacted on 13 November 2026 (Q-1).
+  - In archived files, the personal path and the tenant domain are replaced with placeholders, with a note that the values were redacted on 13 November 2026 (approved in Q-1).
 
 ## Risks / Trade-offs
 
@@ -65,7 +65,7 @@ On 13 November 2026 the repository was assessed before being made public:
 - **Downloading gitleaks in CI adds seconds to `rules`** → measured in this change; it stays within the `rules` job.
 - **Pull request text and comments are not scanned** → written rule (D-4). GitHub's secret scanning covers secrets in them; identifiers rely on the rule.
 
-## Open Questions
+## Maintainer answers (13 November 2026)
 
-- **Q-1** May archived changes be edited to redact the personal paths and the tenant domain? They are historical evidence; the alternative is listing them as exceptions.
-- **Q-2** Should the CI scan cover only the pull request's commits (fast) or the whole history on every run (about a second for 225 commits, growing)?
+- **Q-1 Archived changes:** may be edited to redact the personal paths and the tenant domain (D-5 as written).
+- **Q-2 CI scan:** the pull request's commits only; the whole history is scanned once, in this change.

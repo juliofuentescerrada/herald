@@ -1,6 +1,6 @@
 ## 1. Approval
 
-- [ ] 1.1 Maintainer review of the proposal, specs and design, with answers to Q-1 and Q-2; record the approval in `proposal.md`
+- [ ] 1.1 Maintainer review of the proposal, specs and design, record the approval in `proposal.md` (Q-1 and Q-2 answered on 13 November 2026)
 
 ## 2. Private-data rule
 
@@ -11,7 +11,7 @@
 ## 3. Gitleaks
 
 - [ ] 3.1 Check the licence and checksum of the exact gitleaks release; `.gitleaks.toml` extending the defaults with the development placeholders
-- [ ] 3.2 `scripts/bootstrap` installs it; `.githooks/pre-commit` runs it on staged changes or says it is missing; the CI `rules` job downloads, verifies and runs it (Q-2)
+- [ ] 3.2 `scripts/bootstrap` installs it; `.githooks/pre-commit` runs it on staged changes or says it is missing; the CI `rules` job downloads, verifies and runs it on the pull request's commits (Q-2)
 - [ ] 3.3 Tests for the two secret scenarios; a one-off scan of the whole history, recorded in `design.md`
 
 ## 4. Permissions and written rules
