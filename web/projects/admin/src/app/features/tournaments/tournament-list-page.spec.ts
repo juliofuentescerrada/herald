@@ -26,6 +26,15 @@ const render = (...answers: (() => Observable<unknown>)[]) => open('', { listTou
 describe('The tournament list', () => {
   afterEach(() => TestBed.resetTestingModule());
 
+  it('shows the tournaments icon above the empty list’s heading', { meta: { type: 'covers', description: 'interface-icons: An empty tournament list carries its icon' } }, async () => {
+    const { page, text } = await render(() => of([]));
+    await vi.waitFor(() => expect(text('h2')).toBe('No tournaments yet'));
+    const icon = page().querySelector('#empty-heading')?.previousElementSibling;
+    expect(icon?.getAttribute('data-icon')).toBe('trophy');
+    expect(icon?.querySelector('svg')?.getAttribute('width')).toBe('32');
+    expect(icon?.querySelector('svg')?.getAttribute('aria-hidden')).toBe('true');
+  });
+
   it('says there are no tournaments yet and offers creating one as its only action', async () => {
     const { page, text, texts } = await render(() => of([]));
     await vi.waitFor(() => expect(text('h2')).toBe('No tournaments yet'));
@@ -55,6 +64,22 @@ describe('The tournament list', () => {
 
     const { violations } = await axe.run(page(), { rules: { 'color-contrast': { enabled: false } } });
     expect(violations.map((v) => v.id)).toEqual([]);
+  });
+
+  it('puts each lifecycle label’s icon before its text, hidden from assistive technology', { meta: { type: 'covers', description: 'interface-icons: Lifecycle labels carry icons' } }, async () => {
+    const rows = [row({ id: 't0' }), ...['notOpen', 'open', 'closed'].map((registration, i) => row({ id: `t${i + 1}`, publication: 'published', registration }))];
+    const { page } = await render(() => of(rows));
+    await vi.waitFor(() => expect(page().querySelectorAll('li')).toHaveLength(4));
+    const labels = [...page().querySelectorAll('herald-status-label')];
+    expect([...new Set(labels.map((l) => `${l.firstElementChild?.getAttribute('data-icon')} ${l.textContent?.trim()}`))]).toEqual([
+      'pencil Draft',
+      'clock Registration not open',
+      'hourglass Preparing',
+      'world Published',
+      'door-enter Registration open',
+      'lock Registration closed',
+    ]);
+    expect(labels.every((l) => l.querySelector('svg')?.getAttribute('aria-hidden') === 'true')).toBe(true);
   });
 
   it('labels each registration state separately from publication and competition', async () => {

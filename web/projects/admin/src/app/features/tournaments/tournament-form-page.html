@@ -1,4 +1,4 @@
-<a class="back" [routerLink]="listPath">Back to tournaments</a>
+<a class="back" [routerLink]="listPath"><herald-icon name="arrow-left" size="metadata" />Back to tournaments</a>
 
 @if (!isNew && tournament.isPending()) {
   <p class="panel" role="status">Loading tournament…</p>
@@ -7,7 +7,7 @@
     <herald-notice tone="danger" heading="Tournament not available">It does not exist in this organisation, or it could not be read.</herald-notice>
     <div class="actions">
       <button herald-button variant="primary" type="button" [loading]="tournament.isFetching()" (click)="tournament.refetch()">Try again</button>
-      <a herald-button [routerLink]="listPath">Back to tournaments</a>
+      <a herald-button [routerLink]="listPath"><herald-icon name="arrow-left" />Back to tournaments</a>
     </div>
   </section>
 } @else {
@@ -15,8 +15,8 @@
     <div class="title">
       <h1>{{ published() ? stored()!.configuration.title : stored() ? 'Configure ' + stored()!.configuration.title : 'Create tournament' }}</h1>
       <p class="labels">
-        @for (label of labels(); track label) {
-          <herald-status-label>{{ label }}</herald-status-label>
+        @for (label of labels(); track label.text) {
+          <herald-status-label [icon]="label.icon">{{ label.text }}</herald-status-label>
         }
       </p>
     </div>
@@ -46,7 +46,7 @@
           <h2 id="entries-heading">Entries</h2>
           <p>{{ entriesText() }}</p>
         </div>
-        <a herald-button routerLink="entries">View entries</a>
+        <a herald-button routerLink="entries"><herald-icon name="users" />View entries</a>
       </section>
     }
     @if (state() === 'failed') {
@@ -147,7 +147,7 @@
             <a herald-button routerLink="review">Review and publish</a>
           }
         }
-        <a herald-button [routerLink]="listPath">Back to tournaments</a>
+        <a herald-button [routerLink]="listPath"><herald-icon name="arrow-left" />Back to tournaments</a>
       </div>
       @if (!published() && reviewBlocked(); as why) {
         <p class="help" id="review-why">Review is unavailable. {{ why }}</p>

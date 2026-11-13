@@ -64,6 +64,17 @@ describe('The admin shell', () => {
     expect(text('h1')).toBe('Overview');
   });
 
+  it('shows an icon before each workspace item, its label staying the link’s name', { meta: { type: 'covers', description: "interface-icons: The rail's items carry their icons" } }, async () => {
+    const { element } = await openShell(`/organisations/${northside}`);
+    const links = [...element.querySelectorAll('nav[aria-label="Workspace"] a')];
+    expect(links.map((a) => [a.firstElementChild?.getAttribute('data-icon'), a.textContent?.trim()])).toEqual([
+      ['layout-dashboard', 'Overview'],
+      ['trophy', 'Tournaments'],
+    ]);
+    expect(links.map((a) => a.querySelector('svg')?.getAttribute('aria-hidden'))).toEqual(['true', 'true']);
+    expect(links.map((a) => a.querySelector('svg')?.getAttribute('width'))).toEqual(['24', '24']);
+  });
+
   it('says when no organisation is selected', async () => {
     const { text } = await openShell('/organisations', null);
     expect(text('.context-name')).toBe('No organisation selected');

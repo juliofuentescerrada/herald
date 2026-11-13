@@ -1,16 +1,22 @@
 import { ChangeDetectionStrategy, Component, input, ViewEncapsulation } from '@angular/core';
+import { Icon, IconName } from './icon';
 
 export type StatusTone = 'neutral' | 'info' | 'success' | 'warning' | 'danger';
 
-/** A readable status. Each tone sets its own foreground and background (visual direction §3.1). */
+/**
+ * A readable status. Each tone sets its own foreground and background (visual direction §3.1); the caller picks
+ * the icon by the status's meaning, never by its tone, and the text still carries the status.
+ */
 @Component({
   selector: 'herald-status-label',
+  imports: [Icon],
   host: { class: 'herald-status-label', '[attr.data-tone]': 'tone()' },
-  template: `<ng-content />`,
+  template: `@if (icon(); as name) {<herald-icon [name]="name" size="metadata" />}<ng-content />`,
   styles: `
     .herald-status-label {
       display: inline-flex;
       align-items: center;
+      gap: var(--herald-space-2);
       padding: var(--herald-space-1) var(--herald-space-2);
       border-radius: var(--herald-radius-default);
       font-size: var(--herald-text-base);
@@ -29,4 +35,5 @@ export type StatusTone = 'neutral' | 'info' | 'success' | 'warning' | 'danger';
 })
 export class StatusLabel {
   readonly tone = input<StatusTone>('neutral');
+  readonly icon = input<IconName>();
 }

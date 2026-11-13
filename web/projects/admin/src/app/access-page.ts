@@ -1,5 +1,5 @@
 import { ChangeDetectionStrategy, Component, computed, DOCUMENT, inject, signal } from '@angular/core';
-import { Button, Notice } from '@herald/ui';
+import { Button, Icon, Notice } from '@herald/ui';
 import { AccessProblem, AccessState, AppContext, AUTH_CONFIG, Session } from './platform';
 
 interface Copy {
@@ -42,7 +42,7 @@ const copy: Record<AccessProblem, Copy> = {
 /** Replaces the whole workspace while access needs attention (D-9); which state applies is platform's AccessState. */
 @Component({
   selector: 'app-access-page',
-  imports: [Button, Notice],
+  imports: [Button, Icon, Notice],
   templateUrl: './access-page.html',
   styleUrl: './access-page.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

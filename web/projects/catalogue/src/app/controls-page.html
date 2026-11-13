@@ -71,6 +71,7 @@
       <span class="sample"><herald-icon name="home" size="navigation" /> Navigation, 24 px</span>
       <span class="sample"><herald-icon name="refresh" /> Control, 20 px</span>
       <span class="sample"><herald-icon name="info-circle" size="metadata" /> Metadata, 16 px</span>
+      <span class="sample"><herald-icon name="trophy" size="empty" /> Empty state, 32 px</span>
       <button herald-button><herald-icon name="refresh" />Try again</button>
       <button herald-button variant="quiet" aria-label="Open menu"><herald-icon name="menu" /></button>
     </p>
@@ -80,6 +81,8 @@
     <h2 id="labels">Status labels</h2>
     <p class="row">
       <herald-status-label>Draft</herald-status-label>
+      <herald-status-label icon="pencil">Draft</herald-status-label>
+      <herald-status-label tone="success" icon="circle-check">Checked in</herald-status-label>
       <herald-status-label tone="info">Live</herald-status-label>
       <herald-status-label tone="success">Finalised</herald-status-label>
       <herald-status-label tone="warning">Check-in pending</herald-status-label>
@@ -113,8 +116,8 @@
   <section aria-labelledby="navigation">
     <h2 id="navigation">Navigation links</h2>
     <nav class="rail" data-herald-surface="inverse" aria-label="Workspace example">
-      <a herald-nav-link href="#navigation" aria-current="page"><herald-icon name="home" size="navigation" />Overview</a>
-      <a herald-nav-link href="#navigation">Tournaments</a>
+      <a herald-nav-link href="#navigation" aria-current="page" icon="layout-dashboard">Overview</a>
+      <a herald-nav-link href="#navigation" icon="trophy">Tournaments</a>
       <a herald-nav-link href="#navigation">Organisation</a>
     </nav>
   </section>

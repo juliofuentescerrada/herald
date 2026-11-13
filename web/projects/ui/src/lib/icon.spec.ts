@@ -8,6 +8,7 @@ import { accessibilityViolations, renderHost } from './testing';
     <herald-icon name="menu" />
     <herald-icon name="home" size="navigation" />
     <herald-icon name="alert-circle" size="metadata" label="Error" />
+    <herald-icon name="trophy" size="empty" />
   `,
 })
 class Host {}
@@ -15,7 +16,12 @@ class Host {}
 describe('Icon', () => {
   it('uses the sizes of the visual direction', async () => {
     const { element } = await renderHost(Host);
-    expect([...element.querySelectorAll('svg')].map((svg) => svg.getAttribute('width'))).toEqual(['20', '24', '16']);
+    expect([...element.querySelectorAll('svg')].map((svg) => svg.getAttribute('width'))).toEqual(['20', '24', '16', '32']);
+  });
+
+  it('names its icon for tests', async () => {
+    const { element } = await renderHost(Host);
+    expect([...element.querySelectorAll('herald-icon')].map((icon) => icon.getAttribute('data-icon'))).toEqual(['menu', 'home', 'alert-circle', 'trophy']);
   });
 
   it('is hidden from assistive technology unless it has a label', async () => {
