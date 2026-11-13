@@ -22,4 +22,4 @@
 ## 5. Review and archive
 
 - [x] 5.1 `herald-reviewer` review of the diff; findings and outcomes in the pull request
-- [ ] 5.2 Archive in the same pull request: the specification sync, the roadmap's current-state row (`herald-docs` skill), every new scenario covered
+- [x] 5.2 Archive in the same pull request: the specification sync, the roadmap's current-state row (`herald-docs` skill), every new scenario covered

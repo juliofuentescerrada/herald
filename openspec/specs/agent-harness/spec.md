@@ -20,11 +20,19 @@ This specification covers the harness's environment, review, measurement, observ
 - **THEN** it completes without reinstalling what is current, and the git hooks remain enabled
 
 ### Requirement: Permissions are declared in the repository
-`.claude/settings.json` SHALL allow the project's routine commands and SHALL deny force pushes, hard resets to a remote, infrastructure apply and destroy, deleting Azure resources, and writing environment or variable files, in every permission mode.
+`.claude/settings.json` SHALL allow the project's routine commands. In every permission mode it SHALL deny:
+- force pushes and hard resets to a remote;
+- infrastructure apply and destroy, and deleting Azure resources;
+- writing environment or variable files;
+- listing or reading .NET user secrets.
 
 #### Scenario: An unattended session tries a force push
 - **WHEN** a session in any permission mode runs `git push --force`
 - **THEN** the command is refused by the settings before it runs
+
+#### Scenario: A session tries to read the user secrets
+- **WHEN** a session in any permission mode runs `dotnet user-secrets list` or reads a file in the user-secrets folder
+- **THEN** the settings refuse it before it runs
 
 ### Requirement: A reviewer with a clean context reviews each slice
 A `herald-reviewer` subagent with read-only tools SHALL review a slice's diff against its OpenSpec change, the ADRs it cites and the rules of the folders touched, and SHALL report findings with file, line, rule and failure scenario without editing. The slice procedure in `CLAUDE.md` SHALL require that review before each slice's pull request and its findings, with how each was resolved, in the pull request description.
