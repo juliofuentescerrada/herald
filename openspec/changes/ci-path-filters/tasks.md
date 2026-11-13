@@ -4,7 +4,7 @@
 
 ## 2. Classification
 
-- [ ] 2.1 `scripts/ci-changes.mjs` with the documentation and harness groups, the ADR 0017 exception and the unknown-base fallback
+- [x] 2.1 `scripts/ci-changes.mjs` with the documentation and harness groups, the ADR 0017 exception and the unknown-base fallback
 - [ ] 2.2 `scripts/ci-changes.test.mjs` marking the classification scenarios
 
 ## 3. Workflows
