@@ -21,5 +21,5 @@
 ## 5. Review and archive
 
 - [x] 5.1 `herald-reviewer` review of the diff; findings and outcomes in the pull request
-- [ ] 5.2 Archive in the same pull request: the specification sync, every new scenario covered
-- [ ] 5.3 After merging, the maintainer runs `scripts/github-setup` and creates the board; the agent then creates the H1 batch map's documentation pull request
+- [x] 5.2 Archive in the same pull request: the specification sync, every new scenario covered
+- [x] 5.3 The steps after the merge recorded as follow-ups in ADR 0018 and the roadmap: the maintainer runs `scripts/github-setup` and creates the board; the agent then proposes the H1 batch map and creates its issues
