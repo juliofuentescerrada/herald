@@ -2,7 +2,7 @@
 // node --test scripts/gitleaks.test.mjs (CI installs gitleaks first; scripts/bootstrap does locally).
 import assert from 'node:assert/strict';
 import { execFileSync, spawnSync } from 'node:child_process';
-import { mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
 import { after, test } from 'node:test';
@@ -27,18 +27,17 @@ test('A staged cloud access key fails the scan', () => {
   const secret = ['k9Vq2', 'Lw8Tz', 'R4mYc', 'N7pXs', 'B3hJd', 'F6gKa', 'E1uWo', 'I5yZt'].join('');
   const result = scanStaged('secret', `aws_access_key_id = ${keyId}\naws_secret_access_key = ${secret}\n`);
   assert.equal(result.status, 1, result.stderr);
-  assert.match(result.stderr, /leaks found: [1-9]/);
+  const output = result.stdout + result.stderr;
+  assert.match(output, /leaks found: [1-9]/);
+  assert.match(output, /File:\s+config\.ini/, 'the finding names the file');
+  assert.match(output, /RuleID:\s+aws-access-token/, 'and the rule that matched');
 });
 
 // covers: repository-rules: Development placeholders
 test('The development connection strings and the E2E password pass', () => {
-  const result = scanStaged(
-    'placeholders',
-    [
-      'messaging = "Endpoint=sb://localhost;SharedAccessKeyName=RootManageSharedAccessKey;SharedAccessKey=SAS_KEY_VALUE;UseDevelopmentEmulator=true;"',
-      "databasePassword = 'herald-e2e'",
-      'herald = "Host=localhost;Database=herald;Username=postgres"',
-    ].join('\n'),
-  );
-  assert.equal(result.status, 0, result.stderr);
+  // The real files, read at run time, so the test follows them when they change.
+  const placeholders = [join('src', 'Herald.Host', 'app' + 'settings.Development.json'), join('e2e', 'environment.ts')].map((path) => readFileSync(join(root, path), 'utf8')).join('\n');
+  assert.match(placeholders, /SAS_KEY_VALUE/);
+  const result = scanStaged('placeholders', placeholders);
+  assert.equal(result.status, 0, result.stdout + result.stderr);
 });

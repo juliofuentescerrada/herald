@@ -1,12 +1,12 @@
 ## ADDED Requirements
 
 ### Requirement: Private data is rejected
-The repository rules SHALL report, in every text file and in their three layers, private data the repository must not hold:
+The repository rules SHALL report, in every tracked file that is not binary and in their three layers, private data the repository must not hold:
 - a GUID that is neither synthetic nor a listed exception;
 - an email address outside the allowed example and noreply domains;
 - a real External ID or B2C host;
 - a personal home path;
-- a public IP address.
+- a public IPv4 address.
 
 The patterns, allowed values and exceptions SHALL be data in `docs/rules/private-data.json`, each exception with its reason.
 
@@ -27,7 +27,7 @@ The patterns, allowed values and exceptions SHALL be data in `docs/rules/private
 - **THEN** the rules report nothing
 
 ### Requirement: Secrets are scanned before commit and in CI
-Gitleaks, at a pinned and verified version, SHALL scan staged changes in the `pre-commit` hook where it is installed, and the pull request's commits in the CI `rules` job. A secret it finds SHALL fail the commit or the job. Its configuration SHALL allow only the listed development placeholders.
+Gitleaks, at a pinned and verified version, SHALL scan staged changes in the `pre-commit` hook where it is installed, and the pull request's commits in the CI `rules` job. A secret it finds SHALL fail the commit or the job, naming the file and the rule that matched. Any allow list in its configuration SHALL hold only values that are not secrets, each with its reason.
 
 #### Scenario: A secret is committed
 - **WHEN** a staged change adds a value with the shape of a cloud access key

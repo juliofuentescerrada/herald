@@ -7,12 +7,15 @@
 #   scripts/gitleaks ARGS               install if needed, then run (CI)
 set -euo pipefail
 version=8.30.1
-declare -A checksums=(
-  [linux_x64]=551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb
-  [linux_arm64]=e4a487ee7ccd7d3a7f7ec08657610aa3606637dab924210b3aee62570fb4b080
-  [darwin_x64]=dfe101a4db2255fc85120ac7f3d25e4342c3c20cf749f2c20a18081af1952709
-  [darwin_arm64]=b40ab0ae55c505963e365f271a8d3846efbc170aa17f2607f13df610a9aeb6a5
-)
+# A function, not an associative array, so macOS's bash 3.2 runs it too.
+checksum() {
+  case "$1" in
+    linux_x64) echo 551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb ;;
+    linux_arm64) echo e4a487ee7ccd7d3a7f7ec08657610aa3606637dab924210b3aee62570fb4b080 ;;
+    darwin_x64) echo dfe101a4db2255fc85120ac7f3d25e4342c3c20cf749f2c20a18081af1952709 ;;
+    darwin_arm64) echo b40ab0ae55c505963e365f271a8d3846efbc170aa17f2607f13df610a9aeb6a5 ;;
+  esac
+}
 tools="${HERALD_TOOLS:-$HOME/.local/bin}"
 binary="$tools/gitleaks"
 root="$(cd "$(dirname "$0")/.." && pwd)"
@@ -25,23 +28,28 @@ install() {
   os=$(uname -s | tr '[:upper:]' '[:lower:]')
   case "$(uname -m)" in x86_64|amd64) arch=x64 ;; aarch64|arm64) arch=arm64 ;; *) arch=unknown ;; esac
   platform="${os}_${arch}"
-  if [ -z "${checksums[$platform]:-}" ]; then
-    echo "No pinned gitleaks for ${platform}: install gitleaks ${version} by hand." >&2
+  local expected
+  expected=$(checksum "$platform")
+  if [ -z "$expected" ]; then
+    echo "No pinned gitleaks for ${platform}: put gitleaks ${version} at ${binary} by hand." >&2
     return 1
   fi
-  local temp archive
   temp=$(mktemp -d)
-  archive="gitleaks_${version}_${platform}.tar.gz"
+  trap 'rm -rf "$temp"' EXIT
+  local archive="gitleaks_${version}_${platform}.tar.gz" actual
   curl -fsSL -o "$temp/$archive" "https://github.com/gitleaks/gitleaks/releases/download/v${version}/${archive}"
-  echo "${checksums[$platform]}  $temp/$archive" | sha256sum -c --quiet -
+  if command -v sha256sum >/dev/null; then actual=$(sha256sum "$temp/$archive"); else actual=$(shasum -a 256 "$temp/$archive"); fi
+  if [ "${actual%% *}" != "$expected" ]; then
+    echo "The gitleaks archive does not match its pinned checksum: not installed." >&2
+    return 1
+  fi
   tar -xzf "$temp/$archive" -C "$temp" gitleaks
   mkdir -p "$tools"
   mv "$temp/gitleaks" "$binary"
-  rm -rf "$temp"
 }
 
 case "${1:-}" in
-  --install) install; exit 0 ;;
+  --install) install; exit $? ;;
   --installed)
     shift
     if ! current; then
@@ -51,4 +59,5 @@ case "${1:-}" in
     ;;
   *) install ;;
 esac
-exec "$binary" "$@" --config "$root/.gitleaks.toml" --no-banner --redact
+# --verbose names the file, the line and the rule of each finding; --redact hides the secret itself.
+exec "$binary" "$@" --config "$root/.gitleaks.toml" --no-banner --redact --verbose

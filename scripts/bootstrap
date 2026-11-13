@@ -43,7 +43,7 @@ openspec --version 2>/dev/null | grep -qx "$openspec_version" || npm install -g 
 command -v codegraph >/dev/null || npm install -g @colbymchenry/codegraph@1.6.2
 
 # Gitleaks for the pre-commit hook, at the version and checksum scripts/gitleaks pins (private-data-guard D-2).
-scripts/gitleaks --install
+scripts/gitleaks --install || echo "Gitleaks is not installed: the pre-commit hook will say so, and CI still scans for secrets." >&2
 
 # Dependencies, CodeGraph's index and the repository's git hooks.
 dotnet restore Herald.slnx

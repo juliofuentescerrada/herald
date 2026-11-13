@@ -23,7 +23,7 @@ On 13 November 2026 the repository was assessed before being made public:
 ## Decisions
 
 - **D-1 Private data as a rule of `scripts/rules.mjs`.**
-  - `checkPrivateData(files, config)` runs on every text file the rules already read, in every folder. Private data is as harmful in a document as in code.
+  - `checkPrivateData(files, config)` runs on every tracked file that is not binary (a NUL byte or a binary extension), in every folder, shell scripts and `.slnx` included. Private data is as harmful in a document as in code.
   - `docs/rules/private-data.json` holds:
     - each pattern with its message;
     - the allowed email domains and directory-host placeholders;
@@ -33,7 +33,7 @@ On 13 November 2026 the repository was assessed before being made public:
     - well-known example GUIDs, such as OpenAPI's `3fa85f64-…`, are listed exceptions.
   - **Hosts:** a placeholder such as `<subdomain>.ciamlogin.com` does not match, because the pattern requires a real label.
   - **Personal paths** match `/home/<name>/`, `/Users/<name>/` and `C:\Users\<name>\`. Generic tool paths (`/home/runner/`, `/tmp/`) are not personal.
-  - **Public IPs:** private ranges, loopback and documentation ranges are allowed.
+  - **Public IPv4 addresses:** private, loopback, link-local, shared, benchmarking, documentation, multicast and reserved ranges are allowed. A run of dotted numbers longer than four (an OID) and an address ending in `.0.0` (a version number) are not taken for IPs. IPv6 is out of scope.
   - *Alternative:* gitleaks custom rules for identifiers. Rejected: the exceptions would live in another tool's format, outside the three layers' single script, and the agent's edit hook would not see them.
 - **D-2 Gitleaks for secrets.**
   - A pinned release binary with its checksum:
@@ -56,7 +56,7 @@ On 13 November 2026 the repository was assessed before being made public:
   - The `herald-screens` skill requires committed screenshots to come from the E2E environment's personas.
 - **D-5 Clean-up.**
   - The manifests' `sourceUrl` becomes a path relative to the repository (`prototypes/frontend/…`).
-  - In archived files, the personal path and the tenant domain are replaced with placeholders, with a note that the values were redacted on 13 November 2026 (approved in Q-1).
+  - In archived files, the personal path and the tenant domain are replaced with placeholders (approved in Q-1). The note that they were redacted lives in this change's design, below, rather than in each archived file.
 
 ## Risks / Trade-offs
 
@@ -65,6 +65,29 @@ On 13 November 2026 the repository was assessed before being made public:
 - **Gitleaks is missing on a machine** → the hook says so, and CI is the backstop.
 - **Downloading gitleaks in CI adds seconds to `rules`** → measured in this change; it stays within the `rules` job.
 - **Pull request text and comments are not scanned** → written rule (D-4). GitHub's secret scanning covers secrets in them; identifiers rely on the rule.
+
+## Review (13 November 2026)
+
+The `herald-reviewer` subagent reviewed the diff against this change. Nothing was blocking. Findings and outcomes:
+
+1. **Gitleaks did not name the file or the rule.** **Fixed:** `--verbose`, and the test asserts the file and `aws-access-token`.
+2. **Bootstrap stopped where gitleaks could not install** (Windows Git Bash, macOS's bash 3.2, no network). **Fixed:**
+   - bootstrap continues with a message;
+   - `scripts/gitleaks` runs under bash 3.2, falls back to `shasum`, cleans up its temporary folder and names the path for a manual install.
+3. **The rule skipped scripts without an extension, `.slnx`, `.toml` and `.txt`.** **Fixed:** every tracked file that is not binary (D-1).
+4. **Escaped or lower-case Windows paths, and `/home/<name>` without a slash, were missed.** **Fixed,** with tests.
+5. **The secret-read denials can be worked around** (globs, `find`, `jq`), and Aspire's MCP server may show parameter values. **Left to the maintainer:** they are permission settings.
+6. **The broad Bash denials also block routine commands** such as `grep UserSecretsId`. **Left to the maintainer,** with finding 5.
+7. **D-3 and the gitleaks requirement no longer matched what was built.** **Fixed:** the requirement now says an allow list holds only values that are not secrets. D-3 waits for findings 5 and 6.
+8. **The skip list had no reasons and skipped the rule's own file.** **Fixed:** only `pnpm-lock.yaml` is skipped, with its reason.
+9. **Versions and OIDs were taken for IPs, and some reserved ranges counted as public.** **Fixed.** IPv6 is out of scope (D-1, the requirement).
+10. **`icon@2x.png` was taken for an email.** **Fixed.**
+11. **A force push to `main` failed the CI scan.** **Fixed:** without a reachable base, CI scans the whole history.
+12. **The hook and the CI range are not tested directly, and the tests download gitleaks when it is missing.** **Accepted:**
+    - the hook's two steps run in every commit of this change;
+    - CI installs gitleaks before the tests, and `scripts/bootstrap` does so locally.
+13. **The placeholder test copied the values.** **Fixed:** it stages the real files.
+14. **The archived files carry no redaction note.** **Fixed in D-5:** the note lives in this change's design.
 
 ## Maintainer answers (13 November 2026)
 
