@@ -62,4 +62,9 @@ The `herald-reviewer` subagent reviewed the diff. Nothing was blocking. Findings
 ## Fresh-session checks (13 November 2026, task 2.3)
 
 1. **A fresh cloud session on the branch, with only the project settings:** `claude plugin list` showed no plugins, no ponytail instruction reached the session, and no hook error appeared. This led to D-4.
-2. **A second fresh session, after D-4,** whose setup script runs the new bootstrap: recorded below.
+2. **A second fresh session, after D-4:** still no plugin. The environment restored its setup checkpoint from the first check ("Setup script cached from previous run"), so the new bootstrap step never ran: the checkpoint follows the environment's setup script, not the bootstrap it calls.
+3. **After the maintainer approved a change to the environment's setup script** (its comment now names the plugin, which forces a fresh run), a third fresh session showed:
+   - `ponytail@ponytail` 5.3.3 at local scope, enabled;
+   - "PONYTAIL MODE ACTIVE — level: full" injected at session start;
+   - no hook error.
+   - **Consequence:** a change to the bootstrap reaches cloud sessions only when the setup checkpoint is rebuilt. A future version change of the plugin therefore also edits the environment's setup script, or waits for the checkpoint to expire.
