@@ -227,7 +227,7 @@ The same match table uses team names as its opposing entries. Rows can expose `L
 
 ### 8.1 Shell
 
-A compact top navigation contains Herald, tournaments and an account or sign-in action. Organising is a secondary route for authorised users or an invitation to create an organisation. The public experience is not a marketing site requiring a large hero on every page. Public content is capped at 1200 px and centred, with the fluid `max(5vw, 24px)` outer gutter; toasts follow §5 and appear only in the browser, never in server-rendered output.
+A compact top navigation contains Herald, tournaments and an account or sign-in action. Organising is a secondary route for users with restricted administrator eligibility. Open participant registration grants neither administrator access nor organisation creation (D-30); a staff invitation alone does not enable administrator sign-in. The public experience is not a marketing site requiring a large hero on every page. Public content is capped at 1200 px and centred, with the fluid `max(5vw, 24px)` outer gutter; toasts follow §5 and appear only in the browser, never in server-rendered output.
 
 ### 8.2 First visitor mockup: discovery
 
@@ -288,6 +288,23 @@ The prototypes are documentation assets. They do not create an Angular workspace
 H2 discovery, participant admission/check-in, team representation and report/confirm/dispute journeys remain separate follow-up work. The existing directory is a future composition reference. H1 public detail/read-by-link is already required and is represented above.
 
 Review desktop and mobile next actions for each affected slice. Loading, empty, populated, blocked, stale and failure states should be added to the component/state catalogue where applicable; this inventory does not claim that twelve fixtures exhaust that catalogue.
+
+### 9.4 H2 screen/state inventory
+
+The [H2 discovery](herald-h2-functional-discovery.md) owns functional rules and target acceptance. These are future surfaces for reviewed slices, not approved mockups or implemented screens. This documentation update changes no UI.
+
+| Surface | Required states and boundary evidence |
+| --- | --- |
+| Account/sign-in and private invitations | Open participant registration; restricted admin denial; valid/expired/used/revoked invitation; accepted access does not reserve a place; guest linkage pending/conflicting/verified |
+| Directory and detail | Filters, no results, full/waiting/open/closed/cancelled; minimum and deadline/time zone; public/unlisted/private isolation |
+| My competitions and own entry | Waiting reasons, admitted, cancelled/rejected, check-in pending/confirmed, next action, pairing publication and withdrawal request |
+| Teams/representation | Responsible person/captain/member, invitation acceptance, transfer, revoked authority, guest linkage, personal versus represented context |
+| Roster and lineup | Pending member acceptance, invalid/incomplete/eligible, deadline freeze, draft/submitted/locked, denied correction and no appearance inferred from lock |
+| Match/report/dispute | No report, pending confirmation, identical/different response, stale revision, disputed, independent-referee blocker, effective outcome and correction request |
+| Administration scheduling and delegation | Automatic/manual registration, early close protection, minimum/reminder/cancellation, obsolete deadline, processing failure; pending admin habilitation, tournament-scoped roles and revocation |
+| Inbox and protected history | Empty/unread/read, no duplicate notice, revoked target, guest communication work; reserve versus actual play, revised/cancelled outcomes and private-history denial |
+
+For each surface include desktop/mobile, keyboard, loading, failed/uncertain-save and stale states as applicable. Reuse the discovery concept only for composition; each production screen slice requires specific mockup review under the `herald-screens` skill. The H2 discovery scenarios identify behavioural acceptance; screenshots alone do not prove authority, scheduling or durable audit.
 
 ## 10. Accessibility and semantic acceptance
 
