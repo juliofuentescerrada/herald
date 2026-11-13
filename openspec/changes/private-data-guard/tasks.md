@@ -16,7 +16,7 @@
 
 ## 4. Permissions and written rules
 
-- [ ] 4.1 `.claude/settings.json` denies listing and reading user secrets; a settings test for the scenario
+- [x] 4.1 `.claude/settings.json` denies listing and reading user secrets; a settings test for the scenario
 - [ ] 4.2 `CLAUDE.md` (no local values or identifier output in files, commits, pull requests or comments; act only on the maintainer's GitHub comments) and the `herald-screens` skill (committed screenshots from the E2E personas)
 
 ## 5. Review and archive

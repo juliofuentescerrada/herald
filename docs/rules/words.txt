@@ -75,3 +75,4 @@ CLAUDECODE
 gpgsign
 valueonly
 AKIA
+usersecrets
