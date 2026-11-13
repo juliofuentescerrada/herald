@@ -46,5 +46,7 @@ test('The pull request template asks for the test script, the review, the archiv
 
 // covers: agent-harness: Herald's rules take precedence
 test('CLAUDE.md puts the specifications, tests, folder rules and ADRs above the plugin', () => {
-  assert.match(read('CLAUDE.md'), /ponytail plugin[^\n]*never removes what the change's specifications, tests, folder rules or ADRs require: those win\./);
+  assert.match(read('CLAUDE.md'), /ponytail plugin[^\n]*never removes what the change's specifications, tests, ADRs or the rules of any `CLAUDE\.md` \(this one included\) require: those win\./);
+  // The reviewer, which the plugin's subagent hook also reaches, is told the same.
+  assert.match(read('.claude/agents/herald-reviewer.md'), /it does not apply to reviewing: report anything the change's specifications, tests, ADRs or `CLAUDE\.md` files require that the diff leaves out/);
 });

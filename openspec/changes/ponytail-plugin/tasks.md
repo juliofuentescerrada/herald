@@ -10,5 +10,5 @@
 
 ## 3. Review and archive
 
-- [ ] 3.1 `herald-reviewer` review of the diff; findings and outcomes in the pull request
+- [x] 3.1 `herald-reviewer` review of the diff; findings and outcomes in the pull request
 - [ ] 3.2 Archive in the same pull request: the specification sync, every new scenario covered

@@ -47,4 +47,6 @@ test('The ponytail marketplace is pinned to an exact tag and its plugin is enabl
   assert.deepEqual({ source: source?.source, repo: source?.repo }, { source: 'github', repo: 'DietrichGebert/ponytail' });
   assert.match(source?.ref ?? '', /^v\d+\.\d+\.\d+$/, 'an exact version tag, never a branch');
   assert.equal(settings.enabledPlugins?.['ponytail@ponytail'], true);
+  // The repository is public: no plugin configuration, webhook or token is committed.
+  assert.doesNotMatch(JSON.stringify(settings), /webhook|pluginConfigs|userConfig/i);
 });
