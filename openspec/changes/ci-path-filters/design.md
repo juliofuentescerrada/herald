@@ -64,3 +64,15 @@ Findings that shape the design:
 ## Maintainer answers (13 November 2026)
 
 - **Q-1 Rules on drafts:** no. Drafts run nothing, and the local edit and commit hooks check the rules (D-3 as written).
+
+## Classification of recent merges (13 November 2026, task 4.4)
+
+`node scripts/ci-changes.mjs <merge>^1 <merge>` run locally:
+
+| Merge | Files | Result | Effect |
+|---|---|---|---|
+| #28 `h1-check-in` | 87 | `code=true` | every job, as before |
+| #29 archive of `h1-check-in` | 13 | `code=false` | `rules` only |
+| #30 `harness-resumption` | 21 | `code=false` | `rules` only |
+
+#30 counts as harness because every file it changed is in `scripts/`, `.claude/`, `.githooks/` or the documentation. Its 14 commits ran 4 jobs on each push to the pull request; with this change they would have run `rules` alone.
