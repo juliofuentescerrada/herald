@@ -1,0 +1,7 @@
+# Gitleaks configuration (private-data-guard D-2): the default rules. On 13 November 2026 they found nothing in the
+# whole history, the development placeholders included, so no allow list is needed. Add one only for a value that is
+# not a secret, with its reason. Identifiers, addresses and paths are checked by scripts/rules.mjs instead.
+title = "Herald"
+
+[extend]
+useDefault = true

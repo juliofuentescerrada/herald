@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+# Gitleaks at the version Herald pins, verified by its checksum (private-data-guard D-2). The version and checksums
+# live here only. Installs into $HERALD_TOOLS (default ~/.local/bin) when missing or at another version, then runs it
+# with the given arguments and the repository's .gitleaks.toml:
+#   scripts/gitleaks --install          install only (scripts/bootstrap, CI)
+#   scripts/gitleaks --installed ARGS   run only if already installed, else say so and succeed (.githooks/pre-commit)
+#   scripts/gitleaks ARGS               install if needed, then run (CI)
+set -euo pipefail
+version=8.30.1
+declare -A checksums=(
+  [linux_x64]=551f6fc83ea457d62a0d98237cbad105af8d557003051f41f3e7ca7b3f2470eb
+  [linux_arm64]=e4a487ee7ccd7d3a7f7ec08657610aa3606637dab924210b3aee62570fb4b080
+  [darwin_x64]=dfe101a4db2255fc85120ac7f3d25e4342c3c20cf749f2c20a18081af1952709
+  [darwin_arm64]=b40ab0ae55c505963e365f271a8d3846efbc170aa17f2607f13df610a9aeb6a5
+)
+tools="${HERALD_TOOLS:-$HOME/.local/bin}"
+binary="$tools/gitleaks"
+root="$(cd "$(dirname "$0")/.." && pwd)"
+
+current() { [ -x "$binary" ] && [ "$("$binary" version 2>/dev/null)" = "$version" ]; }
+
+install() {
+  current && return 0
+  local os arch platform
+  os=$(uname -s | tr '[:upper:]' '[:lower:]')
+  case "$(uname -m)" in x86_64|amd64) arch=x64 ;; aarch64|arm64) arch=arm64 ;; *) arch=unknown ;; esac
+  platform="${os}_${arch}"
+  if [ -z "${checksums[$platform]:-}" ]; then
+    echo "No pinned gitleaks for ${platform}: install gitleaks ${version} by hand." >&2
+    return 1
+  fi
+  local temp archive
+  temp=$(mktemp -d)
+  archive="gitleaks_${version}_${platform}.tar.gz"
+  curl -fsSL -o "$temp/$archive" "https://github.com/gitleaks/gitleaks/releases/download/v${version}/${archive}"
+  echo "${checksums[$platform]}  $temp/$archive" | sha256sum -c --quiet -
+  tar -xzf "$temp/$archive" -C "$temp" gitleaks
+  mkdir -p "$tools"
+  mv "$temp/gitleaks" "$binary"
+  rm -rf "$temp"
+}
+
+case "${1:-}" in
+  --install) install; exit 0 ;;
+  --installed)
+    shift
+    if ! current; then
+      echo "gitleaks ${version} is not installed: secrets were not scanned here (CI scans them). Run scripts/bootstrap." >&2
+      exit 0
+    fi
+    ;;
+  *) install ;;
+esac
+exec "$binary" "$@" --config "$root/.gitleaks.toml" --no-banner --redact

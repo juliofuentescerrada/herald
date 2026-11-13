@@ -42,6 +42,7 @@ On 13 November 2026 the repository was assessed before being made public:
     - the CI `rules` job downloads and verifies it and scans the pull request's commits.
   - Its configuration extends the default rules, with an allow list only for the known development placeholders (`SAS_KEY_VALUE`, the E2E database password).
   - A one-off scan of the whole history is recorded here.
+  - **As implemented:** gitleaks 8.30.1 (MIT, checked in its release archive), installed by `scripts/gitleaks`, which holds the version and the SHA-256 of the Linux and macOS archives. The default rules found nothing, the development placeholders included, so `.gitleaks.toml` only extends them.
   - *Alternative:* the gitleaks GitHub Action. Rejected: it adds a third-party action, and its terms vary by account type.
   - *Alternative:* TruffleHog. Rejected: AGPL-3.0.
 - **D-3 Denied secret reads.** `.claude/settings.json` denies, in every permission mode:
