@@ -15,7 +15,7 @@
         "label": "Tournament list · empty",
         "file": "tournament-setup-list-empty-desktop.png",
         "source": "prototypes/frontend/tournament-setup-states.html?state=list-empty",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/tournament-setup-states.html?state=list-empty",
+        "sourceUrl": "prototypes/frontend/tournament-setup-states.html?state=list-empty",
         "viewport": [
           1440,
           1000
@@ -39,7 +39,7 @@
         "label": "Tournament list · empty",
         "file": "tournament-setup-list-empty-mobile.png",
         "source": "prototypes/frontend/tournament-setup-states.html?state=list-empty",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/tournament-setup-states.html?state=list-empty",
+        "sourceUrl": "prototypes/frontend/tournament-setup-states.html?state=list-empty",
         "viewport": [
           390,
           844
@@ -63,7 +63,7 @@
         "label": "Tournament list · populated",
         "file": "tournament-setup-list-populated-desktop.png",
         "source": "prototypes/frontend/tournament-setup-states.html?state=list-populated",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/tournament-setup-states.html?state=list-populated",
+        "sourceUrl": "prototypes/frontend/tournament-setup-states.html?state=list-populated",
         "viewport": [
           1440,
           1000
@@ -87,7 +87,7 @@
         "label": "Tournament list · populated",
         "file": "tournament-setup-list-populated-mobile.png",
         "source": "prototypes/frontend/tournament-setup-states.html?state=list-populated",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/tournament-setup-states.html?state=list-populated",
+        "sourceUrl": "prototypes/frontend/tournament-setup-states.html?state=list-populated",
         "viewport": [
           390,
           844
@@ -111,7 +111,7 @@
         "label": "Tournament list · loading",
         "file": "tournament-setup-list-loading-desktop.png",
         "source": "prototypes/frontend/tournament-setup-states.html?state=list-loading",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/tournament-setup-states.html?state=list-loading",
+        "sourceUrl": "prototypes/frontend/tournament-setup-states.html?state=list-loading",
         "viewport": [
           1440,
           1000
@@ -135,7 +135,7 @@
         "label": "Tournament list · loading",
         "file": "tournament-setup-list-loading-mobile.png",
         "source": "prototypes/frontend/tournament-setup-states.html?state=list-loading",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/tournament-setup-states.html?state=list-loading",
+        "sourceUrl": "prototypes/frontend/tournament-setup-states.html?state=list-loading",
         "viewport": [
           390,
           844
@@ -159,7 +159,7 @@
         "label": "Tournament list · failed",
         "file": "tournament-setup-list-failed-desktop.png",
         "source": "prototypes/frontend/tournament-setup-states.html?state=list-failed",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/tournament-setup-states.html?state=list-failed",
+        "sourceUrl": "prototypes/frontend/tournament-setup-states.html?state=list-failed",
         "viewport": [
           1440,
           1000
@@ -183,7 +183,7 @@
         "label": "Tournament list · failed",
         "file": "tournament-setup-list-failed-mobile.png",
         "source": "prototypes/frontend/tournament-setup-states.html?state=list-failed",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/tournament-setup-states.html?state=list-failed",
+        "sourceUrl": "prototypes/frontend/tournament-setup-states.html?state=list-failed",
         "viewport": [
           390,
           844
@@ -207,7 +207,7 @@
         "label": "New individual draft · empty",
         "file": "tournament-setup-create-individual-desktop.png",
         "source": "prototypes/frontend/tournament-setup-states.html?state=create-individual",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/tournament-setup-states.html?state=create-individual",
+        "sourceUrl": "prototypes/frontend/tournament-setup-states.html?state=create-individual",
         "viewport": [
           1440,
           1000
@@ -231,7 +231,7 @@
         "label": "New individual draft · empty",
         "file": "tournament-setup-create-individual-mobile.png",
         "source": "prototypes/frontend/tournament-setup-states.html?state=create-individual",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/tournament-setup-states.html?state=create-individual",
+        "sourceUrl": "prototypes/frontend/tournament-setup-states.html?state=create-individual",
         "viewport": [
           390,
           844
@@ -255,7 +255,7 @@
         "label": "Individual draft · saved",
         "file": "tournament-setup-edit-individual-draft-desktop.png",
         "source": "prototypes/frontend/tournament-setup-states.html?state=edit-individual-draft",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/tournament-setup-states.html?state=edit-individual-draft",
+        "sourceUrl": "prototypes/frontend/tournament-setup-states.html?state=edit-individual-draft",
         "viewport": [
           1440,
           1000
@@ -279,7 +279,7 @@
         "label": "Individual draft · saved",
         "file": "tournament-setup-edit-individual-draft-mobile.png",
         "source": "prototypes/frontend/tournament-setup-states.html?state=edit-individual-draft",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/tournament-setup-states.html?state=edit-individual-draft",
+        "sourceUrl": "prototypes/frontend/tournament-setup-states.html?state=edit-individual-draft",
         "viewport": [
           390,
           844
@@ -303,7 +303,7 @@
         "label": "Team draft · saved",
         "file": "tournament-setup-edit-team-draft-desktop.png",
         "source": "prototypes/frontend/tournament-setup-states.html?state=edit-team-draft",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/tournament-setup-states.html?state=edit-team-draft",
+        "sourceUrl": "prototypes/frontend/tournament-setup-states.html?state=edit-team-draft",
         "viewport": [
           1440,
           1000
@@ -327,7 +327,7 @@
         "label": "Team draft · saved",
         "file": "tournament-setup-edit-team-draft-mobile.png",
         "source": "prototypes/frontend/tournament-setup-states.html?state=edit-team-draft",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/tournament-setup-states.html?state=edit-team-draft",
+        "sourceUrl": "prototypes/frontend/tournament-setup-states.html?state=edit-team-draft",
         "viewport": [
           390,
           844
@@ -351,7 +351,7 @@
         "label": "Draft · publication blocked",
         "file": "tournament-setup-draft-incomplete-desktop.png",
         "source": "prototypes/frontend/tournament-setup-states.html?state=draft-incomplete",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/tournament-setup-states.html?state=draft-incomplete",
+        "sourceUrl": "prototypes/frontend/tournament-setup-states.html?state=draft-incomplete",
         "viewport": [
           1440,
           1000
@@ -375,7 +375,7 @@
         "label": "Draft · publication blocked",
         "file": "tournament-setup-draft-incomplete-mobile.png",
         "source": "prototypes/frontend/tournament-setup-states.html?state=draft-incomplete",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/tournament-setup-states.html?state=draft-incomplete",
+        "sourceUrl": "prototypes/frontend/tournament-setup-states.html?state=draft-incomplete",
         "viewport": [
           390,
           844
@@ -399,7 +399,7 @@
         "label": "Team draft · validation errors",
         "file": "tournament-setup-validation-errors-desktop.png",
         "source": "prototypes/frontend/tournament-setup-states.html?state=validation-errors",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/tournament-setup-states.html?state=validation-errors",
+        "sourceUrl": "prototypes/frontend/tournament-setup-states.html?state=validation-errors",
         "viewport": [
           1440,
           1000
@@ -423,7 +423,7 @@
         "label": "Team draft · validation errors",
         "file": "tournament-setup-validation-errors-mobile.png",
         "source": "prototypes/frontend/tournament-setup-states.html?state=validation-errors",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/tournament-setup-states.html?state=validation-errors",
+        "sourceUrl": "prototypes/frontend/tournament-setup-states.html?state=validation-errors",
         "viewport": [
           390,
           844
@@ -447,7 +447,7 @@
         "label": "Draft · saving",
         "file": "tournament-setup-saving-desktop.png",
         "source": "prototypes/frontend/tournament-setup-states.html?state=saving",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/tournament-setup-states.html?state=saving",
+        "sourceUrl": "prototypes/frontend/tournament-setup-states.html?state=saving",
         "viewport": [
           1440,
           1000
@@ -471,7 +471,7 @@
         "label": "Draft · saving",
         "file": "tournament-setup-saving-mobile.png",
         "source": "prototypes/frontend/tournament-setup-states.html?state=saving",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/tournament-setup-states.html?state=saving",
+        "sourceUrl": "prototypes/frontend/tournament-setup-states.html?state=saving",
         "viewport": [
           390,
           844
@@ -495,7 +495,7 @@
         "label": "Draft · save failed",
         "file": "tournament-setup-save-failed-desktop.png",
         "source": "prototypes/frontend/tournament-setup-states.html?state=save-failed",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/tournament-setup-states.html?state=save-failed",
+        "sourceUrl": "prototypes/frontend/tournament-setup-states.html?state=save-failed",
         "viewport": [
           1440,
           1000
@@ -519,7 +519,7 @@
         "label": "Draft · save failed",
         "file": "tournament-setup-save-failed-mobile.png",
         "source": "prototypes/frontend/tournament-setup-states.html?state=save-failed",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/tournament-setup-states.html?state=save-failed",
+        "sourceUrl": "prototypes/frontend/tournament-setup-states.html?state=save-failed",
         "viewport": [
           390,
           844
@@ -543,7 +543,7 @@
         "label": "Draft · revision conflict",
         "file": "tournament-setup-revision-conflict-desktop.png",
         "source": "prototypes/frontend/tournament-setup-states.html?state=revision-conflict",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/tournament-setup-states.html?state=revision-conflict",
+        "sourceUrl": "prototypes/frontend/tournament-setup-states.html?state=revision-conflict",
         "viewport": [
           1440,
           1000
@@ -567,7 +567,7 @@
         "label": "Draft · revision conflict",
         "file": "tournament-setup-revision-conflict-mobile.png",
         "source": "prototypes/frontend/tournament-setup-states.html?state=revision-conflict",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/tournament-setup-states.html?state=revision-conflict",
+        "sourceUrl": "prototypes/frontend/tournament-setup-states.html?state=revision-conflict",
         "viewport": [
           390,
           844
@@ -591,7 +591,7 @@
         "label": "Individual · publication preview",
         "file": "tournament-setup-preview-individual-desktop.png",
         "source": "prototypes/frontend/tournament-setup-states.html?state=preview-individual",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/tournament-setup-states.html?state=preview-individual",
+        "sourceUrl": "prototypes/frontend/tournament-setup-states.html?state=preview-individual",
         "viewport": [
           1440,
           1000
@@ -615,7 +615,7 @@
         "label": "Individual · publication preview",
         "file": "tournament-setup-preview-individual-mobile.png",
         "source": "prototypes/frontend/tournament-setup-states.html?state=preview-individual",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/tournament-setup-states.html?state=preview-individual",
+        "sourceUrl": "prototypes/frontend/tournament-setup-states.html?state=preview-individual",
         "viewport": [
           390,
           844
@@ -639,7 +639,7 @@
         "label": "Team · publication preview",
         "file": "tournament-setup-preview-team-desktop.png",
         "source": "prototypes/frontend/tournament-setup-states.html?state=preview-team",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/tournament-setup-states.html?state=preview-team",
+        "sourceUrl": "prototypes/frontend/tournament-setup-states.html?state=preview-team",
         "viewport": [
           1440,
           1000
@@ -663,7 +663,7 @@
         "label": "Team · publication preview",
         "file": "tournament-setup-preview-team-mobile.png",
         "source": "prototypes/frontend/tournament-setup-states.html?state=preview-team",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/tournament-setup-states.html?state=preview-team",
+        "sourceUrl": "prototypes/frontend/tournament-setup-states.html?state=preview-team",
         "viewport": [
           390,
           844
@@ -687,7 +687,7 @@
         "label": "Draft · publishing",
         "file": "tournament-setup-publishing-desktop.png",
         "source": "prototypes/frontend/tournament-setup-states.html?state=publishing",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/tournament-setup-states.html?state=publishing",
+        "sourceUrl": "prototypes/frontend/tournament-setup-states.html?state=publishing",
         "viewport": [
           1440,
           1000
@@ -711,7 +711,7 @@
         "label": "Draft · publishing",
         "file": "tournament-setup-publishing-mobile.png",
         "source": "prototypes/frontend/tournament-setup-states.html?state=publishing",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/tournament-setup-states.html?state=publishing",
+        "sourceUrl": "prototypes/frontend/tournament-setup-states.html?state=publishing",
         "viewport": [
           390,
           844
@@ -735,7 +735,7 @@
         "label": "Draft · publication failed",
         "file": "tournament-setup-publish-failed-desktop.png",
         "source": "prototypes/frontend/tournament-setup-states.html?state=publish-failed",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/tournament-setup-states.html?state=publish-failed",
+        "sourceUrl": "prototypes/frontend/tournament-setup-states.html?state=publish-failed",
         "viewport": [
           1440,
           1000
@@ -759,7 +759,7 @@
         "label": "Draft · publication failed",
         "file": "tournament-setup-publish-failed-mobile.png",
         "source": "prototypes/frontend/tournament-setup-states.html?state=publish-failed",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/tournament-setup-states.html?state=publish-failed",
+        "sourceUrl": "prototypes/frontend/tournament-setup-states.html?state=publish-failed",
         "viewport": [
           390,
           844
@@ -783,7 +783,7 @@
         "label": "Published individual · configuration",
         "file": "tournament-setup-published-individual-desktop.png",
         "source": "prototypes/frontend/tournament-setup-states.html?state=published-individual",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/tournament-setup-states.html?state=published-individual",
+        "sourceUrl": "prototypes/frontend/tournament-setup-states.html?state=published-individual",
         "viewport": [
           1440,
           1000
@@ -807,7 +807,7 @@
         "label": "Published individual · configuration",
         "file": "tournament-setup-published-individual-mobile.png",
         "source": "prototypes/frontend/tournament-setup-states.html?state=published-individual",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/tournament-setup-states.html?state=published-individual",
+        "sourceUrl": "prototypes/frontend/tournament-setup-states.html?state=published-individual",
         "viewport": [
           390,
           844
@@ -831,7 +831,7 @@
         "label": "Published team · configuration",
         "file": "tournament-setup-published-team-desktop.png",
         "source": "prototypes/frontend/tournament-setup-states.html?state=published-team",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/tournament-setup-states.html?state=published-team",
+        "sourceUrl": "prototypes/frontend/tournament-setup-states.html?state=published-team",
         "viewport": [
           1440,
           1000
@@ -855,7 +855,7 @@
         "label": "Published team · configuration",
         "file": "tournament-setup-published-team-mobile.png",
         "source": "prototypes/frontend/tournament-setup-states.html?state=published-team",
-        "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/tournament-setup-states.html?state=published-team",
+        "sourceUrl": "prototypes/frontend/tournament-setup-states.html?state=published-team",
         "viewport": [
           390,
           844

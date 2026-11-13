@@ -7,7 +7,7 @@
       "label": "check in mandatory",
       "file": "check-in-check-in-mandatory-desktop.png",
       "source": "prototypes/frontend/check-in-states.html?state=check-in-mandatory",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/check-in-states.html?state=check-in-mandatory&capture=1",
+      "sourceUrl": "prototypes/frontend/check-in-states.html?state=check-in-mandatory&capture=1",
       "viewport": [
         1440,
         1000
@@ -34,7 +34,7 @@
       "label": "check in mandatory",
       "file": "check-in-check-in-mandatory-mobile.png",
       "source": "prototypes/frontend/check-in-states.html?state=check-in-mandatory",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/check-in-states.html?state=check-in-mandatory&capture=1",
+      "sourceUrl": "prototypes/frontend/check-in-states.html?state=check-in-mandatory&capture=1",
       "viewport": [
         390,
         1100
@@ -61,7 +61,7 @@
       "label": "check in optional",
       "file": "check-in-check-in-optional-desktop.png",
       "source": "prototypes/frontend/check-in-states.html?state=check-in-optional",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/check-in-states.html?state=check-in-optional&capture=1",
+      "sourceUrl": "prototypes/frontend/check-in-states.html?state=check-in-optional&capture=1",
       "viewport": [
         1440,
         1000
@@ -88,7 +88,7 @@
       "label": "check in optional",
       "file": "check-in-check-in-optional-mobile.png",
       "source": "prototypes/frontend/check-in-states.html?state=check-in-optional",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/check-in-states.html?state=check-in-optional&capture=1",
+      "sourceUrl": "prototypes/frontend/check-in-states.html?state=check-in-optional&capture=1",
       "viewport": [
         390,
         1100
@@ -115,7 +115,7 @@
       "label": "no admitted",
       "file": "check-in-no-admitted-desktop.png",
       "source": "prototypes/frontend/check-in-states.html?state=no-admitted",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/check-in-states.html?state=no-admitted&capture=1",
+      "sourceUrl": "prototypes/frontend/check-in-states.html?state=no-admitted&capture=1",
       "viewport": [
         1440,
         1000
@@ -142,7 +142,7 @@
       "label": "no admitted",
       "file": "check-in-no-admitted-mobile.png",
       "source": "prototypes/frontend/check-in-states.html?state=no-admitted",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/check-in-states.html?state=no-admitted&capture=1",
+      "sourceUrl": "prototypes/frontend/check-in-states.html?state=no-admitted&capture=1",
       "viewport": [
         390,
         1100
@@ -169,7 +169,7 @@
       "label": "checking in",
       "file": "check-in-checking-in-desktop.png",
       "source": "prototypes/frontend/check-in-states.html?state=checking-in",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/check-in-states.html?state=checking-in&capture=1",
+      "sourceUrl": "prototypes/frontend/check-in-states.html?state=checking-in&capture=1",
       "viewport": [
         1440,
         1000
@@ -196,7 +196,7 @@
       "label": "checking in",
       "file": "check-in-checking-in-mobile.png",
       "source": "prototypes/frontend/check-in-states.html?state=checking-in",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/check-in-states.html?state=checking-in&capture=1",
+      "sourceUrl": "prototypes/frontend/check-in-states.html?state=checking-in&capture=1",
       "viewport": [
         390,
         1100
@@ -223,7 +223,7 @@
       "label": "checked in toast",
       "file": "check-in-checked-in-toast-desktop.png",
       "source": "prototypes/frontend/check-in-states.html?state=checked-in-toast",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/check-in-states.html?state=checked-in-toast&capture=1",
+      "sourceUrl": "prototypes/frontend/check-in-states.html?state=checked-in-toast&capture=1",
       "viewport": [
         1440,
         1000
@@ -250,7 +250,7 @@
       "label": "checked in toast",
       "file": "check-in-checked-in-toast-mobile.png",
       "source": "prototypes/frontend/check-in-states.html?state=checked-in-toast",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/check-in-states.html?state=checked-in-toast&capture=1",
+      "sourceUrl": "prototypes/frontend/check-in-states.html?state=checked-in-toast&capture=1",
       "viewport": [
         390,
         1100
@@ -277,7 +277,7 @@
       "label": "undo",
       "file": "check-in-undo-desktop.png",
       "source": "prototypes/frontend/check-in-states.html?state=undo",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/check-in-states.html?state=undo&capture=1",
+      "sourceUrl": "prototypes/frontend/check-in-states.html?state=undo&capture=1",
       "viewport": [
         1440,
         1000
@@ -304,7 +304,7 @@
       "label": "undo",
       "file": "check-in-undo-mobile.png",
       "source": "prototypes/frontend/check-in-states.html?state=undo",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/check-in-states.html?state=undo&capture=1",
+      "sourceUrl": "prototypes/frontend/check-in-states.html?state=undo&capture=1",
       "viewport": [
         390,
         1100
@@ -331,7 +331,7 @@
       "label": "check in failed",
       "file": "check-in-check-in-failed-desktop.png",
       "source": "prototypes/frontend/check-in-states.html?state=check-in-failed",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/check-in-states.html?state=check-in-failed&capture=1",
+      "sourceUrl": "prototypes/frontend/check-in-states.html?state=check-in-failed&capture=1",
       "viewport": [
         1440,
         1000
@@ -358,7 +358,7 @@
       "label": "check in failed",
       "file": "check-in-check-in-failed-mobile.png",
       "source": "prototypes/frontend/check-in-states.html?state=check-in-failed",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/check-in-states.html?state=check-in-failed&capture=1",
+      "sourceUrl": "prototypes/frontend/check-in-states.html?state=check-in-failed&capture=1",
       "viewport": [
         390,
         1100
@@ -385,7 +385,7 @@
       "label": "check in conflict",
       "file": "check-in-check-in-conflict-desktop.png",
       "source": "prototypes/frontend/check-in-states.html?state=check-in-conflict",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/check-in-states.html?state=check-in-conflict&capture=1",
+      "sourceUrl": "prototypes/frontend/check-in-states.html?state=check-in-conflict&capture=1",
       "viewport": [
         1440,
         1000
@@ -412,7 +412,7 @@
       "label": "check in conflict",
       "file": "check-in-check-in-conflict-mobile.png",
       "source": "prototypes/frontend/check-in-states.html?state=check-in-conflict",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/check-in-states.html?state=check-in-conflict&capture=1",
+      "sourceUrl": "prototypes/frontend/check-in-states.html?state=check-in-conflict&capture=1",
       "viewport": [
         390,
         1100
@@ -439,7 +439,7 @@
       "label": "cancelled checked in",
       "file": "check-in-cancelled-checked-in-desktop.png",
       "source": "prototypes/frontend/check-in-states.html?state=cancelled-checked-in",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/check-in-states.html?state=cancelled-checked-in&capture=1",
+      "sourceUrl": "prototypes/frontend/check-in-states.html?state=cancelled-checked-in&capture=1",
       "viewport": [
         1440,
         1000
@@ -466,7 +466,7 @@
       "label": "cancelled checked in",
       "file": "check-in-cancelled-checked-in-mobile.png",
       "source": "prototypes/frontend/check-in-states.html?state=cancelled-checked-in",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/check-in-states.html?state=cancelled-checked-in&capture=1",
+      "sourceUrl": "prototypes/frontend/check-in-states.html?state=cancelled-checked-in&capture=1",
       "viewport": [
         390,
         1100
@@ -493,7 +493,7 @@
       "label": "team check in",
       "file": "check-in-team-check-in-desktop.png",
       "source": "prototypes/frontend/check-in-states.html?state=team-check-in",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/check-in-states.html?state=team-check-in&capture=1",
+      "sourceUrl": "prototypes/frontend/check-in-states.html?state=team-check-in&capture=1",
       "viewport": [
         1440,
         1000
@@ -520,7 +520,7 @@
       "label": "team check in",
       "file": "check-in-team-check-in-mobile.png",
       "source": "prototypes/frontend/check-in-states.html?state=team-check-in",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/check-in-states.html?state=team-check-in&capture=1",
+      "sourceUrl": "prototypes/frontend/check-in-states.html?state=team-check-in&capture=1",
       "viewport": [
         390,
         1100
@@ -547,7 +547,7 @@
       "label": "check in locked",
       "file": "check-in-check-in-locked-desktop.png",
       "source": "prototypes/frontend/check-in-states.html?state=check-in-locked",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/check-in-states.html?state=check-in-locked&capture=1",
+      "sourceUrl": "prototypes/frontend/check-in-states.html?state=check-in-locked&capture=1",
       "viewport": [
         1440,
         1000
@@ -574,7 +574,7 @@
       "label": "check in locked",
       "file": "check-in-check-in-locked-mobile.png",
       "source": "prototypes/frontend/check-in-states.html?state=check-in-locked",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/check-in-states.html?state=check-in-locked&capture=1",
+      "sourceUrl": "prototypes/frontend/check-in-states.html?state=check-in-locked&capture=1",
       "viewport": [
         390,
         1100

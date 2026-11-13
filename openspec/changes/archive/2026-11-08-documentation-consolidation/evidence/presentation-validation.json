@@ -76,8 +76,8 @@
     "passed": true,
     "slideCount": 12,
     "sha256": "dd34b8ac8abb91113a95f3c4df8cc100fbb53bc1023ebcf42efc3db975a3b4e5",
-    "runtimeNodeModules": "/home/julio/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules",
-    "nodeExecutable": "/home/julio/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node"
+    "runtimeNodeModules": "<home>/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/node_modules",
+    "nodeExecutable": "<home>/.cache/codex-runtimes/codex-primary-runtime/dependencies/node/bin/node"
   },
   "nativeTableArithmetic": {
     "performed": true,

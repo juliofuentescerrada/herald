@@ -17,12 +17,12 @@ The remaining architectural work is to make responsibility, composition and reus
 | Area | Verified state | Evidence |
 | --- | --- | --- |
 | Backend in remote `main` | ADR 0004 still describes `Domain`, `Application` and `Adapters` | [Remote ADR 0004](https://github.com/juliofuentescerrada/herald/blob/main/docs/adr/0004-modular-monolith-of-hexagonal-modules.md) |
-| Backend in local `m0-messaging` | Commit `70e9872` revises the proposal to vertical slices; `08c3308` adds the OpenSpec proposal, design, specification deltas and tasks | [Current ADR 0004](/home/julio/Code/herald/docs/adr/0004-modular-monolith-of-hexagonal-modules.md:20); [migration design](/home/julio/Code/herald/openspec/changes/m0-messaging/design.md:82) |
-| Backend implementation | Still the empty skeleton with entry points in `Adapters`; the migration and feature-boundary checks are pending | [Registration entry point](/home/julio/Code/herald/src/Herald.Registration/Adapters/RegistrationModule.cs:3); [migration tasks](/home/julio/Code/herald/openspec/changes/m0-messaging/tasks.md:12) |
-| Frontend proposal | Standalone components, signals, features, lazy routes and no feature-to-feature imports; two applications with separate `ui` and `api-client` libraries | [ADR 0011](/home/julio/Code/herald/docs/adr/0011-angular-front-end-and-generated-api-contract.md:14), also present in [remote main](https://github.com/juliofuentescerrada/herald/blob/main/docs/adr/0011-angular-front-end-and-generated-api-contract.md) |
+| Backend in local `m0-messaging` | Commit `70e9872` revises the proposal to vertical slices; `08c3308` adds the OpenSpec proposal, design, specification deltas and tasks | [Current ADR 0004](docs/adr/0004-modular-monolith-of-hexagonal-modules.md:20); [migration design](openspec/changes/m0-messaging/design.md:82) |
+| Backend implementation | Still the empty skeleton with entry points in `Adapters`; the migration and feature-boundary checks are pending | [Registration entry point](src/Herald.Registration/Adapters/RegistrationModule.cs:3); [migration tasks](openspec/changes/m0-messaging/tasks.md:12) |
+| Frontend proposal | Standalone components, signals, features, lazy routes and no feature-to-feature imports; two applications with separate `ui` and `api-client` libraries | [ADR 0011](docs/adr/0011-angular-front-end-and-generated-api-contract.md:14), also present in [remote main](https://github.com/juliofuentescerrada/herald/blob/main/docs/adr/0011-angular-front-end-and-generated-api-contract.md) |
 | Frontend work already completed | The chat “Definir estrategia frontend SPA y SSR” completed the rendering/shared-UI documentation, ultimately in commit `1801d7c` | Chat history checked; commit is in local `main` ancestry |
-| Frontend implementation | No production Angular workspace yet; the HTML/JS/CSS prototype is explicitly disposable | [Prototype scope](/home/julio/Code/herald/openspec/changes/frontend-visual-prototype/design.md:3) |
-| Next frontend change | `m0-web-shell` is planned but has no proposal directory yet | [Roadmap](/home/julio/Code/herald/docs/roadmap.md:19) |
+| Frontend implementation | No production Angular workspace yet; the HTML/JS/CSS prototype is explicitly disposable | [Prototype scope](openspec/changes/frontend-visual-prototype/design.md:3) |
+| Next frontend change | `m0-web-shell` is planned but has no proposal directory yet | [Roadmap](docs/roadmap.md:19) |
 
 GitHub was checked directly, including branch pagination: only `main` and `m0-solution-skeleton` were returned, and there were no open pull requests. `m0-messaging` is local and has not been published as a remote branch. The source checkout and this review worktree both start at `08c3308`; the source checkout additionally contains uncommitted design notes. No other active Herald architecture chat was found in the accessible local Codex chat inventory. This is evidence of recorded work, not a claim about activity in other tools.
 
@@ -79,7 +79,7 @@ Frontend feature boundaries follow user capabilities and navigation. They should
 
 ### A-01 · Clarify what may be shared without putting everything in Domain
 
-**Evidence:** [ADR 0004:23](/home/julio/Code/herald/docs/adr/0004-modular-monolith-of-hexagonal-modules.md:23) and the [proposed boundary rule:31](/home/julio/Code/herald/openspec/changes/m0-messaging/specs/module-boundaries/spec.md:31) say that anything shared by two features belongs in Domain.
+**Evidence:** [ADR 0004:23](docs/adr/0004-modular-monolith-of-hexagonal-modules.md:23) and the [proposed boundary rule:31](openspec/changes/m0-messaging/specs/module-boundaries/spec.md:31) say that anything shared by two features belongs in Domain.
 
 That is too broad. Shared business rules belong in Domain; an HTTP response type, query helper, authentication mechanism or persistence concern does not become domain logic merely because two features use it.
 
@@ -99,7 +99,7 @@ For example, showing rounds beside a standings summary must not require the roun
 
 ### A-03 · Allocate responsibility for workflows spanning backend modules
 
-Tournaments owns lifecycle, Registration owns admission/readiness, Competition owns matches, and Standings owns derived views. Starting or finalising a tournament needs facts from several owners. See [ADR 0004's responsibility map](/home/julio/Code/herald/docs/adr/0004-modular-monolith-of-hexagonal-modules.md:35) and [functional control points](/home/julio/Code/herald/docs/herald-functional-discovery.md:133).
+Tournaments owns lifecycle, Registration owns admission/readiness, Competition owns matches, and Standings owns derived views. Starting or finalising a tournament needs facts from several owners. See [ADR 0004's responsibility map](docs/adr/0004-modular-monolith-of-hexagonal-modules.md:35) and [functional control points](docs/herald-functional-discovery.md:133).
 
 **Recommended clarification:** identify who owns each cross-module operation, who authoritatively validates its conditions, and when its result is provisional or effective. Assign organisation/permission checks and audit responsibility to those operations. If an invariant is repeatedly awkward to enforce across a boundary, revisit the boundary before introducing a hidden dependency.
 
@@ -109,17 +109,17 @@ The high-level architecture should provide this ownership model. The concrete co
 
 ### A-04 · Make durable history an explicit architectural responsibility
 
-The proposal stores current state and dispatches events; it does not use event sourcing. Yet the product requires previous result/roster revisions, actor and reason to remain explainable. The phrase that events provide history in [ADR 0006:30](/home/julio/Code/herald/docs/adr/0006-tactical-ddd-with-domain-events.md:30), alongside [ADR 0007:18–29](/home/julio/Code/herald/docs/adr/0007-postgresql-ef-core-state-stored.md:18), does not specify who preserves that evidence.
+The proposal stores current state and dispatches events; it does not use event sourcing. Yet the product requires previous result/roster revisions, actor and reason to remain explainable. The phrase that events provide history in [ADR 0006:30](docs/adr/0006-tactical-ddd-with-domain-events.md:30), alongside [ADR 0007:18–29](docs/adr/0007-postgresql-ef-core-state-stored.md:18), does not specify who preserves that evidence.
 
 **Recommended clarification:** each owning module preserves the durable business revisions required by its operations. Operational logs and delivery mechanisms should not be the only record of a competitive decision. This fits state storage and does not require adopting event sourcing.
 
-Similarly, distinguish a command's execution outcome from a read model: [ADR 0005:16](/home/julio/Code/herald/docs/adr/0005-cqrs-with-wolverine.md:16)'s “at most the id” wording needs to accommodate the product's operation receipts and revision/conflict metadata without abandoning CQRS.
+Similarly, distinguish a command's execution outcome from a read model: [ADR 0005:16](docs/adr/0005-cqrs-with-wolverine.md:16)'s “at most the id” wording needs to accommodate the product's operation receipts and revision/conflict metadata without abandoning CQRS.
 
 **Close in:** ADRs 0005–0007 and the first H1 write/history contract.
 
 ### A-05 · Complete the frontend dependency and state-ownership model
 
-[ADR 0011:14–19](/home/julio/Code/herald/docs/adr/0011-angular-front-end-and-generated-api-contract.md:14) defines the major direction well. What remains is a small, enforceable dependency matrix:
+[ADR 0011:14–19](docs/adr/0011-angular-front-end-and-generated-api-contract.md:14) defines the major direction well. What remains is a small, enforceable dependency matrix:
 
 | Area | Intended responsibility and dependencies |
 | --- | --- |
@@ -136,7 +136,7 @@ Keep server state owned by the feature's queries/mutations and local UI state sc
 
 ### A-06 · Turn architectural intent into verified boundaries and accurate status
 
-Current [.NET architecture tests](/home/julio/Code/herald/tests/Herald.Architecture.Tests/ModuleTests.cs:16) protect the previous skeleton. `m0-messaging` plans the new tests. Frontend has no production workspace or boundary checks yet. These are pending work, not failures in an existing feature implementation.
+Current [.NET architecture tests](tests/Herald.Architecture.Tests/ModuleTests.cs:16) protect the previous skeleton. `m0-messaging` plans the new tests. Frontend has no production workspace or boundary checks yet. These are pending work, not failures in an existing feature implementation.
 
 **Recommended clarification:** require checks for module independence, Domain independence and backend slice independence as the migration lands. Add frontend import checks with the first workspace, including shared-library direction and feature entry points. Demonstrate the rules with representative violations rather than relying only on empty folders or naming conventions.
 
@@ -155,7 +155,7 @@ The principal recommendation is therefore to **complete and make verifiable the 
 
 ## Review scope and validation
 
-Reviewed current source files in `/home/julio/Code/herald`, including uncommitted documentation; local branches and worktrees; current remote branches, open PRs and the relevant files on remote `main`; the completed frontend strategy chat; accepted specifications, proposed deltas and current architecture code via CodeGraph.
+Reviewed current source files in `<repository>`, including uncommitted documentation; local branches and worktrees; current remote branches, open PRs and the relevant files on remote `main`; the completed frontend strategy chat; accepted specifications, proposed deltas and current architecture code via CodeGraph.
 
 `openspec validate m0-messaging --strict` passed. This validates proposal structure, not implementation or runtime behaviour. No product tests or messaging spike were run for this review. No production code, existing ADR, proposal or original working-tree change was modified. This note and its input manifest are the only additions for this review.
 

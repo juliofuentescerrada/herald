@@ -69,3 +69,12 @@ On 13 November 2026 the repository was assessed before being made public:
 
 - **Q-1 Archived changes:** may be edited to redact the personal paths and the tenant domain (D-5 as written).
 - **Q-2 CI scan:** the pull request's commits only; the whole history is scanned once, in this change.
+
+## Redaction (13 November 2026, task 2.3)
+
+The rule's first full run found 323 personal paths in 14 files and the tenant domain in one archived design, the values the assessment had found, and nothing else. They were replaced:
+- `file:///home/<name>/Code/herald/` and `/home/<name>/Code/herald/` became paths relative to the repository: the mockup manifests' `sourceUrl` and links in archived reviews;
+- the bare checkout path became `<repository>`, and the other home paths became `<home>/`;
+- the External ID domain became `<directory>.onmicrosoft.com`.
+
+The archived changes of 8 and 9 November 2026 hold these placeholders since this date (Q-1). Their findings are otherwise unchanged.

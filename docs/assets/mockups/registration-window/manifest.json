@@ -7,7 +7,7 @@
       "label": "not open ready",
       "file": "registration-window-not-open-ready-desktop.png",
       "source": "prototypes/frontend/registration-window-states.html?state=not-open-ready",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/registration-window-states.html?state=not-open-ready",
+      "sourceUrl": "prototypes/frontend/registration-window-states.html?state=not-open-ready",
       "viewport": [
         1440,
         1000
@@ -30,7 +30,7 @@
       "label": "not open ready",
       "file": "registration-window-not-open-ready-mobile.png",
       "source": "prototypes/frontend/registration-window-states.html?state=not-open-ready",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/registration-window-states.html?state=not-open-ready",
+      "sourceUrl": "prototypes/frontend/registration-window-states.html?state=not-open-ready",
       "viewport": [
         390,
         844
@@ -53,7 +53,7 @@
       "label": "not open missing dates",
       "file": "registration-window-not-open-missing-dates-desktop.png",
       "source": "prototypes/frontend/registration-window-states.html?state=not-open-missing-dates",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/registration-window-states.html?state=not-open-missing-dates",
+      "sourceUrl": "prototypes/frontend/registration-window-states.html?state=not-open-missing-dates",
       "viewport": [
         1440,
         1000
@@ -76,7 +76,7 @@
       "label": "not open missing dates",
       "file": "registration-window-not-open-missing-dates-mobile.png",
       "source": "prototypes/frontend/registration-window-states.html?state=not-open-missing-dates",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/registration-window-states.html?state=not-open-missing-dates",
+      "sourceUrl": "prototypes/frontend/registration-window-states.html?state=not-open-missing-dates",
       "viewport": [
         390,
         844
@@ -99,7 +99,7 @@
       "label": "unsaved changes",
       "file": "registration-window-unsaved-changes-desktop.png",
       "source": "prototypes/frontend/registration-window-states.html?state=unsaved-changes",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/registration-window-states.html?state=unsaved-changes",
+      "sourceUrl": "prototypes/frontend/registration-window-states.html?state=unsaved-changes",
       "viewport": [
         1440,
         1000
@@ -122,7 +122,7 @@
       "label": "unsaved changes",
       "file": "registration-window-unsaved-changes-mobile.png",
       "source": "prototypes/frontend/registration-window-states.html?state=unsaved-changes",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/registration-window-states.html?state=unsaved-changes",
+      "sourceUrl": "prototypes/frontend/registration-window-states.html?state=unsaved-changes",
       "viewport": [
         390,
         844
@@ -145,7 +145,7 @@
       "label": "opening",
       "file": "registration-window-opening-desktop.png",
       "source": "prototypes/frontend/registration-window-states.html?state=opening",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/registration-window-states.html?state=opening",
+      "sourceUrl": "prototypes/frontend/registration-window-states.html?state=opening",
       "viewport": [
         1440,
         1000
@@ -168,7 +168,7 @@
       "label": "opening",
       "file": "registration-window-opening-mobile.png",
       "source": "prototypes/frontend/registration-window-states.html?state=opening",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/registration-window-states.html?state=opening",
+      "sourceUrl": "prototypes/frontend/registration-window-states.html?state=opening",
       "viewport": [
         390,
         844
@@ -191,7 +191,7 @@
       "label": "open",
       "file": "registration-window-open-desktop.png",
       "source": "prototypes/frontend/registration-window-states.html?state=open",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/registration-window-states.html?state=open",
+      "sourceUrl": "prototypes/frontend/registration-window-states.html?state=open",
       "viewport": [
         1440,
         1000
@@ -214,7 +214,7 @@
       "label": "open",
       "file": "registration-window-open-mobile.png",
       "source": "prototypes/frontend/registration-window-states.html?state=open",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/registration-window-states.html?state=open",
+      "sourceUrl": "prototypes/frontend/registration-window-states.html?state=open",
       "viewport": [
         390,
         844
@@ -237,7 +237,7 @@
       "label": "open failed",
       "file": "registration-window-open-failed-desktop.png",
       "source": "prototypes/frontend/registration-window-states.html?state=open-failed",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/registration-window-states.html?state=open-failed",
+      "sourceUrl": "prototypes/frontend/registration-window-states.html?state=open-failed",
       "viewport": [
         1440,
         1000
@@ -260,7 +260,7 @@
       "label": "open failed",
       "file": "registration-window-open-failed-mobile.png",
       "source": "prototypes/frontend/registration-window-states.html?state=open-failed",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/registration-window-states.html?state=open-failed",
+      "sourceUrl": "prototypes/frontend/registration-window-states.html?state=open-failed",
       "viewport": [
         390,
         844
@@ -283,7 +283,7 @@
       "label": "closing",
       "file": "registration-window-closing-desktop.png",
       "source": "prototypes/frontend/registration-window-states.html?state=closing",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/registration-window-states.html?state=closing",
+      "sourceUrl": "prototypes/frontend/registration-window-states.html?state=closing",
       "viewport": [
         1440,
         1000
@@ -306,7 +306,7 @@
       "label": "closing",
       "file": "registration-window-closing-mobile.png",
       "source": "prototypes/frontend/registration-window-states.html?state=closing",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/registration-window-states.html?state=closing",
+      "sourceUrl": "prototypes/frontend/registration-window-states.html?state=closing",
       "viewport": [
         390,
         844
@@ -329,7 +329,7 @@
       "label": "closed",
       "file": "registration-window-closed-desktop.png",
       "source": "prototypes/frontend/registration-window-states.html?state=closed",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/registration-window-states.html?state=closed",
+      "sourceUrl": "prototypes/frontend/registration-window-states.html?state=closed",
       "viewport": [
         1440,
         1000
@@ -352,7 +352,7 @@
       "label": "closed",
       "file": "registration-window-closed-mobile.png",
       "source": "prototypes/frontend/registration-window-states.html?state=closed",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/registration-window-states.html?state=closed",
+      "sourceUrl": "prototypes/frontend/registration-window-states.html?state=closed",
       "viewport": [
         390,
         844
@@ -375,7 +375,7 @@
       "label": "conflict",
       "file": "registration-window-conflict-desktop.png",
       "source": "prototypes/frontend/registration-window-states.html?state=conflict",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/registration-window-states.html?state=conflict",
+      "sourceUrl": "prototypes/frontend/registration-window-states.html?state=conflict",
       "viewport": [
         1440,
         1000
@@ -398,7 +398,7 @@
       "label": "conflict",
       "file": "registration-window-conflict-mobile.png",
       "source": "prototypes/frontend/registration-window-states.html?state=conflict",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/registration-window-states.html?state=conflict",
+      "sourceUrl": "prototypes/frontend/registration-window-states.html?state=conflict",
       "viewport": [
         390,
         844
@@ -421,7 +421,7 @@
       "label": "open date removed",
       "file": "registration-window-open-date-removed-desktop.png",
       "source": "prototypes/frontend/registration-window-states.html?state=open-date-removed",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/registration-window-states.html?state=open-date-removed",
+      "sourceUrl": "prototypes/frontend/registration-window-states.html?state=open-date-removed",
       "viewport": [
         1440,
         1000
@@ -444,7 +444,7 @@
       "label": "open date removed",
       "file": "registration-window-open-date-removed-mobile.png",
       "source": "prototypes/frontend/registration-window-states.html?state=open-date-removed",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/registration-window-states.html?state=open-date-removed",
+      "sourceUrl": "prototypes/frontend/registration-window-states.html?state=open-date-removed",
       "viewport": [
         390,
         844
@@ -467,7 +467,7 @@
       "label": "list registration states",
       "file": "registration-window-list-registration-states-desktop.png",
       "source": "prototypes/frontend/registration-window-states.html?state=list-registration-states",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/registration-window-states.html?state=list-registration-states",
+      "sourceUrl": "prototypes/frontend/registration-window-states.html?state=list-registration-states",
       "viewport": [
         1440,
         1000
@@ -490,7 +490,7 @@
       "label": "list registration states",
       "file": "registration-window-list-registration-states-mobile.png",
       "source": "prototypes/frontend/registration-window-states.html?state=list-registration-states",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/registration-window-states.html?state=list-registration-states",
+      "sourceUrl": "prototypes/frontend/registration-window-states.html?state=list-registration-states",
       "viewport": [
         390,
         844

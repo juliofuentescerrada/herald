@@ -1,6 +1,6 @@
 {
   "review_date": "2026-11-07",
-  "source_root": "/home/julio/Code/herald",
+  "source_root": "<repository>",
   "source_head": "08c3308dcf775bc03add59a768303d7d07cd1bc0",
   "includes_uncommitted_source_changes": true,
   "sources": [

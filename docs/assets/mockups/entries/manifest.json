@@ -7,7 +7,7 @@
       "label": "entries empty open",
       "file": "entries-entries-empty-open-desktop.png",
       "source": "prototypes/frontend/entries-states.html?state=entries-empty-open",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=entries-empty-open",
+      "sourceUrl": "prototypes/frontend/entries-states.html?state=entries-empty-open",
       "viewport": [
         1440,
         1000
@@ -30,7 +30,7 @@
       "label": "entries empty open",
       "file": "entries-entries-empty-open-mobile.png",
       "source": "prototypes/frontend/entries-states.html?state=entries-empty-open",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=entries-empty-open",
+      "sourceUrl": "prototypes/frontend/entries-states.html?state=entries-empty-open",
       "viewport": [
         390,
         844
@@ -53,7 +53,7 @@
       "label": "entries not open",
       "file": "entries-entries-not-open-desktop.png",
       "source": "prototypes/frontend/entries-states.html?state=entries-not-open",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=entries-not-open",
+      "sourceUrl": "prototypes/frontend/entries-states.html?state=entries-not-open",
       "viewport": [
         1440,
         1000
@@ -76,7 +76,7 @@
       "label": "entries not open",
       "file": "entries-entries-not-open-mobile.png",
       "source": "prototypes/frontend/entries-states.html?state=entries-not-open",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=entries-not-open",
+      "sourceUrl": "prototypes/frontend/entries-states.html?state=entries-not-open",
       "viewport": [
         390,
         844
@@ -99,7 +99,7 @@
       "label": "entries automatic full",
       "file": "entries-entries-automatic-full-desktop.png",
       "source": "prototypes/frontend/entries-states.html?state=entries-automatic-full",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=entries-automatic-full",
+      "sourceUrl": "prototypes/frontend/entries-states.html?state=entries-automatic-full",
       "viewport": [
         1440,
         1000
@@ -122,7 +122,7 @@
       "label": "entries automatic full",
       "file": "entries-entries-automatic-full-mobile.png",
       "source": "prototypes/frontend/entries-states.html?state=entries-automatic-full",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=entries-automatic-full",
+      "sourceUrl": "prototypes/frontend/entries-states.html?state=entries-automatic-full",
       "viewport": [
         390,
         844
@@ -145,7 +145,7 @@
       "label": "entries manual team",
       "file": "entries-entries-manual-team-desktop.png",
       "source": "prototypes/frontend/entries-states.html?state=entries-manual-team",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=entries-manual-team",
+      "sourceUrl": "prototypes/frontend/entries-states.html?state=entries-manual-team",
       "viewport": [
         1440,
         1000
@@ -168,7 +168,7 @@
       "label": "entries manual team",
       "file": "entries-entries-manual-team-mobile.png",
       "source": "prototypes/frontend/entries-states.html?state=entries-manual-team",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=entries-manual-team",
+      "sourceUrl": "prototypes/frontend/entries-states.html?state=entries-manual-team",
       "viewport": [
         390,
         844
@@ -191,7 +191,7 @@
       "label": "entries closed",
       "file": "entries-entries-closed-desktop.png",
       "source": "prototypes/frontend/entries-states.html?state=entries-closed",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=entries-closed",
+      "sourceUrl": "prototypes/frontend/entries-states.html?state=entries-closed",
       "viewport": [
         1440,
         1000
@@ -214,7 +214,7 @@
       "label": "entries closed",
       "file": "entries-entries-closed-mobile.png",
       "source": "prototypes/frontend/entries-states.html?state=entries-closed",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=entries-closed",
+      "sourceUrl": "prototypes/frontend/entries-states.html?state=entries-closed",
       "viewport": [
         390,
         844
@@ -237,7 +237,7 @@
       "label": "add existing",
       "file": "entries-add-existing-desktop.png",
       "source": "prototypes/frontend/entries-states.html?state=add-existing",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=add-existing",
+      "sourceUrl": "prototypes/frontend/entries-states.html?state=add-existing",
       "viewport": [
         1440,
         1000
@@ -260,7 +260,7 @@
       "label": "add existing",
       "file": "entries-add-existing-mobile.png",
       "source": "prototypes/frontend/entries-states.html?state=add-existing",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=add-existing",
+      "sourceUrl": "prototypes/frontend/entries-states.html?state=add-existing",
       "viewport": [
         390,
         844
@@ -283,7 +283,7 @@
       "label": "add new",
       "file": "entries-add-new-desktop.png",
       "source": "prototypes/frontend/entries-states.html?state=add-new",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=add-new",
+      "sourceUrl": "prototypes/frontend/entries-states.html?state=add-new",
       "viewport": [
         1440,
         1000
@@ -306,7 +306,7 @@
       "label": "add new",
       "file": "entries-add-new-mobile.png",
       "source": "prototypes/frontend/entries-states.html?state=add-new",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=add-new",
+      "sourceUrl": "prototypes/frontend/entries-states.html?state=add-new",
       "viewport": [
         390,
         844
@@ -329,7 +329,7 @@
       "label": "add duplicate",
       "file": "entries-add-duplicate-desktop.png",
       "source": "prototypes/frontend/entries-states.html?state=add-duplicate",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=add-duplicate",
+      "sourceUrl": "prototypes/frontend/entries-states.html?state=add-duplicate",
       "viewport": [
         1440,
         1000
@@ -352,7 +352,7 @@
       "label": "add duplicate",
       "file": "entries-add-duplicate-mobile.png",
       "source": "prototypes/frontend/entries-states.html?state=add-duplicate",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=add-duplicate",
+      "sourceUrl": "prototypes/frontend/entries-states.html?state=add-duplicate",
       "viewport": [
         390,
         844
@@ -375,7 +375,7 @@
       "label": "adding",
       "file": "entries-adding-desktop.png",
       "source": "prototypes/frontend/entries-states.html?state=adding",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=adding",
+      "sourceUrl": "prototypes/frontend/entries-states.html?state=adding",
       "viewport": [
         1440,
         1000
@@ -398,7 +398,7 @@
       "label": "adding",
       "file": "entries-adding-mobile.png",
       "source": "prototypes/frontend/entries-states.html?state=adding",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=adding",
+      "sourceUrl": "prototypes/frontend/entries-states.html?state=adding",
       "viewport": [
         390,
         844
@@ -421,7 +421,7 @@
       "label": "add failed",
       "file": "entries-add-failed-desktop.png",
       "source": "prototypes/frontend/entries-states.html?state=add-failed",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=add-failed",
+      "sourceUrl": "prototypes/frontend/entries-states.html?state=add-failed",
       "viewport": [
         1440,
         1000
@@ -444,7 +444,7 @@
       "label": "add failed",
       "file": "entries-add-failed-mobile.png",
       "source": "prototypes/frontend/entries-states.html?state=add-failed",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=add-failed",
+      "sourceUrl": "prototypes/frontend/entries-states.html?state=add-failed",
       "viewport": [
         390,
         844
@@ -467,7 +467,7 @@
       "label": "admit unavailable",
       "file": "entries-admit-unavailable-desktop.png",
       "source": "prototypes/frontend/entries-states.html?state=admit-unavailable",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=admit-unavailable",
+      "sourceUrl": "prototypes/frontend/entries-states.html?state=admit-unavailable",
       "viewport": [
         1440,
         1000
@@ -490,7 +490,7 @@
       "label": "admit unavailable",
       "file": "entries-admit-unavailable-mobile.png",
       "source": "prototypes/frontend/entries-states.html?state=admit-unavailable",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=admit-unavailable",
+      "sourceUrl": "prototypes/frontend/entries-states.html?state=admit-unavailable",
       "viewport": [
         390,
         844
@@ -513,7 +513,7 @@
       "label": "admit out of order",
       "file": "entries-admit-out-of-order-desktop.png",
       "source": "prototypes/frontend/entries-states.html?state=admit-out-of-order",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=admit-out-of-order",
+      "sourceUrl": "prototypes/frontend/entries-states.html?state=admit-out-of-order",
       "viewport": [
         1440,
         1000
@@ -536,7 +536,7 @@
       "label": "admit out of order",
       "file": "entries-admit-out-of-order-mobile.png",
       "source": "prototypes/frontend/entries-states.html?state=admit-out-of-order",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=admit-out-of-order",
+      "sourceUrl": "prototypes/frontend/entries-states.html?state=admit-out-of-order",
       "viewport": [
         390,
         844
@@ -559,7 +559,7 @@
       "label": "cancel confirm",
       "file": "entries-cancel-confirm-desktop.png",
       "source": "prototypes/frontend/entries-states.html?state=cancel-confirm",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=cancel-confirm",
+      "sourceUrl": "prototypes/frontend/entries-states.html?state=cancel-confirm",
       "viewport": [
         1440,
         1000
@@ -582,7 +582,7 @@
       "label": "cancel confirm",
       "file": "entries-cancel-confirm-mobile.png",
       "source": "prototypes/frontend/entries-states.html?state=cancel-confirm",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=cancel-confirm",
+      "sourceUrl": "prototypes/frontend/entries-states.html?state=cancel-confirm",
       "viewport": [
         390,
         844
@@ -605,7 +605,7 @@
       "label": "cancel confirm closed",
       "file": "entries-cancel-confirm-closed-desktop.png",
       "source": "prototypes/frontend/entries-states.html?state=cancel-confirm-closed",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=cancel-confirm-closed",
+      "sourceUrl": "prototypes/frontend/entries-states.html?state=cancel-confirm-closed",
       "viewport": [
         1440,
         1000
@@ -628,7 +628,7 @@
       "label": "cancel confirm closed",
       "file": "entries-cancel-confirm-closed-mobile.png",
       "source": "prototypes/frontend/entries-states.html?state=cancel-confirm-closed",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=cancel-confirm-closed",
+      "sourceUrl": "prototypes/frontend/entries-states.html?state=cancel-confirm-closed",
       "viewport": [
         390,
         844
@@ -651,7 +651,7 @@
       "label": "conflict",
       "file": "entries-conflict-desktop.png",
       "source": "prototypes/frontend/entries-states.html?state=conflict",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=conflict",
+      "sourceUrl": "prototypes/frontend/entries-states.html?state=conflict",
       "viewport": [
         1440,
         1000
@@ -674,7 +674,7 @@
       "label": "conflict",
       "file": "entries-conflict-mobile.png",
       "source": "prototypes/frontend/entries-states.html?state=conflict",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=conflict",
+      "sourceUrl": "prototypes/frontend/entries-states.html?state=conflict",
       "viewport": [
         390,
         844
@@ -697,7 +697,7 @@
       "label": "over capacity",
       "file": "entries-over-capacity-desktop.png",
       "source": "prototypes/frontend/entries-states.html?state=over-capacity",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=over-capacity",
+      "sourceUrl": "prototypes/frontend/entries-states.html?state=over-capacity",
       "viewport": [
         1440,
         1000
@@ -720,7 +720,7 @@
       "label": "over capacity",
       "file": "entries-over-capacity-mobile.png",
       "source": "prototypes/frontend/entries-states.html?state=over-capacity",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=over-capacity",
+      "sourceUrl": "prototypes/frontend/entries-states.html?state=over-capacity",
       "viewport": [
         390,
         844
@@ -743,7 +743,7 @@
       "label": "loading",
       "file": "entries-loading-desktop.png",
       "source": "prototypes/frontend/entries-states.html?state=loading",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=loading",
+      "sourceUrl": "prototypes/frontend/entries-states.html?state=loading",
       "viewport": [
         1440,
         1000
@@ -766,7 +766,7 @@
       "label": "loading",
       "file": "entries-loading-mobile.png",
       "source": "prototypes/frontend/entries-states.html?state=loading",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=loading",
+      "sourceUrl": "prototypes/frontend/entries-states.html?state=loading",
       "viewport": [
         390,
         844
@@ -789,7 +789,7 @@
       "label": "failed",
       "file": "entries-failed-desktop.png",
       "source": "prototypes/frontend/entries-states.html?state=failed",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=failed",
+      "sourceUrl": "prototypes/frontend/entries-states.html?state=failed",
       "viewport": [
         1440,
         1000
@@ -812,7 +812,7 @@
       "label": "failed",
       "file": "entries-failed-mobile.png",
       "source": "prototypes/frontend/entries-states.html?state=failed",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=failed",
+      "sourceUrl": "prototypes/frontend/entries-states.html?state=failed",
       "viewport": [
         390,
         844
@@ -835,7 +835,7 @@
       "label": "entries link",
       "file": "entries-entries-link-desktop.png",
       "source": "prototypes/frontend/entries-states.html?state=entries-link",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=entries-link",
+      "sourceUrl": "prototypes/frontend/entries-states.html?state=entries-link",
       "viewport": [
         1440,
         1000
@@ -858,7 +858,7 @@
       "label": "entries link",
       "file": "entries-entries-link-mobile.png",
       "source": "prototypes/frontend/entries-states.html?state=entries-link",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=entries-link",
+      "sourceUrl": "prototypes/frontend/entries-states.html?state=entries-link",
       "viewport": [
         390,
         844
@@ -881,7 +881,7 @@
       "label": "fields locked",
       "file": "entries-fields-locked-desktop.png",
       "source": "prototypes/frontend/entries-states.html?state=fields-locked",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=fields-locked",
+      "sourceUrl": "prototypes/frontend/entries-states.html?state=fields-locked",
       "viewport": [
         1440,
         1000
@@ -904,7 +904,7 @@
       "label": "fields locked",
       "file": "entries-fields-locked-mobile.png",
       "source": "prototypes/frontend/entries-states.html?state=fields-locked",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=fields-locked",
+      "sourceUrl": "prototypes/frontend/entries-states.html?state=fields-locked",
       "viewport": [
         390,
         844
@@ -927,7 +927,7 @@
       "label": "capacity rejected",
       "file": "entries-capacity-rejected-desktop.png",
       "source": "prototypes/frontend/entries-states.html?state=capacity-rejected",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=capacity-rejected",
+      "sourceUrl": "prototypes/frontend/entries-states.html?state=capacity-rejected",
       "viewport": [
         1440,
         1000
@@ -950,7 +950,7 @@
       "label": "capacity rejected",
       "file": "entries-capacity-rejected-mobile.png",
       "source": "prototypes/frontend/entries-states.html?state=capacity-rejected",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=capacity-rejected",
+      "sourceUrl": "prototypes/frontend/entries-states.html?state=capacity-rejected",
       "viewport": [
         390,
         844
@@ -973,7 +973,7 @@
       "label": "list with entries",
       "file": "entries-list-with-entries-desktop.png",
       "source": "prototypes/frontend/entries-states.html?state=list-with-entries",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=list-with-entries",
+      "sourceUrl": "prototypes/frontend/entries-states.html?state=list-with-entries",
       "viewport": [
         1440,
         1000
@@ -996,7 +996,7 @@
       "label": "list with entries",
       "file": "entries-list-with-entries-mobile.png",
       "source": "prototypes/frontend/entries-states.html?state=list-with-entries",
-      "sourceUrl": "file:///home/julio/Code/herald/prototypes/frontend/entries-states.html?state=list-with-entries",
+      "sourceUrl": "prototypes/frontend/entries-states.html?state=list-with-entries",
       "viewport": [
         390,
         844
