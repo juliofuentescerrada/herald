@@ -1,0 +1,7 @@
+/* Batch 1 additions over the check-in composition. */
+.sp-tabs{display:flex;gap:var(--space-4);margin-top:var(--space-4);border-bottom:1px solid var(--line)}.sp-tabs a{padding:var(--space-2) 0;color:var(--secondary);text-decoration:none}.sp-tabs a[aria-current="page"]{color:var(--ink);font-weight:600;border-bottom:3px solid var(--ink)}
+.sp-checks{list-style:none;margin:var(--space-4) 0;padding:0;display:grid;gap:var(--space-3)}.sp-checks li{display:flex;gap:var(--space-4);align-items:flex-start}.sp-checks p{margin:var(--space-1) 0 0}.sp-checks .check-label{min-width:6.5rem;justify-content:center}
+.sp-round h3{margin:0 0 var(--space-2)}.sp-round li{display:grid;grid-template-columns:1fr auto 1fr;gap:var(--space-3);align-items:center}
+.sp-seeding{border:0;padding:0;margin:var(--space-4) 0;display:grid;gap:var(--space-2)}.sp-seeding legend{font-weight:600;margin-bottom:var(--space-2)}
+#state-links strong{display:block;margin-top:var(--space-3)}
+@media(max-width:699px){.sp-round li{grid-template-columns:1fr}.sp-round li .help{display:none}.sp-checks li{flex-direction:column;gap:var(--space-1)}}
