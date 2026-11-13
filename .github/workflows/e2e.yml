@@ -13,7 +13,31 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  # Classifies the change (ci-path-filters D-1, D-2): the code jobs run only when it touches code.
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      code: ${{ steps.classify.outputs.code }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 2
+      - id: classify
+        env:
+          EVENT: ${{ github.event_name }}
+          BEFORE: ${{ github.event.before }}
+        run: |
+          if [ "$EVENT" = "pull_request" ]; then
+            base="$(git rev-parse HEAD^1)"
+          else
+            base="$BEFORE"
+            git fetch --no-tags --depth=1 origin "$base" 2>/dev/null || true
+          fi
+          node scripts/ci-changes.mjs "$base" HEAD >> "$GITHUB_OUTPUT"
+
   e2e:
+    needs: changes
+    if: needs.changes.outputs.code == 'true'
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
