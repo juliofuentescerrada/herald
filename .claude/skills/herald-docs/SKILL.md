@@ -17,6 +17,7 @@ description: Herald's rules for maintaining documentation and decisions. Use whe
 | Detailed H3 elimination, single-match and profile rules and target acceptance | `docs/herald-h3-functional-discovery.md`, linked from the baseline and its register |
 | Detailed H4 Swiss/connected-consumer rules and target acceptance | `docs/herald-h4-functional-discovery.md`, linked from the baseline and its register |
 | Detailed H5 combined-stage/live/ecosystem rules and target acceptance | `docs/herald-h5-functional-discovery.md`, linked from the baseline and its register |
+| Detailed H6 composite/substitution/amendment/submission rules and target acceptance | `docs/herald-h6-functional-discovery.md`, linked from the baseline and its register |
 | Architecture decisions | `docs/adr/` |
 | Visual contracts and screen/state coverage | `docs/herald-visual-direction.md` |
 | A change's design notes, measurements and reviews | the change's `design.md` |

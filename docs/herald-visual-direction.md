@@ -360,6 +360,25 @@ The [H5 discovery](herald-h5-functional-discovery.md) owns functional detail and
 
 For every applicable surface include desktop/mobile, keyboard/focus, loading/empty/denied, long aliases and accessible explanations independent of colour. Keep focus/scroll stable during live updates, avoid unsolicited focus movement and excessive live-region announcements, and provide an accessible list alternative to the bracket. Review large-group/cut navigation at the agreed maximum; numbers and delivery status must not imply inbox reading or guaranteed instant freshness. Follow §4/§5/§7.2/§8.1 composition and the `herald-screens` process; H5 §13 supplies behavioural acceptance, not screenshots of executed tests.
 
+<a id="h6-screen-state-inventory"></a>
+
+### 9.8 H6 screen/state inventory
+
+The [H6 discovery](herald-h6-functional-discovery.md) owns functional detail and target acceptance. This is a future inventory for reviewed implementation slices, not approved mockups or implemented screens. No UI changes in this documentary discovery.
+
+| Surface | States and comparisons to explore |
+| --- | --- |
+| Profile and requirement setup | Direct versus composite, three-board league/ordered direct series, incompatible combinations, fixed profile, clinch/completion policy, substitution/amendment opt-in, player/team game-list scope and reference deadline; individual without human roster fields |
+| Board allocation and reveal | Own draft/invalid duplicate or ineligible player, one side locked/other pending, rival status without content, both locked joint reveal, revealed allocation corrected with fresh review/locks, revoked/understrength/start blocker |
+| Parent/board operations | Board pending/reported/disputed/effective, partial exact units versus parent standings, 2–0 clinch with unresolved third board, all-zero adjudication, updating parent, administrative override/terminated unfinished boards, final review and cancellation |
+| Participation timeline/substitution | Starting lineup versus actual game participants, eligible/unused reserve, requested/approved/rejected/cancelled/stale change, no-next-game, pending readiness, boundary/start conflict, allowance used/no return, unknown response/receipt, disconnected same player |
+| Exceptional roster review | Announced allowance/disabled profile, outgoing and incoming history, prior opposing-team blocker, current round incomplete/future match started, required submission exception, independent reviewer unavailable, approved future roster and invalidated unstarted locks, historical roster unchanged |
+| Private game submission | Correct individual/player/team slot, missing/draft/version conflict/uncertain save, deadline and effective lock, inspection pending/accepted/issue, exception deadline/waiver, guest delegated source, denied content with permitted status, retained input after late failure, inert text/size error |
+| Protected release/history | Private default, explicit assigned inspection, redacted audit and content expired, optional separately approved post-final named-version preview/release, superseded result/submission distinct from released version, access revoked and downloaded-content limitation |
+| Correction and public read | Child→parent→standings/appearances impact, safe pending/rebuild, published/started dependency blocker, administrative override review, source versions, public aggregate board results without private player mapping/roster/text |
+
+Explore desktop/mobile and keyboard/focus, long team/player aliases, empty/loading/error/denied, stale/failed-save with preserved input and uncertain-response recovery for every applicable surface. Keep board-level and parent-level actions/status distinct; display exact half-units intelligibly without relying on colour. Use accessible board lists/tables and participation timelines, clear current-acting-team context and no private content in public captures. Follow §4/§5/§7.2/§8.1 and `herald-screens`; H6 §11 supplies behavioural targets, not executed screenshot evidence.
+
 ## 10. Accessibility and semantic acceptance
 
 - Target WCAG 2.2 AA. Verify normal text at least 4.5:1 and large text at least 3:1. Validate control boundaries, focus visibility, non-text contrast and states separately before implementation.

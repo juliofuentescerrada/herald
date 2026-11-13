@@ -25,6 +25,8 @@ context: |
     D-48–56 remain proposed in the baseline register; no prerequisite milestone completion is implied.
   - docs/herald-h5-functional-discovery.md: detailed H5 stages/live/ecosystem extension;
     D-57–65 remain proposed in the baseline register; target scenarios are not executed tests.
+  - docs/herald-h6-functional-discovery.md: detailed H6 advanced-team/game-submission extension;
+    D-66–74 remain proposed in the baseline register; earlier fixed-roster profiles stay unchanged.
   - docs/roadmap.md: delivery order, milestones and exit criteria; batches' progress is in GitHub
     Issues (ADR 0018). openspec/specs: implemented behaviour.
 
