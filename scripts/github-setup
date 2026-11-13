@@ -1,0 +1,52 @@
+#!/usr/bin/env bash
+# Creates or updates the labels and milestones of the delivery tracking (ADR 0018, batch-delivery D-4), with the
+# maintainer's gh. Idempotent: run it again at any time. The project board is a manual step
+# (docs/operations/delivery-tracking.md).
+#   scripts/github-setup             create or update them in the current repository
+#   scripts/github-setup --dry-run   print what it would do, without calling GitHub
+set -euo pipefail
+dry_run=false
+[ "${1:-}" = "--dry-run" ] && dry_run=true
+
+# name|colour|description
+labels=(
+  "batch|5319e7|A batch of three to five slices that share decisions and screens (ADR 0018)"
+  "slice|1d76db|One OpenSpec change of a batch, implemented in one pull request"
+  "batch-proposals|0e8a16|The pull request with a batch's proposals and prototypes; merging it approves the batch"
+  "needs-decision|d93f0b|Waits for the maintainer to settle a rule the decision register does not"
+  "in-progress|fbca04|A slice an agent session is implementing (at most two at once)"
+  "ready-to-test|0e8a16|A slice or batch waiting for the maintainer's test round"
+  "feedback|c5def5|The maintainer's feedback is waiting for the agent"
+  "agent:start|000000|Starts or resumes the slice in an agent session"
+)
+
+# title|description
+milestones=(
+  "H1 Operator league|The remaining H1 slices; exit criteria in docs/roadmap.md"
+  "M4 Cloud|Azure deployment and the preview slot; exit criteria in docs/roadmap.md"
+  "H2 Participant portal|Participants and representatives; exit criteria in docs/roadmap.md"
+)
+
+for entry in "${labels[@]}"; do
+  IFS='|' read -r name colour description <<< "$entry"
+  if $dry_run; then
+    echo "label: create or update '${name}' (#${colour}): ${description}"
+  else
+    gh label create "$name" --color "$colour" --description "$description" --force >/dev/null
+    echo "label '${name}' ready"
+  fi
+done
+
+existing=""
+$dry_run || existing=$(gh api 'repos/{owner}/{repo}/milestones?state=all&per_page=100' --jq '.[].title')
+for entry in "${milestones[@]}"; do
+  IFS='|' read -r title description <<< "$entry"
+  if $dry_run; then
+    echo "milestone: create '${title}' unless it exists: ${description}"
+  elif grep -qxF "$title" <<< "$existing"; then
+    echo "milestone '${title}' already exists"
+  else
+    gh api -X POST 'repos/{owner}/{repo}/milestones' -f title="$title" -f description="$description" >/dev/null
+    echo "milestone '${title}' created"
+  fi
+done
