@@ -29,8 +29,9 @@ rules:
       applicable (herald-screens skill).
     - List the notifiable facts the change introduces, or state that it introduces none (ADR 0017).
   design:
-    - Reference the mockups or prototypes of each affected screen; a proposal with missing
-      mockups stays pending visual input (herald-screens skill).
+    - Reference the mockups or prototypes of each affected screen; in a batch, the prototypes in
+      prototypes/frontend/ reviewed in the batch's proposals pull request; outside a batch, a
+      proposal with missing mockups stays pending visual input (herald-screens skill).
     - Explain any change to a module boundary, cross-module transition or integration contract,
       with its owner, authoritative conditions and revisions.
     - Measurements, visual comparisons and acceptance reviews are recorded here.
