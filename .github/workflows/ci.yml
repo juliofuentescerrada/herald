@@ -1,21 +1,49 @@
 name: CI
 
+# Drafts run nothing (ci-path-filters D-3): CI runs when a pull request is opened ready, marked ready or updated.
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
   push:
     branches: [main]
 
 permissions:
   contents: read
 
+# A newer push cancels a pull request's run. On main each merge has its own group and completes: the next merge's
+# classification looks only at its own changes, so cancelling or queueing would drop a merge's checks (ci-path-filters D-2).
 concurrency:
-  group: ci-${{ github.ref }}
-  cancel-in-progress: true
+  group: ci-${{ github.ref == 'refs/heads/main' && github.sha || github.ref }}
+  cancel-in-progress: ${{ github.ref != 'refs/heads/main' }}
 
 jobs:
+  # Classifies the change (ci-path-filters D-1, D-2): the code jobs run only when it touches code.
+  changes:
+    if: github.event_name == 'push' || !github.event.pull_request.draft
+    runs-on: ubuntu-latest
+    outputs:
+      code: ${{ steps.classify.outputs.code }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 2
+      - id: classify
+        env:
+          EVENT: ${{ github.event_name }}
+          BEFORE: ${{ github.event.before }}
+        run: |
+          if [ "$EVENT" = "pull_request" ]; then
+            base="$(git rev-parse HEAD^1)"
+          else
+            base="$BEFORE"
+            git fetch --no-tags --depth=1 origin "$base" 2>/dev/null || true
+          fi
+          node scripts/ci-changes.mjs "$base" HEAD >> "$GITHUB_OUTPUT"
+
   # Repository rules and spec traceability on every file (harness-engineering): the edit and commit hooks run
   # the same checks earlier, but can be bypassed; this job cannot.
   rules:
+    if: github.event_name == 'push' || !github.event.pull_request.draft
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -47,6 +75,9 @@ jobs:
   # Each slice's executable test script against the local application with seeded data; its screenshots are the
   # pull request's `test-script-screens` artefact (harness-engineering D-14).
   test-scripts:
+    needs: changes
+    # Runs unless the classification ran and said documentation only: a failed classification runs the code jobs.
+    if: ${{ !cancelled() && needs.changes.result != 'skipped' && needs.changes.outputs.code != 'false' }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:
@@ -83,6 +114,9 @@ jobs:
           retention-days: 14
 
   dotnet:
+    needs: changes
+    # Runs unless the classification ran and said documentation only: a failed classification runs the code jobs.
+    if: ${{ !cancelled() && needs.changes.result != 'skipped' && needs.changes.outputs.code != 'false' }}
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
@@ -105,6 +139,9 @@ jobs:
       - run: dotnet test --solution Herald.slnx -c Release --no-build
 
   web:
+    needs: changes
+    # Runs unless the classification ran and said documentation only: a failed classification runs the code jobs.
+    if: ${{ !cancelled() && needs.changes.result != 'skipped' && needs.changes.outputs.code != 'false' }}
     runs-on: ubuntu-latest
     defaults:
       run:

@@ -1,0 +1,142 @@
+// The classification of changed files for CI (ci-path-filters D-1): node --test scripts/ci-changes.test.mjs
+import assert from 'node:assert/strict';
+import { execFileSync } from 'node:child_process';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
+import { tmpdir } from 'node:os';
+import { dirname, join } from 'node:path';
+import { after, test } from 'node:test';
+import { classify, touchesCode } from './ci-changes.mjs';
+import { root } from './rules.mjs';
+
+const temp = mkdtempSync(join(tmpdir(), 'herald-ci-changes-test-'));
+after(() => rmSync(temp, { recursive: true, force: true }));
+
+// covers: continuous-integration: Only documentation and harness files change
+test('Documentation and harness files alone are not code', () => {
+  assert.equal(
+    touchesCode([
+      'docs/roadmap.md',
+      'docs/adr/0018-deliver-in-batches-tested-on-a-deployed-preview.md',
+      'openspec/changes/some-change/tasks.md',
+      'openspec/specs/agent-harness/spec.md',
+      'prototypes/frontend/check-in-states.html',
+      'README.md',
+      'CLAUDE.md',
+      'src/CLAUDE.md',
+      'web/CLAUDE.md',
+      '.claude/skills/herald-docs/SKILL.md',
+      '.claude/agents/herald-reviewer.md',
+      '.github/pull_request_template.md',
+      '.github/ISSUE_TEMPLATE/batch.yml',
+      'scripts/rules.mjs',
+      '.claude/hooks/guard.mjs',
+      '.claude/settings.json',
+      '.githooks/pre-commit',
+      'cspell.config.yaml',
+    ]),
+    false,
+  );
+});
+
+// covers: continuous-integration: A source file changes
+test('Any file outside both groups is code', () => {
+  for (const file of ['src/Herald.Host/Program.cs', 'web/projects/admin/src/main.ts', 'tests/Herald.Host.Tests/CheckInTests.cs', 'tools/Herald.Seed/Scenarios.cs', 'e2e/journeys/a.spec.ts', '.github/workflows/ci.yml', 'Directory.Packages.props', 'web/package.json', 'docs.md']) {
+    assert.equal(touchesCode(['docs/roadmap.md', file]), true, file);
+  }
+});
+
+// covers: continuous-integration: ADR 0017 changes
+test('ADR 0017 is code, because an architecture test reads its inventory', () => {
+  assert.equal(touchesCode(['docs/adr/0017-notifications-consume-fact-events.md']), true);
+});
+
+test('The classification itself is code, so a change to it cannot skip the code jobs', () => {
+  assert.equal(touchesCode(['scripts/ci-changes.mjs']), true);
+  assert.equal(touchesCode(['scripts/ci-changes.test.mjs']), true);
+});
+
+// covers: continuous-integration: The base is unknown
+test('Without a usable base the change is code', () => {
+  assert.equal(classify('0000000000000000000000000000000000000000', 'HEAD'), true);
+  assert.equal(classify('', 'HEAD'), true);
+  assert.equal(classify('not-a-commit', 'HEAD'), true);
+});
+
+// covers: continuous-integration: A file moves out of the code
+test('A real diff between two commits is classified', () => {
+  const repo = join(temp, 'repo');
+  mkdirSync(repo);
+  const git = (...args) => execFileSync('git', args, { cwd: repo, encoding: 'utf8', env: { ...process.env, CLAUDECODE: '' } }).trim();
+  const commit = (file, message) => {
+    mkdirSync(join(repo, dirname(file)), { recursive: true });
+    writeFileSync(join(repo, file), message);
+    git('add', '-A');
+    git('commit', '-q', '--no-verify', '-m', message);
+    return git('rev-parse', 'HEAD');
+  };
+  git('init', '-q', '-b', 'main');
+  git('config', 'user.email', 'test@example.org');
+  git('config', 'user.name', 'Test');
+  git('config', 'commit.gpgsign', 'false');
+  const start = commit('README.md', 'start');
+  const docs = commit('docs/roadmap.md', 'docs');
+  const code = commit('src/Program.cs', 'code');
+  assert.equal(classify(start, docs, repo), false);
+  assert.equal(classify(docs, code, repo), true);
+
+  mkdirSync(join(repo, 'docs', 'archive'), { recursive: true });
+  git('mv', 'src/Program.cs', 'docs/archive/Program.cs');
+  git('commit', '-q', '--no-verify', '-m', 'move');
+  assert.equal(classify(code, 'HEAD', repo), true, 'a file moved out of the code is still a change to the code');
+});
+
+// The workflows' jobs, read as text: each job's block under `jobs:`, keyed by its name.
+const jobsOf = (workflow) => {
+  const text = readFileSync(join(root, '.github', 'workflows', workflow), 'utf8');
+  const body = text.slice(text.indexOf('\njobs:\n'));
+  const jobs = {};
+  for (const block of body.split(/\n(?= {2}[a-z][\w-]*:\n)/).slice(1)) jobs[block.match(/^ {2}([\w-]+):/)[1]] = block;
+  return { text, jobs };
+};
+const codeOnly = /needs: changes\n(?: {4}#.*\n)? {4}if: \$\{\{ !cancelled\(\) && needs\.changes\.result != 'skipped' && needs\.changes\.outputs\.code != 'false' \}\}/;
+const notDraft = "if: github.event_name == 'push' || !github.event.pull_request.draft";
+
+// covers: continuous-integration: A documentation-only pull request
+// covers: continuous-integration: The classification fails
+test('The build, test and test-script jobs wait for the classification and run only for code', () => {
+  const { jobs } = jobsOf('ci.yml');
+  assert.deepEqual(Object.keys(jobs).sort(), ['changes', 'dotnet', 'rules', 'test-scripts', 'web']);
+  for (const job of ['dotnet', 'web', 'test-scripts']) assert.match(jobs[job], codeOnly, job);
+  assert.doesNotMatch(jobs.rules, /needs:/, 'the rules run for every ready change');
+  assert.match(jobs.changes, /node scripts\/ci-changes\.mjs/);
+});
+
+// covers: continuous-integration: A draft pull request
+test('No CI job runs on a draft, and marking it ready starts them', () => {
+  const { text, jobs } = jobsOf('ci.yml');
+  assert.match(text, /types: \[opened, synchronize, reopened, ready_for_review\]/);
+  assert.ok(jobs.changes.includes(notDraft) && jobs.rules.includes(notDraft), 'the jobs without needs skip drafts');
+});
+
+// covers: continuous-integration: A documentation-only merge
+test('The journeys after a merge wait for the classification and run only for code', () => {
+  const { jobs } = jobsOf('e2e.yml');
+  assert.match(jobs.e2e, codeOnly);
+  assert.match(jobs.changes, /node scripts\/ci-changes\.mjs/);
+});
+
+// covers: continuous-integration: Two merges in quick succession
+test('Runs on main are never cancelled or replaced, so every merge is checked', () => {
+  const ci = jobsOf('ci.yml').text;
+  assert.match(ci, /group: ci-\$\{\{ github\.ref == 'refs\/heads\/main' && github\.sha \|\| github\.ref \}\}/);
+  assert.match(ci, /cancel-in-progress: \$\{\{ github\.ref != 'refs\/heads\/main' \}\}/);
+  const e2e = jobsOf('e2e.yml').text;
+  assert.match(e2e, /group: e2e-\$\{\{ github\.sha \}\}/);
+  assert.match(e2e, /cancel-in-progress: false/);
+});
+
+test('The bootstrap workflow skips drafts too', () => {
+  const { text, jobs } = jobsOf('bootstrap.yml');
+  assert.match(text, /types: \[opened, synchronize, reopened, ready_for_review\]/);
+  assert.match(jobs.bootstrap, /!github\.event\.pull_request\.draft/);
+});
