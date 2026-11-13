@@ -1,6 +1,6 @@
 # Herald — Domain Discovery, Functional Specification and Roadmap
 
-Version 0.8 · 13 November 2026 · Consolidated baseline with the H2 functional extension
+Version 0.8 + H4 discovery · 13 November 2026 · Consolidated baseline with linked H2 and H4 extensions
 
 ## 1. Purpose and status
 
@@ -366,6 +366,8 @@ The minimum contract includes active entrants, points for outcomes/byes, rounds,
 Initial direction: minimise score gaps while respecting constraints; do not repeat opponents; assign a bye to the lowest-scoring eligible entrant without a prior bye, with a stable published tie order and only if the remaining field can be paired. A competitive bye awards win points without actually played games. Its statistical treatment is separately defined by profile.
 
 This is not a complete algorithm. Global pairing, floats, administrative-win exclusions, search limits and unsatisfiable cases require their own specification and validated examples before H4. There is no promise of official MTG Swiss. Minimum scenarios include odd groups, withdrawal, previous byes, an impossible final pairing and reproducible reconstruction. Failure is explicit, never a hidden rematch or partially published round.
+
+The [H4 extension](herald-h4-functional-discovery.md#4-swiss-pairing-and-publication) develops a complete candidate policy, exact statistical examples and failure handling for review. Its new defaults remain proposed under D-48–56; neither this summary nor the extension claims implementation or official rules compatibility.
 
 ### 7.5 Combined stages
 
@@ -776,6 +778,8 @@ Exit criteria:
 - Recovery after a lost response neither repeats effects nor requires simulating an already-produced result again.
 - Local mode is distinguishable from connected authority; a connected tournament has one competitive authority.
 
+The [H4 discovery](herald-h4-functional-discovery.md) owns detailed target rules, connected recovery and acceptance. D-48–56 in §15 retain their proposed status; delivery sequencing stays in the [roadmap](roadmap.md#h4-discovery-and-delivery-handoff).
+
 ### H5 — Combined stages, live following and the API ecosystem
 
 **Value:** tournaments with cuts and consumers that follow change without constant polling.
@@ -879,13 +883,27 @@ This is the single register for product decisions. **Confirmed** means an explic
 | D-37 Reports/scoped referees | Author-defined 13 Nov 2026: freeze reporting mode at start; immutable pending reports, matching counter-report confirms, different report disputes; reasoned independent resolution, no attachments/appeals; delegation never opens administrator eligibility. Confirmed automatic confirmation/dispute effects remain D-36. [H2 §7/8](herald-h2-functional-discovery.md#7-reports-confirmation-disputes-and-corrections) | Proposed detailed policy; D-36 effects confirmed | H2 reports/staff; H2-AT-09/10/23 |
 | D-38 Notices/history/API | Author-defined 13 Nov 2026: in-app notices, private personal/represented-team history, actual appearances distinct from rosters, current visibility on reads and delegated API parity; no email or global public profile history in H2. Cancellation delivery is confirmed by D-35. [H2 §9/10](herald-h2-functional-discovery.md#9-notices-standings-and-protected-history) | Proposed detail; D-35 delivery confirmed | H2 inbox/history/API; H2-AT-20/22/25 |
 
+D-39–47 are reserved for the unmerged [H3 discovery PR #56](https://github.com/juliofuentescerrada/herald/pull/56); reservation is neither incorporation nor confirmation of those proposals. The following H4 rows use the next available range. Existing D-01/03/11/12/13/15 retain their statuses and refer to the detailed H4 recommendations, not new approvals.
+
+| ID | Confirmed clause or recommendation awaiting decision | Status | Gate and evidence |
+| --- | --- | --- | --- |
+| D-48 Swiss pairing | Proposed 13 Nov 2026 (`h4-functional-discovery`): fixed rounds, deterministic global gap-vector matching, no repeats/second competitive bye, feasible lowest-score bye candidate; exclude unplayed administrative-win recipients from bye eligibility. [H4 §3–4](herald-h4-functional-discovery.md#4-swiss-pairing-and-publication) | Proposed defaults for review | Maintainer; complete policy/examples before pairing implementation; H4-AT-01–08 |
+| D-49 Swiss scoring/tiebreakers | Recommend versioned 3/1/0 and exact rational opponent match-win percentage with 1/3 floor, no bye denominator, administrative matches included, shared positions. No game-statistic or official-rule compatibility inferred. [H4 §5](herald-h4-functional-discovery.md#5-points-tiebreakers-and-ranking) | Proposed; shared consumer formulae unresolved | Maintainer with standings/consumer owners; independently agreed fixtures before profile/adapter implementation; H4-AT-09 |
+| D-50 Swiss incidents/closure | Preserve prior play; resolve current published encounter, omit inactive entrants from later rounds; order-independent double absence; no automatic R reduction or final bye champion. Exceptional incomplete closure and positions need agreement. [H4 §6.1](herald-h4-functional-discovery.md#h4-ex-01-departures-and-unsatisfiable-rounds) | Proposed; exceptional closure unresolved | Maintainer; before complete Swiss operations/closure; H4-AT-07/22–24 |
+| D-51 Connected agreement | Develop D-01/11: Herald directs, identified consumer executes; fixed connected/local mode and exact version/participation compatibility before assignment. Real consumer remains to be selected/validated. [H4 §7](herald-h4-functional-discovery.md#7-connected-authority-identity-and-compatibility) | Proposed; no authority-policy approval | Maintainer with consumer owner; responsibility/profile agreement before real integration; H4-AT-14/15 |
+| D-52 External/synthetic identity | Develop D-03/15: application/organisation/kind-scoped stable mappings, explicit synthetic classification, no fabricated human accounts/history; synthetic-team execution/readiness detail remains a gate. [H4-ID-01](herald-h4-functional-discovery.md#h4-id-01-stable-external-references-and-synthetic-entries) | Proposed H4 detail; existing H1 guest status unchanged | Maintainer with identity/consumer owners; before connected field writes; H4-AT-12/13/16/17 |
+| D-53 Assignment/result authority | Develop D-12/13: one execution application, one fenced current attempt/match, explicit replacement without automatic expiry initially, terminal payload immutable; direct effect requires explicit result-source grant. [H4 §8](herald-h4-functional-discovery.md#8-execution-lifecycle-reattempts-and-cancellation) | Proposed; grant/authentication design pending | Maintainer with integration/security owners; before executable assignments; H4-AT-18–22 |
+| D-54 Swiss correction barriers | Develop D-07/08/24: prior results feed every later Swiss round; block ordinary corrections after dependent publication, invalidate drafts and verify authoritative revisions at publication/finalisation. [H4-CR-01](herald-h4-functional-discovery.md#h4-cr-01-current-state-impact-and-recovery) | Proposed H4 detail; inherited gates retained | Maintainer with module owners; before correction/publication coordination; H4-AT-10/11/27 |
+| D-55 Recovery/privacy/retention | Recover lost responses by receipt/current attempt without repeated simulation; current access and protected mappings; target notices under ADR 0017; recommend receipts through archive, with minimum recovery window and purge/rate limits to agree. [H4 §8–9](herald-h4-functional-discovery.md#9-api-notices-privacy-and-durable-history) | Proposed; concrete retention/limits unresolved | Maintainer with API/privacy/operations owners; before pilot availability; H4-AT-18/19/25/26/28 |
+| D-56 H4 operational evidence | Validate eight-/32-entry runs, real consumer and team invariants; agree supported maximum, deterministic search budget and accessible review/recovery evidence. [H4 §11–13](herald-h4-functional-discovery.md#11-observable-acceptance-scenarios) | Proposed; limits unresolved | Maintainer with engineering/design/consumer owners; before operational readiness claims; H4-AT-01–07/12/14 |
+
 The former G-01–06 list is consolidated into D-21/22/24/25/27; it is not a second approval queue. H1 decisions must be closed for each affected slice. Later recommendations need not be resolved to continue unrelated foundations.
 
 Deferred questions that do not block the stated H1 pilot: payments, prizes, minors, official governing-rule compatibility, bidirectional offline authority, rollback of played brackets, complex penalties, higher-than-pilot scale, detailed dispute-evidence access, transfers after roster freeze, cross-tournament scheduling and detailed player statistics. If the pilot introduces any of these conditions, its specification is no longer deferrable. H1 must still protect the private operational evidence it already holds.
 
 ## 16. Documentation and implementation handoff
 
-This file is functional baseline v0.8. Shared rules, initial journeys and the single decision register remain here. The linked [H2 extension](herald-h2-functional-discovery.md) owns detailed H2 rules and target journeys; it is part of this baseline, not an independent decision or implementation-status tree. The roadmap records delivery order, ADRs record significant decisions, and each OpenSpec change takes a vertical slice with executable acceptance scenarios. Product agreement is not approval to implement an unspecified change.
+This file is functional baseline v0.8 with the H4 discovery extension. Shared rules, initial journeys and the single decision register remain here. The linked [H2 extension](herald-h2-functional-discovery.md) and [H4 extension](herald-h4-functional-discovery.md) own detailed milestone rules and target journeys; they are part of this baseline, not independent decision or implementation-status trees. The roadmap records delivery order, ADRs record significant decisions, and each OpenSpec change takes a vertical slice with executable acceptance scenarios. Product agreement is not approval to implement an unspecified change.
 
 The functional sequence H1–H7 is the product delivery reference (ADR 0013). M0 foundations and M4 cloud remain technical tracks. Proposed clauses in §15 require review before their affected implementation slice. Each OpenSpec design names the owner of the operation, its authoritative preconditions, current organisation/permission context, required durable history and the observable provisional/effective result. Cross-module coordination details stay in the technical design; they must satisfy these functional conditions rather than change them silently.
 
