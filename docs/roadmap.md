@@ -34,6 +34,61 @@ The two audit notes are historical evidence. Their [consolidation record](../ope
 
 The [H2 functional discovery](herald-h2-functional-discovery.md) now defines the participant/representative milestone, bounded automation and target acceptance scenarios. Confirmed direction and author-defined defaults are distinguished in the [single decision register](herald-functional-discovery.md#15-decision-register-and-development-gates), D-30–38. This is documentation work (`h2-functional-discovery`), not an implemented H2 slice. M4 still precedes H2. H1 manual registration-window actions remain the implemented contract; H2 adds operative dates and minimum-field cancellation.
 
+## H1 batches — proposed 13 November 2026
+
+H1's remaining work, grouped into batches under [ADR 0018](adr/0018-deliver-in-batches-tested-on-a-deployed-preview.md). Slice names, boundaries and decision rows are proposals for the maintainer's review; each batch's issue links here, and its decision session settles its rows before its proposals pull request. Rules come from the [functional discovery](herald-functional-discovery.md) (F-05 to F-11, AT-01 to AT-14); nothing here decides a rule.
+
+Slices in the same module do not run side by side (ADR 0018). Pairings, lineups and results all live in `Herald.Competition`, so parallel work pairs a Competition slice with one from another module.
+
+### Batch 1: start and pair
+
+Goal: an owner starts a league and publishes its round-robin schedule.
+
+| Slice | Delivers | Main module | Depends on |
+|---|---|---|---|
+| `h1-competition-start` | Start readiness, the absence review, roster freeze and competition start (F-05) | Tournaments, Registration | none |
+| `h1-round-robin-pairings` | A draft schedule, publication as a revision, rest rounds, draft regeneration (F-06) | Competition | `h1-competition-start` |
+| `h1-change-log` | An operator-visible change log: admissions, cancellations, published pairings (F-10, D-26) | Tournaments | `h1-competition-start` |
+
+Decision rows: D-29 (absences at start), D-23 (frozen-roster eligibility), D-18 and D-25 (team start), D-26 (H1 announcements, a new proposal).
+Acceptance journey: four individual entries yield six published matches; five yield ten with one rest round each; four teams yield six matches (AT-01 and AT-04, pairing part).
+
+### Batch 2: play and score
+
+Goal: rounds are played and the standings explain themselves.
+
+| Slice | Delivers | Main module | Depends on |
+|---|---|---|---|
+| `h1-match-lineups` | Locked match lineups from the frozen roster, with the required active count (F-06, F-08) | Competition | batch 1 |
+| `h1-operator-results` | Operator-entered results validated against the profile, safe retries, no-show, concession and administrative outcomes (F-07, F-08) | Competition | `h1-match-lineups` |
+| `h1-standings` | Standings from effective results, explained points and tiebreakers, rest rounds without points, shared positions (F-09) | Standings | `h1-operator-results` |
+| `h1-round-operations` | The operations queue, round completion and withdrawals during competition (F-08, D-05) | Competition | `h1-operator-results` |
+
+Decision rows: D-05 (withdrawal and disqualification), D-23 (lineups), the exceptional outcomes of §8.1.
+Acceptance journey: AT-01 in full (six matches and explainable final standings), AT-04 (a seven-player roster fields five starters; a team of four cannot play), AT-06 (no-show and withdrawal in play).
+
+### Batch 3: correct, close and open
+
+Goal: the tournament is corrected safely, finalised, read by link and run end to end through the API.
+
+| Slice | Delivers | Main module | Depends on |
+|---|---|---|---|
+| `h1-safe-corrections` | Corrections with a revision and an impact preview (UJ-06, D-07) | Competition, Standings | batch 2 |
+| `h1-tournament-cancel-and-dates` | Cancellation, archiving and postponed dates (AT-09, AT-11, D-27) | Tournaments | batch 2 |
+| `h1-finalisation` | Review and finalisation, and history (F-09, D-24) | Standings | `h1-safe-corrections` |
+| `h1-public-read` | The public or unlisted page with rounds and standings (UJ-07, D-09, D-27) | Tournaments, public web | `h1-tournament-cancel-and-dates` |
+| `h1-api-journey` | A complete league without Angular: receipts, revision-aware reads, idempotency (UJ-08, F-11) | across modules | `h1-finalisation`, `h1-public-read` |
+
+Decision rows: D-07 (corrections), D-24 (finalisation barrier), D-27 (visibility, cancellation, dates), D-09 (public identity), D-02, D-12 and D-15 (the API's result and identity contract), D-14 (pilot).
+Acceptance journey: AT-07 to AT-11, AT-13 and AT-14; with it, H1's exit criteria below.
+
+### Open questions for the maintainer
+
+- **Slice size:** `h1-operator-results` (results and exceptional outcomes) and `h1-api-journey` are the largest; either may be split when it is proposed.
+- **D-26 timing:** `h1-change-log` could move to batch 3 if announcements wait, at the cost of batch 1's only parallel pair.
+- **Cancellation and dates in H1:** included because AT-09 and AT-11 belong to H1's acceptance.
+- **Public read earlier:** `h1-public-read` could join batch 2 if something should be shown sooner.
+
 ## Target delivery
 
 | Milestone | Delivers | Exit criteria |
