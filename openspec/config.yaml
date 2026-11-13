@@ -19,6 +19,8 @@ context: |
     read the sections the change needs, not the whole file.
   - docs/herald-h2-functional-discovery.md: detailed H2 extension; its decision statuses remain
     in the baseline register (D-30–38); target acceptance is not implemented behaviour.
+  - docs/herald-h3-functional-discovery.md: detailed H3 extension; proposed policies and gates
+    remain in the baseline register (D-39–47); target acceptance is not implemented behaviour.
   - docs/herald-h4-functional-discovery.md: detailed H4 Swiss/connected-consumer extension;
     D-48–56 remain proposed in the baseline register; no prerequisite milestone completion is implied.
   - docs/roadmap.md: delivery order, milestones and exit criteria; batches' progress is in GitHub
