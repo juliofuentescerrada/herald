@@ -54,6 +54,6 @@ Findings that shape the design:
 - **The base cannot be fetched** → the script falls back to code, which costs minutes but loses no checks.
 - **Branch protection may require checks by name** → skipped jobs report as skipped and satisfy it.
 
-## Open Questions
+## Maintainer answers (13 November 2026)
 
-- **Q-1** Should a draft pull request still run `rules`, about 2 minutes per push, as an early warning? The proposal runs nothing on drafts, because the local hooks run the same rules.
+- **Q-1 Rules on drafts:** no. Drafts run nothing, and the local edit and commit hooks check the rules (D-3 as written).

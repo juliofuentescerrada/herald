@@ -1,6 +1,6 @@
 ## Status
 
-**Pending the maintainer's review** (gate 1.1). Proposed on 13 November 2026, after the repository reached its GitHub Actions usage limit. The maintainer asked for this change before any change that would trigger the workflows again.
+**Approved for implementation on 13 November 2026** (gate 1.1). Proposed the same day, after the repository reached its GitHub Actions usage limit. The maintainer approved it and answered Q-1 (`design.md`).
 
 ## Why
 
