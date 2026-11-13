@@ -18,6 +18,6 @@
 ## 4. Documents and review
 
 - [x] 4.1 `CLAUDE.md`: pull requests start as drafts and are marked ready for review or a test round
-- [ ] 4.2 `herald-reviewer` review of the diff; findings and outcomes in the pull request
+- [x] 4.2 `herald-reviewer` review of the diff; findings and outcomes in the pull request
 - [ ] 4.3 Archive in the same pull request: the specification sync, the roadmap's current-state row (`herald-docs` skill), every new scenario covered
 - [x] 4.4 Run `scripts/ci-changes.mjs` locally on the merges of #29 (documentation only) and #28 (code); record the results in `design.md`

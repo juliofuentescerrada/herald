@@ -132,29 +132,42 @@ state.turn ??= newTurn();
 
 const git = (...args) => {
   try {
-    return execFileSync('git', args, { cwd: repositoryRoot, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
+    return execFileSync('git', args, { cwd: repositoryRoot, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'], timeout: 15000 }).trim();
   } catch {
     return null;
   }
 };
 
-// Where the session's pull request was seen; read only when it is seen and before a push.
-const markPullRequest = () => {
-  state.pullRequest = { branch: git('branch', '--show-current'), commit: git('rev-parse', 'HEAD') };
+// Where the session's pull request was seen (ci-path-filters D-5). A pull request tool records the current branch and
+// commit. A GitHub event records them only when nothing was recorded yet (a fresh container): a late event about a merged
+// pull request must not tie the next change's commits to it. A new branch starts the rounds again.
+const markPullRequest = ({ fromEvent = false } = {}) => {
+  const recorded = state.pullRequest && state.pullRequest !== true ? state.pullRequest : null;
+  if (fromEvent && (recorded || state.pullRequest === false)) return;
+  const branch = git('branch', '--show-current');
+  if (!recorded || recorded.branch !== branch) state.pushes = 0;
+  state.pullRequest = { branch, commit: git('rev-parse', 'HEAD') };
 };
 
-// Whether pushes count towards the rounds: a pull request was seen on this branch and has not been merged.
-const pullRequestOpen = () => {
+// Whether pushes count towards the rounds: a pull request was seen on this branch and has not been merged. Merged means
+// the recorded commit is in origin/main, which `fetch` refreshes first (only when a push would be refused). Herald
+// merges with merge commits, so the recorded commit reaches main; each counted push moves it to the pushed commit,
+// which follows a rebase. A detached HEAD counts as the same branch.
+const pullRequestOpen = ({ fetch = false } = {}) => {
   // A flag without a location (saved before ci-path-filters) cannot be tied to a pull request: forgotten.
   if (!state.pullRequest || state.pullRequest === true) return false;
   const seen = state.pullRequest;
-  if (seen.branch && git('branch', '--show-current') !== seen.branch) return false;
+  const branch = git('branch', '--show-current');
+  if (seen.branch && branch && branch !== seen.branch) return false;
+  if (fetch) git('fetch', '--quiet', '--no-tags', 'origin', 'main');
   if (seen.commit && git('merge-base', '--is-ancestor', seen.commit, 'origin/main') !== null) {
     state.pullRequest = false;
+    state.pushes = 0;
     return false;
   }
   return true;
 };
+
 const command = input.tool_name === 'Bash' ? normalise(input.tool_input?.command) : '';
 let exitCode = 0;
 
@@ -163,7 +176,7 @@ switch (input.hook_event_name) {
     state.turn = { ...newTurn(), number: state.turn.number + 1, maintainer: fromMaintainer(input.prompt) };
     // A GitHub event after the session's first turn comes from a pull request it subscribed to; the first turn's event
     // is the trigger that started the session (a merge, a label), which says nothing about this session's pull request.
-    if (githubEvent(input.prompt) && state.turn.number > 1) markPullRequest();
+    if (githubEvent(input.prompt) && state.turn.number > 1) markPullRequest({ fromEvent: true });
     if (fromMaintainer(input.prompt)) {
       state.tools = 0;
       state.pushes = 0;
@@ -190,7 +203,7 @@ switch (input.hook_event_name) {
         `Herald guard: this command has failed ${maxFailures} times in a row. Retrying it will not help. ` +
           `Find the cause another way or ${stopAdvice.charAt(0).toLowerCase()}${stopAdvice.slice(1)}`,
       );
-    } else if (isPush(command) && state.pushes >= maxPushes && pullRequestOpen()) {
+    } else if (isPush(command) && state.pushes >= maxPushes && pullRequestOpen({ fetch: true })) {
       deny(
         `Herald guard: ${maxPushes} pushes since the maintainer's last message. ` +
           'Further fixes need the maintainer: describe the remaining failure on the pull request and end your turn.',
@@ -203,7 +216,10 @@ switch (input.hook_event_name) {
     if (command) {
       delete state.failures[command];
       if (isPush(command)) {
-        if (pullRequestOpen()) state.pushes += 1;
+        if (pullRequestOpen()) {
+          state.pushes += 1;
+          state.pullRequest.commit = git('rev-parse', 'HEAD') ?? state.pullRequest.commit;
+        }
         state.turn.pushes += 1;
       }
     }

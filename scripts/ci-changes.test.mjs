@@ -50,6 +50,11 @@ test('ADR 0017 is code, because an architecture test reads its inventory', () =>
   assert.equal(touchesCode(['docs/adr/0017-notifications-consume-fact-events.md']), true);
 });
 
+test('The classification itself is code, so a change to it cannot skip the code jobs', () => {
+  assert.equal(touchesCode(['scripts/ci-changes.mjs']), true);
+  assert.equal(touchesCode(['scripts/ci-changes.test.mjs']), true);
+});
+
 // covers: continuous-integration: The base is unknown
 test('Without a usable base the change is code', () => {
   assert.equal(classify('0000000000000000000000000000000000000000', 'HEAD'), true);
@@ -57,6 +62,7 @@ test('Without a usable base the change is code', () => {
   assert.equal(classify('not-a-commit', 'HEAD'), true);
 });
 
+// covers: continuous-integration: A file moves out of the code
 test('A real diff between two commits is classified', () => {
   const repo = join(temp, 'repo');
   mkdirSync(repo);
@@ -77,6 +83,11 @@ test('A real diff between two commits is classified', () => {
   const code = commit('src/Program.cs', 'code');
   assert.equal(classify(start, docs, repo), false);
   assert.equal(classify(docs, code, repo), true);
+
+  mkdirSync(join(repo, 'docs', 'archive'), { recursive: true });
+  git('mv', 'src/Program.cs', 'docs/archive/Program.cs');
+  git('commit', '-q', '--no-verify', '-m', 'move');
+  assert.equal(classify(code, 'HEAD', repo), true, 'a file moved out of the code is still a change to the code');
 });
 
 // The workflows' jobs, read as text: each job's block under `jobs:`, keyed by its name.
@@ -87,10 +98,11 @@ const jobsOf = (workflow) => {
   for (const block of body.split(/\n(?= {2}[a-z][\w-]*:\n)/).slice(1)) jobs[block.match(/^ {2}([\w-]+):/)[1]] = block;
   return { text, jobs };
 };
-const codeOnly = /needs: changes\n {4}if: needs\.changes\.outputs\.code == 'true'/;
+const codeOnly = /needs: changes\n(?: {4}#.*\n)? {4}if: \$\{\{ !cancelled\(\) && needs\.changes\.result != 'skipped' && needs\.changes\.outputs\.code != 'false' \}\}/;
 const notDraft = "if: github.event_name == 'push' || !github.event.pull_request.draft";
 
 // covers: continuous-integration: A documentation-only pull request
+// covers: continuous-integration: The classification fails
 test('The build, test and test-script jobs wait for the classification and run only for code', () => {
   const { jobs } = jobsOf('ci.yml');
   assert.deepEqual(Object.keys(jobs).sort(), ['changes', 'dotnet', 'rules', 'test-scripts', 'web']);
@@ -111,4 +123,20 @@ test('The journeys after a merge wait for the classification and run only for co
   const { jobs } = jobsOf('e2e.yml');
   assert.match(jobs.e2e, codeOnly);
   assert.match(jobs.changes, /node scripts\/ci-changes\.mjs/);
+});
+
+// covers: continuous-integration: Two merges in quick succession
+test('Runs on main are never cancelled or replaced, so every merge is checked', () => {
+  const ci = jobsOf('ci.yml').text;
+  assert.match(ci, /group: ci-\$\{\{ github\.ref == 'refs\/heads\/main' && github\.sha \|\| github\.ref \}\}/);
+  assert.match(ci, /cancel-in-progress: \$\{\{ github\.ref != 'refs\/heads\/main' \}\}/);
+  const e2e = jobsOf('e2e.yml').text;
+  assert.match(e2e, /group: e2e-\$\{\{ github\.sha \}\}/);
+  assert.match(e2e, /cancel-in-progress: false/);
+});
+
+test('The bootstrap workflow skips drafts too', () => {
+  const { text, jobs } = jobsOf('bootstrap.yml');
+  assert.match(text, /types: \[opened, synchronize, reopened, ready_for_review\]/);
+  assert.match(jobs.bootstrap, /!github\.event\.pull_request\.draft/);
 });

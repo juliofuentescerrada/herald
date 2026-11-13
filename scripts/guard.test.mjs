@@ -229,3 +229,56 @@ test('A flag saved without its branch and commit is forgotten', () => {
   writeFileSync(file, JSON.stringify({ ...JSON.parse(readFileSync(file, 'utf8')), pullRequest: true, pushes: 3 }));
   assert.doesNotMatch(hook('r3', 'PreToolUse', bash('git push'), {}).stdout, /deny/);
 });
+
+// covers: agent-harness: A late event about the merged pull request
+test('A late GitHub event about the merged pull request does not tie the next change to it', () => {
+  const { repo, git } = sliceRepository('late-event');
+  const env = { HERALD_GUARD_ROOT: repo };
+  openPullRequest('r4', env);
+  hook('r4', 'Stop', {}, env);
+  git('update-ref', 'refs/remotes/origin/main', 'slice');
+  git('commit', '-q', '--allow-empty', '--no-verify', '-m', 'next change, task 1.1');
+  hook('r4', 'PreToolUse', bash('git push'), env);
+  hook('r4', 'PostToolUse', bash('git push'), env);
+  hook('r4', 'UserPromptSubmit', { prompt: '<wake reason="external-event"><event source="github">pull request merged</event></wake>' }, env);
+  for (let task = 0; task < 4; task++) {
+    assert.doesNotMatch(hook('r4', 'PreToolUse', bash('git push'), env).stdout, /deny/);
+    hook('r4', 'PostToolUse', bash('git push'), env);
+  }
+});
+
+test('A rebased pull request is still recognised as merged, because each push moves the recorded commit', () => {
+  const { repo, git } = sliceRepository('rebased');
+  const env = { HERALD_GUARD_ROOT: repo };
+  hook('r5', 'UserPromptSubmit', { prompt: 'Implement the slice' }, env);
+  hook('r5', 'PostToolUse', { tool_name: 'mcp__github__create_pull_request', tool_input: {} }, env);
+  git('commit', '-q', '--amend', '--allow-empty', '--no-verify', '-m', 'slice, rebased');
+  hook('r5', 'PreToolUse', bash('git push --force-with-lease'), env);
+  hook('r5', 'PostToolUse', bash('git push --force-with-lease'), env);
+  git('update-ref', 'refs/remotes/origin/main', 'slice');
+  const state = JSON.parse(readFileSync(join(temp, 'herald-guard', 'r5.json'), 'utf8'));
+  assert.equal(state.pullRequest.commit, git('rev-parse', 'HEAD'));
+  for (let task = 0; task < 4; task++) {
+    assert.doesNotMatch(hook('r5', 'PreToolUse', bash('git push'), env).stdout, /deny/);
+    hook('r5', 'PostToolUse', bash('git push'), env);
+  }
+});
+
+test('A new pull request after a merged one starts its rounds at zero', () => {
+  const { repo, git } = sliceRepository('next-pull-request');
+  const env = { HERALD_GUARD_ROOT: repo };
+  openPullRequest('r6', env);
+  git('update-ref', 'refs/remotes/origin/main', 'slice');
+  git('checkout', '-q', '-b', 'next-slice');
+  git('commit', '-q', '--allow-empty', '--no-verify', '-m', 'next slice');
+  hook('r6', 'PostToolUse', { tool_name: 'mcp__github__create_pull_request', tool_input: {} }, env);
+  assert.doesNotMatch(hook('r6', 'PreToolUse', bash('git push'), env).stdout, /deny/);
+});
+
+test('Pushing from a detached HEAD still counts towards the rounds', () => {
+  const { repo, git } = sliceRepository('detached');
+  const env = { HERALD_GUARD_ROOT: repo };
+  openPullRequest('r7', env);
+  git('checkout', '-q', '--detach');
+  assert.match(hook('r7', 'PreToolUse', bash('git push origin HEAD:slice'), env).stdout, /deny/);
+});

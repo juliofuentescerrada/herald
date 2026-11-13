@@ -23,6 +23,17 @@ A GitHub Actions workflow SHALL run on every pull request that is not a draft an
 - **WHEN** a draft pull request is opened or updated
 - **THEN** no CI job runs until it is marked ready for review
 
+### Requirement: CI has least privilege and cancels stale runs
+The workflow SHALL run with read-only access to the repository contents. A new push to the same pull request SHALL cancel the run in progress. Runs on `main` SHALL each complete, because the next merge's classification covers only its own changes.
+
+#### Scenario: Two quick pushes to a pull request
+- **WHEN** a second push arrives while the first run is in progress
+- **THEN** the first run is cancelled and only the second completes
+
+#### Scenario: Two merges in quick succession
+- **WHEN** a merge that touches code is followed by a documentation-only merge while its runs are in progress
+- **THEN** the first merge's runs complete, including the end-to-end suite
+
 ### Requirement: Merges to main run the end-to-end journeys
 A workflow of its own SHALL run the end-to-end suite on every push to `main` that touches code, as the classification of changed files decides, that is after each such merge, and not on pull requests. It SHALL fail when any journey or accessibility check fails, and a failed run SHALL keep the suite's report and traces as artifacts.
 
@@ -45,7 +56,7 @@ A workflow of its own SHALL run the end-to-end suite on every push to `main` tha
 ## ADDED Requirements
 
 ### Requirement: Changed files are classified in one place
-`scripts/ci-changes.mjs` SHALL classify a change as code unless every changed file belongs to the documentation group or the harness group, and both workflows SHALL use it. ADR 0017 SHALL count as code, because an architecture test reads its inventory. When the base cannot be read, the change SHALL count as code.
+`scripts/ci-changes.mjs` SHALL classify a change as code unless every changed file, under its old and its new path, belongs to the documentation group or the harness group, and both workflows SHALL use it. ADR 0017 SHALL count as code, because an architecture test reads its inventory, and so SHALL the classification itself. When the base cannot be read, or the classification fails, the change SHALL count as code.
 
 #### Scenario: Only documentation and harness files change
 - **WHEN** a change touches only `docs/`, `openspec/`, `prototypes/`, a `CLAUDE.md`, the agent's skills, `scripts/` or the git hooks
@@ -62,3 +73,11 @@ A workflow of its own SHALL run the end-to-end suite on every push to `main` tha
 #### Scenario: The base is unknown
 - **WHEN** the base commit is all zeros or cannot be fetched
 - **THEN** the classification is code
+
+#### Scenario: A file moves out of the code
+- **WHEN** a change moves a file from `src/` to `docs/`
+- **THEN** the classification is code
+
+#### Scenario: The classification fails
+- **WHEN** the classification job fails or gives no result
+- **THEN** the build, test and test-script jobs run

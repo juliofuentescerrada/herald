@@ -27,20 +27,24 @@ const documentation = [
 // Tested by the `rules` job itself (node --test scripts/*.test.mjs).
 const harness = [/^scripts\//, /^\.claude\/hooks\//, /^\.claude\/settings\.json$/, /^\.githooks\//, /^\.mcp\.json$/, /^cspell\.config\.yaml$/];
 
-// Documents that a build or test reads: NotifiableFactsTests reads ADR 0017's inventory.
-const readByTests = [/^docs\/adr\/0017-[^/]+\.md$/];
+// Always code, inside the groups above:
+// - ADR 0017: NotifiableFactsTests reads its inventory;
+// - the classification itself: the `changes` job runs the change's own copy, so a change to it must not be able to
+//   skip the code jobs.
+const alwaysCode = [/^docs\/adr\/0017-[^/]+\.md$/, /^scripts\/ci-changes(\.test)?\.mjs$/];
 
 export function isCode(file) {
-  if (readByTests.some((pattern) => pattern.test(file))) return true;
+  if (alwaysCode.some((pattern) => pattern.test(file))) return true;
   return ![...documentation, ...harness].some((pattern) => pattern.test(file));
 }
 
 export const touchesCode = (files) => files.some(isCode);
 
+// Without rename detection, a moved file lists both its old and its new path.
 export function changedFiles(base, head, cwd = process.cwd()) {
   if (!base || /^0+$/.test(base) || !head) return null;
   try {
-    const output = execFileSync('git', ['diff', '--name-only', base, head], { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
+    const output = execFileSync('git', ['diff', '--name-only', '--no-renames', base, head], { cwd, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] });
     return output.split('\n').filter(Boolean);
   } catch {
     return null;

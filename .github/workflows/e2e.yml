@@ -8,9 +8,11 @@ on:
 permissions:
   contents: read
 
+# Each merge has its own group and completes: the next merge's classification looks only at its own changes, so
+# cancelling or queueing would drop a merge's journeys (ci-path-filters D-2).
 concurrency:
-  group: e2e-${{ github.ref }}
-  cancel-in-progress: true
+  group: e2e-${{ github.sha }}
+  cancel-in-progress: false
 
 jobs:
   # Classifies the change (ci-path-filters D-1, D-2): the code jobs run only when it touches code.
@@ -24,20 +26,15 @@ jobs:
           fetch-depth: 2
       - id: classify
         env:
-          EVENT: ${{ github.event_name }}
           BEFORE: ${{ github.event.before }}
         run: |
-          if [ "$EVENT" = "pull_request" ]; then
-            base="$(git rev-parse HEAD^1)"
-          else
-            base="$BEFORE"
-            git fetch --no-tags --depth=1 origin "$base" 2>/dev/null || true
-          fi
-          node scripts/ci-changes.mjs "$base" HEAD >> "$GITHUB_OUTPUT"
+          git fetch --no-tags --depth=1 origin "$BEFORE" 2>/dev/null || true
+          node scripts/ci-changes.mjs "$BEFORE" HEAD >> "$GITHUB_OUTPUT"
 
   e2e:
     needs: changes
-    if: needs.changes.outputs.code == 'true'
+    # Runs unless the classification ran and said documentation only: a failed classification runs the code jobs.
+    if: ${{ !cancelled() && needs.changes.result != 'skipped' && needs.changes.outputs.code != 'false' }}
     runs-on: ubuntu-latest
     timeout-minutes: 20
     steps:

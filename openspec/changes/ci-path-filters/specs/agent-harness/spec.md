@@ -11,6 +11,10 @@ When the agent completes a task of a change's `tasks.md`, it SHALL commit the ta
 - **WHEN** a session has opened a pull request and reaches the push rounds since the maintainer's last message
 - **THEN** the guard refuses the next push
 
+#### Scenario: A late event about the merged pull request
+- **WHEN** a GitHub event about the merged pull request wakes the session after it started a new change
+- **THEN** the guard still allows the new change's checkpoint pushes
+
 #### Scenario: A new change after the pull request merged
 - **WHEN** the commit on which the session's pull request was seen is in `origin/main`, and the session pushes checkpoints of a new change
 - **THEN** the guard allows each push
