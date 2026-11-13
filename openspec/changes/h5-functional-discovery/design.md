@@ -37,7 +37,7 @@ Documentation checks passed: repository rules on affected/staged files (British 
 
 `HERALD_TOOLS=<temporary-tool-directory> node --test scripts/*.test.mjs` passed 74/75 tests, with the existing opt-in full-bootstrap test skipped because `HERALD_TEST_BOOTSTRAP` is unset. Only the repository-pinned OpenSpec, spelling tools and Gitleaks were installed outside tracked files, using temporary caches with write access. Full application bootstrap/builds, dependency/licence re-enumeration and application/UI tests were not run: no runtime or dependency manifest changes. No H5 target scenario was executed and no Wolverine/OpenAPI regeneration was needed. The hooks run rules and Gitleaks before commit. Codex has no instrumented Claude guard session; harness metrics report zeros, not measured effort.
 
-Independent read-only review of the complete committed diff against main is pending before PR readiness.
+The repository-required independent read-only `herald-reviewer` reviewed the complete committed `git diff main...HEAD`, the proposal/design/tasks/delta, root rules and cited ADRs. No findings. Checked inherited H2–H4 constraints, maintained-source responsibilities, cut/seed examples, correction/publication/cancellation races, delivery/recovery/privacy contracts and owned unresolved gates. No product scenario execution or policy approval was inferred. Main was fetched again before handoff and had no new commits; no merge or runtime regeneration was necessary. The CI classifier (`node scripts/ci-changes.mjs main HEAD`) reports documentation/harness only (`code=false`). Final affected rules, strict OpenSpec, link/coverage/whitespace checks and Gitleaks commit-range scan passed; CI results are linked from the PR.
 
 ## Open Questions
 
