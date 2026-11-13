@@ -73,6 +73,8 @@ Hard constraints: no self-pair; no repeat opponent (including a previously publi
 
 For an even field enumerate feasible complete matchings. For each compute all absolute match-point differences, sort them descending and minimise that vector lexicographically. This minimises the largest gap first, then the next, rather than making a locally attractive pair that strands another group. With equal gap vectors, sort each pair's seed ranks ascending, sort pairs lexicographically and choose the smallest flattened seed vector. Table/side presentation follows that order and has no sporting preference. Entrant IDs never depend on translated aliases.
 
+Worked matching examples: with A/B on six points and C/D on three, suppose the only legal edges are A–B, A–C and B–D. Choosing A–B greedily strands C/D; the complete solution is A–C and B–D, with gap vector [3, 3]. With no prior-opponent restrictions, A–B/C–D instead has [0, 0] and wins. With all four on equal points, A–B/C–D beats A–C/B–D by the canonical seed-vector tie key. These are policy review fixtures, not executed solver tests.
+
 A float is a cross-score pairing, not an extra slot or round. Display both score groups and the gap. This candidate policy does not balance repeated up/down floats or colours; if the real consumer requires those properties, select a separately versioned compatible policy before execution. It cannot silently substitute them.
 
 ### H4-SW-02 Odd field and feasibility
@@ -81,7 +83,7 @@ For an odd field, order eligible bye candidates by ascending points, then descen
 
 The bye awards the profile's win points and no played match/game/appearance. At most one such bye per entry per tournament. If all candidates fail, publish nothing. Show separately proven infeasibility and search-budget exhaustion; the latter does not prove no matching exists. Never relax a hard constraint automatically. A bounded deterministic search must prove the optimum before presenting the draft as publishable; an interrupted search retains diagnostic evidence and can be retried with the same input.
 
-Example: A–E all have zero points, seeds 1–5. E is the first bye candidate; absent history the pairs are A–B and C–D. Next round E is excluded from another bye even if E is again lowest on points. A different candidate can be necessary if removing E leaves two remaining entries whose only possible opponent is each other and they have already met.
+Example: A–E all have zero points, seeds 1–5. E is the first bye candidate; absent history the pairs are A–B and C–D. Next round E is excluded from another bye even if E is again lowest on points. For a concrete feasibility fixture, let the current non-repeat graph have only A–B, C–E and D–E edges, with E then D first in the eligible bye order. Removing E leaves C/D uncovered; removing D leaves A–B and C–E, so D receives the bye. Retain the prior-opponent evidence producing this graph; do not publish the failed candidate as a partial round.
 
 ### H4-SW-03 Draft → review → publication → completion
 
@@ -174,6 +176,8 @@ Recommend one authorised execution application per connected tournament initiall
 
 Propose explicit replacement without automatic time expiry for the first pilot: a timeout flags stalled work for review but does not transfer authority. Replacement fences the old attempt before new work; record actor and reason. This supports disconnected completion without pretending a wall-clock lease remained valid. A new lease/multiple-executor scheme requires its own agreed expiry/clock/fencing contract before scope expands (D-13/53).
 
+Recommend a consumer-side atomic work claim in durable execution state shared by every instance of that application (or a single-instance durable store with enforced exclusive process access). Key it by Herald match and current attempt generation; retain execution owner, running/terminal status and immutable produced outcome. Receiving or rereading a Herald assignment is not permission for another instance to start the engine. One claim wins; other instances inspect/reconcile its state. If the durable claim cannot be checked, do not start duplicate work. Restart first recovers the existing execution/output; uncertainty about a running engine is an incident, not permission to take over the same attempt on a timer. An explicit fenced replacement uses a new attempt and preserves the former record. This is a proposed interoperability obligation; the adapter design must demonstrate atomic claims and crash recovery without selecting a storage product here.
+
 ### H4-EXE-02 Submission and lost response
 
 Send Herald match/entrant IDs, assignment/attempt generation, execution reference, completed outcome/score, operation identity, expected revisions and applicable locked lineups. Propose binding one immutable terminal payload to an attempt. Same operation/content returns the same receipt; changed content conflicts. A second operation identity cannot apply another result for the same terminal attempt/match. Correction is a separate authorised operation, not a mutated engine retry.
@@ -186,7 +190,7 @@ Recommend retaining immutable operation receipts and terminal attempt identity t
 
 | Race/failure | Required observable resolution |
 | --- | --- |
-| Two instances claim the same match | Same assignment or one explicit conflict; at most one current generation |
+| Two instances claim the same match | Assignment retry/read does not grant a second execution; one atomic durable consumer claim wins, the other reconciles without independently starting the engine; at most one current generation |
 | Old attempt submits after reassignment | Stale assignment rejection; retain attempted provenance, no points |
 | Cancellation races result acceptance | Authoritative ordering: acceptance first is retained as pre-cancellation history; cancellation first rejects the late outcome; no new work after cancellation |
 | Readiness/lineup changes before play | Invalidate stale assignment/start permission; lock replacement under inherited policy; no silent player substitution |
@@ -250,7 +254,7 @@ These are target scenarios for future implementation, not tests run by this docu
 | H4-AT-17 Synthetic privacy | Synthetic team/actors complete game | Competitive alias/classification only in public data; no human account/history/appearance invented |
 | H4-AT-18 Lost response | Apply result then lose response/restart consumer | Recover same receipt/outcome; one competitive effect, no required repeated simulation |
 | H4-AT-19 Duplicate intent | Same key/content; changed content; new key for same completed attempt | Original receipt; content conflict; no second terminal effect |
-| H4-AT-20 Fencing | Two instances claim; director replaces attempt; old instance submits | One current generation; superseded submission rejected with reason |
+| H4-AT-20 Fencing and exclusive execution | Two instances claim; one crashes/restarts; director replaces attempt; old instance submits | One durable execution claim, no independent duplicate engine start; recover retained execution/outcome before rerun; one current generation and superseded submission rejected with reason |
 | H4-AT-21 Offline cancellation | Finish assigned game offline, cancel/revoke, then reconnect | No new round offline; late unauthorised/cancelled submission rejected; retained output available for authorised incident review |
 | H4-AT-22 Engine failure | Crash, unsupported configuration or computation limit | Unresolved encounter, retry/recover or explicit human decision; no inferred draw/no contest |
 | H4-AT-23 Double departure | Withdraw both published opponents in both orders | Same effective zero-point double absence; no future manufactured losses; dependency checks honoured |
@@ -277,7 +281,7 @@ Authoritative statuses remain in baseline §15. The maintainer owns each product
 | D-50 | Preserve past results, current published administrative handling; exceptional close without silent R reduction | Maintainer; director/referee | Agree no-contest, double departure, incomplete closure and positions before complete Swiss delivery |
 | D-51, D-01/11 | Herald competitive authority, fixed mode, exact compatibility with an identified real consumer | Maintainer; consumer owner and integration engineer | Select real application/profile/build and approve responsibility agreement before connected execution |
 | D-52, D-03/15 | Scoped immutable mappings and explicit synthetic classification; no human claims | Maintainer; identity/privacy and consumer owners | Agree synthetic team actor/readiness contract before registration/adapter writes |
-| D-53, D-12/13 | Single execution application, fenced current attempt, explicit replacement; no automatic expiry initially | Maintainer; integration/security engineer | Grant/provisioning ADR and assignment/revocation/cancellation race design before executable work |
+| D-53, D-12/13 | Single execution application, fenced current attempt, exclusive durable consumer claim, explicit replacement; no automatic expiry initially | Maintainer; integration/security engineer | Grant/provisioning ADR and assignment/revocation/cancellation race design before executable work |
 | D-54, D-07/08/24 | Block ordinary correction after dependent publication; verify current authoritative inputs | Maintainer; module owners | Correction/publication/finalisation barrier design with race examples |
 | D-55, D-09/38 | Recoverable receipts through archive; current access; bounded polling and target notices | Maintainer; API/privacy/operations owners | Set receipt/audit retention, purge, retry/rate limits and authorised notice recipients before pilot |
 | D-56 | Eight-/32-entry evidence; no guessed operational maximum/search budget | Maintainer; engineering/design and consumer owner | Agree supported limits; prove deterministic search, accessibility and recovery at those limits |
