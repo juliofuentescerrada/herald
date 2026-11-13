@@ -1,5 +1,5 @@
 name: Slice
-description: One OpenSpec change inside a batch, implemented in one pull request and tested on its preview (ADR 0018).
+description: One OpenSpec change inside a batch, implemented in one pull request and tested by the maintainer, locally until M4 and then on its preview (ADR 0018).
 title: "Slice: "
 labels: ["slice"]
 body:
@@ -18,7 +18,7 @@ body:
     id: depends
     attributes:
       label: Depends on
-      description: The slices that must be merged before this one starts (sub-issue numbers), or "none". At most two slices are in progress at once (ADR 0018).
+      description: The slices that must be merged before this one starts (sub-issue numbers), or "none" (ADR 0018).
       placeholder: "#…, #… or none"
     validations:
       required: true

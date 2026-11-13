@@ -27,7 +27,7 @@ body:
     id: slices
     attributes:
       label: Slices
-      description: One sub-issue per slice, in order, each with the slices it depends on. Independent slices may run two at a time; two slices that change the same module's EF Core model depend on each other (ADR 0018). Add them as sub-issues; list them here for reading.
+      description: One sub-issue per slice, in order, each with the slices it depends on (ADR 0018 says which may run side by side). Add them as sub-issues; list them here for reading.
       placeholder: |
         - [ ] #… round-robin schedule (depends on: none)
         - [ ] #… locked lineups (depends on: none)
@@ -36,11 +36,11 @@ body:
     id: prototypes
     attributes:
       label: Prototypes
-      description: Screens and states the agent prototypes in prototypes/frontend/ for review in the decision session.
+      description: Screens and states the agent prototypes in prototypes/frontend/ for review in the batch's proposals pull request.
   - type: textarea
     id: journey
     attributes:
       label: Acceptance journey
-      description: The journey that, passing on the preview, accepts the batch. Persona, starting data and steps.
+      description: The journey that, passing in the maintainer's test round (locally until M4, then on the preview), accepts the batch. Persona, starting data and steps.
     validations:
       required: true

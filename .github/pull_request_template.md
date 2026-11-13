@@ -14,7 +14,7 @@ OpenSpec change: `openspec/changes/<name>/`
 
 ## Archive
 
-<!-- The change is archived in this pull request: the specification sync, the roadmap row, every new scenario with its test. Or why not. -->
+<!-- The change is archived in this pull request: the specification sync and every new scenario with its test (herald-docs skill). Or why not. -->
 
 ## Checklist
 
@@ -25,4 +25,6 @@ OpenSpec change: `openspec/changes/<name>/`
 - [ ] Confirmed decisions, proposed defaults, historical evidence and implemented behaviour are distinguishable
 - [ ] Affected visual references/states and feature dependency boundaries are recorded, or marked not applicable
 
-<!-- End with `node scripts/harness-metrics.mjs --branch --markdown`. -->
+## Harness metrics
+
+<!-- The output of `node scripts/harness-metrics.mjs --branch --markdown`. -->

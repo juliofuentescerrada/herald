@@ -33,9 +33,9 @@ State each fact in its source and link to it elsewhere; do not restate it.
 - `openspec/specs/` describes what is implemented; target deltas remain in active changes until implemented and archived.
 - Archived changes and dated reviews are historical evidence, not live architecture instructions.
 - A slice archives its change in its own pull request (ADR 0018); work outside a batch may still archive in a follow-up pull request.
-- When archiving a change, update the roadmap's current-state row for it, the README's status if it changes, and ADR 0017's inventory if the change introduced notifiable facts. Every scenario the change adds to `openspec/specs/` must be marked by a test (`scripts/spec-coverage.mjs`); the baseline of uncovered scenarios never gains a line.
+- When archiving a slice of a batch, its status is its closed issue: change the roadmap only when a milestone's scope or exit criteria change, and the README only when its summary of what Herald does changes. A change outside a batch still updates its roadmap row. Either way, update ADR 0017's inventory if the change introduced notifiable facts. Every scenario the change adds to `openspec/specs/` must be marked by a test (`scripts/spec-coverage.mjs`); the baseline of uncovered scenarios never gains a line.
 - `openspec/config.yaml` holds the context and per-artifact rules OpenSpec gives the agent; keep it consistent with `CLAUDE.md` and these skills, without restating them.
 
 ## Pull requests
 
-Pull requests follow `.github/pull_request_template.md` and link their OpenSpec change. A slice's pull request closes its issue (`Closes #…`), carries its test script and the reviewer's findings, and ends with its harness metrics. Issues hold state and feedback, never content: link to the repository instead of copying rules into them.
+Pull requests follow `.github/pull_request_template.md` and link their OpenSpec change. A slice's pull request closes its issue (`Closes #…`). Issues hold state and feedback, never content: link to the repository instead of copying rules into them.

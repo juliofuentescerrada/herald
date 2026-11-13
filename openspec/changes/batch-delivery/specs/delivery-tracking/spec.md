@@ -12,7 +12,7 @@ It SHALL be idempotent. With `--dry-run` it SHALL print every action without cal
 - **THEN** it prints one line per label and milestone it would create or update, and makes no call to GitHub
 
 ### Requirement: A slice declares its dependencies
-The slice issue template SHALL ask for the slices it depends on, and the batch issue template SHALL list its slices in order with their dependencies. The next-slice procedure SHALL start a slice only when its dependencies are merged and fewer than two slices are in progress.
+The slice issue template SHALL ask for the slices it depends on, and the batch issue template SHALL list its slices in order with their dependencies. The next-slice procedure SHALL start a slice only when its dependencies are merged and fewer than two slices are in progress. A slice SHALL count as in progress from its start until its pull request is merged, whatever its status label meanwhile, and the procedure SHALL start every eligible slice up to that limit.
 
 #### Scenario: Two independent slices
 - **WHEN** a batch lists two slices without dependencies on each other and none is in progress

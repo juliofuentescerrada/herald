@@ -5,8 +5,11 @@
 #   scripts/github-setup             create or update them in the current repository
 #   scripts/github-setup --dry-run   print what it would do, without calling GitHub
 set -euo pipefail
-dry_run=false
-[ "${1:-}" = "--dry-run" ] && dry_run=true
+case "$#:${1:-}" in
+  0:) dry_run=false ;;
+  1:--dry-run) dry_run=true ;;
+  *) echo "Usage: scripts/github-setup [--dry-run]" >&2; exit 2 ;;
+esac
 
 # name|colour|description
 labels=(
@@ -14,7 +17,7 @@ labels=(
   "slice|1d76db|One OpenSpec change of a batch, implemented in one pull request"
   "batch-proposals|0e8a16|The pull request with a batch's proposals and prototypes; merging it approves the batch"
   "needs-decision|d93f0b|Waits for the maintainer to settle a rule the decision register does not"
-  "in-progress|fbca04|A slice an agent session is implementing (at most two at once)"
+  "in-progress|fbca04|A slice an agent session is implementing (ADR 0018)"
   "ready-to-test|0e8a16|A slice or batch waiting for the maintainer's test round"
   "feedback|c5def5|The maintainer's feedback is waiting for the agent"
   "agent:start|000000|Starts or resumes the slice in an agent session"
@@ -37,14 +40,17 @@ for entry in "${labels[@]}"; do
   fi
 done
 
+# number<TAB>title of every milestone, open or closed.
 existing=""
-$dry_run || existing=$(gh api 'repos/{owner}/{repo}/milestones?state=all&per_page=100' --jq '.[].title')
+$dry_run || existing=$(gh api --paginate 'repos/{owner}/{repo}/milestones?state=all&per_page=100' --jq '.[] | "\(.number)\t\(.title)"')
 for entry in "${milestones[@]}"; do
   IFS='|' read -r title description <<< "$entry"
+  number=$(awk -F '\t' -v title="$title" '$2 == title { print $1 }' <<< "$existing")
   if $dry_run; then
-    echo "milestone: create '${title}' unless it exists: ${description}"
-  elif grep -qxF "$title" <<< "$existing"; then
-    echo "milestone '${title}' already exists"
+    echo "milestone: create or update '${title}': ${description}"
+  elif [ -n "$number" ]; then
+    gh api -X PATCH "repos/{owner}/{repo}/milestones/${number}" -f description="$description" >/dev/null
+    echo "milestone '${title}' updated"
   else
     gh api -X POST 'repos/{owner}/{repo}/milestones' -f title="$title" -f description="$description" >/dev/null
     echo "milestone '${title}' created"

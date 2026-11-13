@@ -18,14 +18,16 @@ From H1's remaining slices, progress lives in GitHub Issues ([ADR 0018](../adr/0
 | `slice` | An issue for one OpenSpec change of a batch, or its pull request | The slice template, the agent on the pull request |
 | `batch-proposals` | The pull request with a batch's proposals and prototypes; merging it approves the batch | The agent |
 | `needs-decision` | Waits for the maintainer to settle a rule the decision register does not | The batch template, the agent |
-| `in-progress` | A slice an agent session is implementing; at most two at once | The agent |
+| `in-progress` | A slice an agent session is implementing | The agent |
 | `ready-to-test` | A slice or a batch waiting for the maintainer's test round | The agent |
 | `feedback` | The maintainer's feedback is waiting for the agent | The maintainer |
 | `agent:start` | Starts or resumes the slice in an agent session | The maintainer |
 
-Status labels describe the board and trigger nothing, except `agent:start` once the next-slice scheduled task exists (after H1's first batch).
+Status labels trigger nothing. `agent:start` starts or resumes a slice once the `issues.labeled` scheduled task exists, which is after H1's first batch (ADR 0018); until then it only marks the slice the maintainer asks a session to start. ADR 0018 defines when a slice counts as in progress and how many may be.
 
 ## Board columns
+
+Projects does not map labels to its Status field by itself: the agent moves a slice's card when it changes the slice's label, and the board's built-in workflows move closed issues to Done and newly added issues to Ready.
 
 | Column | Issues in it |
 |---|---|

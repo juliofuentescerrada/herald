@@ -89,6 +89,29 @@ Findings that shape the design:
 - **The maintainer's local round costs more of their time than a preview** → it is temporary until M4, and the test script and screenshots narrow what they check.
 - **Labels and board drift from the script** → the script is idempotent and can be run again; the board follows the labels.
 
+## Review (13 November 2026)
+
+The `herald-reviewer` subagent reviewed the diff against this change. Nothing was blocking. Findings and outcomes:
+
+1. **"In progress" was counted by the `in-progress` label, which a slice leaves when its pull request opens,** so a third slice could start before either was merged. **Fixed:** ADR 0018 defines in progress as from start until merge, whatever the label, with a test pinning it.
+2. **One run per merge started only one slice.** **Fixed:** the run starts every eligible slice up to the limit, each in its own session.
+3. **ADR 0019, the roadmap and parts of ADR 0018 still described the old process** (one slice, from H2, the preview as the only test round). **Fixed:** they now describe the local round until M4 and the batch's acceptance in that round.
+4. **The archive steps still updated per-slice status in the roadmap and the README.** **Fixed:** for a batch's slice the closed issue is the status (herald-docs, the pull request template, `openspec/config.yaml`); a change outside a batch keeps its roadmap row.
+5. **`agent:start` does nothing in the first batch, and the guide named the wrong task.** **Fixed** in ADR 0018 and the guide.
+6. **`scripts/github-setup` ran for real on an unknown argument.** **Fixed:** it prints the usage and exits 2, with a test.
+7. **Milestones were never updated.** **Fixed:** an existing one gets its description patched, and the milestone list is paginated. A test with a recording `gh` proves it, and that a second run is the same.
+8. **The tests checked wording more than behaviour.**
+   - **Fixed:**
+     - the template test reads the "Depends on" field's own block;
+     - the dry-run test checks each description;
+     - the real run is tested.
+   - The parallel rule stays procedural, so its test pins the definition from finding 1.
+9. **The harness metrics were only an HTML comment.** **Fixed:** a `## Harness metrics` section.
+10. **The issue templates and the E2E scripts' text still said "on its preview" and "the decision session".** **Fixed.**
+11. **The same rules were stated in several places.** **Fixed:**
+    - ADR 0018 holds the decision and the limit; `CLAUDE.md` holds the procedure; the templates, `openspec/config.yaml` and `herald-docs` refer to them;
+    - the guide says who moves the board's cards.
+
 ## Maintainer answers (13 November 2026)
 
 - **Q-1 ADR 0018:** accepted when this change is approved (D-1).
