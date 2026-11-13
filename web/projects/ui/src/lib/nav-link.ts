@@ -1,4 +1,5 @@
-import { ChangeDetectionStrategy, Component, ViewEncapsulation } from '@angular/core';
+import { ChangeDetectionStrategy, Component, input, ViewEncapsulation } from '@angular/core';
+import { Icon, IconName } from './icon';
 
 /**
  * A navigation link on a graphite shell surface. The app marks the current page with
@@ -6,8 +7,9 @@ import { ChangeDetectionStrategy, Component, ViewEncapsulation } from '@angular/
  */
 @Component({
   selector: 'a[herald-nav-link]',
+  imports: [Icon],
   host: { class: 'herald-nav-link' },
-  template: `<ng-content />`,
+  template: `@if (icon(); as name) {<herald-icon [name]="name" size="navigation" />}<ng-content />`,
   styles: `
     .herald-nav-link {
       display: flex;
@@ -32,4 +34,7 @@ import { ChangeDetectionStrategy, Component, ViewEncapsulation } from '@angular/
   encapsulation: ViewEncapsulation.None,
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
-export class NavLink {}
+export class NavLink {
+  /** Decorative: the link's text stays its name. */
+  readonly icon = input<IconName>();
+}

@@ -90,7 +90,7 @@
         }
       }
       @if (publicUrl && access.problem() !== 'signing-in' && access.problem() !== 'session-expired') {
-        <a herald-button [href]="publicUrl">Back to public page</a>
+        <a herald-button [href]="publicUrl"><herald-icon name="arrow-left" />Back to public page</a>
       }
     </div>
     <p class="copy-status" role="status">{{ copyStatus() }}</p>

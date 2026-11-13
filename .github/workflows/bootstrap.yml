@@ -3,6 +3,7 @@ name: Bootstrap
 # scripts/bootstrap twice on a clean runner, when it or what it reads changes (agent-harness, harness-engineering).
 on:
   pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
     paths:
       - scripts/bootstrap
       - scripts/bootstrap.test.mjs
@@ -22,6 +23,8 @@ concurrency:
 
 jobs:
   bootstrap:
+    # Drafts run nothing (ci-path-filters D-3).
+    if: github.event_name == 'workflow_dispatch' || !github.event.pull_request.draft
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:

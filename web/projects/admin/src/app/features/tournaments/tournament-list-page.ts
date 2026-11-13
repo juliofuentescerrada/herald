@@ -1,7 +1,7 @@
 import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { HeraldHostAdminService, TournamentSummary } from '@herald/api-client/admin';
-import { Button, Notice, StatusLabel } from '@herald/ui';
+import { Button, Icon, Notice, StatusLabel } from '@herald/ui';
 import { injectQuery } from '@tanstack/angular-query-experimental';
 import { firstValueFrom } from 'rxjs';
 import { injectWorkingOrganisation } from '../../platform';
@@ -10,7 +10,7 @@ import { admittedText, capacityText, dateTimeText, injectOrganisation, lifecycle
 /** The organisation's tournaments, newest first, each with its three lifecycle facts. */
 @Component({
   selector: 'app-tournament-list-page',
-  imports: [Button, Notice, RouterLink, StatusLabel],
+  imports: [Button, Icon, Notice, RouterLink, StatusLabel],
   template: `
     <header class="heading">
       <div>
@@ -33,6 +33,7 @@ import { admittedText, capacityText, dateTimeText, injectOrganisation, lifecycle
       </section>
     } @else if (tournaments.data()!.length === 0) {
       <section class="panel" aria-labelledby="empty-heading">
+        <herald-icon class="empty-icon" name="trophy" size="empty" />
         <h2 id="empty-heading">No tournaments yet</h2>
         <p>Create a draft with a title, complete it when you are ready, then publish it. Publishing does not open registration.</p>
         <div class="actions">
@@ -51,8 +52,8 @@ import { admittedText, capacityText, dateTimeText, injectOrganisation, lifecycle
               }
               <p class="capacity">{{ capacityLine(tournament) }}</p>
               <p class="labels">
-                @for (label of labels(tournament); track label) {
-                  <herald-status-label>{{ label }}</herald-status-label>
+                @for (label of labels(tournament); track label.text) {
+                  <herald-status-label [icon]="label.icon">{{ label.text }}</herald-status-label>
                 }
               </p>
             </div>
@@ -60,7 +61,7 @@ import { admittedText, capacityText, dateTimeText, injectOrganisation, lifecycle
             <div class="row-actions">
               <a herald-button [routerLink]="tournament.id" [attr.aria-label]="action(tournament) + ': ' + tournament.title">{{ action(tournament) }}</a>
               @if (tournament.publication === 'published') {
-                <a herald-button [routerLink]="[tournament.id, 'entries']" [attr.aria-label]="'Entries: ' + tournament.title">Entries</a>
+                <a herald-button [routerLink]="[tournament.id, 'entries']" [attr.aria-label]="'Entries: ' + tournament.title"><herald-icon name="users" />Entries</a>
               }
             </div>
           </li>
@@ -72,6 +73,7 @@ import { admittedText, capacityText, dateTimeText, injectOrganisation, lifecycle
     .heading { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--herald-space-4); margin-bottom: var(--herald-space-6); }
     h1 { font-size: 32px; margin-bottom: var(--herald-space-2); }
     .panel h2 { margin-top: 0; }
+    .empty-icon { color: var(--herald-color-text-secondary); margin-bottom: var(--herald-space-2); }
     .tournaments { list-style: none; margin: 0; padding: 0; background: var(--herald-color-surface-default); border: 1px solid var(--herald-color-border-default); }
     li { display: flex; align-items: center; justify-content: space-between; gap: var(--herald-space-4); padding: var(--herald-space-6); }
     li + li { border-top: 1px solid var(--herald-color-border-default); }

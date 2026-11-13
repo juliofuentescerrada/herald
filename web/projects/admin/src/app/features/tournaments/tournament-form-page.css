@@ -5,7 +5,7 @@ h1 { font-size: 32px; }
 .title h1 { margin: 0; }
 .lead { margin: 0 0 var(--herald-space-2); }
 .lead:last-child { margin-bottom: 0; }
-.back { color: var(--herald-color-text-secondary); }
+.back { display: inline-flex; align-items: center; gap: var(--herald-space-2); color: var(--herald-color-text-secondary); }
 .labels { display: flex; flex-wrap: wrap; gap: var(--herald-space-2); margin: 0; }
 /* The summaries and the form share one width (V-2). */
 .column { display: flex; flex-direction: column; gap: var(--herald-space-6); }

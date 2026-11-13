@@ -17,6 +17,8 @@ context: |
   - herald-docs skill: documentation sources, ADRs, decisions, archiving and status.
   - docs/herald-functional-discovery.md: product rules, journeys and the decision register (§15);
     read the sections the change needs, not the whole file.
+  - docs/herald-h2-functional-discovery.md: detailed H2 extension; its decision statuses remain
+    in the baseline register (D-30–38); target acceptance is not implemented behaviour.
   - docs/roadmap.md: delivery order and what is implemented. openspec/specs: implemented behaviour.
 
 rules:

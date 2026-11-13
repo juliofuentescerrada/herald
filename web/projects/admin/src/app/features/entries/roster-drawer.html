@@ -178,13 +178,13 @@
               </button>
             }
           }
-          <button herald-button type="button" [disabled]="state() === 'busy'" (click)="backToRoster()">Back to roster</button>
+          <button herald-button type="button" [disabled]="state() === 'busy'" (click)="backToRoster()"><herald-icon name="arrow-left" />Back to roster</button>
         </div>
       </form>
     }
   }
 
   <div class="actions leave">
-    <button herald-button type="button" [disabled]="state() === 'busy'" (click)="leave.emit()">Back to entries</button>
+    <button herald-button type="button" [disabled]="state() === 'busy'" (click)="leave.emit()"><herald-icon name="arrow-left" />Back to entries</button>
   </div>
 </herald-drawer>

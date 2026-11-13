@@ -279,6 +279,18 @@ describe('The tournament configuration form', () => {
     expect(page().querySelector('.summary.entries a')?.getAttribute('href')).toBe(`${base}/${tournamentId}/entries`);
   });
 
+  it('puts the back arrow and the entries icon before their links’ text, keeping their names', { meta: { type: 'covers', description: 'interface-icons: Back and entries links carry icons' } }, async () => {
+    const { page } = await render(`/${tournamentId}`, { reads: [() => of(details({ publication: 'published' }))] });
+    await vi.waitFor(() => expect(page().querySelector('.summary.entries a')).toBeTruthy());
+    const back = page().querySelector('a.back')!;
+    const entries = page().querySelector('.summary.entries a')!;
+    expect([back, entries].map((a) => [a.firstElementChild?.getAttribute('data-icon'), a.textContent?.trim()])).toEqual([
+      ['arrow-left', 'Back to tournaments'],
+      ['users', 'View entries'],
+    ]);
+    expect([back, entries].map((a) => a.querySelector('svg')?.getAttribute('aria-hidden'))).toEqual(['true', 'true']);
+  });
+
   it('has no entries link on a draft', async () => {
     const { page } = await render(`/${tournamentId}`, { reads: [() => of(details())] });
     expect(page().querySelector('.summary.entries')).toBeNull();
