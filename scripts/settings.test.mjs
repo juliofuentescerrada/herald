@@ -27,7 +27,15 @@ test('Listing or reading the user secrets is denied, while setting one the maint
   assert.ok(denied('dotnet user-secrets list'));
   assert.ok(denied('dotnet user-secrets --project src/Herald.AppHost list'));
   assert.ok(denied('cat ~/.microsoft/usersecrets/abc/secrets.json'));
+  // The variants a literal folder name would miss: globs, find, jq.
+  assert.ok(denied('cat ~/.microsoft/user*/*/secrets.json'));
+  assert.ok(denied('find ~/.microsoft -name secrets.json -exec cat {} +'));
+  assert.ok(denied('jq . ~/.microsoft/*/*/secrets.json'));
+  assert.ok(denied('type %APPDATA%\\Microsoft\\UserSecrets\\abc\\secrets.json'));
   assert.ok(!denied('dotnet user-secrets set "Parameters:auth-authority" "<value>" --project src/Herald.AppHost'));
+  // Routine commands that only name the folder or the property stay allowed.
+  assert.ok(!denied('grep -n UserSecretsId src/Herald.AppHost/Herald.AppHost.csproj'));
+  assert.ok(!denied('git log -S usersecrets'));
   const reads = settings.permissions.deny.filter((rule) => rule.startsWith('Read('));
   assert.ok(reads.includes('Read(~/.microsoft/usersecrets/**)'));
   assert.ok(reads.some((rule) => rule.includes('AppData/Roaming/Microsoft/UserSecrets')));

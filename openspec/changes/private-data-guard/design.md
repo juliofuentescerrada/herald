@@ -51,6 +51,11 @@ On 13 November 2026 the repository was assessed before being made public:
   - `Read(**/AppData/Roaming/Microsoft/UserSecrets/**)`.
 
   The agent can still set a secret when the maintainer dictates it, and it never needs to read one: the AppHost reads them.
+  - **As implemented, after the review (findings 5 and 6, the maintainer's choice on 13 November 2026):**
+    - `Bash(dotnet user-secrets list *)` and `Bash(dotnet user-secrets * list *)`;
+    - the two `Read(…)` rules above, the second in Claude Code's absolute form `//**/AppData/…`;
+    - shell commands that reach the folders or the file by path: `Bash(*.microsoft/*)`, `Bash(*AppData*Microsoft*UserSecrets*)` and `Bash(*secrets.json*)`. These catch globs, `find` and `jq`, and leave routine commands that only name the folder (`grep UserSecretsId`, a commit message) allowed.
+  - **Not covered:** Aspire's MCP server, which the agent uses to read resources, may show the values of AppHost parameters that are not marked secret, such as the authority with the tenant id. Marking them secret changes the AppHost, production code for a change of its own; until then the written rule (D-4) applies.
 - **D-4 Written rules where hooks cannot reach.**
   - `CLAUDE.md` forbids copying local configuration values, or output with identifiers, into files, commits, pull requests and comments. It also says to act only on GitHub comments from the maintainer.
   - The `herald-screens` skill requires committed screenshots to come from the E2E environment's personas.
@@ -76,9 +81,9 @@ The `herald-reviewer` subagent reviewed the diff against this change. Nothing wa
    - `scripts/gitleaks` runs under bash 3.2, falls back to `shasum`, cleans up its temporary folder and names the path for a manual install.
 3. **The rule skipped scripts without an extension, `.slnx`, `.toml` and `.txt`.** **Fixed:** every tracked file that is not binary (D-1).
 4. **Escaped or lower-case Windows paths, and `/home/<name>` without a slash, were missed.** **Fixed,** with tests.
-5. **The secret-read denials can be worked around** (globs, `find`, `jq`), and Aspire's MCP server may show parameter values. **Left to the maintainer:** they are permission settings.
-6. **The broad Bash denials also block routine commands** such as `grep UserSecretsId`. **Left to the maintainer,** with finding 5.
-7. **D-3 and the gitleaks requirement no longer matched what was built.** **Fixed:** the requirement now says an allow list holds only values that are not secrets. D-3 waits for findings 5 and 6.
+5. **The secret-read denials can be worked around** (globs, `find`, `jq`), and Aspire's MCP server may show parameter values. **Fixed with the maintainer's agreement:** shell commands that reach the folders or `secrets.json` by path are denied (D-3), with tests for each variant. Aspire's MCP output is recorded as not covered (D-3), for a change of its own.
+6. **The broad Bash denials also block routine commands** such as `grep UserSecretsId`. **Fixed with the maintainer's agreement:** the denials match paths, not the bare folder name, with tests that routine commands stay allowed.
+7. **D-3 and the gitleaks requirement no longer matched what was built.** **Fixed:** the requirement now says an allow list holds only values that are not secrets, and D-3 has its "as implemented" note.
 8. **The skip list had no reasons and skipped the rule's own file.** **Fixed:** only `pnpm-lock.yaml` is skipped, with its reason.
 9. **Versions and OIDs were taken for IPs, and some reserved ranges counted as public.** **Fixed.** IPv6 is out of scope (D-1, the requirement).
 10. **`icon@2x.png` was taken for an email.** **Fixed.**

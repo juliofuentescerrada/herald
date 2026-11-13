@@ -51,8 +51,9 @@
       "Edit(/**/*.tfvars)",
       "Bash(dotnet user-secrets list *)",
       "Bash(dotnet user-secrets * list *)",
-      "Bash(*usersecrets*)",
-      "Bash(*UserSecrets*)",
+      "Bash(*.microsoft/*)",
+      "Bash(*AppData*Microsoft*UserSecrets*)",
+      "Bash(*secrets.json*)",
       "Read(~/.microsoft/usersecrets/**)",
       "Read(//**/AppData/Roaming/Microsoft/UserSecrets/**)"
     ]
