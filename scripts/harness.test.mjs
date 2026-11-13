@@ -43,3 +43,8 @@ test('The pull request template asks for the test script, the review, the archiv
   for (const section of ['## Test script', '## Review', '## Archive', '## Harness metrics']) assert.ok(template.includes(`\n${section}\n`), section);
   assert.match(template, /## Harness metrics\n\n<!-- The output of `node scripts\/harness-metrics\.mjs --branch --markdown`/);
 });
+
+// covers: agent-harness: Herald's rules take precedence
+test('CLAUDE.md puts the specifications, tests, folder rules and ADRs above the plugin', () => {
+  assert.match(read('CLAUDE.md'), /ponytail plugin[^\n]*never removes what the change's specifications, tests, folder rules or ADRs require: those win\./);
+});
