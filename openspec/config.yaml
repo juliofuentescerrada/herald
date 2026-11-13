@@ -19,7 +19,8 @@ context: |
     read the sections the change needs, not the whole file.
   - docs/herald-h2-functional-discovery.md: detailed H2 extension; its decision statuses remain
     in the baseline register (D-30–38); target acceptance is not implemented behaviour.
-  - docs/roadmap.md: delivery order and what is implemented. openspec/specs: implemented behaviour.
+  - docs/roadmap.md: delivery order, milestones and exit criteria; batches' progress is in GitHub
+    Issues (ADR 0018). openspec/specs: implemented behaviour.
 
 rules:
   proposal:
@@ -29,8 +30,8 @@ rules:
       applicable (herald-screens skill).
     - List the notifiable facts the change introduces, or state that it introduces none (ADR 0017).
   design:
-    - Reference the mockups or prototypes of each affected screen; a proposal with missing
-      mockups stays pending visual input (herald-screens skill).
+    - Reference the mockups or prototypes of each affected screen, as the herald-screens skill
+      requires in a batch and outside one.
     - Explain any change to a module boundary, cross-module transition or integration contract,
       with its owner, authoritative conditions and revisions.
     - Measurements, visual comparisons and acceptance reviews are recorded here.

@@ -9,6 +9,8 @@ description: Herald's rules for screens, UI states, layout and mockups. Use when
 
 ## When proposing a change
 
+In a batch (ADR 0018), the agent does not ask for mockups: it generates navigable prototypes of every affected screen and state in `prototypes/frontend/`, following the layout rules below and visual direction §4 and §7.2, and the maintainer reviews them in the batch's proposals pull request. The steps below apply to work outside a batch.
+
 1. Identify every screen to create or modify, and the relevant states of each (empty, loading, error, conflict, permission, the domain states the change introduces).
 2. Ask the maintainer explicitly for mockups of each affected screen, including those states. Reuse supplied mockups when they cover the proposed change and record their references in the change's `design.md`.
 3. If mockups are missing, keep the proposal pending visual input; do not declare it ready for implementation.

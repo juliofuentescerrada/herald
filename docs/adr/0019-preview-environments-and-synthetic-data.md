@@ -5,12 +5,12 @@
 
 ## Context
 
-ADR 0018 delivers H2 onwards through a preview per pull request that the maintainer tests, and M4 (ADR 0012) deploys Herald onto the shared Azure platform after H1. Nothing runs in production yet; every deployed environment is a preview in practice. These choices are hard to reverse once M4's pipeline and infrastructure exist, so they are taken before M4.
+ADR 0018 delivers H1's remaining slices onwards in batches that the maintainer tests, locally until M4 and then on a preview per pull request, and M4 (ADR 0012) deploys Herald onto the shared Azure platform after H1. Nothing runs in production yet; every deployed environment is a preview in practice. These choices are hard to reverse once M4's pipeline and infrastructure exist, so they are taken before M4.
 
 Forces:
 
 - **Identity.** Herald signs people in through the External ID directory shared with Arcana (ADR 0014). The admin application is a single-page application, whose redirect URIs are registered one by one, without wildcards. A deployment pipeline allowed to add redirect URIs would need write rights on `herald-admin` in a directory shared with another project. The fake identity provider of the end-to-end suite (ADR 0015) would let anyone sign in as anyone on a public address, which is why the host refuses its `E2E` environment in a deployment.
-- **Work in progress.** ADR 0018 keeps at most one slice in progress; the batch's proposals pull request changes no running code.
+- **Work in progress.** ADR 0018 allows two slices in progress but tests and merges them one at a time, so one preview slot serves them in turn; the batch's proposals pull request changes no running code.
 - **Messaging.** Modules of the host exchange integration events through durable local queues (ADR 0016); Service Bus is needed only when a party leaves the process (H4, H5). The host already runs without a broker in its `E2E` environment.
 - **Data.** Testing a slice needs a populated application: organisations, tournaments in each state, entries, rosters. Today the maintainer creates them by hand on every local run. The application's rules live in its endpoints and aggregates, and the cross-module steps travel through the outbox (ADR 0008), so data written around them would be inconsistent.
 - **Cost.** ADR 0012 already accepts the fixed cost of the shared PostgreSQL server and the Container Apps environment. Previews must not add a fixed cost of their own.
@@ -56,7 +56,7 @@ M4 records the measured monthly cost of `main` and `preview` beside the base cos
 
 ## Alternatives considered
 
-- **One environment per pull request**: needs a redirect URI per pull request, so either write rights on the shared directory's application registration in the pipeline or a fake provider exposed publicly; and ADR 0018 never has two slices in progress.
+- **One environment per pull request**: needs a redirect URI per pull request, so either write rights on the shared directory's application registration in the pipeline or a fake provider exposed publicly; and ADR 0018 tests one slice at a time, so a second slot would sit idle.
 - **The fake identity provider in previews**: anyone could sign in as anyone on a public address.
 - **A separate test directory**: isolates test accounts but adds a second External ID tenant and its configuration; the maintainer accepted the shared directory.
 - **Revisions of one container app with labels**: cheaper to wire, but slots would share configuration and the database.

@@ -61,7 +61,7 @@ It shows each step with the page, the console and the network. For the servers' 
 ## Test scripts
 
 `scripts/` holds each slice's executable test script (harness-engineering D-14): the steps the maintainer will take
-on its preview, which the agent runs first against the local application. Unlike the journeys, they start from
+in the test round (locally until M4, then on its preview), which the agent runs first against the local application. Unlike the journeys, they start from
 seeded data: `scripts/seed.ts` runs `tools/Herald.Seed` once the host is up, for the persona in
 `environment.ts` (`scriptPersona`), and the script signs in as it. `screen(page, info, step)` saves a full-page
 screenshot at device scale factor 2 under `test-results/screens/<script>/`.
