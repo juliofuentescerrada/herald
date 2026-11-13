@@ -4,7 +4,7 @@
 
 ## 2. Declaration
 
-- [ ] 2.1 `.claude/settings.json`: the marketplace pinned to `v5.3.3` and the plugin enabled, written with the Claude Code CLI at project scope and validated
+- [x] 2.1 `.claude/settings.json`: the marketplace pinned to `v5.3.3` and the plugin enabled, written with the Claude Code CLI at project scope and validated
 - [ ] 2.2 `CLAUDE.md`: the precedence line; tests for both scenarios
 - [ ] 2.3 Check that a fresh cloud session on the branch loads the plugin; record the result in `design.md`, with the setup-script fallback if it does not
 
