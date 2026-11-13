@@ -37,6 +37,19 @@ The [H2 functional discovery](herald-h2-functional-discovery.md) now defines the
 ## H3 functional refinement — 13 November 2026
 
 The [H3 functional discovery](herald-h3-functional-discovery.md) develops elimination, single match and result profiles with target journeys and acceptance. Proposed defaults and unresolved gates are recorded in the [single decision register](herald-functional-discovery.md#15-decision-register-and-development-gates), D-39–47. This is documentation work (`h3-functional-discovery`), not implemented H3 or approval of optional profile additions. H3 still follows H2; the delivery order is unchanged.
+## H4 discovery and delivery handoff
+
+The [H4 discovery](herald-h4-functional-discovery.md) specifies candidate Swiss rules, exact tiebreaker examples and the connected-consumer lifecycle for review (`h4-functional-discovery`, documentation only). The [single register](herald-functional-discovery.md#15-decision-register-and-development-gates) owns D-48–56 status. The [H3 discovery](herald-h3-functional-discovery.md) owns the preceding milestone detail and D-39–47 remain proposed, not implemented behaviour. H1 is incomplete, M4 remains before H2, and H4 follows the existing H2/H3 sequence. None of these prerequisites is declared complete here.
+
+Proposed delivery sequence, subject to policy and sizing review:
+
+1. Approve the Swiss policy/profile and independent expected fixtures, including odd groups, prior byes, withdrawal, exact arithmetic and impossible/exhausted search. Identify the real consumer and resolve its compatibility needs before fixing a profile it cannot execute.
+2. Deliver reproducible Swiss preview/publication and authoritative round gates as bounded slices, including individual/direct-team readiness and incident recovery.
+3. Deliver points/explanations, safe corrections, departure/exceptional closure and final review with current-input barriers. Include the necessary result/standings behaviour in earlier slices for a complete vertical journey.
+4. Deliver scoped connected identity/profile agreement and fenced assignment/reconciliation, first proving recovery on a league if useful, then completing the real connected Swiss journey. Human reporting and explicitly granted result-source authority remain separate.
+5. Validate full eight-/32-entry runs, team invariants, the real adapter, cancellation/revocation/restart races and reviewed visual/operational limits before H4 completion. A mock consumer or documentation scenarios alone cannot meet this exit.
+
+These are delivery recommendations, not approved batches, issues or production tasks. Each batch follows ADR 0018 after prerequisite slices merge, with its decision/visual review and executable acceptance. Local imports, offline direction, cuts, email/webhooks and multi-executor expansion remain outside H4's first scope.
 
 ## H1 batches — accepted 13 November 2026
 
@@ -108,7 +121,7 @@ The maintainer's answers of 13 November 2026 to the map's open questions:
 | **H1 Operator league** | Individual and direct-team league through web/API; identity and organisation isolation; guests, admission, check-in, roster/lineup readiness, operator outcomes and safe corrections | UJ-01–03 and UJ-06–08; four entries produce six matches; retry-safe results; private data protected; reviewed current final standings |
 | **H2 Participant portal** | [Detailed H2 scope](herald-h2-functional-discovery.md): open participant access with restricted administration, discovery/self-service, teams, reporting, history/notices and bounded automation | UJ-04/05 and H2 acceptance scenarios complete; minimum-field cancellation with notices; no pending-result points or private-data leaks |
 | **H3 More competition systems** | [Detailed H3 scope](herald-h3-functional-discovery.md): elimination, single match and richer result profiles | Individual/team brackets, byes and profile validation; H3 target acceptance with proposed gates resolved |
-| **H4 Swiss and connected consumer** | Specified Swiss policy and a real external consumer | Reproducible pairings/standings; recovery without duplicate effects |
+| **H4 Swiss and connected consumer** | [Detailed H4 target](herald-h4-functional-discovery.md): specified Swiss policy/profile and an identified compatible real consumer, for individual/direct-team entries | Eight-/32-entry configured runs; no forbidden rematches/byes or partial publication; exact shared standings; real connected execution and lost-response recovery without duplicate effects; policy/operational gates resolved |
 | **H5 Stages and live ecosystem** | Combined stages, live following, email and webhooks | Unambiguous cuts; revision-aware consumer reconciliation |
 | **H6 Advanced teams** | Composite encounters, substitutions and game submissions | Versioned participation; aggregate outcome counted once |
 | **H7 Circuits** | Seasons and cross-tournament points | Revisable standings and explicit continuity policy |

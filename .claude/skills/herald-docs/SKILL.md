@@ -15,6 +15,7 @@ description: Herald's rules for maintaining documentation and decisions. Use whe
 | Shared product rules, journeys and the single decision register (§15) | `docs/herald-functional-discovery.md` |
 | Detailed H2 participant rules and target acceptance | `docs/herald-h2-functional-discovery.md`, linked from the baseline and its register |
 | Detailed H3 elimination, single-match and profile rules and target acceptance | `docs/herald-h3-functional-discovery.md`, linked from the baseline and its register |
+| Detailed H4 Swiss/connected-consumer rules and target acceptance | `docs/herald-h4-functional-discovery.md`, linked from the baseline and its register |
 | Architecture decisions | `docs/adr/` |
 | Visual contracts and screen/state coverage | `docs/herald-visual-direction.md` |
 | A change's design notes, measurements and reviews | the change's `design.md` |

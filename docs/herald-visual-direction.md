@@ -321,6 +321,25 @@ The [H3 discovery](herald-h3-functional-discovery.md) owns functional rules and 
 
 Include desktop/mobile, keyboard, empty/loading, denied/revoked, failed-save with retained input and uncertain-response recovery where applicable. Future screen slices require specific visual review under the `herald-screens` skill and executable scenarios linked to H3 §12. The existing league concepts do not approve an elimination bracket or exceptional-closure presentation.
 
+<a id="h4-screenstate-inventory"></a>
+
+### 9.6 H4 screen/state inventory
+
+The [H4 discovery](herald-h4-functional-discovery.md) owns functional rules/acceptance. This is a future inventory, not approved mockups or implemented screens. The explicit anchor remains stable alongside the H3 inventory in §9.5.
+
+| Surface | Required states and boundary evidence |
+| --- | --- |
+| Swiss configuration/profile agreement | Fixed rounds, individual/team, supported versions and limits, incompatible consumer, locked running rules, real versus synthetic entries |
+| Field/seed and pairing preview | Eligible/inactive, current snapshot, seed order, score groups/floats, feasible bye candidate, prior-bye exclusion, proven infeasible versus search exhausted, stale/invalidated draft, all-or-nothing publication |
+| Published rounds and match preparation | Draft opponent absent, published opponent/bye, pending versus terminal round, team understrength/locked lineup, individual journey without roster controls |
+| Standings and formula explanation | Points versus actual play, exact OMW and display rounding, bye/administrative/no-contest statistics, withdrawn opponent, tied/shared positions, updating/current/final input revision |
+| Connected setup and mapping | Local versus connected authority, scoped application/source grant, compatible/unsupported version, synthetic classification, mapping retry/conflict without private external reference disclosure |
+| Execution/receipt operations | Unassigned/current attempt, running/offline outcome, received/processing/applied/rejected receipt, stale fence, stalled/failed engine, explicit replacement, uncertain response, cancelled/revoked authority |
+| Incident/correction/final review | No legal round, incomplete closure policy pending, double departure, old/new/transitive standings impact, draft invalidation, named later-round blocker, stale final review, retained prior final revision |
+| Public view, inbox and protected history | Published facts only, synthetic label without human appearance, bye versus play, duplicate-notice suppression, failed target/revoked link, no private diagnostics/mappings/credentials |
+
+For each relevant surface explore desktop/mobile, keyboard and screen-reader meaning, empty/loading, permission denial/revocation, failure with retained input and stale/uncertain-save recovery. Follow §4/5/7.2/8.1 for layout and feedback. Future screen slices require reviewed prototypes/mockups and executable scenarios; the existing league concepts do not approve Swiss explanations or connected execution controls.
+
 ## 10. Accessibility and semantic acceptance
 
 - Target WCAG 2.2 AA. Verify normal text at least 4.5:1 and large text at least 3:1. Validate control boundaries, focus visibility, non-text contrast and states separately before implementation.
