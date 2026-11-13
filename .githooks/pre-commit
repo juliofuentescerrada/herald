@@ -1,4 +1,7 @@
 #!/bin/sh
 # Herald's repository rules on the staged files (harness-engineering D-1). Enabled by scripts/bootstrap
 # (git config core.hooksPath .githooks). CI runs the same rules on every file, so bypassing this only delays them.
-exec node "$(git rev-parse --show-toplevel)/scripts/rules.mjs" --staged
+root="$(git rev-parse --show-toplevel)"
+node "$root/scripts/rules.mjs" --staged || exit 1
+# Secrets in the staged changes (private-data-guard D-2), when scripts/bootstrap has installed gitleaks; CI always scans.
+exec "$root/scripts/gitleaks" --installed git --pre-commit --staged "$root"

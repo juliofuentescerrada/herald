@@ -47,6 +47,8 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          fetch-depth: 0
       - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
         with:
           package_json_file: web/package.json
@@ -69,6 +71,14 @@ jobs:
         run: node scripts/rules.mjs
       - name: Every specified scenario has a test, or is in the shrinking baseline
         run: node scripts/spec-coverage.mjs
+      - name: Gitleaks, pinned and verified (private-data-guard D-2)
+        run: scripts/gitleaks --install
+      - name: No secret in the pull request's commits, or in the pushed ones
+        env:
+          RANGE: ${{ github.event_name == 'pull_request' && format('{0}..{1}', github.event.pull_request.base.sha, github.event.pull_request.head.sha) || format('{0}..{1}', github.event.before, github.sha) }}
+        run: |
+          case "$RANGE" in 0000000000000000000000000000000000000000..*) RANGE="${RANGE#*..}" ;; esac
+          scripts/gitleaks git --log-opts="$RANGE" .
       - name: The rules' own tests
         run: node --test scripts/*.test.mjs
 
