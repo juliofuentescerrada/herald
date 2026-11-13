@@ -33,4 +33,4 @@ When asking for new mockups, put the current layout rules in the prompt (visual 
 
 ## When implementing
 
-Compare the implemented screens with their mockups or prototypes by screenshot, record the differences and their resolution in the change's `design.md`, and keep feedback placement, confirmations and layout as visual direction §4, §5, §7.2 and §8.1 set them.
+Screenshots committed to the repository or attached to a pull request come from the E2E environment's synthetic personas (`e2e/`, the test scripts), never from a local Aspire run, which seeds as the maintainer with real identifiers (private-data-guard D-4). Compare the implemented screens with their mockups or prototypes by screenshot, record the differences and their resolution in the change's `design.md`, and keep feedback placement, confirmations and layout as visual direction §4, §5, §7.2 and §8.1 set them.
