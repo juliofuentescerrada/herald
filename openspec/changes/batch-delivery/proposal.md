@@ -1,6 +1,6 @@
 ## Status
 
-**Pending the maintainer's review** (gate 1.1). Proposed on 13 November 2026. The maintainer decided the same day to start ADR 0018's flow with H1's remaining slices, tested locally until M4, with at most two slices in progress, and to track the remaining work in GitHub Issues. The open questions are in `design.md`.
+**Approved for implementation on 13 November 2026** (gate 1.1). Proposed the same day: the maintainer decided to start ADR 0018's flow with H1's remaining slices, tested locally until M4, with at most two slices in progress, and to track the remaining work in GitHub Issues. The maintainer answered Q-1 to Q-3 (`design.md`) and approved the change.
 
 ## Why
 
@@ -39,7 +39,7 @@ The ADR also allows only one slice in progress. With one preview slot, the bottl
 - **README and roadmap:** they point to the board for status. The H1 batch map is not part of this change: it follows as its own documentation pull request, so the maintainer reviews it on its own.
 
 Out of scope:
-- creating the next-slice scheduled task: after the first batch's trial, started by hand with `agent:start` (Q-3);
+- creating the next-slice scheduled task: the first H1 batch is started by hand, and the task follows it (Q-3);
 - M4 itself;
 - any product rule.
 

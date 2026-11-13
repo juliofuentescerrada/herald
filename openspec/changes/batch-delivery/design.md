@@ -59,7 +59,7 @@ Findings that shape the design:
   - *Alternative:* a preview inside the cloud session, behind its preview port (ADR 0018's fallback). Rejected for now: it lives only while the session does, and it needs a non-deployed environment with the fake identity provider reachable through one origin.
 - **D-3 Two slices in progress, dependencies declared.**
   - The slice template gains "Depends on" (sub-issue numbers), and the batch issue lists its slices in order with their dependencies.
-  - The next-slice run, by hand until Q-3, starts a slice only when its dependencies are merged and fewer than two slices are `in-progress`.
+  - The next-slice run, by hand for the first H1 batch (Q-3), starts a slice only when its dependencies are merged and fewer than two slices are `in-progress`.
   - Test rounds and merges go one at a time: the maintainer tests one pull request, then the next.
   - Before marking a pull request ready for a test round, the agent:
     - merges `main` into it;
@@ -93,7 +93,4 @@ Findings that shape the design:
 
 - **Q-1 ADR 0018:** accepted when this change is approved (D-1).
 - **Q-2 H1 milestone:** issues only for the remaining work.
-
-## Open Questions
-
-- **Q-3** Should the first H1 batch be started by hand (`agent:start` and a message to a new session), with the next-slice scheduled task created after it, as proposed?
+- **Q-3 Starting slices:** the first H1 batch is started by hand (the maintainer asks a session, or adds `agent:start`); the next-slice scheduled task is created after that batch.
