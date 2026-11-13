@@ -11,7 +11,7 @@
 
 - [x] 3.1 `ci.yml`: `ready_for_review`, the draft condition, the `changes` job and `needs`/`if` on `dotnet`, `web` and `test-scripts`
 - [x] 3.2 `e2e.yml`: the `changes` job and the condition on the suite
-- [ ] 3.3 A test that reads both workflows and checks that the code jobs depend on `changes` and that every `ci.yml` job skips drafts; mark the draft, documentation-only and documentation-only-merge scenarios
+- [x] 3.3 A test that reads both workflows and checks that the code jobs depend on `changes` and that every `ci.yml` job skips drafts; mark the draft, documentation-only and documentation-only-merge scenarios
 
 - [x] 3.4 `guard.mjs` (D-5): the pull request tied to its branch and commit, forgotten once merged or on another branch; tests on a temporary repository, the existing push-round tests moved onto one
 

@@ -1,11 +1,12 @@
 // The classification of changed files for CI (ci-path-filters D-1): node --test scripts/ci-changes.test.mjs
 import assert from 'node:assert/strict';
 import { execFileSync } from 'node:child_process';
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from 'node:fs';
+import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { dirname, join } from 'node:path';
 import { after, test } from 'node:test';
 import { classify, touchesCode } from './ci-changes.mjs';
+import { root } from './rules.mjs';
 
 const temp = mkdtempSync(join(tmpdir(), 'herald-ci-changes-test-'));
 after(() => rmSync(temp, { recursive: true, force: true }));
@@ -76,4 +77,38 @@ test('A real diff between two commits is classified', () => {
   const code = commit('src/Program.cs', 'code');
   assert.equal(classify(start, docs, repo), false);
   assert.equal(classify(docs, code, repo), true);
+});
+
+// The workflows' jobs, read as text: each job's block under `jobs:`, keyed by its name.
+const jobsOf = (workflow) => {
+  const text = readFileSync(join(root, '.github', 'workflows', workflow), 'utf8');
+  const body = text.slice(text.indexOf('\njobs:\n'));
+  const jobs = {};
+  for (const block of body.split(/\n(?= {2}[a-z][\w-]*:\n)/).slice(1)) jobs[block.match(/^ {2}([\w-]+):/)[1]] = block;
+  return { text, jobs };
+};
+const codeOnly = /needs: changes\n {4}if: needs\.changes\.outputs\.code == 'true'/;
+const notDraft = "if: github.event_name == 'push' || !github.event.pull_request.draft";
+
+// covers: continuous-integration: A documentation-only pull request
+test('The build, test and test-script jobs wait for the classification and run only for code', () => {
+  const { jobs } = jobsOf('ci.yml');
+  assert.deepEqual(Object.keys(jobs).sort(), ['changes', 'dotnet', 'rules', 'test-scripts', 'web']);
+  for (const job of ['dotnet', 'web', 'test-scripts']) assert.match(jobs[job], codeOnly, job);
+  assert.doesNotMatch(jobs.rules, /needs:/, 'the rules run for every ready change');
+  assert.match(jobs.changes, /node scripts\/ci-changes\.mjs/);
+});
+
+// covers: continuous-integration: A draft pull request
+test('No CI job runs on a draft, and marking it ready starts them', () => {
+  const { text, jobs } = jobsOf('ci.yml');
+  assert.match(text, /types: \[opened, synchronize, reopened, ready_for_review\]/);
+  assert.ok(jobs.changes.includes(notDraft) && jobs.rules.includes(notDraft), 'the jobs without needs skip drafts');
+});
+
+// covers: continuous-integration: A documentation-only merge
+test('The journeys after a merge wait for the classification and run only for code', () => {
+  const { jobs } = jobsOf('e2e.yml');
+  assert.match(jobs.e2e, codeOnly);
+  assert.match(jobs.changes, /node scripts\/ci-changes\.mjs/);
 });
