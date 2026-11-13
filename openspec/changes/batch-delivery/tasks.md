@@ -16,7 +16,7 @@
 ## 4. Skills, configuration and status
 
 - [x] 4.1 `herald-screens` (prototypes in batched work), `herald-docs` (archive in the slice's pull request, status in issues), `openspec/config.yaml`
-- [ ] 4.2 `README.md` and `docs/roadmap.md` point to the board for status; the roadmap's delivery-process row
+- [x] 4.2 `README.md` and `docs/roadmap.md` point to the board for status; the roadmap's delivery-process row
 
 ## 5. Review and archive
 
