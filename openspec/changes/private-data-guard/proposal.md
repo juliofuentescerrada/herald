@@ -1,6 +1,6 @@
 ## Status
 
-**Pending the maintainer's review** (gate 1.1). Proposed on 13 November 2026. The maintainer is making the repository public to remove the private repository's GitHub Actions limit. The maintainer answered the design's questions the same day (`design.md`). The assessment found no secret or real identifier in the tree or its history; this change keeps it that way.
+**Approved for implementation on 13 November 2026** (gate 1.1). Proposed the same day, as the maintainer made the repository public to remove the private repository's GitHub Actions limit. The maintainer answered the design's questions (`design.md`) and approved it the same day. The assessment the same day found no secret or real identifier in the tree or its history; this change keeps it that way.
 
 ## Why
 

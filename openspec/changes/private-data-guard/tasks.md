@@ -1,6 +1,6 @@
 ## 1. Approval
 
-- [ ] 1.1 Maintainer review of the proposal, specs and design, record the approval in `proposal.md` (Q-1 and Q-2 answered on 13 November 2026)
+- [x] 1.1 Maintainer review of the proposal, specs and design, record the approval in `proposal.md` (Q-1 and Q-2 answered on 13 November 2026)
 
 ## 2. Private-data rule
 
