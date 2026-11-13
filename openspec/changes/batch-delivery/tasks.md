@@ -11,7 +11,7 @@
 
 - [x] 3.1 `scripts/github-setup [--dry-run]` with its test (`// covers:` the dry-run scenario)
 - [x] 3.2 `docs/operations/delivery-tracking.md`: running the script, the board's columns and the labels' meaning
-- [ ] 3.3 Issue templates (slice "Depends on", batch order and dependencies) and the pull request template's sections, with a test reading them (`// covers:` the template scenarios and "Two independent slices")
+- [x] 3.3 Issue templates (slice "Depends on", batch order and dependencies) and the pull request template's sections, with a test reading them (`// covers:` the template scenarios and "Two independent slices")
 
 ## 4. Skills, configuration and status
 

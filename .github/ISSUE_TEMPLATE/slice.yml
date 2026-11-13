@@ -14,6 +14,14 @@ body:
       placeholder: openspec/changes/<name>/
     validations:
       required: true
+  - type: input
+    id: depends
+    attributes:
+      label: Depends on
+      description: The slices that must be merged before this one starts (sub-issue numbers), or "none". At most two slices are in progress at once (ADR 0018).
+      placeholder: "#…, #… or none"
+    validations:
+      required: true
   - type: textarea
     id: scope
     attributes:

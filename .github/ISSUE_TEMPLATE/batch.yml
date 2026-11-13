@@ -27,9 +27,11 @@ body:
     id: slices
     attributes:
       label: Slices
-      description: One sub-issue per slice, in order. Add them as sub-issues; list them here for reading.
+      description: One sub-issue per slice, in order, each with the slices it depends on. Independent slices may run two at a time; two slices that change the same module's EF Core model depend on each other (ADR 0018). Add them as sub-issues; list them here for reading.
       placeholder: |
-        - [ ] #… self-service registration
+        - [ ] #… round-robin schedule (depends on: none)
+        - [ ] #… locked lineups (depends on: none)
+        - [ ] #… operator results (depends on: #…)
   - type: textarea
     id: prototypes
     attributes:
