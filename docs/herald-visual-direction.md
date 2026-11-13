@@ -306,6 +306,21 @@ The [H2 discovery](herald-h2-functional-discovery.md) owns functional rules and 
 
 For each surface include desktop/mobile, keyboard, loading, failed/uncertain-save and stale states as applicable. Reuse the discovery concept only for composition; each production screen slice requires specific mockup review under the `herald-screens` skill. The H2 discovery scenarios identify behavioural acceptance; screenshots alone do not prove authority, scheduling or durable audit.
 
+### 9.5 H3 screen/state inventory
+
+The [H3 discovery](herald-h3-functional-discovery.md) owns functional rules and target acceptance. These are future surfaces for reviewed slices, not approved mockups or implemented screens. This documentation update changes no UI.
+
+| Surface | Required states and boundary evidence |
+| --- | --- |
+| Configuration/profile selection | Elimination/single match, individual/team, supported combinations, profile/version, required winner, incompatible draw/detail and unsupported field size |
+| Field/seeding/bracket preview | Empty/ineligible field, explicit draw, initial byes, reproducible revision, changed-field/stale review, fixed bracket and denied regeneration/replacement |
+| Desktop bracket/mobile round list | Planned source, unresolved origin, current derived entrant, published opponent, bye versus administrative advance, no qualifier, blocked/complete round; no colour-only meaning |
+| Match/result/incident | Outcome-only/aggregate Bo3, invalid terminal score, retained partial-play evidence, pending/disputed/effective, team understrength, one series lineup and independent-referee blocker |
+| Round operations and correction | Ready for review versus published, updating projections, old/new result/participation impact, unpublished draft invalidated, named published dependency, concurrent conflict and recoverable receipt |
+| Final review, history and notices | Current/stale review, ordinary shared places, exceptional no-champion policy pending decision, reopened/revised result, no fabricated appearance, visibility/representation revoked and guest communication work |
+
+Include desktop/mobile, keyboard, empty/loading, denied/revoked, failed-save with retained input and uncertain-response recovery where applicable. Future screen slices require specific visual review under the `herald-screens` skill and executable scenarios linked to H3 §12. The existing league concepts do not approve an elimination bracket or exceptional-closure presentation.
+
 ## 10. Accessibility and semantic acceptance
 
 - Target WCAG 2.2 AA. Verify normal text at least 4.5:1 and large text at least 3:1. Validate control boundaries, focus visibility, non-text contrast and states separately before implementation.
