@@ -115,9 +115,9 @@ The full bracket may be visible as structure while future slots still say “win
 
 ### H3-AV-01 Effective results and destinations
 
-Each winner feeds exactly one successor slot; a loser never advances. Slot sources remain traceable through result revisions. A pending report, open dispute or correction request is not an effective winner. Silence does not resolve a report. Apply H2's selected reporting mode, independent-referee rules and current representative authority.
+Each non-final winner feeds exactly one declared successor slot; a loser never advances. The final has no successor: its effective result enables final review. Slot sources remain traceable through result revisions. A pending report, open dispute or correction request is not an effective winner. Silence does not resolve a report. Apply H2's selected reporting mode, independent-referee rules and current representative authority.
 
-An effective resolution derives the successor assignment once. A bye derives its advancement without a fictitious effective played result. A future slot may show its source while unresolved; do not populate it with a predicted winner.
+Where a successor exists, an effective resolution derives its assignment once. A bye derives its advancement without a fictitious effective played result. A future slot may show its source while unresolved; do not populate it with a predicted winner.
 
 ### H3-AV-02 Round publication and readiness
 
@@ -171,7 +171,7 @@ Preserve the H1 generic draw-capable outcome-only profile; no-draw is a separate
 
 Propose a decisive first-to-two-wins profile, without drawn games or time-limit rules in its initial form. Ordinary completed scores are 2–0, 2–1 and their reverses. Reject 0–0, 1–0, 1–1, 2–2, 3–0, negatives and fractions. Derive the winner on the server; reject a supplied winner inconsistent with evidence.
 
-Aggregate 2–1 does not establish game order. Do not invent ordered games to complete a display. The series is one match, one effective result and one advancement, including when each side fields several players. Administrative resolution of an unfinished series follows §6, retaining actual evidence rather than passing ordinary completed-series validation.
+Aggregate 2–1 does not establish game order. Do not invent ordered games to complete a display. The series is one match with one effective result and, where a successor exists, one advancement, including when each side fields several players. Administrative resolution of an unfinished series follows §6, retaining actual evidence rather than passing ordinary completed-series validation.
 
 ### H3-RP-03 Conditional detail and direct score
 
@@ -243,7 +243,7 @@ These are target acceptance scenarios for later slices, not claims of passing ex
 | H3-AT-05 Pending/disputed | Report Q2, leave silent, then dispute | No effective winner or confirmed S1 entrant from the pending report; independent decision required |
 | H3-AT-06 Publication | Last effective result completes round; review/publish next | No automatic publication; current sources assign each winner to exactly one correct slot |
 | H3-AT-07 Terminal draw | Submit draw to decisive elimination profile | Rejected without advancement; explanation and input retained |
-| H3-AT-08 Bo3 validation | Submit 2–0/2–1/reverses; 3–0/1–1/fraction or contradictory winner | Only valid ordinary terminal scores accepted; one derived winner and advance |
+| H3-AT-08 Bo3 validation | Submit 2–0/2–1/reverses; 3–0/1–1/fraction or contradictory winner | Only valid ordinary terminal scores accepted; one derived winner and advance where a successor exists |
 | H3-AT-09 Evidence | Aggregate 2–1; administrative concession with real 1–0 | No invented order in first case or second game in second; cause/evidence preserved |
 | H3-AT-10 Profiles | Run different profiles concurrently; update catalogue | Independent validation/presentation; started tournament keeps its version |
 | H3-AT-11 Individual API | Complete individual journey without team payloads | No roster/lineup ID, singleton array or lock command required |

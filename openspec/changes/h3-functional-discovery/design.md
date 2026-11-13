@@ -35,7 +35,11 @@ Documentation only; no deployment, data migration or endpoint regeneration. Reve
 
 ## Verification and review
 
-Run repository rules including British English spelling, implemented-specification coverage, strict OpenSpec validation, changed Markdown link/anchor checks and whitespace checks. The repository-required independent reviewer checks the completed diff before the pull request opens. Record final results and resolved findings here. H3 product scenarios are not executed in this change.
+Verification passed: changed-file repository rules including British English spelling, unchanged implemented-specification coverage (91/356 covered; 265 existing baseline), strict OpenSpec validation, 29 added/changed local Markdown links and anchors, staged secret scanning and whitespace checks. Repository script tests passed with 74 passing and one existing skip after selecting the installed secret scanner through its supported tools-directory setting.
+
+The complete `scripts/check rules` run could not finish its licence inventory: this documentation-only session lacks .NET and the application dependency installations. The first script-test run also used an unwritable default scanner installation path; selecting a tools directory with write access resolved it. No dependency, lockfile or check configuration was changed. Application tests were not run; no runtime code, endpoint or UI changed. H3 scenarios remain target acceptance, not executed product tests.
+
+The repository-required independent reviewer found one minor ambiguity: the unconditional winner-to-successor rule would require a destination for the final. Resolved in H3-AV-01, the Bo3 wording/acceptance, D-41 and the shared elimination summary: only non-final winners feed a declared successor; the final enables review. No blocking or should-fix findings were reported; the independent recheck found no remaining findings. Harness metrics have no instrumented guard sessions in this Codex environment; the generated zero table does not measure actual effort.
 
 ## Open Questions
 
