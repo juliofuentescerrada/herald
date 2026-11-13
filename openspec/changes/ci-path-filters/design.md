@@ -45,6 +45,13 @@ Findings that shape the design:
   - Every job of `ci.yml`, `changes` included, runs only when the pull request is not a draft.
   - The local edit and commit hooks still run the rules while a pull request is a draft.
   - `CLAUDE.md` tells the agent to open a pull request as a draft and mark it ready when it asks for review or a test round.
+- **D-5 The guard forgets a merged pull request** (`harness-resumption` D-2 left the flag set for the rest of the session).
+  - When the guard learns that the session has a pull request, it records the current branch and `HEAD`.
+  - Before counting a push, it compares them with the repository:
+    - on another branch, the push is a checkpoint;
+    - once the recorded commit is an ancestor of `origin/main`, the pull request has been merged, the flag is cleared and the push is a checkpoint.
+  - It reads git only for pushes, so other tool calls pay nothing.
+  - *Alternative:* clearing the flag at the maintainer's next message. Rejected: during a pull request's feedback rounds, the maintainer's messages would reopen unlimited pushes.
 - **D-4 The `continuous-integration` specification changes.** "Every change is checked by CI" now states which checks run for which changes, and the end-to-end requirement runs only for code.
 
 ## Risks / Trade-offs

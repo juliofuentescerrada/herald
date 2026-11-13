@@ -18,6 +18,7 @@ Each push to a pull request runs four jobs that cost about 12 billed minutes, ev
   - skipped jobs report as skipped, which satisfies a required check, so no workflow-level path filter is used.
 - **Draft pull requests run nothing.** CI runs when a pull request is opened ready, marked ready for review, or updated while ready. The agent can keep a pull request in draft while it works and mark it ready before asking for a test round. The edit and commit hooks still check the rules locally.
 - **The classification has its own tests,** run by the `rules` job.
+- **The guard forgets a merged pull request.** Found while implementing this change: after #30 merged, the session moved to this change on the same branch and the guard still counted its checkpoint pushes as pushes on an open pull request, refusing the fourth. The guard now ties the pull request to the branch and commit where it saw it, and stops counting once that commit is in `origin/main` or the branch changes (`agent-harness`).
 
 Out of scope:
 - making the repository public, assessed separately on 13 November 2026;
@@ -34,6 +35,7 @@ None.
 
 ### Modified Capabilities
 
+- `agent-harness`: a pull request the guard saw stops counting push rounds once it is merged or the session is on another branch.
 - `continuous-integration`:
   - the code jobs and the end-to-end suite run only when a change touches code;
   - draft pull requests are not checked;
@@ -45,5 +47,6 @@ None.
 - Changed:
   - `.github/workflows/ci.yml`: a `changes` job, the draft condition, and the `ready_for_review` trigger;
   - `.github/workflows/e2e.yml`: a `changes` job;
-  - `CLAUDE.md`: drafts while working.
+  - `CLAUDE.md`: drafts while working;
+  - `.claude/hooks/guard.mjs` and its tests: the pull request tied to its branch and commit.
 - No dependency, no change to the host, modules, contracts or web applications.

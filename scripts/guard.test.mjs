@@ -1,6 +1,6 @@
 // The loop guard's limits and metrics with synthetic hook inputs (ADR 0018, harness-engineering D-12).
 import assert from 'node:assert/strict';
-import { spawnSync } from 'node:child_process';
+import { execFileSync, spawnSync } from 'node:child_process';
 import { mkdirSync, mkdtempSync, readFileSync, rmSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join } from 'node:path';
@@ -11,10 +11,28 @@ const temp = mkdtempSync(join(tmpdir(), 'herald-guard-test-'));
 after(() => rmSync(temp, { recursive: true, force: true }));
 const guard = new URL('../.claude/hooks/guard.mjs', import.meta.url).pathname;
 
+// A repository whose `slice` branch is ahead of origin/main: where the push-round tests run, so they never depend on
+// the real repository's history (ci-path-filters D-5).
+const sliceRepository = (name) => {
+  const repo = join(temp, name);
+  mkdirSync(repo, { recursive: true });
+  const git = (...args) => execFileSync('git', args, { cwd: repo, encoding: 'utf8', env: { ...process.env, CLAUDECODE: '' } }).trim();
+  git('init', '-q', '-b', 'main');
+  git('config', 'user.email', 'test@example.org');
+  git('config', 'user.name', 'Test');
+  git('config', 'commit.gpgsign', 'false');
+  git('commit', '-q', '--allow-empty', '--no-verify', '-m', 'main');
+  git('update-ref', 'refs/remotes/origin/main', 'HEAD');
+  git('checkout', '-q', '-b', 'slice');
+  git('commit', '-q', '--allow-empty', '--no-verify', '-m', 'slice');
+  return { repo, git };
+};
+const defaultRepository = sliceRepository('default-repository').repo;
+
 const hook = (session, event, extra = {}, env = {}) => {
   const result = spawnSync(process.execPath, [guard], {
     input: JSON.stringify({ session_id: session, hook_event_name: event, ...extra }),
-    env: { ...process.env, TMPDIR: temp, HERALD_GUARD: '', ...env },
+    env: { ...process.env, TMPDIR: temp, HERALD_GUARD: '', HERALD_GUARD_ROOT: defaultRepository, ...env },
     encoding: 'utf8',
   });
   return { code: result.status, stdout: result.stdout, stderr: result.stderr };
@@ -170,4 +188,44 @@ test('A proposal that only mentions the phrase is not an approval', () => {
 test('Production code can be edited once an active change is approved', () => {
   const root = repositoryWith('approved', '## Status\n\n**Approved for implementation on 12 November 2026** (gate 1.1).');
   assert.doesNotMatch(hook('f2', 'PreToolUse', edit(join(root, 'src/Herald.Host/Program.cs')), { HERALD_GUARD_ROOT: root }).stdout, /deny/);
+});
+
+const openPullRequest = (session, env) => {
+  hook(session, 'UserPromptSubmit', { prompt: 'Implement the slice' }, env);
+  hook(session, 'PreToolUse', { tool_name: 'mcp__github__create_pull_request', tool_input: {} }, env);
+  hook(session, 'PostToolUse', { tool_name: 'mcp__github__create_pull_request', tool_input: {} }, env);
+  for (let round = 0; round < 3; round++) {
+    hook(session, 'PreToolUse', bash('git push'), env);
+    hook(session, 'PostToolUse', bash('git push'), env);
+  }
+};
+
+// covers: agent-harness: A new change after the pull request merged
+test('Once the pull request is merged, the next change pushes its checkpoints freely', () => {
+  const { repo, git } = sliceRepository('merged');
+  const env = { HERALD_GUARD_ROOT: repo };
+  openPullRequest('r1', env);
+  assert.match(hook('r1', 'PreToolUse', bash('git push'), env).stdout, /deny/, 'the rounds are spent while it is open');
+
+  git('update-ref', 'refs/remotes/origin/main', 'slice');
+  git('commit', '-q', '--allow-empty', '--no-verify', '-m', 'next change, task 1.1');
+  for (let task = 0; task < 5; task++) {
+    assert.doesNotMatch(hook('r1', 'PreToolUse', bash('git push'), env).stdout, /deny/);
+    hook('r1', 'PostToolUse', bash('git push'), env);
+  }
+});
+
+test('On another branch, pushes are checkpoints again', () => {
+  const { repo, git } = sliceRepository('other-branch');
+  const env = { HERALD_GUARD_ROOT: repo };
+  openPullRequest('r2', env);
+  git('checkout', '-q', '-b', 'another-slice');
+  assert.doesNotMatch(hook('r2', 'PreToolUse', bash('git push -u origin another-slice'), env).stdout, /deny/);
+});
+
+test('A flag saved without its branch and commit is forgotten', () => {
+  hook('r3', 'UserPromptSubmit', { prompt: 'Implement the slice' });
+  const file = join(temp, 'herald-guard', 'r3.json');
+  writeFileSync(file, JSON.stringify({ ...JSON.parse(readFileSync(file, 'utf8')), pullRequest: true, pushes: 3 }));
+  assert.doesNotMatch(hook('r3', 'PreToolUse', bash('git push'), {}).stdout, /deny/);
 });

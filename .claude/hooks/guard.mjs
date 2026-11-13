@@ -6,7 +6,9 @@
 //   everything is refused except git and GitHub tools, so the agent can record where it stopped.
 // - Repeated failure: the same Bash command failing several times in a row is refused.
 // - Push rounds: several pushes since the maintainer's last message are refused, counted only once the session has
-//   opened or updated a pull request; earlier pushes are the slice's checkpoints (harness-resumption D-2).
+//   opened or updated a pull request; earlier pushes are the slice's checkpoints (harness-resumption D-2). The pull
+//   request is tied to the branch and commit where it was seen, and forgotten once that commit is in origin/main or
+//   the session is on another branch (ci-path-filters D-5).
 // - Phase: the file tools cannot edit production code (src/, web/projects/, tools/) while no active change in
 //   openspec/changes/ is approved for implementation (harness-resumption D-6).
 //
@@ -17,6 +19,7 @@
 // Limits: HERALD_GUARD_MAX_TOOLS (400), HERALD_GUARD_MAX_FAILURES (3), HERALD_GUARD_MAX_PUSHES (3).
 // HERALD_GUARD=off disables every guard. HERALD_GUARD_ROOT names another repository root (the guard's tests).
 
+import { execFileSync } from 'node:child_process';
 import { appendFileSync, existsSync, mkdirSync, readdirSync, readFileSync, writeFileSync } from 'node:fs';
 import { tmpdir } from 'node:os';
 import { join, relative, resolve } from 'node:path';
@@ -126,6 +129,32 @@ if (!input || process.env.HERALD_GUARD === 'off') process.exit(0);
 const file = stateFile(input.session_id ?? 'unknown');
 const state = loadState(file);
 state.turn ??= newTurn();
+
+const git = (...args) => {
+  try {
+    return execFileSync('git', args, { cwd: repositoryRoot, encoding: 'utf8', stdio: ['ignore', 'pipe', 'ignore'] }).trim();
+  } catch {
+    return null;
+  }
+};
+
+// Where the session's pull request was seen; read only when it is seen and before a push.
+const markPullRequest = () => {
+  state.pullRequest = { branch: git('branch', '--show-current'), commit: git('rev-parse', 'HEAD') };
+};
+
+// Whether pushes count towards the rounds: a pull request was seen on this branch and has not been merged.
+const pullRequestOpen = () => {
+  // A flag without a location (saved before ci-path-filters) cannot be tied to a pull request: forgotten.
+  if (!state.pullRequest || state.pullRequest === true) return false;
+  const seen = state.pullRequest;
+  if (seen.branch && git('branch', '--show-current') !== seen.branch) return false;
+  if (seen.commit && git('merge-base', '--is-ancestor', seen.commit, 'origin/main') !== null) {
+    state.pullRequest = false;
+    return false;
+  }
+  return true;
+};
 const command = input.tool_name === 'Bash' ? normalise(input.tool_input?.command) : '';
 let exitCode = 0;
 
@@ -134,7 +163,7 @@ switch (input.hook_event_name) {
     state.turn = { ...newTurn(), number: state.turn.number + 1, maintainer: fromMaintainer(input.prompt) };
     // A GitHub event after the session's first turn comes from a pull request it subscribed to; the first turn's event
     // is the trigger that started the session (a merge, a label), which says nothing about this session's pull request.
-    if (githubEvent(input.prompt) && state.turn.number > 1) state.pullRequest = true;
+    if (githubEvent(input.prompt) && state.turn.number > 1) markPullRequest();
     if (fromMaintainer(input.prompt)) {
       state.tools = 0;
       state.pushes = 0;
@@ -161,7 +190,7 @@ switch (input.hook_event_name) {
         `Herald guard: this command has failed ${maxFailures} times in a row. Retrying it will not help. ` +
           `Find the cause another way or ${stopAdvice.charAt(0).toLowerCase()}${stopAdvice.slice(1)}`,
       );
-    } else if (isPush(command) && state.pullRequest && state.pushes >= maxPushes) {
+    } else if (isPush(command) && state.pushes >= maxPushes && pullRequestOpen()) {
       deny(
         `Herald guard: ${maxPushes} pushes since the maintainer's last message. ` +
           'Further fixes need the maintainer: describe the remaining failure on the pull request and end your turn.',
@@ -174,11 +203,11 @@ switch (input.hook_event_name) {
     if (command) {
       delete state.failures[command];
       if (isPush(command)) {
-        if (state.pullRequest) state.pushes += 1;
+        if (pullRequestOpen()) state.pushes += 1;
         state.turn.pushes += 1;
       }
     }
-    if (pullRequestTools.has(input.tool_name) || opensPullRequest(command)) state.pullRequest = true;
+    if (pullRequestTools.has(input.tool_name) || opensPullRequest(command)) markPullRequest();
     // Repository rules on the file just edited (harness-engineering D-1): the agent sees a finding in the same turn.
     if (editTools.has(input.tool_name) && input.tool_input?.file_path) {
       const findings = await editedFileFindings(input.tool_input.file_path);
