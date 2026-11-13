@@ -43,3 +43,18 @@ test('The pull request template asks for the test script, the review, the archiv
   for (const section of ['## Test script', '## Review', '## Archive', '## Harness metrics']) assert.ok(template.includes(`\n${section}\n`), section);
   assert.match(template, /## Harness metrics\n\n<!-- The output of `node scripts\/harness-metrics\.mjs --branch --markdown`/);
 });
+
+// covers: agent-harness: Herald's rules take precedence
+test('CLAUDE.md puts the specifications, tests, folder rules and ADRs above the plugin', () => {
+  assert.match(read('CLAUDE.md'), /ponytail plugin[^\n]*never removes what the change's specifications, tests, ADRs or the rules of any `CLAUDE\.md` \(this one included\) require: those win\./);
+  // The reviewer, which the plugin's subagent hook also reaches, is told the same.
+  assert.match(read('.claude/agents/herald-reviewer.md'), /it does not apply to reviewing: report anything the change's specifications, tests, ADRs or `CLAUDE\.md` files require that the diff leaves out/);
+});
+
+// covers: agent-harness: Preparing a fresh environment
+test('The bootstrap installs the plugin at the version the settings pin, without stopping on failure', () => {
+  const bootstrap = read('scripts/bootstrap');
+  assert.match(bootstrap, /require\('\.\/\.claude\/settings\.json'\)\.extraKnownMarketplaces\.ponytail\.source; s\.repo \+ '#' \+ s\.ref/);
+  assert.match(bootstrap, /claude plugin marketplace add "\$ponytail_source" --scope local/);
+  assert.match(bootstrap, /claude plugin install ponytail@ponytail --scope local[^\n]*\n[^\n]*\|\| echo "The ponytail plugin is not installed/);
+});

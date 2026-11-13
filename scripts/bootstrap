@@ -45,6 +45,16 @@ command -v codegraph >/dev/null || npm install -g @colbymchenry/codegraph@1.6.2
 # Gitleaks for the pre-commit hook, at the version and checksum scripts/gitleaks pins (private-data-guard D-2).
 scripts/gitleaks --install || echo "Gitleaks is not installed: the pre-commit hook will say so, and CI still scans for secrets." >&2
 
+# The ponytail plugin at the repository and tag .claude/settings.json pins (ponytail-plugin D-4). A fresh cloud session
+# does not install project-declared plugins by itself, so the bootstrap does, at local scope (.claude/settings.local.json,
+# which git ignores). It never stops the bootstrap.
+if command -v claude >/dev/null; then
+  ponytail_source=$(node -p "const s = require('./.claude/settings.json').extraKnownMarketplaces.ponytail.source; s.repo + '#' + s.ref")
+  { claude plugin marketplace add "$ponytail_source" --scope local >/dev/null 2>&1 \
+      && claude plugin install ponytail@ponytail --scope local >/dev/null 2>&1; } \
+    || echo "The ponytail plugin is not installed: run scripts/bootstrap again, or install it with /plugin." >&2
+fi
+
 # Dependencies, CodeGraph's index and the repository's git hooks.
 dotnet restore Herald.slnx
 (cd web && pnpm install --frozen-lockfile)

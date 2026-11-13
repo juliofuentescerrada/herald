@@ -40,3 +40,13 @@ test('Listing or reading the user secrets is denied, while setting one the maint
   assert.ok(reads.includes('Read(~/.microsoft/usersecrets/**)'));
   assert.ok(reads.some((rule) => rule.includes('AppData/Roaming/Microsoft/UserSecrets')));
 });
+
+// covers: agent-harness: The plugin's declaration
+test('The ponytail marketplace is pinned to an exact tag and its plugin is enabled', () => {
+  const source = settings.extraKnownMarketplaces?.ponytail?.source;
+  assert.deepEqual({ source: source?.source, repo: source?.repo }, { source: 'github', repo: 'DietrichGebert/ponytail' });
+  assert.match(source?.ref ?? '', /^v\d+\.\d+\.\d+$/, 'an exact version tag, never a branch');
+  assert.equal(settings.enabledPlugins?.['ponytail@ponytail'], true);
+  // The repository is public: no plugin configuration, webhook or token is committed.
+  assert.doesNotMatch(JSON.stringify(settings), /webhook|pluginConfigs|userConfig/i);
+});
