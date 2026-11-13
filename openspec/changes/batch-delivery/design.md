@@ -51,7 +51,7 @@ Findings that shape the design:
   - The test-round paragraph gains the local round until M4.
   - The "Merges drive the sessions" paragraph gains the parallel rule (D-3).
   - The follow-ups are updated with what this change delivers.
-  - Whether its status becomes Accepted is Q-1.
+  - Its status becomes Accepted when this change is approved (Q-1).
 - **D-2 Local test round until M4.**
   - The slice's pull request carries the test script derived from its scenarios, and its screenshots from the E2E environment (the `test-script-screens` artefact).
   - The maintainer reproduces it with `aspire run` and the seeded scenarios.
@@ -89,8 +89,11 @@ Findings that shape the design:
 - **The maintainer's local round costs more of their time than a preview** → it is temporary until M4, and the test script and screenshots narrow what they check.
 - **Labels and board drift from the script** → the script is idempotent and can be run again; the board follows the labels.
 
+## Maintainer answers (13 November 2026)
+
+- **Q-1 ADR 0018:** accepted when this change is approved (D-1).
+- **Q-2 H1 milestone:** issues only for the remaining work.
+
 ## Open Questions
 
-- **Q-1** Is ADR 0018 accepted when this change is approved, or does it stay Proposed until the first batch's trial?
-- **Q-2** Should the H1 milestone cover only the remaining slices, or also the merged ones as closed issues for history? The proposal creates issues only for the remaining work.
 - **Q-3** Should the first H1 batch be started by hand (`agent:start` and a message to a new session), with the next-slice scheduled task created after it, as proposed?

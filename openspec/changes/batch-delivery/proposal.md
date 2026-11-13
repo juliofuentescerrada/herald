@@ -14,7 +14,7 @@ The ADR also allows only one slice in progress. With one preview slot, the bottl
 
 ## What Changes
 
-- **ADR 0018 revised** while Proposed (Q-1 asks whether it is accepted on approval):
+- **ADR 0018 revised** while Proposed, and accepted when this change is approved (Q-1):
   - **Scope:** the flow starts with H1's remaining slices.
   - **Test round until M4:** the maintainer runs the slice locally through Aspire with seeded data, guided by the pull request's test script and its screenshots from the E2E environment. With M4, the round moves to the slice's preview, as the ADR already describes.
   - **Parallel implementation, serial testing:**
