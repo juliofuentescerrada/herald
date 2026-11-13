@@ -51,6 +51,21 @@ Proposed delivery sequence, subject to policy and sizing review:
 
 These are delivery recommendations, not approved batches, issues or production tasks. Each batch follows ADR 0018 after prerequisite slices merge, with its decision/visual review and executable acceptance. Local imports, offline direction, cuts, email/webhooks and multi-executor expansion remain outside H4's first scope.
 
+## H5 discovery and delivery handoff
+
+The [H5 discovery](herald-h5-functional-discovery.md) develops combined stages, live following, operational email and the API ecosystem (`h5-functional-discovery`, documentation only). The [single register](herald-functional-discovery.md#15-decision-register-and-development-gates) owns D-57–65 status; these recommendations approve no new sporting, privacy or service policy. H1 remains incomplete; M4 and the relevant H2–H4 implementation/decision gates precede H5. Discovery documents are not completion evidence.
+
+Proposed delivery sequence, subject to decision, dependency and sizing review:
+
+1. Agree the bounded templates, terminal selector, group crossings, eligibility/exceptional closure and authoritative correction/cut barriers with independent expected fixtures. Confirm real-consumer successor compatibility for connected tournaments.
+2. Deliver stage plan and complete source-closure/cut/successor-publication journeys as bounded vertical slices, including individual/direct-team continuity, atomic recovery and final review. Prove the 16-entry four-group Top 8 and a supported Swiss Top 8; do not ship a cut button without its dependency/correction safety.
+3. Deliver revision-aware live following and current snapshot/cursor reconciliation, including fallback, privacy invalidation, access loss and measured load/freshness limits; transport choice remains a technical review.
+4. Deliver verified operational email after contact/privacy/provider decisions and H2 notices, with preferences, unknown-response/bounce handling and redacted delivery evidence.
+5. Deliver application/grant/credential management and safe public webhook subscriptions with a real consumer, bounded retries/replay, signed attempts, rotation/revocation races and published individual/team API examples. Foundational grant/security work precedes any dispatch or general onboarding even if split into earlier slices.
+6. Fix and publish compatibility, quotas, retention, support and cost commitments before general access. Execute the full cut/live/email/consumer journeys and reviewed visual states, including outages, supersession and resynchronisation. Documentation examples and mock deliveries alone cannot meet H5's exit.
+
+These are delivery recommendations, not approved batches or production tasks. Each future batch follows ADR 0018 with its relevant gates closed and executable acceptance; policy approval, prototype review and measured evidence precede implementation/release claims. Advanced stage graphs, wildcard comparisons, reserve replacement, H6 encounters and H7 continuity remain separate scope.
+
 ## H1 batches — accepted 13 November 2026
 
 H1's remaining work, grouped into batches under [ADR 0018](adr/0018-deliver-in-batches-tested-on-a-deployed-preview.md). The maintainer accepted the map and its answers to the review questions on 13 November 2026; each slice's boundary is refined when it is proposed. Each batch's issue links here, and its decision session settles its rows before its proposals pull request. Rules come from the [functional discovery](herald-functional-discovery.md) (F-05 to F-11, AT-01 to AT-14); nothing here decides a rule.
@@ -122,7 +137,7 @@ The maintainer's answers of 13 November 2026 to the map's open questions:
 | **H2 Participant portal** | [Detailed H2 scope](herald-h2-functional-discovery.md): open participant access with restricted administration, discovery/self-service, teams, reporting, history/notices and bounded automation | UJ-04/05 and H2 acceptance scenarios complete; minimum-field cancellation with notices; no pending-result points or private-data leaks |
 | **H3 More competition systems** | [Detailed H3 scope](herald-h3-functional-discovery.md): elimination, single match and richer result profiles | Individual/team brackets, byes and profile validation; H3 target acceptance with proposed gates resolved |
 | **H4 Swiss and connected consumer** | [Detailed H4 target](herald-h4-functional-discovery.md): specified Swiss policy/profile and an identified compatible real consumer, for individual/direct-team entries | Eight-/32-entry configured runs; no forbidden rematches/byes or partial publication; exact shared standings; real connected execution and lost-response recovery without duplicate effects; policy/operational gates resolved |
-| **H5 Stages and live ecosystem** | Combined stages, live following, email and webhooks | Unambiguous cuts; revision-aware consumer reconciliation |
+| **H5 Stages and live ecosystem** | [Detailed H5 target](herald-h5-functional-discovery.md): combined stages, live following, operational email and scoped application/webhook ecosystem | Reviewed unambiguous Top 8; stable individual/team continuity; dependency-safe corrections; authorised snapshot/retry/replay reconciliation and revocation; concrete compatibility/privacy/operational gates resolved |
 | **H6 Advanced teams** | Composite encounters, substitutions and game submissions | Versioned participation; aggregate outcome counted once |
 | **H7 Circuits** | Seasons and cross-tournament points | Revisable standings and explicit continuity policy |
 | **M4 Cloud — technical track** | Azure deployment on the shared platform under ADR 0012, after H1 and before H2 | Deploy on merge, protected credentials and measured idle cost; accessible environment before a remote pilot; the `main` environment and a `preview` slot for the slice pull request, with seeded data and a test account per persona (ADRs 0018, 0019); the measured monthly cost of both recorded beside the base cost |

@@ -23,6 +23,8 @@ context: |
     remain in the baseline register (D-39–47); target acceptance is not implemented behaviour.
   - docs/herald-h4-functional-discovery.md: detailed H4 Swiss/connected-consumer extension;
     D-48–56 remain proposed in the baseline register; no prerequisite milestone completion is implied.
+  - docs/herald-h5-functional-discovery.md: detailed H5 stages/live/ecosystem extension;
+    D-57–65 remain proposed in the baseline register; target scenarios are not executed tests.
   - docs/roadmap.md: delivery order, milestones and exit criteria; batches' progress is in GitHub
     Issues (ADR 0018). openspec/specs: implemented behaviour.
 
