@@ -33,6 +33,12 @@ A module also records each turn's cost and tests in `~/.config/ponytail/band/`. 
   - The marketplace's `ref` takes a branch or a tag, not a commit: Claude Code clones it by name. A commit pin was tried and refused.
   - The committed settings hold no plugin configuration. The plugin's optional webhook stays empty, so its per-turn records stay in the session's `~/.config/ponytail/`.
 
+- **D-4 The bootstrap installs it** (found by task 2.3).
+  - A fresh cloud session does not install a plugin its project settings declare.
+  - With an empty home, `claude plugin install` does not find the project's marketplace either, until `claude plugin marketplace add` registers it.
+  - `scripts/bootstrap`, which the cloud environment's setup script runs before Claude Code starts, therefore adds the marketplace and installs the plugin at local scope (`.claude/settings.local.json`, ignored by git). It reads the repository and tag from `.claude/settings.json`, so the version stays in one place.
+  - The step never stops the bootstrap. It was run twice from an empty home: both runs succeeded and installed 5.3.3.
+
 ## Risks / Trade-offs
 
 - **A moved tag changes the code without a pull request** → accepted. The marketplace cannot pin a commit, and the author's tags are the published versions. The full commit is recorded here, so a session can compare it with `git ls-remote` if a version looks wrong.
@@ -52,3 +58,8 @@ The `herald-reviewer` subagent reviewed the diff. Nothing was blocking. Findings
 5. **The precedence line did not name the root `CLAUDE.md`.** **Fixed:** "the rules of any `CLAUDE.md` (this one included)", with the test updated.
 6. **Nothing enforced that no webhook or plugin configuration is committed.** **Fixed:** the settings test asserts it.
 7. **No check would notice a licence change.** **Fixed (D-3):** an upgrade re-checks the licence.
+
+## Fresh-session checks (13 November 2026, task 2.3)
+
+1. **A fresh cloud session on the branch, with only the project settings:** `claude plugin list` showed no plugins, no ponytail instruction reached the session, and no hook error appeared. This led to D-4.
+2. **A second fresh session, after D-4,** whose setup script runs the new bootstrap: recorded below.

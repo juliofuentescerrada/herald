@@ -50,3 +50,11 @@ test('CLAUDE.md puts the specifications, tests, folder rules and ADRs above the 
   // The reviewer, which the plugin's subagent hook also reaches, is told the same.
   assert.match(read('.claude/agents/herald-reviewer.md'), /it does not apply to reviewing: report anything the change's specifications, tests, ADRs or `CLAUDE\.md` files require that the diff leaves out/);
 });
+
+// covers: agent-harness: Preparing a fresh environment
+test('The bootstrap installs the plugin at the version the settings pin, without stopping on failure', () => {
+  const bootstrap = read('scripts/bootstrap');
+  assert.match(bootstrap, /require\('\.\/\.claude\/settings\.json'\)\.extraKnownMarketplaces\.ponytail\.source; s\.repo \+ '#' \+ s\.ref/);
+  assert.match(bootstrap, /claude plugin marketplace add "\$ponytail_source" --scope local/);
+  assert.match(bootstrap, /claude plugin install ponytail@ponytail --scope local[^\n]*\n[^\n]*\|\| echo "The ponytail plugin is not installed/);
+});
