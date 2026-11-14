@@ -16,6 +16,9 @@ interface Condition {
   fix: { link: string; text: string } | null;
 }
 
+/** A team's name as a possessive: “Granite Herons’ roster”, “North Stars’ roster”, “Team A’s roster”. */
+const possessive = (name: string): string => (name.endsWith('s') ? `${name}’` : `${name}’s`);
+
 const plural = (count: number, one: string, many: string): string => `${count} ${count === 1 ? one : many}`;
 
 /** Start readiness and start (CP-04, §5.1 row 6): its own operation area after Registration. */
@@ -31,7 +34,7 @@ const plural = (count: number, one: string, many: string): string => `${count} $
         <p class="help">{{ fixedText() }}</p>
         @for (roster of crossed(); track roster.entryId) {
           <herald-notice tone="danger" heading="A roster changed during the start">
-            {{ roster.teamName }}’s frozen roster has {{ roster.members }} players ({{ bound(roster.members) }}). Nothing was repaired; resolve it from the round operations.
+            {{ possessive(roster.teamName) }} frozen roster has {{ roster.members }} players ({{ bound(roster.members) }}). Nothing was repaired; resolve it from the round operations.
           </herald-notice>
         }
       } @else {
@@ -211,6 +214,8 @@ export class CompetitionArea {
     });
   }
 
+  protected readonly possessive = possessive;
+
   protected bound(members: number): string {
     const { minimumRosterSize, maximumRosterSize } = this.tournament().configuration;
     return members < (minimumRosterSize ?? 0) ? `minimum ${minimumRosterSize}` : `maximum ${maximumRosterSize}`;
@@ -251,7 +256,8 @@ export class CompetitionArea {
         return start.publishedScheduleRevision === null ? 'No schedule published' : 'The schedule is not current';
       default: {
         const [first] = start.rostersOutsideBounds ?? [];
-        return first ? `${first.teamName}’s roster is outside its bounds` : 'Rosters not reported yet';
+        if (!first) return 'Rosters not reported yet';
+        return `${possessive(first.teamName)} roster is ${first.members < (this.tournament().configuration.minimumRosterSize ?? 0) ? 'below the minimum' : 'above the maximum'}`;
       }
     }
   }

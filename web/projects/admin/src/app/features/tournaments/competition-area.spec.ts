@@ -70,7 +70,7 @@ describe('The competition area', () => {
       sharedMemberNames: [{ name: 'Alex Kim', teamNames: ['River Falcons', 'North Stars'] }],
     };
     const { area, badge, rows } = await render([() => of(closed(start, {}, team))]);
-    expect(badge()).toBe('Harbour Lights’s roster is outside its bounds');
+    expect(badge()).toBe('Harbour Lights’ roster is below the minimum');
     expect(rows().at(-1)).toEqual(['Rosters within 3–5 players', 'Not met']);
     expect(area().textContent).toContain('Harbour Lights has 2 players (minimum 3).');
     expect(area().textContent).toContain('Warning, not a blocker: River Falcons and North Stars both have a member named “Alex Kim”.');
@@ -123,6 +123,6 @@ describe('The competition area', () => {
   it('reports a frozen roster outside its bounds after the start', { meta: { type: 'covers', description: 'competition-start: A roster edit crossed the start' } }, async () => {
     const { area } = await render([() => of(running({ rostersOutsideBounds: [{ entryId: 'e-1', teamName: 'Harbour Lights', members: 2 }] }, team))]);
     expect(area().querySelector('herald-notice strong')?.textContent).toBe('A roster changed during the start');
-    expect(area().textContent).toContain('Harbour Lights’s frozen roster has 2 players (minimum 3). Nothing was repaired');
+    expect(area().textContent).toContain('Harbour Lights’ frozen roster has 2 players (minimum 3). Nothing was repaired');
   });
 });

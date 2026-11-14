@@ -72,6 +72,11 @@ describe('The registration area', () => {
     expect(document.activeElement).toBe(page().querySelector('#t-registrationOpensAt'));
   });
 
+  it('offers no registration action once the competition is running', async () => {
+    const { action } = await render([() => of(published({ registration: 'closed', registrationChangedAt: '2026-11-13T17:00:00Z', schedulePublished: true, competition: 'running' }))]);
+    expect(action()).toBeNull();
+  });
+
   it('keeps reopening disabled with its reason while a schedule is published',
     { meta: { type: 'covers', description: "registration-window: Reopening a published schedule's tournament" } }, async () => {
       const { page, area, action } = await render([() => of(published({ registration: 'closed', registrationChangedAt: '2026-11-13T17:00:00Z', schedulePublished: true }))]);

@@ -300,7 +300,7 @@ test('An owner sees a team tournament’s start blocked by an incomplete roster,
   await expect(competition).toBeVisible();
   await expect(async () => {
     await page.reload();
-    await expect(competition.getByText('River Falcons’s roster is outside its bounds')).toBeVisible({ timeout: 1_000 });
+    await expect(competition.getByText('River Falcons’ roster is below the minimum')).toBeVisible({ timeout: 1_000 });
   }).toPass();
   await expect(competition.getByText('River Falcons has 2 players (minimum 3).')).toBeVisible();
   await expect(competition.getByRole('button', { name: 'Start competition' })).toBeDisabled();
