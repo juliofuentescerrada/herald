@@ -10,8 +10,8 @@
 ## 3. Registration
 
 - [x] 3.1 `Field`: eligible revision (design D-2), cancellation cause, mark absent (D-7), the lock from the terms rejecting admit, cancel and check-in changes (D-3); domain events; domain tests for every scenario of the modified `entrant-check-in` and `guest-entries`
-- [ ] 3.2 Mapping and migration; feature `MarkAbsent`; the eligible field message published through the outbox with the field counts; `GetField` gains each cancellation's cause and the lock
-- [ ] 3.3 API tests against PostgreSQL for those scenarios, including another organisation's generic 404s
+- [x] 3.2 Mapping and migration; feature `MarkAbsent`; the eligible field message published through the outbox with the field counts; `GetField` gains each cancellation's cause and the lock
+- [x] 3.3 API tests against PostgreSQL for those scenarios, including another organisation's generic 404s
 
 ## 4. Competition
 

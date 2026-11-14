@@ -19,6 +19,7 @@ public static class CancelEntryEndpoint
     [EndpointGroupName(HeraldApi.Admin)]
     [EndpointName("cancelEntry")]
     [ProducesResponseType<FieldDetails>(StatusCodes.Status200OK)]
+    [ProducesResponseType<HttpValidationProblemDetails>(StatusCodes.Status400BadRequest, "application/problem+json")]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound, "application/problem+json")]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict, "application/problem+json")]
     public static async Task<IResult> Post(
