@@ -108,6 +108,7 @@ export class RegistrationArea {
     if (this.state() === 'busy') return 'Request in progress. Please wait; do not submit again.';
     if (this.state() === 'conflict') return 'Reload the latest version first.';
     if (this.unsaved()) return 'Save your changes first.';
+    if (!this.isOpen() && this.tournament().schedulePublished) return 'The schedule is published. Withdraw it before reopening registration.';
     return !this.isOpen() && this.missing().length ? 'Set both registration dates before opening registration.' : null;
   });
   protected readonly lastChange = computed(() => {

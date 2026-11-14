@@ -27,9 +27,9 @@
 
 ## 6. Admin application
 
-- [ ] 6.1 `schedule` feature: route beside Entries and every Schedule state of design.md's Visual input
-- [ ] 6.2 `entries` feature: absence-review summary, "Mark absent" with confirmation, cancellation cause, locked field; `tournaments` feature: reopening locked
-- [ ] 6.3 Vitest for each Visual input state and `axe-core`; lint and boundary checks pass
+- [x] 6.1 `schedule` feature: route beside Entries and every Schedule state of design.md's Visual input
+- [x] 6.2 `entries` feature: absence-review summary, "Mark absent" with confirmation, cancellation cause, locked field; `tournaments` feature: reopening locked
+- [x] 6.3 Vitest for each Visual input state and `axe-core`; lint and boundary checks pass
 
 ## 7. End-to-end journey and seeds
 
