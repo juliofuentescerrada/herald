@@ -76,14 +76,14 @@ Delivered slices already cover AT-12 (`h1-organisation-access`) and the publicat
 
 ### Batch 1: start and pair
 
-Goal: an owner starts a league and publishes its round-robin schedule.
+Goal: an owner publishes a league's round-robin schedule and starts it.
 
 | Slice | Delivers | Main module | Depends on |
 |---|---|---|---|
-| `h1-competition-start` | Start readiness, the absence review, roster freeze and competition start (F-05) | Tournaments, Registration | none |
-| `h1-round-robin-pairings` | A draft schedule, publication as a revision, rest rounds, draft regeneration (F-06) | Competition | `h1-competition-start` |
+| `h1-round-robin-pairings` | The absence review, a draft schedule from the eligible field, publication as a revision and its withdrawal, rest rounds, draft regeneration (F-05, F-06) | Competition, Registration | none |
+| `h1-competition-start` | Start readiness against the current publication, roster freeze and competition start (F-05, CP-04) | Tournaments, Registration | `h1-round-robin-pairings` |
 
-Decision rows: D-29 (absences at start), D-23 (frozen-roster eligibility), D-18 and D-25 (team start).
+Decision rows: D-29 (absences at start), D-23 (frozen roster), D-18 and D-17 (team start). The decision session of 13 November 2026 closed them ([§15](herald-functional-discovery.md#15-decision-register-and-development-gates)) and confirmed §5.1's order: pairings are published before start, so the slices run in that order. D-25 (§8.1) moved to batch 2.
 Acceptance journey: four individual entries yield six published matches; five yield ten with one rest round each; four teams yield six matches (AT-01 and AT-04, pairing part); starting fails with fewer than two eligible entrants (AT-02, start part); a published pre-start schedule changes only by withdrawal, review and republication (AT-03, pairing part).
 
 ### Batch 2: play and score
