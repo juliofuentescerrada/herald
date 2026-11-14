@@ -16,6 +16,12 @@ public sealed class TournamentsDbContext(DbContextOptions<TournamentsDbContext> 
 
     public DbSet<FieldCounts> FieldCounts => Set<FieldCounts>();
 
+    public DbSet<ScheduleState> Schedules => Set<ScheduleState>();
+
+    // Whether Competition last reported a published schedule: it locks the field and reopening (D-4).
+    public Task<bool> SchedulePublishedAsync(TournamentId id, CancellationToken cancellationToken) =>
+        Schedules.AsNoTracking().AnyAsync(schedule => schedule.TournamentId == id && schedule.PublishedRevision != null, cancellationToken);
+
     // Registration's last report for the tournament, or none before its first.
     public async Task<EntryCounts> EntryCountsAsync(TournamentId id, CancellationToken cancellationToken) =>
         await FieldCounts.AsNoTracking().Where(counts => counts.TournamentId == id)
@@ -35,6 +41,8 @@ public sealed class TournamentsDbContext(DbContextOptions<TournamentsDbContext> 
             tournament.Property(t => t.Registration).HasConversion<string>().HasMaxLength(20);
             // Two writes based on the same revision cannot both succeed.
             tournament.Property(t => t.Revision).IsConcurrencyToken();
+            // The schedule's lock bumps only the terms sequence: two snapshots must never share a number (ADR 0016).
+            tournament.Property(t => t.TermsRevision).IsConcurrencyToken();
             tournament.HasIndex(OrganisationProperty, nameof(Tournament.CreatedAt));
             tournament.ComplexProperty(t => t.Configuration, configuration =>
             {
@@ -58,6 +66,12 @@ public sealed class TournamentsDbContext(DbContextOptions<TournamentsDbContext> 
             counts.HasKey(c => c.TournamentId);
             counts.Property(c => c.TournamentId).HasConversion(id => id.Value, value => new TournamentId(value));
             counts.Ignore(c => c.Counts);
+        });
+
+        modelBuilder.Entity<ScheduleState>(schedule =>
+        {
+            schedule.HasKey(s => s.TournamentId);
+            schedule.Property(s => s.TournamentId).HasConversion(id => id.Value, value => new TournamentId(value));
         });
     }
 }

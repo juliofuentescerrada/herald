@@ -35,6 +35,9 @@ public sealed class RegistrationDbContext(DbContextOptions<RegistrationDbContext
         {
             field.Ignore(f => f.DomainEvents);
             field.Ignore(f => f.Queue);
+            field.Ignore(f => f.Eligible);
+            field.Ignore(f => f.Pending);
+            field.Ignore(f => f.PendingEntries);
             field.Property(f => f.Id).HasConversion(id => id.Value, value => new TournamentId(value));
             // Two writes based on the same field cannot both succeed: the last slot is decided once (EN-9).
             field.Property(f => f.Revision).IsConcurrencyToken();
@@ -43,6 +46,7 @@ public sealed class RegistrationDbContext(DbContextOptions<RegistrationDbContext
                 terms.Property(t => t.Registration).HasConversion<string>().HasMaxLength(20);
                 terms.Property(t => t.EntryKind).HasConversion<string>().HasMaxLength(20);
                 terms.Property(t => t.Admission).HasConversion<string>().HasMaxLength(20);
+                terms.Property(t => t.CheckIn).HasConversion<string>().HasMaxLength(20);
             });
             field.HasMany(f => f.Entries).WithOne().HasForeignKey("TournamentId").IsRequired();
             field.Navigation(f => f.Entries).HasField("_entries").UsePropertyAccessMode(PropertyAccessMode.Field).AutoInclude();
@@ -59,6 +63,7 @@ public sealed class RegistrationDbContext(DbContextOptions<RegistrationDbContext
             entry.Property(e => e.WaitingReason).HasConversion<string>().HasMaxLength(20);
             entry.Property(e => e.AdmissionMethod).HasConversion<string>().HasMaxLength(20);
             entry.Property(e => e.AdmissionReason).HasMaxLength(Field.ReasonMaxLength);
+            entry.Property(e => e.CancellationCause).HasConversion<string>().HasMaxLength(20);
             entry.HasIndex(nameof(Domain.Entry.GuestId));
             entry.OwnsMany(e => e.Members, member =>
             {

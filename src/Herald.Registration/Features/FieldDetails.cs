@@ -27,7 +27,8 @@ public sealed record EntryDetails(
     RosterReadiness? RosterReadiness = null,
     CheckInState? CheckIn = null,
     int? CheckInRevision = null,
-    DateTimeOffset? CheckInChangedAt = null);
+    DateTimeOffset? CheckInChangedAt = null,
+    CancellationCause? CancellationCause = null);
 
 public enum CheckInState
 {
@@ -44,6 +45,7 @@ public sealed record FieldDetails(
     int Admitted,
     int Waiting,
     int CheckedIn,
+    int Pending,
     int OverCapacityBy,
     bool KindMismatch,
     IReadOnlyList<EntryDetails> Entries)
@@ -74,7 +76,8 @@ public sealed record FieldDetails(
             field.ReadinessOf(entry),
             entry.HasCheckIn ? entry.IsCheckedIn ? CheckInState.Confirmed : CheckInState.Pending : null,
             entry.HasCheckIn ? entry.CheckInRevision : null,
-            entry.CheckInChanges is [.., var last] ? last.ChangedAt : null);
+            entry.CheckInChanges is [.., var last] ? last.ChangedAt : null,
+            entry.CancellationCause);
 
         var admitted = field.Entries.Where(entry => entry.State == EntryState.Admitted).OrderBy(entry => entry.AdmittedAt).ThenBy(entry => entry.Sequence);
         var cancelled = field.Entries.Where(entry => entry.State == EntryState.Cancelled).OrderByDescending(entry => entry.CancelledAt);
@@ -86,6 +89,7 @@ public sealed record FieldDetails(
             field.Admitted,
             field.Waiting,
             field.CheckedIn,
+            field.Pending,
             field.OverCapacityBy,
             field.HasKindMismatch,
             [.. admitted.Concat(queue).Concat(cancelled).Select(Of)]);
@@ -94,6 +98,34 @@ public sealed record FieldDetails(
     // The counts Tournaments keeps for its own rules and reads (design D-2).
     public static TournamentFieldChanged Changed(Guid organisationId, Field field) =>
         new(organisationId, field.Id.Value, field.Revision, field.Admitted, field.Waiting, field.CheckedIn);
+
+    // The eligible entrants Competition drafts from (h1-round-robin-pairings D-2).
+    public static async Task<TournamentEligibleFieldChanged> EligibleAsync(Guid organisationId, Field field, RegistrationDbContext db, CancellationToken cancellationToken)
+    {
+        var eligible = field.Eligible;
+        var pending = field.PendingEntries;
+        var guestIds = eligible.Select(entry => entry.Entry.GuestId).Concat(pending.Select(entry => entry.GuestId)).ToList();
+        var names = await db.Guests.AsNoTracking()
+            .Where(guest => guestIds.Contains(guest.Id))
+            .ToDictionaryAsync(guest => guest.Id, guest => guest.Name, cancellationToken);
+        return new(
+            organisationId,
+            field.Id.Value,
+            field.EligibleRevision,
+            field.Terms.Registration == RegistrationState.Closed,
+            [.. pending.Select(entry => new PendingEntrant(entry.Id.Value, names.GetValueOrDefault(entry.GuestId, "")))],
+            [.. eligible.Select(entry => new EligibleEntrant(entry.Entry.Id.Value, names.GetValueOrDefault(entry.Entry.GuestId, ""), entry.AdmissionOrder))]);
+    }
+
+    // Both snapshots, in the transaction of the change; the eligible one only when it changed.
+    public static async Task PublishAsync(IMessageBus bus, Guid organisationId, Field field, int eligibleRevisionBefore, RegistrationDbContext db, CancellationToken cancellationToken)
+    {
+        await bus.PublishAsync(Changed(organisationId, field));
+        if (field.EligibleRevision != eligibleRevisionBefore)
+        {
+            await bus.PublishAsync(await EligibleAsync(organisationId, field, db, cancellationToken));
+        }
+    }
 }
 
 internal static class FieldResults
@@ -130,6 +162,7 @@ internal static class FieldResults
                 return NotFound();
             }
 
+            var eligibleRevision = field.EligibleRevision;
             var result = write(field);
             switch (result.Outcome)
             {
@@ -153,7 +186,7 @@ internal static class FieldResults
                     }
 
                     // Stored with the change by the transaction around the endpoint, sent after its commit.
-                    await bus.PublishAsync(FieldDetails.Changed(organisationId, field));
+                    await FieldDetails.PublishAsync(bus, organisationId, field, eligibleRevision, db, cancellationToken);
                     break;
             }
 

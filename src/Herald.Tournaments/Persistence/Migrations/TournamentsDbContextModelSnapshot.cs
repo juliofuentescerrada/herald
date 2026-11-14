@@ -71,6 +71,9 @@ namespace Herald.Tournaments.Persistence.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("integer");
 
+                    b.Property<int>("TermsRevision")
+                        .HasColumnType("integer");
+
                     b.ComplexProperty(typeof(Dictionary<string, object>), "Configuration", "Herald.Tournaments.Domain.Tournament.Configuration#TournamentConfiguration", b1 =>
                         {
                             b1.IsRequired();
@@ -163,6 +166,25 @@ namespace Herald.Tournaments.Persistence.Migrations
                     b.HasKey("TournamentId");
 
                     b.ToTable("FieldCounts", "tournaments");
+                });
+
+            modelBuilder.Entity("Herald.Tournaments.Persistence.ScheduleState", b =>
+                {
+                    b.Property<Guid>("TournamentId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int?>("EligibleRevision")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("PublishedRevision")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Revision")
+                        .HasColumnType("integer");
+
+                    b.HasKey("TournamentId");
+
+                    b.ToTable("Schedules", "tournaments");
                 });
 
             modelBuilder.Entity("Wolverine.EntityFrameworkCore.Internals.IncomingMessage", b =>

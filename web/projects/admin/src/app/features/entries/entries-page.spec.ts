@@ -38,6 +38,7 @@ const tournament = (over: Partial<TournamentDetails> = {}): TournamentDetails =>
   admittedEntries: 0,
   waitingEntries: 0,
   checkedInEntries: 0,
+  schedulePublished: false,
   ...over,
 });
 
@@ -69,6 +70,7 @@ const field = (entries: EntryDetails[], terms: Partial<FieldDetails['terms']> = 
   admitted: entries.filter((e) => e.state === 'admitted').length,
   waiting: entries.filter((e) => e.state === 'waiting').length,
   checkedIn: 0,
+  pending: 0,
   overCapacityBy: 0,
   kindMismatch: false,
   entries,
@@ -980,5 +982,48 @@ describe('Check-in on the entries page', () => {
     // Roster first, then check-in, then cancelling.
     expect([...falcons.querySelectorAll('button')].map((b) => b.textContent?.trim())).toEqual(['Roster', 'Undo check-in', 'Cancel entry']);
     expect(await violations(page())).toEqual([]);
+  });
+
+  describe('absence review and the field lock (h1-round-robin-pairings)', () => {
+    const closed = (entries: EntryDetails[], over: Partial<FieldDetails> = {}, terms: Partial<FieldDetails['terms']> = {}) =>
+      field(entries, { registration: 'closed', checkIn: 'mandatory', ...terms }, over);
+    const pendingSam = () => closed([entry('Robin Vale', { checkIn: 'confirmed', checkInRevision: 1 }), entry('Sam Reed', { checkIn: 'pending', checkInRevision: 0 })], { pending: 1 });
+
+    it('marks a pending entry absent after confirming, with its cause in the cancelled history',
+      { meta: { type: 'covers', description: 'entrant-check-in: The owner marks a pending entry absent' } }, async () => {
+        const absent = closed([entry('Robin Vale', { checkIn: 'confirmed', checkInRevision: 1 }), entry('Sam Reed', { state: 'cancelled', cancelledAt: '2026-11-21T08:41:00Z', cancellationCause: 'absentAtStart' })]);
+        const markAbsent = vi.fn(() => of(absent));
+        const { page, button, text, texts, heading, toasts, settle } = await open({ getField: () => of(pendingSam()), markAbsent }, tournament({ registration: 'closed' }));
+        await vi.waitFor(() => expect(text('herald-notice')).toContain('1 entry is pending check-in'));
+        expect(button('Mark absent')).toBeTruthy();
+        expect(await violations(page())).toEqual([]);
+
+        button('Mark absent')!.click();
+        await settle();
+        expect(heading()).toBe('Mark Sam Reed absent?');
+        [...document.querySelectorAll<HTMLButtonElement>('[role=dialog] button')].find((b) => b.textContent?.trim() === 'Mark absent')!.click();
+        await vi.waitFor(() => expect(toasts()).toContain('Sam Reed marked absent.'));
+
+        expect(markAbsent).toHaveBeenCalledWith(organisation, tournamentId, 'e-Sam-Reed', { expectedRevision: 1 });
+        expect(texts('details.cancelled herald-status-label')).toContain('Absent at start');
+        expect(text('details.cancelled li')).toContain('Marked absent');
+      });
+
+    it('offers no absence review under an optional policy', async () => {
+      const { button, text } = await open({ getField: () => of(closed([entry('Robin Vale'), entry('Sam Reed')], {}, { checkIn: 'optional' })) }, tournament({ registration: 'closed' }));
+      await vi.waitFor(() => expect(text('#summary-heading')).toBe('2 of 2 individual entries'));
+      expect(button('Mark absent')).toBeUndefined();
+    });
+
+    it('disables check-in and cancelling while the schedule is published, with the reason and a way to the schedule',
+      { meta: { type: 'covers', description: 'entrant-check-in: Undo after publication' } }, async () => {
+        const locked = closed([entry('Robin Vale', { checkIn: 'confirmed', checkInRevision: 1 })], {}, { fieldLocked: true });
+        const { page, button, text } = await open({ getField: () => of(locked) }, tournament({ registration: 'closed', schedulePublished: true }));
+        await vi.waitFor(() => expect(text('herald-notice')).toContain('Field locked by the published schedule'));
+        expect(button('Undo check-in')?.disabled).toBe(true);
+        expect(button('Cancel entry')?.disabled).toBe(true);
+        expect(page().querySelector('herald-notice a')?.getAttribute('href')).toBe(`/organisations/${organisation}/tournaments/${tournamentId}/schedule`);
+        expect(await violations(page())).toEqual([]);
+      });
   });
 });

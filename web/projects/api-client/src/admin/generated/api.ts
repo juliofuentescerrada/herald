@@ -58,6 +58,14 @@ export interface CancelEntry {
   expectedRevision: number;
 }
 
+export type CancellationCause = typeof CancellationCause[keyof typeof CancellationCause] | null;
+
+
+export const CancellationCause = {
+  owner: 'owner',
+  absentAtStart: 'absentAtStart',
+} as const;
+
 export type CheckIn = typeof CheckIn[keyof typeof CheckIn] | null;
 
 
@@ -69,6 +77,14 @@ export const CheckIn = {
 export interface CheckInEntry {
   expectedRevision: number;
 }
+
+export type CheckInPolicy = typeof CheckInPolicy[keyof typeof CheckInPolicy];
+
+
+export const CheckInPolicy = {
+  optional: 'optional',
+  mandatory: 'mandatory',
+} as const;
 
 export type CheckInState = typeof CheckInState[keyof typeof CheckInState] | null;
 
@@ -166,6 +182,45 @@ export interface CreateTournament {
   configuration: TournamentConfiguration;
 }
 
+export type Seeding = typeof Seeding[keyof typeof Seeding];
+
+
+export const Seeding = {
+  admissionOrder: 'admissionOrder',
+  draw: 'draw',
+} as const;
+
+export interface EntrantDetails {
+  entryId: string;
+  name: string;
+}
+
+export interface MatchDetails {
+  first: EntrantDetails;
+  second: EntrantDetails;
+}
+
+export interface RoundDetails {
+  number: number;
+  matches: MatchDetails[];
+  rest: null | EntrantDetails;
+}
+
+export interface PairingsDetails {
+  seeding: Seeding;
+  /** @nullable */
+  seed: number | null;
+  entrants: number;
+  matches: number;
+  rounds: RoundDetails[];
+}
+
+export interface DraftDetails {
+  pairings: PairingsDetails;
+  generatedAt: string;
+  stale: boolean;
+}
+
 export interface EnterGuest {
   guestId: string;
 }
@@ -224,6 +279,7 @@ export interface EntryDetails {
   checkInRevision?: number | null;
   /** @nullable */
   checkInChangedAt?: string | null;
+  cancellationCause?: null | CancellationCause;
 }
 
 export type RegistrationState = typeof RegistrationState[keyof typeof RegistrationState];
@@ -244,6 +300,13 @@ export interface EntryTerms {
   minimumRosterSize?: number | null;
   /** @nullable */
   maximumRosterSize?: number | null;
+  checkIn?: CheckInPolicy;
+  fieldLocked?: boolean;
+}
+
+export interface FieldChangeDetails {
+  added: EntrantDetails[];
+  removed: EntrantDetails[];
 }
 
 export interface FieldDetails {
@@ -254,9 +317,16 @@ export interface FieldDetails {
   admitted: number;
   waiting: number;
   checkedIn: number;
+  pending: number;
   overCapacityBy: number;
   kindMismatch: boolean;
   entries: EntryDetails[];
+}
+
+export interface GenerateDraft {
+  operationId: string;
+  expectedRevision: number;
+  seeding: Seeding;
 }
 
 export interface RosterTeam {
@@ -297,6 +367,10 @@ export interface HttpValidationProblemDetails {
 
 export interface IResult { [key: string]: unknown }
 
+export interface MarkAbsent {
+  expectedRevision: number;
+}
+
 export interface OpenRegistration {
   expectedRevision: number;
 }
@@ -331,6 +405,20 @@ export const Publication = {
   draft: 'draft',
   published: 'published',
 } as const;
+
+export interface PublicationDetails {
+  number: number;
+  pairings: PairingsDetails;
+  publishedAt: string;
+  /** @nullable */
+  withdrawalReason: string | null;
+  /** @nullable */
+  withdrawnAt: string | null;
+}
+
+export interface PublishSchedule {
+  expectedRevision: number;
+}
 
 export interface PublishTournament {
   expectedRevision: number;
@@ -388,6 +476,20 @@ export interface SaveTournament {
   configuration: TournamentConfiguration;
 }
 
+export interface ScheduleDetails {
+  tournamentId: string;
+  revision: number;
+  registrationClosed: boolean;
+  pending: EntrantDetails[];
+  eligible: number;
+  blockers: string[];
+  draft: null | DraftDetails;
+  draftChange: null | FieldChangeDetails;
+  current: null | PublicationDetails;
+  crossedChange: null | FieldChangeDetails;
+  history: PublicationDetails[];
+}
+
 export interface SignedInPerson {
   displayName: string;
   organisations: OwnedOrganisation[];
@@ -408,6 +510,7 @@ export interface TournamentDetails {
   admittedEntries: number;
   waitingEntries: number;
   checkedInEntries: number;
+  schedulePublished: boolean;
 }
 
 export interface TournamentSummary {
@@ -430,6 +533,12 @@ export interface TournamentSummary {
   competition: string;
   admittedEntries: number;
   waitingEntries: number;
+}
+
+export interface WithdrawSchedule {
+  expectedRevision: number;
+  /** @nullable */
+  reason: string | null;
 }
 
 export type UndoCheckInParams = {
@@ -1178,6 +1287,56 @@ export class HeraldHostAdminService {
   }
 
 /**
+ * POST_api_organisations_organisationId_tournaments_tournamentId_entries_entryId_absence
+ * @summary POST_api_organisations_organisationId_tournaments_tournamentId_entries_entryId_absence
+ */
+ markAbsent<TData = FieldDetails>(organisationId: string,
+    tournamentId: string,
+    entryId: string,
+    markAbsentBody: MarkAbsent, options?: HttpClientBodyOptions): Observable<TData>;
+ markAbsent<TData = FieldDetails>(organisationId: string,
+    tournamentId: string,
+    entryId: string,
+    markAbsentBody: MarkAbsent, options?: HttpClientEventOptions): Observable<HttpEvent<TData>>;
+ markAbsent<TData = FieldDetails>(organisationId: string,
+    tournamentId: string,
+    entryId: string,
+    markAbsentBody: MarkAbsent, options?: HttpClientResponseOptions): Observable<AngularHttpResponse<TData>>;
+  markAbsent<TData = FieldDetails>(
+    organisationId: string,
+    tournamentId: string,
+    entryId: string,
+    markAbsentBody: MarkAbsent, options?: HttpClientObserveOptions): Observable<TData | HttpEvent<TData> | AngularHttpResponse<TData>> {
+    if (options?.observe === 'events') {
+      return this.http.post<TData>(
+      `/api/organisations/${organisationId}/tournaments/${tournamentId}/entries/${entryId}/absence`,
+      markAbsentBody,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'events',
+      }
+    );
+    }
+
+    if (options?.observe === 'response') {
+      return this.http.post<TData>(
+      `/api/organisations/${organisationId}/tournaments/${tournamentId}/entries/${entryId}/absence`,
+      markAbsentBody,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'response',
+      }
+    );
+    }
+
+    return this.http.post<TData>(
+      `/api/organisations/${organisationId}/tournaments/${tournamentId}/entries/${entryId}/absence`,
+      markAbsentBody,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'body',
+      }
+    );
+  }
+
+/**
  * GET_api_organisations_organisationId_tournaments_tournamentId_entries_entryId_roster
  * @summary GET_api_organisations_organisationId_tournaments_tournamentId_entries_entryId_roster
  */
@@ -1496,6 +1655,183 @@ export class HeraldHostAdminService {
     );
   }
 
+/**
+ * POST_api_organisations_organisationId_tournaments_tournamentId_schedule_withdrawal
+ * @summary POST_api_organisations_organisationId_tournaments_tournamentId_schedule_withdrawal
+ */
+ withdrawSchedule<TData = ScheduleDetails>(organisationId: string,
+    tournamentId: string,
+    withdrawScheduleBody: WithdrawSchedule, options?: HttpClientBodyOptions): Observable<TData>;
+ withdrawSchedule<TData = ScheduleDetails>(organisationId: string,
+    tournamentId: string,
+    withdrawScheduleBody: WithdrawSchedule, options?: HttpClientEventOptions): Observable<HttpEvent<TData>>;
+ withdrawSchedule<TData = ScheduleDetails>(organisationId: string,
+    tournamentId: string,
+    withdrawScheduleBody: WithdrawSchedule, options?: HttpClientResponseOptions): Observable<AngularHttpResponse<TData>>;
+  withdrawSchedule<TData = ScheduleDetails>(
+    organisationId: string,
+    tournamentId: string,
+    withdrawScheduleBody: WithdrawSchedule, options?: HttpClientObserveOptions): Observable<TData | HttpEvent<TData> | AngularHttpResponse<TData>> {
+    if (options?.observe === 'events') {
+      return this.http.post<TData>(
+      `/api/organisations/${organisationId}/tournaments/${tournamentId}/schedule/withdrawal`,
+      withdrawScheduleBody,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'events',
+      }
+    );
+    }
+
+    if (options?.observe === 'response') {
+      return this.http.post<TData>(
+      `/api/organisations/${organisationId}/tournaments/${tournamentId}/schedule/withdrawal`,
+      withdrawScheduleBody,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'response',
+      }
+    );
+    }
+
+    return this.http.post<TData>(
+      `/api/organisations/${organisationId}/tournaments/${tournamentId}/schedule/withdrawal`,
+      withdrawScheduleBody,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'body',
+      }
+    );
+  }
+
+/**
+ * POST_api_organisations_organisationId_tournaments_tournamentId_schedule_publication
+ * @summary POST_api_organisations_organisationId_tournaments_tournamentId_schedule_publication
+ */
+ publishSchedule<TData = ScheduleDetails>(organisationId: string,
+    tournamentId: string,
+    publishScheduleBody: PublishSchedule, options?: HttpClientBodyOptions): Observable<TData>;
+ publishSchedule<TData = ScheduleDetails>(organisationId: string,
+    tournamentId: string,
+    publishScheduleBody: PublishSchedule, options?: HttpClientEventOptions): Observable<HttpEvent<TData>>;
+ publishSchedule<TData = ScheduleDetails>(organisationId: string,
+    tournamentId: string,
+    publishScheduleBody: PublishSchedule, options?: HttpClientResponseOptions): Observable<AngularHttpResponse<TData>>;
+  publishSchedule<TData = ScheduleDetails>(
+    organisationId: string,
+    tournamentId: string,
+    publishScheduleBody: PublishSchedule, options?: HttpClientObserveOptions): Observable<TData | HttpEvent<TData> | AngularHttpResponse<TData>> {
+    if (options?.observe === 'events') {
+      return this.http.post<TData>(
+      `/api/organisations/${organisationId}/tournaments/${tournamentId}/schedule/publication`,
+      publishScheduleBody,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'events',
+      }
+    );
+    }
+
+    if (options?.observe === 'response') {
+      return this.http.post<TData>(
+      `/api/organisations/${organisationId}/tournaments/${tournamentId}/schedule/publication`,
+      publishScheduleBody,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'response',
+      }
+    );
+    }
+
+    return this.http.post<TData>(
+      `/api/organisations/${organisationId}/tournaments/${tournamentId}/schedule/publication`,
+      publishScheduleBody,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'body',
+      }
+    );
+  }
+
+/**
+ * GET_api_organisations_organisationId_tournaments_tournamentId_schedule
+ * @summary GET_api_organisations_organisationId_tournaments_tournamentId_schedule
+ */
+ getSchedule<TData = ScheduleDetails>(organisationId: string,
+    tournamentId: string, options?: HttpClientBodyOptions): Observable<TData>;
+ getSchedule<TData = ScheduleDetails>(organisationId: string,
+    tournamentId: string, options?: HttpClientEventOptions): Observable<HttpEvent<TData>>;
+ getSchedule<TData = ScheduleDetails>(organisationId: string,
+    tournamentId: string, options?: HttpClientResponseOptions): Observable<AngularHttpResponse<TData>>;
+  getSchedule<TData = ScheduleDetails>(
+    organisationId: string,
+    tournamentId: string, options?: HttpClientObserveOptions): Observable<TData | HttpEvent<TData> | AngularHttpResponse<TData>> {
+    if (options?.observe === 'events') {
+      return this.http.get<TData>(
+      `/api/organisations/${organisationId}/tournaments/${tournamentId}/schedule`,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'events',
+      }
+    );
+    }
+
+    if (options?.observe === 'response') {
+      return this.http.get<TData>(
+      `/api/organisations/${organisationId}/tournaments/${tournamentId}/schedule`,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'response',
+      }
+    );
+    }
+
+    return this.http.get<TData>(
+      `/api/organisations/${organisationId}/tournaments/${tournamentId}/schedule`,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'body',
+      }
+    );
+  }
+
+/**
+ * POST_api_organisations_organisationId_tournaments_tournamentId_schedule_draft
+ * @summary POST_api_organisations_organisationId_tournaments_tournamentId_schedule_draft
+ */
+ generateDraft<TData = ScheduleDetails>(organisationId: string,
+    tournamentId: string,
+    generateDraftBody: GenerateDraft, options?: HttpClientBodyOptions): Observable<TData>;
+ generateDraft<TData = ScheduleDetails>(organisationId: string,
+    tournamentId: string,
+    generateDraftBody: GenerateDraft, options?: HttpClientEventOptions): Observable<HttpEvent<TData>>;
+ generateDraft<TData = ScheduleDetails>(organisationId: string,
+    tournamentId: string,
+    generateDraftBody: GenerateDraft, options?: HttpClientResponseOptions): Observable<AngularHttpResponse<TData>>;
+  generateDraft<TData = ScheduleDetails>(
+    organisationId: string,
+    tournamentId: string,
+    generateDraftBody: GenerateDraft, options?: HttpClientObserveOptions): Observable<TData | HttpEvent<TData> | AngularHttpResponse<TData>> {
+    if (options?.observe === 'events') {
+      return this.http.post<TData>(
+      `/api/organisations/${organisationId}/tournaments/${tournamentId}/schedule/draft`,
+      generateDraftBody,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'events',
+      }
+    );
+    }
+
+    if (options?.observe === 'response') {
+      return this.http.post<TData>(
+      `/api/organisations/${organisationId}/tournaments/${tournamentId}/schedule/draft`,
+      generateDraftBody,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'response',
+      }
+    );
+    }
+
+    return this.http.post<TData>(
+      `/api/organisations/${organisationId}/tournaments/${tournamentId}/schedule/draft`,
+      generateDraftBody,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'body',
+      }
+    );
+  }
+
 };
 
 export type GetOrganisationClientResult = NonNullable<OrganisationSummary>
@@ -1512,6 +1848,7 @@ export type UndoCheckInClientResult = NonNullable<FieldDetails>
 export type CheckInClientResult = NonNullable<FieldDetails>
 export type RemoveRosterMemberClientResult = NonNullable<RosterDetails>
 export type AddRosterMemberClientResult = NonNullable<RosterDetails>
+export type MarkAbsentClientResult = NonNullable<FieldDetails>
 export type GetRosterClientResult = NonNullable<RosterDetails>
 export type GetFieldClientResult = NonNullable<FieldDetails>
 export type FindGuestsClientResult = NonNullable<GuestDetails[]>
@@ -1519,3 +1856,7 @@ export type EnterGuestClientResult = NonNullable<FieldDetails>
 export type CreateGuestClientResult = NonNullable<GuestDetails>
 export type CancelEntryClientResult = NonNullable<FieldDetails>
 export type AdmitEntryClientResult = NonNullable<FieldDetails>
+export type WithdrawScheduleClientResult = NonNullable<ScheduleDetails>
+export type PublishScheduleClientResult = NonNullable<ScheduleDetails>
+export type GetScheduleClientResult = NonNullable<ScheduleDetails>
+export type GenerateDraftClientResult = NonNullable<ScheduleDetails>

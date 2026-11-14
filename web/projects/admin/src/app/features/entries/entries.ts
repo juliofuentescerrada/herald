@@ -1,10 +1,8 @@
 import { EntryDetails, EntryTerms, FieldDetails, RosterReadiness } from '@herald/api-client/admin';
 import { organisationKey } from '../../platform';
 
-/** The same keys as the tournaments feature uses, so a write here refreshes its tournament and list. */
-export const tournamentKey = (organisation: string, id: string) => organisationKey(organisation, 'tournament', id);
-export const tournamentsKey = (organisation: string) => organisationKey(organisation, 'tournaments');
-export const fieldKey = (organisation: string, id: string) => organisationKey(organisation, 'field', id);
+/** Shared with the tournaments and schedule features, so a write here refreshes their reads. */
+export { fieldKey, tournamentKey, tournamentsKey } from '../../platform';
 export const guestsKey = (organisation: string) => organisationKey(organisation, 'guests');
 export const rosterKey = (organisation: string, tournament: string, entry: string) => organisationKey(organisation, 'roster', tournament, entry);
 
@@ -53,6 +51,8 @@ export const ruleText = (field: string, rule: string): string => {
     case 'capacity/full': return 'No slot is free.';
     case 'entry/cancelled': return 'This entry was cancelled.';
     case 'entry/not-admitted': return 'Only an admitted entry can check in.';
+    case 'entry/not-pending': return 'Only an entry still pending a mandatory check-in can be marked absent.';
+    case 'field/schedule-published': return 'The schedule is published. Withdraw it to change the field.';
     case 'reason/required': return 'Enter a private reason.';
     case 'reason/too-long': return 'Use at most 500 characters.';
     case 'name/required': return 'Enter a name.';

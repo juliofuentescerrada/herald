@@ -30,6 +30,13 @@ public enum RosterChangeKind
     Removed,
 }
 
+// Why an entry was cancelled: by the owner, or marked absent in the absence review (F-05).
+public enum CancellationCause
+{
+    Owner,
+    AbsentAtStart,
+}
+
 public enum CheckInChangeKind
 {
     Confirmed,
@@ -100,6 +107,8 @@ public sealed class Entry : Entity<EntryId>
 
     public DateTimeOffset? CancelledAt { get; private set; }
 
+    public CancellationCause? CancellationCause { get; private set; }
+
     // Starts at 0 and grows by one with each addition or removal; roster writes state it (design D-2).
     public int RosterRevision { get; private set; }
 
@@ -163,9 +172,10 @@ public sealed class Entry : Entity<EntryId>
         AdmissionReason = reason;
     }
 
-    internal void Cancel(Guid actor, DateTimeOffset at)
+    internal void Cancel(CancellationCause cause, Guid actor, DateTimeOffset at)
     {
         State = EntryState.Cancelled;
+        CancellationCause = cause;
         WaitingReason = null;
         CancelledBy = actor;
         CancelledAt = at;

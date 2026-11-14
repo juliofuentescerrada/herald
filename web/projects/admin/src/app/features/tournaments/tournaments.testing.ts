@@ -52,6 +52,7 @@ export const details = (over: Partial<TournamentDetails> = {}, config: Partial<T
   admittedEntries: 0,
   waitingEntries: 0,
   checkedInEntries: 0,
+  schedulePublished: false,
   ...over,
 });
 

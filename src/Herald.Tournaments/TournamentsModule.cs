@@ -1,3 +1,4 @@
+using Herald.Contracts.Competition.V1;
 using Herald.Contracts.Registration.V1;
 using Herald.ModuleHosting;
 using Herald.Tournaments.Persistence;
@@ -13,6 +14,7 @@ public static class TournamentsModule
     {
         // Integration events this module consumes come through its durable local queue (ADR 0016).
         options.PublishMessage<TournamentFieldChanged>().ToLocalQueue(Queue);
+        options.PublishMessage<TournamentScheduleChanged>().ToLocalQueue(Queue);
         return options.AddHeraldModule<TournamentsDbContext>(TournamentsDbContext.Schema);
     }
 }

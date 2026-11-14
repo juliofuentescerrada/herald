@@ -47,6 +47,10 @@ namespace Herald.Registration.Persistence.Migrations
                     b.Property<Guid?>("AdmittedBy")
                         .HasColumnType("uuid");
 
+                    b.Property<string>("CancellationCause")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
                     b.Property<DateTimeOffset?>("CancelledAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -106,6 +110,9 @@ namespace Herald.Registration.Persistence.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
 
+                    b.Property<int>("EligibleRevision")
+                        .HasColumnType("integer");
+
                     b.Property<long>("LastSequence")
                         .HasColumnType("bigint");
 
@@ -134,10 +141,18 @@ namespace Herald.Registration.Persistence.Migrations
                             b1.Property<int>("Capacity")
                                 .HasColumnType("integer");
 
+                            b1.Property<string>("CheckIn")
+                                .IsRequired()
+                                .HasMaxLength(20)
+                                .HasColumnType("character varying(20)");
+
                             b1.Property<string>("EntryKind")
                                 .IsRequired()
                                 .HasMaxLength(20)
                                 .HasColumnType("character varying(20)");
+
+                            b1.Property<bool>("FieldLocked")
+                                .HasColumnType("boolean");
 
                             b1.Property<int?>("MaximumRosterSize")
                                 .HasColumnType("integer");

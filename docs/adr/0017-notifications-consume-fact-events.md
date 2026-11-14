@@ -25,8 +25,9 @@ ADR 0007 already requires owning modules to persist actor, time and reason with 
 | Fact | Owner | Recorded by | Published |
 |---|---|---|---|
 | Entry admitted on entering, by hand or by promotion from the queue (`WaitingSince` set) | Registration | `h1-entries`: `Entry` state, method, actor, time, revision | Not yet |
-| Entry cancelled | Registration | `h1-entries`: `Entry` actor, time, revision | Not yet |
+| Entry cancelled, by the owner or marked absent at start | Registration | `h1-entries`: `Entry` actor, time, revision; `h1-round-robin-pairings`: its cause | Not yet |
 | Roster member added or removed | Registration | `h1-team-rosters`: `RosterChange` player, added or removed, actor, time, roster revision | Not yet |
+| Schedule published, or withdrawn with its reason | Competition | `h1-round-robin-pairings`: `Publication` number, pairings, actor, time; withdrawal actor, time and private reason | Not yet |
 
 Each change that adds a fact adds a row, including H1's tournament publication, material changes and registration opening or closing when their owning change confirms what is recorded.
 

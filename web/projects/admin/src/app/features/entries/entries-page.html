@@ -62,6 +62,17 @@
         </div>
       </section>
 
+      @if (locked()) {
+        <herald-notice heading="Field locked by the published schedule">
+          Entries cannot be admitted, cancelled or checked in while the schedule is published. Withdraw it to change the field.
+          <span class="notice-action"><a herald-button routerLink="../schedule">Open schedule</a></span>
+        </herald-notice>
+      }
+      @if (reviewing()) {
+        <herald-notice tone="warning" [heading]="field.data()!.pending === 1 ? '1 entry is pending check-in' : field.data()!.pending + ' entries are pending check-in'">
+          Check-in is mandatory, so pending entries block the schedule. Check each in, or mark it absent: marking absent cancels the entry and cannot be undone.
+        </herald-notice>
+      }
       @if (state() === 'conflict') {
         <herald-notice tone="danger" heading="This entry changed elsewhere">
           Nothing changed with this request. Reload the latest entries before trying again.
@@ -124,12 +135,17 @@
                     <button herald-button type="button" [disabled]="state() !== 'ready' || working" (click)="openRoster(entry, $any($event.currentTarget))"
                       [attr.aria-label]="'Roster: ' + entry.guestName">Roster</button>
                   }
-                  <button herald-button type="button" [loading]="working" [disabled]="state() !== 'ready'" (click)="toggleCheckIn(entry)"
+                  <button herald-button type="button" [loading]="working" [disabled]="state() !== 'ready' || locked()" (click)="toggleCheckIn(entry)"
                     [attr.aria-label]="(working ? (confirmed ? 'Undoing check-in' : 'Checking in') : confirmed ? 'Undo check-in' : 'Check in') + ': ' + entry.guestName">
                     {{ working ? (confirmed ? 'Undoing…' : 'Checking in…') : confirmed ? 'Undo check-in' : 'Check in' }}
                   </button>
-                  <button herald-button type="button" [disabled]="state() !== 'ready' || working" (click)="askCancel(entry, $any($event.currentTarget))"
-                    [attr.aria-label]="'Cancel entry: ' + entry.guestName">Cancel entry</button>
+                  @if (reviewing() && !confirmed) {
+                    <button herald-button type="button" [disabled]="state() !== 'ready' || working" (click)="askAbsent(entry, $any($event.currentTarget))"
+                      [attr.aria-label]="'Mark absent: ' + entry.guestName">Mark absent</button>
+                  } @else {
+                    <button herald-button type="button" [disabled]="state() !== 'ready' || working || locked()" (click)="askCancel(entry, $any($event.currentTarget))"
+                      [attr.aria-label]="'Cancel entry: ' + entry.guestName">Cancel entry</button>
+                  }
                 </div>
               </li>
             }
@@ -165,7 +181,7 @@
                   <button herald-button type="button" [disabled]="!!admitBlocked() || state() !== 'ready'"
                     [attr.aria-describedby]="admitBlocked() ? 'admit-why-' + entry.id : null" [attr.aria-label]="'Admit: ' + entry.guestName"
                     (click)="admit(entry, $any($event.currentTarget))">Admit</button>
-                  <button herald-button type="button" [disabled]="state() !== 'ready'" (click)="askCancel(entry, $any($event.currentTarget))"
+                  <button herald-button type="button" [disabled]="state() !== 'ready' || locked()" (click)="askCancel(entry, $any($event.currentTarget))"
                     [attr.aria-label]="'Cancel entry: ' + entry.guestName">Cancel entry</button>
                 </div>
               </li>
@@ -184,7 +200,10 @@
               <li>
                 <div>
                   <span class="name-line">
-                    <span><span class="name">{{ entry.guestName }}</span><span class="help">{{ ' · Cancelled ' + zoned(entry.cancelledAt) }}</span></span>
+                    <span><span class="name">{{ entry.guestName }}</span><span class="help">{{ (entry.cancellationCause === 'absentAtStart' ? ' · Marked absent ' : ' · Cancelled ') + zoned(entry.cancelledAt) }}</span></span>
+                    @if (entry.cancellationCause === 'absentAtStart') {
+                      <herald-status-label>Absent at start</herald-status-label>
+                    }
                     @if (entry.checkIn === 'confirmed') {
                       <herald-status-label tone="success" icon="circle-check">Checked in</herald-status-label>
                     }
@@ -319,6 +338,22 @@
         {{ state() === 'busy' ? 'Cancelling…' : failure() ? 'Try again' : 'Confirm cancellation' }}
       </button>
       <button herald-button type="button" data-herald-initial-focus [disabled]="state() === 'busy'" (click)="close()">Keep entry</button>
+    </div>
+  </herald-dialog>
+</ng-template>
+
+<ng-template #absentDialog>
+  @let entry = $any(panel())?.entry;
+  <herald-dialog [heading]="'Mark ' + entry?.guestName + ' absent?'" [busy]="state() === 'busy'">
+    <p>{{ entry?.guestName }}’s entry will be cancelled with the cause “absent at start”. This cannot be undone. The freed slot admits nobody automatically; you can admit a waiting entry afterwards.</p>
+    @if (failure(); as failed) {
+      <herald-notice tone="danger" [heading]="failed.heading">{{ failed.text }}</herald-notice>
+    }
+    <div heraldDialogActions>
+      <button herald-button variant="destructive" type="button" [loading]="state() === 'busy'" (click)="confirmAbsent()">
+        {{ state() === 'busy' ? 'Marking absent…' : failure() ? 'Try again' : 'Mark absent' }}
+      </button>
+      <button herald-button type="button" data-herald-initial-focus [disabled]="state() === 'busy'" (click)="close()">Keep pending</button>
     </div>
   </herald-dialog>
 </ng-template>

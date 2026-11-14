@@ -1,0 +1,236 @@
+<a class="back" routerLink=".."><herald-icon name="arrow-left" size="metadata" />Back to configuration</a>
+
+@if (tournament.isPending()) {
+  <p class="panel" role="status">Loading schedule…</p>
+} @else if (unavailable()) {
+  <section class="panel">
+    <herald-notice tone="danger" heading="Schedule not available">
+      Only a published tournament has a schedule. This one is a draft, does not exist in this organisation, or could not be read.
+    </herald-notice>
+    <div class="actions">
+      <button herald-button variant="primary" type="button" [loading]="tournament.isFetching()" (click)="tournament.refetch()">Try again</button>
+      <a herald-button routerLink="../.."><herald-icon name="arrow-left" />Back to tournaments</a>
+    </div>
+  </section>
+} @else {
+  <header class="page-header">
+    <div class="title">
+      <h1>Schedule · {{ tournament.data()!.configuration.title }}</h1>
+      <p class="labels">
+        @for (label of labels(); track label.text) {
+          <herald-status-label [icon]="label.icon">{{ label.text }}</herald-status-label>
+        }
+      </p>
+    </div>
+  </header>
+
+  @if (schedule.isPending()) {
+    <section class="operation" role="status" aria-busy="true">
+      <h2>Loading schedule…</h2>
+      <p>Please wait while the schedule is loaded.</p>
+    </section>
+  } @else if (notYet()) {
+    <herald-notice heading="No eligible field reported yet">
+      The schedule appears once the tournament’s entries have been reported. Change an entry, or try again in a moment.
+      <span class="notice-action"><button herald-button type="button" [loading]="schedule.isFetching()" (click)="schedule.refetch()">Try again</button></span>
+    </herald-notice>
+  } @else if (schedule.isError()) {
+    <herald-notice tone="danger" heading="The schedule could not be loaded">
+      No pairings are shown. Try loading the schedule again.
+      <span class="notice-action">
+        <button herald-button variant="primary" type="button" [loading]="schedule.isFetching()" (click)="schedule.refetch()">Try again</button>
+      </span>
+    </herald-notice>
+  } @else {
+    @let s = schedule.data()!;
+    <!-- Stacked at every width: the summary and its operation, notices, the rounds, then the publication history. -->
+    <div class="column">
+      <section class="summary" aria-labelledby="summary-heading" [attr.aria-busy]="state() === 'busy' || null">
+        <div class="summary-text">
+          <div class="summary-title">
+            <h2 id="summary-heading">{{ heading() }}</h2>
+            <herald-status-label [tone]="statusTone()" [icon]="current() ? 'circle-check' : draft()?.stale ? 'alert-triangle' : undefined">{{ statusText() }}</herald-status-label>
+          </div>
+          <p class="help">{{ meta() }} @if (when()) {<span class="when">{{ when() }}</span>}</p>
+          @if (teams()) {
+            <p class="help">Each team is one entrant; lineups are chosen per match.</p>
+          }
+        </div>
+        @if (current()) {
+          <div class="summary-action">
+            <button herald-button type="button" [disabled]="state() !== 'ready'" (click)="askWithdraw($any($event.currentTarget))">Withdraw</button>
+          </div>
+        } @else if (draft()) {
+          <div class="summary-action">
+            @if (draft()!.stale) {
+              <button herald-button type="button" disabled aria-describedby="stale-why">Publish</button>
+              <p class="help" id="stale-why">A stale draft cannot be published. Regenerate it first.</p>
+            } @else {
+              <button herald-button variant="primary" type="button" [loading]="state() === 'busy'" [disabled]="state() === 'conflict'" (click)="publish()">
+                {{ state() === 'busy' ? 'Publishing…' : 'Publish' }}
+              </button>
+            }
+          </div>
+        }
+      </section>
+
+      @if (state() === 'conflict') {
+        <herald-notice tone="danger" heading="This schedule changed elsewhere">
+          Nothing changed with this request. Reload the latest schedule before trying again.
+          <span class="notice-action"><button herald-button type="button" (click)="reload()">Reload latest</button></span>
+        </herald-notice>
+      }
+      @if (!dialogOpen() && failure(); as failed) {
+        <herald-notice tone="danger" [heading]="failed.heading">{{ failed.text }}</herald-notice>
+      }
+      @if (s.crossedChange; as change) {
+        <herald-notice tone="danger" heading="The field changed since publication">
+          @if (change.removed.length) {
+            No longer eligible: {{ names(change.removed) }}.
+          }
+          @if (change.added.length) {
+            Now eligible: {{ names(change.added) }}.
+          }
+          The published pairings are unchanged. Withdraw the schedule, regenerate and publish again.
+        </herald-notice>
+      }
+      @if (draft()?.stale && s.draftChange; as change) {
+        <herald-notice tone="warning" heading="The field changed after this draft">
+          @if (change.removed.length) {
+            No longer eligible: {{ names(change.removed) }}.
+          }
+          @if (change.added.length) {
+            Now eligible: {{ names(change.added) }}.
+          }
+          @if (!change.removed.length && !change.added.length) {
+            Registration or a pending check-in changed.
+          }
+          Regenerate before publishing.
+        </herald-notice>
+      }
+      @if (current() && !s.crossedChange) {
+        <herald-notice heading="The field is locked">
+          While this revision is published, entries cannot be admitted, cancelled or checked in, and registration cannot reopen. Withdraw it to change the field.
+        </herald-notice>
+      }
+
+      @if (!current()) {
+        <section class="operation" aria-labelledby="generate-heading">
+          <h2 id="generate-heading">{{ draft() ? 'Regenerate the draft' : 'Before generating' }}</h2>
+          @if (blockers().length) {
+            <ul class="checks" aria-label="Conditions to generate">
+              @for (blocker of blockers(); track blocker.code) {
+                <li>
+                  <div>
+                    <strong>{{ blocker.condition }}</strong>
+                    <p class="help">
+                      {{ blocker.fix }}
+                      @if (blocker.code === 'entries-pending' && s.pending.length) {
+                        Pending: {{ names(s.pending) }}.
+                      }
+                      <a [routerLink]="blocker.where === 'entries' ? '../entries' : '..'">{{ blocker.where === 'entries' ? 'Open entries' : 'Open configuration' }}</a>
+                    </p>
+                  </div>
+                  <herald-status-label tone="danger" icon="alert-circle">Not met</herald-status-label>
+                </li>
+              }
+            </ul>
+          } @else {
+            <fieldset class="seeding" [disabled]="state() === 'busy'">
+              <legend>Seeding</legend>
+              <label><input type="radio" name="seeding" value="admissionOrder" [checked]="seeding() === 'admissionOrder'" (change)="seeding.set('admissionOrder')" /> Admission order</label>
+              <label><input type="radio" name="seeding" value="draw" [checked]="seeding() === 'draw'" (change)="seeding.set('draw')" /> Draw (the seed is recorded)</label>
+            </fieldset>
+            @if (draft()) {
+              <p class="help">Regenerating replaces the draft and keeps no copy of it.</p>
+            }
+          }
+          @if (state() === 'busy' && !draft()) {
+            <p class="help" role="status">Generating. Please wait; do not submit again.</p>
+          }
+          <div class="actions">
+            <button herald-button [variant]="draft() && !draft()!.stale ? 'secondary' : 'primary'" type="button" [loading]="state() === 'busy'"
+              [disabled]="!!generateBlocked() && state() !== 'busy'" [attr.aria-describedby]="generateBlocked() ? 'generate-why' : null" (click)="generate()">
+              {{ draft() ? 'Regenerate' : 'Generate draft' }}
+            </button>
+            @if (generateBlocked(); as why) {
+              <p class="help" id="generate-why">{{ why }}</p>
+            }
+          </div>
+        </section>
+      }
+
+      @if (pairings(); as p) {
+        @for (round of p.rounds; track round.number) {
+          <section class="group" [attr.aria-labelledby]="'round-' + round.number">
+            <h2 [id]="'round-' + round.number">Round {{ round.number }}</h2>
+            <ul class="rows matches" [attr.aria-labelledby]="'round-' + round.number">
+              @for (match of round.matches; track match.first.entryId) {
+                <li><span class="home">{{ match.first.name }}</span><span class="vs"> vs </span><span>{{ match.second.name }}</span></li>
+              }
+            </ul>
+            @if (round.rest) {
+              <p class="help rest">Rest: {{ round.rest.name }} · no points</p>
+            }
+          </section>
+        }
+      }
+
+      @if (withdrawn().length) {
+        <details class="history" open>
+          <summary>Publication history · {{ s.history.length }}</summary>
+          <ul aria-label="Publication history">
+            @for (publication of s.history; track publication.number) {
+              <li>
+                <strong>Revision {{ publication.number }}</strong>
+                <p class="help">
+                  Published {{ zoned(publication.publishedAt) }}
+                  @if (publication.withdrawnAt) {
+                    · withdrawn {{ zoned(publication.withdrawnAt) }} · Reason: {{ publication.withdrawalReason }}
+                  } @else {
+                    · current
+                  }
+                </p>
+              </li>
+            }
+          </ul>
+        </details>
+      }
+    </div>
+  }
+}
+
+<ng-template #withdrawDialog>
+  <herald-dialog [heading]="'Withdraw revision ' + current()?.number + '?'" [busy]="state() === 'busy'">
+    <p>The revision stays in the history and its pairings return as the draft. The field unlocks.</p>
+    <form novalidate (submit)="$event.preventDefault(); confirmWithdraw()">
+      <div class="field">
+        <label for="withdraw-reason">Reason (required)</label>
+        <textarea
+          id="withdraw-reason"
+          #reasonInput
+          rows="3"
+          maxlength="500"
+          [value]="reason()"
+          (input)="reason.set(reasonInput.value); reasonError.set(null)"
+          [readOnly]="state() === 'busy'"
+          [attr.aria-invalid]="reasonError() ? 'true' : null"
+          [attr.aria-describedby]="reasonError() ? 'withdraw-reason-help withdraw-reason-error' : 'withdraw-reason-help'"
+        ></textarea>
+        <p class="help" id="withdraw-reason-help">Private to the organisation. At most 500 characters.</p>
+        @if (reasonError(); as message) {
+          <p class="field-error" id="withdraw-reason-error"><herald-icon name="alert-circle" size="metadata" />Error: {{ message }}</p>
+        }
+      </div>
+      @if (failure(); as failed) {
+        <herald-notice tone="danger" [heading]="failed.heading">{{ failed.text }}</herald-notice>
+      }
+      <div class="actions">
+        <button herald-button variant="destructive" type="submit" [loading]="state() === 'busy'">
+          {{ state() === 'busy' ? 'Withdrawing…' : failure() ? 'Try again' : 'Withdraw' }}
+        </button>
+        <button herald-button type="button" data-herald-initial-focus [disabled]="state() === 'busy'" (click)="close()">Keep it published</button>
+      </div>
+    </form>
+  </herald-dialog>
+</ng-template>

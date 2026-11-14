@@ -30,19 +30,27 @@ public static class TournamentEntryTermsChangedHandler
             message.EntryKind == Contract.EntryKind.Team ? Domain.EntryKind.Team : Domain.EntryKind.Individual,
             message.Admission == Contract.Admission.Manual ? Domain.Admission.Manual : Domain.Admission.Automatic,
             message.MinimumRosterSize,
-            message.MaximumRosterSize);
+            message.MaximumRosterSize,
+            message.CheckIn == Contract.CheckInPolicy.Mandatory ? Domain.CheckInPolicy.Mandatory : Domain.CheckInPolicy.Optional,
+            message.FieldLocked);
         var now = DateTimeOffset.UtcNow;
 
+        // A new field publishes its first eligible snapshot too.
+        var eligibleRevision = -1;
         if (await db.Fields.SingleOrDefaultAsync(field => field.Id == id, cancellationToken) is not { } field)
         {
             field = Field.Track(id, terms, message.Revision, now);
             db.Fields.Add(field);
         }
-        else if (!field.ApplyTerms(terms, message.Revision, now))
+        else
         {
-            return;
+            eligibleRevision = field.EligibleRevision;
+            if (!field.ApplyTerms(terms, message.Revision, now))
+            {
+                return;
+            }
         }
 
-        await bus.PublishAsync(Features.FieldDetails.Changed(message.OrganisationId, field));
+        await Features.FieldDetails.PublishAsync(bus, message.OrganisationId, field, eligibleRevision, db, cancellationToken);
     }
 }
