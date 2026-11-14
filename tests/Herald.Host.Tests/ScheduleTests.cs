@@ -147,8 +147,9 @@ public class ScheduleTests(OrganisationApi api)
         var response = await GenerateAsync(league, schedule);
 
         response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
-        Errors(await JsonAsync(response), "entries").ShouldBe(["pending"]);
-        schedule.GetProperty("pending").EnumerateArray().Select(entry => entry.GetProperty("name").GetString()).ShouldBe(["Sam Reed", "Rowan Lake"]);
+        var problem = await JsonAsync(response);
+        Errors(problem, "entries").ShouldBe(["pending"]);
+        problem.GetProperty("schedule").GetProperty("pending").EnumerateArray().Select(entry => entry.GetProperty("name").GetString()).ShouldBe(["Sam Reed", "Rowan Lake"]);
     }
 
     [Fact]
@@ -197,15 +198,21 @@ public class ScheduleTests(OrganisationApi api)
 
     [Fact]
     [Trait("covers", "round-robin-pairings: Withdraw and republish")]
-    public async Task Withdrawing_with_a_reason_keeps_the_history_and_unlocks_the_field()
+    public async Task Withdrawing_with_a_reason_regenerating_after_an_absence_and_republishing_keeps_the_history()
     {
         var league = await LeagueAsync("Robin Vale", "Sam Reed", "Jamie Brook", "Taylor Finch");
         var published = await JsonAsync(await PublishAsync(league, Revision(await JsonAsync(await GenerateAsync(league, await ScheduleAsync(league))))));
 
         var withdrawn = await WithdrawAsync(league, Revision(published), "Late absence");
-        var republished = await JsonAsync(await PublishAsync(league, Revision(await JsonAsync(withdrawn))));
+        var sam = (await JsonAsync(await league.Owner.Client.GetAsync($"{league.Owner.Path}/tournaments/{league.Tournament}/entries", Cancellation)))
+            .GetProperty("entries").EnumerateArray().Single(entry => entry.GetProperty("guestName").GetString() == "Sam Reed");
+        await api.SettledAsync(() => league.Owner.Client.PostAsJsonAsync(
+            $"{league.Owner.Path}/tournaments/{league.Tournament}/entries/{sam.GetProperty("id").GetGuid()}/cancellation", new { expectedRevision = 1 }, Cancellation));
+        var regenerated = await JsonAsync(await GenerateAsync(league, await ScheduleAsync(league)));
+        var republished = await JsonAsync(await PublishAsync(league, Revision(regenerated)));
 
         withdrawn.StatusCode.ShouldBe(HttpStatusCode.OK);
+        regenerated.GetProperty("draft").GetProperty("pairings").GetProperty("entrants").GetInt32().ShouldBe(3);
         republished.GetProperty("current").GetProperty("number").GetInt32().ShouldBe(2);
         var first = republished.GetProperty("history")[1];
         first.GetProperty("number").GetInt32().ShouldBe(1);
@@ -236,6 +243,7 @@ public class ScheduleTests(OrganisationApi api)
         var response = await WithdrawAsync(league, Revision(draft), "Late absence");
 
         response.StatusCode.ShouldBe(HttpStatusCode.Conflict);
+        (await JsonAsync(response)).GetProperty("schedule").GetProperty("current").GetProperty("number").GetInt32().ShouldBe(1);
     }
 
     [Fact]

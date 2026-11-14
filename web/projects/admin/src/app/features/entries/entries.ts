@@ -1,10 +1,8 @@
 import { EntryDetails, EntryTerms, FieldDetails, RosterReadiness } from '@herald/api-client/admin';
 import { organisationKey } from '../../platform';
 
-/** The same keys as the tournaments feature uses, so a write here refreshes its tournament and list. */
-export const tournamentKey = (organisation: string, id: string) => organisationKey(organisation, 'tournament', id);
-export const tournamentsKey = (organisation: string) => organisationKey(organisation, 'tournaments');
-export const fieldKey = (organisation: string, id: string) => organisationKey(organisation, 'field', id);
+/** Shared with the tournaments and schedule features, so a write here refreshes their reads. */
+export { fieldKey, tournamentKey, tournamentsKey } from '../../platform';
 export const guestsKey = (organisation: string) => organisationKey(organisation, 'guests');
 export const rosterKey = (organisation: string, tournament: string, entry: string) => organisationKey(organisation, 'roster', tournament, entry);
 

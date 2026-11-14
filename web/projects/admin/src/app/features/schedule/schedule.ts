@@ -1,10 +1,7 @@
 import { PairingsDetails } from '@herald/api-client/admin';
-import { organisationKey } from '../../platform';
 
-/** The same keys as the tournaments and entries features use, so a write here refreshes their reads. */
-export const tournamentKey = (organisation: string, id: string) => organisationKey(organisation, 'tournament', id);
-export const fieldKey = (organisation: string, id: string) => organisationKey(organisation, 'field', id);
-export const scheduleKey = (organisation: string, id: string) => organisationKey(organisation, 'schedule', id);
+/** Shared with the tournaments and entries features, so a write here refreshes their reads. */
+export { fieldKey, scheduleKey, tournamentKey } from '../../platform';
 
 /** "4 players · 3 rounds · 6 matches": the size of a set of pairings in words. */
 export const sizeText = (pairings: PairingsDetails, teams: boolean): string => {

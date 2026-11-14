@@ -100,14 +100,18 @@ internal static class ScheduleResults
             var result = write(schedule);
             switch (result.Outcome)
             {
+                // Both carry the current schedule, so a rejection names its blockers (pending entries included) and a
+                // conflict shows what the other write left (D-8).
                 case WriteOutcome.Rejected:
-                    return Results.ValidationProblem(result.Broken.GroupBy(rule => rule.Field).ToDictionary(field => field.Key, field => field.Select(rule => rule.Rule).ToArray()));
+                    return Results.ValidationProblem(
+                        result.Broken.GroupBy(rule => rule.Field).ToDictionary(field => field.Key, field => field.Select(rule => rule.Rule).ToArray()),
+                        extensions: new Dictionary<string, object?> { ["schedule"] = ScheduleDetails.Of(schedule) });
                 case WriteOutcome.Stale:
                     return Results.Problem(
                         statusCode: StatusCodes.Status409Conflict,
                         title: "Conflict",
                         type: RevisionConflict,
-                        extensions: new Dictionary<string, object?> { ["currentRevision"] = schedule.Revision });
+                        extensions: new Dictionary<string, object?> { ["currentRevision"] = schedule.Revision, ["schedule"] = ScheduleDetails.Of(schedule) });
                 case WriteOutcome.Applied:
                     try
                     {

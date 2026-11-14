@@ -214,7 +214,8 @@ public sealed class Schedule : AggregateRoot<TournamentId>
         }
 
         _publications[_publications.IndexOf(current)] = current with { WithdrawalReason = reason, WithdrawnBy = actor, WithdrawnAt = at };
-        Draft = new(null, current.Pairings, current.PublishedBy, current.PublishedAt);
+        // The draft is back by this withdrawal: its author and time are the withdrawal's.
+        Draft = new(null, current.Pairings, actor, at);
         Raise(new ScheduleWithdrawn(Id, current.Number, reason, actor, at));
         Revision++;
         return WriteOutcome.Applied;

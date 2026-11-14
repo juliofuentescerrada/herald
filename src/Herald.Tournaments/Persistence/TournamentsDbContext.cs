@@ -41,6 +41,8 @@ public sealed class TournamentsDbContext(DbContextOptions<TournamentsDbContext> 
             tournament.Property(t => t.Registration).HasConversion<string>().HasMaxLength(20);
             // Two writes based on the same revision cannot both succeed.
             tournament.Property(t => t.Revision).IsConcurrencyToken();
+            // The schedule's lock bumps only the terms sequence: two snapshots must never share a number (ADR 0016).
+            tournament.Property(t => t.TermsRevision).IsConcurrencyToken();
             tournament.HasIndex(OrganisationProperty, nameof(Tournament.CreatedAt));
             tournament.ComplexProperty(t => t.Configuration, configuration =>
             {

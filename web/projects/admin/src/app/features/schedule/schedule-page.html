@@ -102,6 +102,9 @@
           @if (change.added.length) {
             Now eligible: {{ names(change.added) }}.
           }
+          @if (!change.removed.length && !change.added.length) {
+            Registration or a pending check-in changed.
+          }
           Regenerate before publishing.
         </herald-notice>
       }

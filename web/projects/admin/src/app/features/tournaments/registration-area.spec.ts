@@ -72,6 +72,16 @@ describe('The registration area', () => {
     expect(document.activeElement).toBe(page().querySelector('#t-registrationOpensAt'));
   });
 
+  it('keeps reopening disabled with its reason while a schedule is published',
+    { meta: { type: 'covers', description: "registration-window: Reopening a published schedule's tournament" } }, async () => {
+      const { page, area, action } = await render([() => of(published({ registration: 'closed', registrationChangedAt: '2026-11-13T17:00:00Z', schedulePublished: true }))]);
+      expect(action().textContent?.trim()).toBe('Reopen registration');
+      expect(action().disabled).toBe(true);
+      expect(area()!.querySelector('#registration-reason')?.textContent?.trim()).toBe('The schedule is published. Withdraw it before reopening registration.');
+      expect(action().getAttribute('aria-describedby')).toBe('registration-reason');
+      expect((await axe.run(page(), { rules: { 'color-contrast': { enabled: false } } })).violations.map((v) => v.id)).toEqual([]);
+    });
+
   it('asks to save unsaved changes first', async () => {
     const { area, action, type } = await render([() => of(published())]);
     await type('capacity', '32');

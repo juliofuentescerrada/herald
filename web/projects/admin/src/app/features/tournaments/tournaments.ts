@@ -3,13 +3,12 @@ import { ActivatedRoute } from '@angular/router';
 import { HeraldHostAdminService, TournamentDetails } from '@herald/api-client/admin';
 import { injectQuery } from '@tanstack/angular-query-experimental';
 import { firstValueFrom } from 'rxjs';
-import { AppContext, organisationKey, organisationPath } from '../../platform';
+import { AppContext, organisationPath, tournamentKey, tournamentsKey } from '../../platform';
 
 export { admittedText, capacityText, dateTimeText, instantText, lifecycleLabels, locationText, registrationText } from '../../shared';
 
 /** Query keys under the organisation, so a change of organisation or person drops them with the rest. */
-export const tournamentsKey = (organisation: string) => organisationKey(organisation, 'tournaments');
-export const tournamentKey = (organisation: string, id: string) => organisationKey(organisation, 'tournament', id);
+export { tournamentKey, tournamentsKey };
 
 export const tournamentsPath = (organisation: string) => `${organisationPath(organisation)}/tournaments`;
 

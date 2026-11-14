@@ -238,8 +238,19 @@ describe('The schedule page', () => {
       expect(button('Reload latest')).toBeTruthy();
     });
 
-  it('says when the field has not been reported yet',
+  it('reads a republished schedule with its rounds and the withdrawn revision in the history',
     { meta: { type: 'covers', description: 'round-robin-pairings: The owner reads a published schedule' } }, async () => {
+      const first = publication(1, { withdrawnAt: '2026-11-21T08:58:00Z', withdrawalReason: 'Late absence' });
+      const second = publication(2, { publishedAt: '2026-11-21T09:02:00Z' });
+      const { page, text, texts } = await open({ getSchedule: () => of(schedule({ revision: 9, current: second, history: [second, first] })) });
+      await vi.waitFor(() => expect(text('.summary herald-status-label')).toBe('Published · revision 2'));
+      expect(texts('.group h2')).toEqual(['Round 1', 'Round 2', 'Round 3']);
+      expect(texts('.history li strong')).toEqual(['Revision 2', 'Revision 1']);
+      expect(texts('.history li .help')[1]).toContain('Reason: Late absence');
+      expect(await violations(page())).toEqual([]);
+    });
+
+  it('says when the field has not been reported yet', async () => {
       const { text } = await open({ getSchedule: () => throwError(() => problem(404)) });
       await vi.waitFor(() => expect(text('herald-notice')).toContain('No eligible field reported yet'));
     });
