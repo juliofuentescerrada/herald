@@ -16,6 +16,9 @@ context: |
   - herald-screens skill: screens, states, layout rules and mockups.
   - refactoring-ui skill: repository-owned design/review practices; read docs/ui/style-guide.md,
     docs/ui/components.md and docs/ui/icons.md for criteria, control intent and icon meaning.
+  - docs/ui/experience-patterns.md: organiser versus participant/representative UX and anonymous
+    H2 public-portal targets; shared foundations do not imply identical workflows. UX aspirations
+    do not settle proposed D-30–38 product policies or imply implemented H2 screens.
   - herald-docs skill: documentation sources, ADRs, decisions, archiving and status.
   - docs/herald-functional-discovery.md: product rules, journeys and the decision register (§15);
     read the sections the change needs, not the whole file.
@@ -39,6 +42,8 @@ rules:
     - List the notifiable facts the change introduces, or state that it introduces none (ADR 0017).
     - For UI work, use herald-screens and refactoring-ui, select controls by documented intent and
       identify icon meanings; a documentation-only audit lists inspected screens without implying edits.
+    - For UI work, identify the audience/acting context and relevant XP experience patterns; cover
+      visitor and signed-in participant states for H2 portal flows and preserve decision statuses.
   design:
     - Reference the mockups or prototypes of each affected screen, as the herald-screens skill
       requires in a batch and outside one.

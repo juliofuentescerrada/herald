@@ -20,6 +20,7 @@ description: Herald's rules for maintaining documentation and decisions. Use whe
 | Architecture decisions | `docs/adr/` |
 | Visual contracts and screen/state coverage | `docs/herald-visual-direction.md` |
 | UI design workflow, review criteria and handoff | `docs/ui/style-guide.md` |
+| Organiser/participant UX patterns and H2 public-portal design targets | `docs/ui/experience-patterns.md` |
 | Component intent, selection and public integration API | `docs/ui/components.md` |
 | Icon meanings, placement and registry extension | `docs/ui/icons.md` |
 | A change's design notes, measurements and reviews | the change's `design.md` |

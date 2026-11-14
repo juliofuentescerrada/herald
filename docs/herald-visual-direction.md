@@ -8,6 +8,8 @@ This document translates the functional proposal into a visual direction, shared
 
 For the operational design/review workflow, start with the [UI style guide](ui/style-guide.md). [Component intent and APIs](ui/components.md) and [icon meanings and usage](ui/icons.md) complement the foundations here; they distinguish implemented controls from future patterns. Dated implementation reviews remain in their owning change.
 
+[Experience patterns](ui/experience-patterns.md) apply the maintainer's organiser/participant UX perspectives to these same foundations, including the H2 public portal. They own audience-specific task hierarchy, navigation and disclosure guidance while the H2 discovery/register retain functional authority and decision status.
+
 The baseline is `docs/herald-functional-discovery.md` v0.7. Confirmed requirements remain authoritative: individual and team entrants, implicit participation in individual 1v1, scoped permissions, distinct lifecycle dimensions, effective results, and an externally consumable API. The single decision register in discovery §15 distinguishes accepted scope from proposed rules. Wireframes use illustrative data and label pending policies; visual completeness does not settle those decisions.
 
 The maintainer's visual direction is contemporary video-game competition and sport: neutral surfaces, strong hierarchy and one intense contrasting accent. Administration retains the proposed compact operational layout. The public experience uses more expressive composition within the same modern identity. The existing illustrated repository wordmark is not a visual constraint for this proposal; the initial mockups use a typographic HERALD wordmark without redesigning or deleting the existing asset.
@@ -150,6 +152,8 @@ Loading buttons prevent accidental repeats without pretending that the operation
 | Conflict, or a state that blocks actions (over capacity) | Persistent notice on the page with its next action ("Reload latest") | Resolved or the page is reloaded |
 
 An error is never only a toast, and a toast never holds the only copy of information needed later or the only path to an action: the page also shows the outcome (the entry moves group, the form shows the saved values).
+
+Specific implemented flows retain their contracts: organisation creation lands with the created notice ([critical journey](../openspec/specs/end-to-end-journeys/spec.md)), and roster additions/removals update their drawer/page readiness without a toast ([team-rosters](../openspec/specs/team-rosters/spec.md)). The general placement rule does not silently change either flow; a proposed change must reconcile the affected specification and its journey checks.
 
 **Confirmation pattern.** An action with consequences that can be decided with one question and at most a short input confirms in a modal dialog. A flow of several steps that benefits from keeping the page in view opens in a drawer. A review of many values before a consequential action is its own page (review before publishing). An action that is reversible and changes nothing else acts at once with no confirmation (admitting in order, opening or closing registration). Browser `confirm` prompts are not used inside the applications; only closing or reloading the tab keeps the browser's own prompt.
 
@@ -294,6 +298,8 @@ Review desktop and mobile next actions for each affected slice. Loading, empty, 
 ### 9.4 H2 screen/state inventory
 
 The [H2 discovery](herald-h2-functional-discovery.md) owns functional rules and target acceptance. These are future surfaces for reviewed slices, not approved mockups or implemented screens. This documentation update changes no UI.
+
+Use the [H2 public/participant experience patterns](ui/experience-patterns.md) alongside this inventory: anonymous discovery and signed-in next-action flows have a different UX from organiser operations despite sharing the same design system.
 
 | Surface | Required states and boundary evidence |
 | --- | --- |

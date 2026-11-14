@@ -32,6 +32,8 @@ The [visual direction and design system](docs/herald-visual-direction.md) descri
 
 For mockups and implementation, start at the [UI style guide](docs/ui/style-guide.md), with [component intent and usage](docs/ui/components.md) and [icon meanings](docs/ui/icons.md). The repository-owned [Refactoring UI practice skill](.claude/skills/refactoring-ui/SKILL.md) applies the same criteria in the harness; [AGENTS.md](AGENTS.md) routes Codex to the shared instructions.
 
+[Experience patterns](docs/ui/experience-patterns.md) distinguish organiser operations, participant/representative tasks and the H2 public portal using the same foundations, with supplied UX aspirations mapped to current or future scope.
+
 Review references:
 
 - [Canonical individual outcomes and standings concept](docs/assets/mockups/herald-match-outcomes-and-standings.png)

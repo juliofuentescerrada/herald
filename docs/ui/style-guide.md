@@ -6,7 +6,7 @@ Status: documentation proposal, 14 November 2026. Applies to mockups, prototypes
 
 Before designing or implementing a screen:
 
-1. Read the relevant product journey and decision-register rows. Write down the person's job, the record/context they are acting on and the next permitted action.
+1. Read the relevant product journey and decision-register rows. Select the organiser, visitor or participant/representative context from [experience patterns](experience-patterns.md). Write down the person's job, the record/context they are acting on and the next permitted action.
 2. Load [herald-screens](../../.claude/skills/herald-screens/SKILL.md) and [Refactoring UI practices](../../.claude/skills/refactoring-ui/SKILL.md). Follow the proposal's existing visual-input process.
 3. Choose the page composition from visual direction §7.2 or §8, then the controls from [component guidance](components.md). Check [icon guidance](icons.md) before choosing symbols.
 4. Specify every relevant state and its recovery, including permission changes, conflicts and long content. Apply the review criteria below to mockups as well as code.
@@ -20,6 +20,7 @@ The first implementation audit is [Existing screens, 14 November 2026](../../ope
 | --- | --- |
 | What may the person do, and what does a status mean? | [Functional discovery](../herald-functional-discovery.md), its decision register and implemented OpenSpec capability |
 | What are Herald's colours, type sizes, spacing, geometry and page order? | [Visual direction §§3–8](../herald-visual-direction.md#3-colour-foundations) |
+| How does UX differ for the organiser, participant and H2 public portal? | [Experience patterns](experience-patterns.md), including supplied-document scope mapping and H2 design targets |
 | Which control fits the intent and what does its API support? | [Component guidance](components.md), checked against `@herald/ui` public exports |
 | Which icon represents this meaning? | [Icon guidance](icons.md) and the typed `IconName` registry |
 | How do we apply Refactoring UI? | [Local practice skill](../../.claude/skills/refactoring-ui/SKILL.md); Herald's confirmed constraints take precedence |
@@ -27,6 +28,12 @@ The first implementation audit is [Existing screens, 14 November 2026](../../ope
 | Where does implementation belong? | [Frontend rules](../../web/CLAUDE.md), ADR 0011 |
 
 An old screenshot or archived design cannot override a current confirmed contract. Preserve the distinction between confirmed direction, proposed refinements and implemented behaviour. This guide adds no dark-theme toggle, new public workflow or product policy.
+
+## Choose the experience before the composition
+
+Use one system of foundations and controls for different jobs. The organiser needs operational awareness and exception handling; the participant needs a mobile companion that exposes their next action; a public visitor needs to assess an event before signing in. These contexts have different information order, density, navigation and disclosure, not different token sets or implicit permission grants.
+
+The [experience-pattern reference](experience-patterns.md) develops the supplied organiser/participant perspectives into operational, discovery, detail, onboarding, match-day, team, reporting and history patterns. It also maps aspirations such as calendar export, cloning, live updates and public career statistics to current scope or an explicit future decision. Read it for every affected audience. H2 portal patterns are required design inputs for future proposals; their presence here does not implement or approve those flows.
 
 ## Review criteria
 
@@ -66,7 +73,7 @@ Align text, field edges, summaries and action groups consistently. Avoid fixing 
 
 ### G-05 Compose for the available width
 
-Administration follows [§7.2](../herald-visual-direction.md#72-page-compositions): full width, stacked page groups, summaries before their actionable lists, secondary content below, status labels beside the title and summary actions to the right when they fit. A semantic `<aside>` below a form is acceptable; a competing side column is not. Two field columns within a form group are compatible with the existing composition and collapse below the single breakpoint.
+Administration follows [§7.2](../herald-visual-direction.md#72-page-compositions): full width, stacked page groups, summaries before their actionable lists, secondary content below, status labels beside the record title and summary actions to the right when they fit. The fixed-title publishing review keeps its labels under the lead, as that composition specifies. A semantic `<aside>` below a form is acceptable; a competing side column is not. Two field columns within a form group are compatible with the existing composition and collapse below the single breakpoint.
 
 Public pages follow [§8](../herald-visual-direction.md#8-public-and-participant-composition): capped, centred content, a restrained graphite introduction where useful and the documented fluid outer gutter. Do not add a hero to every page.
 
@@ -93,6 +100,8 @@ For forms, include default, edited, validation failure, submitting, request fail
 ### G-08 Feedback stays with its cause
 
 Apply the placement table and confirmation pattern in [visual direction §5](../herald-visual-direction.md#5-shared-component-contracts). Field errors belong at the field; failed row actions remain on the row; dialog/drawer errors remain inside the open surface; page blockers persist on the page. Toasts report the person's completed action and are never the only record or the only recovery path.
+
+Preserve specific implemented workflow contracts: organisation creation still lands with its created notice, and roster additions/removals update in place without a toast. Reconcile the specification and journey tests explicitly before changing either; the generic feedback table is not authority to remove required behaviour.
 
 Use a confirmation for a consequential decision that fits one question, a drawer for contextual work and a page for a substantial review. Do not add a confirmation to every reversible action. Name the consequence, including effects on waiting entries, rather than asking a vague "Are you sure?".
 
@@ -145,6 +154,7 @@ Copy this outline into a change's `design.md` or a linked review file. Use one f
 ```text
 Revision / date:
 Product journey / decision rows and statuses:
+Audience / acting context / relevant XP patterns:
 Screens and states (including overlays):
 Visual reference and any superseding rule:
 Component choices and reasons:

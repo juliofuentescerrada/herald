@@ -25,7 +25,7 @@ Admin paths below are relative to the app; `:organisationId` and `:tournamentId`
 | Admin access replacement | Signing in, failed, cancelled, not assigned, session expired, unavailable, recovery; unsaved input/copy where relevant | Pass (source): explicit recovery and preserved-input explanations; denied-state browser/privacy behaviour not verified |
 | Admin `/organisations`, `/organisations/:organisationId/switch` | Loading, current/other organisation rows, switch, create/keep navigation | Pass (source): full-width list, current selection distinct; runtime loading/failure replacement not verified |
 | Admin `/organisations/new` | Default/edited, name validation, creating, failure, leave with input | Pass (source): single panel then supporting content, associated errors and retained value. Visual field-error treatment differs from tournament/drawer forms (A-09) |
-| Admin `/organisations/:organisationId` | Overview, just-created notice, notice dismissed | Gap A-03: completed creation shown as a persistent success notice. Empty overview is current scope, not an invented missing dashboard |
+| Admin `/organisations/:organisationId` | Overview, just-created notice, notice dismissed | A-03 records the specific created-notice requirement versus the general toast rule; preserve the implemented notice pending explicit reconciliation. Empty overview is current scope, not an invented missing dashboard |
 | Admin `.../tournaments` | Loading, failed/retry, empty, draft/published list with lifecycle/capacity/entries links | Pass (source): stacked records, empty icon and independent lifecycle labels. Tabular numerals absent (A-02); long-name/zoom layout not verified |
 | Admin `.../tournaments/new`, `.../tournaments/:tournamentId` | Create, individual/team draft, saved/published, missing values, invalid fields, saving, failure, conflict, locked fields, unavailable | Pass (source): full-width form, grouped fields, summaries and local recovery; numeral gap A-02; browser state transitions not verified |
 | Published configuration registration area | Not open/open/closed, missing dates, unsaved-blocked, busy, failure, conflict/reload | Pass (source): separate operation area and explained unavailability; dates do not imply automatic registration; A-02 applies |
@@ -41,6 +41,8 @@ Admin paths below are relative to the app; `:organisationId` and `:tournamentId`
 | Catalogue overlays/toasts | Destructive initial focus, Escape/return, busy ignores Escape, narrow drawer, three toasts/reserved space, reduced motion | Pass for the specific interactions under Executed checks. Exhaustive focus-cycle, timing, errors/retry and assistive-technology behaviour not verified |
 
 H2–H5 discovery, participant, match, round, standings and live-update screens are future prototypes/targets, not implemented routes in this baseline. They are excluded from current-screen pass counts; their coverage remains in visual direction §9. The audit did not treat an absent future route as a regression.
+
+The supplied organiser/participant perspectives are covered by [experience patterns](../../../../docs/ui/experience-patterns.md), including the H2 public portal and the mapping of exploratory features to scope. That design guidance extends the review criteria for future H2 slices; this baseline audit does not imply those experiences were implemented or tested.
 
 ## Findings
 
@@ -62,13 +64,13 @@ All open production findings are proposed follow-up, not changes made by this br
 - **Correction:** apply tabular numerals to comparison-bearing date/count/result roles while leaving prose unchanged; check the actual fallback and intended fonts.
 - **Disposition:** open; typography follow-up, scoped to numeric roles.
 
-### A-03 Completed-action outcomes remain persistent notices — should fix, open
+### A-03 Completed-action outcomes and a specific created-notice contract — should fix, open
 
 - **Criterion:** G-08 / RU-09; feedback placement in visual direction §5.
-- **Evidence:** `web/projects/admin/src/app/overview-page.ts:14` shows `Organisation created` as a success notice. `web/projects/catalogue/src/app/controls-page.html:104` shows `Results saved` as one; `recovery-demo.ts:32` shows successful publication the same way.
-- **Trigger:** after the person's action completes, the example/overview teaches a persistent outcome message instead of the current toast placement rule. It competes with genuine ongoing state and is easy for agents to copy.
-- **Correction:** keep the confirmed state in page content and report the personal outcome through the shell's toast service. Use persistent success examples only for an ongoing condition. Preserve the explicit team-rosters no-toast exception.
-- **Disposition:** open; catalogue/overview remediation with the existing creation/recovery checks. The guide now states the correct selection rule.
+- **Evidence:** `web/projects/catalogue/src/app/controls-page.html:104` shows `Results saved` as a notice; `recovery-demo.ts:32` shows successful publication the same way. Separately, `web/projects/admin/src/app/overview-page.ts:14` shows `Organisation created`, which the implemented `end-to-end-journeys/spec.md:33` explicitly requires. The reviewed feedback/layout change also retained that notice and removed its width cap (archived design D-9).
+- **Trigger:** catalogue-only outcome examples teach persistence despite the generic toast rule. The overview presents a different issue: following that generic rule literally would remove a specific required created-notice behaviour. It cannot be classified as an unconditional implementation defect.
+- **Correction:** change catalogue-only outcome examples to use toasts with confirmed state retained on the page, or use persistent examples of ongoing conditions. Preserve the overview notice unless a reviewed delta explicitly reconciles the created-notice requirement, general feedback rule and existing creation journey. Preserve the separate team-rosters no-toast exception too.
+- **Disposition:** catalogue examples open for remediation; overview contract reconciliation open for maintainer review, with current behaviour preserved. The guide now records both specific workflow exceptions.
 
 ### A-04 Loading changes button width — should fix, open
 
@@ -158,7 +160,7 @@ Before accepting a production remediation, run the existing synthetic E2E script
 | Priority | Findings | Scope and exit evidence |
 | --- | --- | --- |
 | 1 | A-04 | Shared Button progress stability; measured before/busy width, focus/repeat checks, catalogue captures |
-| 2 | A-03, A-10, A-11 | Catalogue/overview feedback, intent and boundary corrections; examples teach the same contracts as the guide, creation/recovery flows verified |
+| 2 | A-03, A-10, A-11 | Catalogue feedback, intent and boundary corrections; review the created-notice contract tension separately before any overview change, with creation/recovery checks |
 | 3 | A-05, A-07, A-09 | Entry/roster/form consistency; multiple results, empty history and invalid fields, synthetic signed-in checks |
 | 4 | A-08 | Public content alignment; 390/1440/2560 comparisons and not-found response regression check |
 | 5 | A-01, A-02 | Token/numeral consistency; affected semantic pairs and comparison-bearing roles verified |

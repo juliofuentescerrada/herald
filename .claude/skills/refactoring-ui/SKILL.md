@@ -11,6 +11,8 @@ This is an original, repository-maintained practice checklist informed by [Refac
 
 Read the relevant sections of [Herald's style guide](../../../docs/ui/style-guide.md), [component intent](../../../docs/ui/components.md), [icons](../../../docs/ui/icons.md) and [visual direction](../../../docs/herald-visual-direction.md). Preserve square geometry, the declared spacing scale, the single breakpoint, full-width stacked admin composition and the reviewed icon treatment. Use `herald-screens` for visual-input/evidence rules. Product decisions remain in the discovery register; no visual heuristic can settle one.
 
+Read the [experience patterns](../../../docs/ui/experience-patterns.md) to select the organiser, visitor or participant/representative job before choosing page hierarchy and density. Apply shared design primitives to the H2 public portal without copying the admin workflow. Keep target patterns and exploratory source aspirations separate from implemented capabilities and confirmed D-30–38 policies.
+
 ## Apply the practices
 
 | ID | Practice | Concrete Herald review |

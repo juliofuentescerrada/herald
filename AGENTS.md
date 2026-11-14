@@ -10,6 +10,6 @@ For UI proposals, mockups, implementation and reviews, load these repository-own
 
 Their `SKILL.md` entry points are links to the canonical `.claude/skills/` sources; edit the source once. Claude Code discovers those sources directly. OpenSpec routes to them through `openspec/config.yaml`. No external design plugin is required.
 
-Start UI work at `docs/ui/style-guide.md`, then read the relevant component intent and icon guidance it links. Record implementation-conformance findings in the owning change, using the guide's criteria and distinguishing source inspection from executed browser checks.
+Start UI work at `docs/ui/style-guide.md`, then read `docs/ui/experience-patterns.md` for organiser/participant differences and H2 public-portal targets, plus the relevant component intent and icon guidance. Record implementation-conformance findings in the owning change, using the guide's criteria and distinguishing source inspection from executed browser checks. Supplied UX aspirations do not silently approve new product capabilities or settle proposed decision-register rows.
 
 Run `node --test scripts/ui-guidance.test.mjs` after changing the guide or routing. Use the root procedure's read-only `herald-reviewer` subagent before opening the change's pull request; give it the diff and change name, and resolve/report its findings.

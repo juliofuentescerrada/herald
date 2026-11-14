@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict';
 import { readFileSync, realpathSync } from 'node:fs';
-import { join } from 'node:path';
+import { dirname, join, resolve } from 'node:path';
 import { test } from 'node:test';
 import { root } from './rules.mjs';
 
@@ -8,13 +8,27 @@ const read = (path) => readFileSync(join(root, path), 'utf8');
 const components = 'docs/ui/components.md';
 const icons = 'docs/ui/icons.md';
 const guide = 'docs/ui/style-guide.md';
-const review = 'openspec/changes/style-guide-and-ui-audit/reviews/existing-screens.md';
+const experiences = 'docs/ui/experience-patterns.md';
+
+function publicExports(source) {
+  const code = source.replace(/\/\*[\s\S]*?\*\/|\/\/[^\n]*/g, '');
+  const named = /export\s+(type\s+)?\{([^}]+)\}\s+from\s+['"][^'"]+['"]\s*;/g;
+  const declarations = [...code.matchAll(named)];
+  assert.equal(code.replace(named, '').trim(), '', 'Extend the documentation inventory check before using another public export syntax');
+  assert.ok(declarations.length, 'The public API declares named exports');
+  for (const declaration of declarations) {
+    for (const name of declaration[2].split(',').map((name) => name.trim())) {
+      assert.match(name, /^[A-Za-z_$][\w$]*$/, 'Extend the inventory check before using export aliases or inline type modifiers');
+    }
+  }
+  return declarations;
+}
 
 // covers: interface-guidance: A public UI export is documented
 test('Every public UI export has usage documentation, and every control has an intent and contract', () => {
   const api = read('web/projects/ui/src/public-api.ts');
   const documentation = read(components);
-  for (const declaration of api.matchAll(/export\s+(type\s+)?\{([^}]+)\}/g)) {
+  for (const declaration of publicExports(api)) {
     for (const name of declaration[2].split(',').map((name) => name.trim())) {
       assert.match(documentation, new RegExp(`\\b${name}\\b`), `Document the public export ${name} in ${components}`);
       if (declaration[1] || name === 'toastDuration') continue;
@@ -29,6 +43,13 @@ test('Every public UI export has usage documentation, and every control has an i
   assert.match(documentation, /## Native and feature-owned patterns/);
   assert.match(documentation, /not exported components/);
   assert.match(read(guide), /herald-visual-direction\.md/);
+});
+
+test('Unsupported public export forms cannot bypass the documentation inventory', () => {
+  const existing = "export { Button } from './lib/button';\n";
+  for (const extra of ["export * from './lib/new-control';", 'export class NewControl {}', "export { Hidden as NewControl } from './lib/new-control';"]) {
+    assert.throws(() => publicExports(existing + extra), /Extend the/);
+  }
 });
 
 // covers: interface-guidance: A registered icon is documented
@@ -76,8 +97,9 @@ test('Claude Code, Codex and OpenSpec route UI work to the same local skill and 
 
 // covers: interface-guidance: Reading the existing-screen review
 test('The guide links an audit with explicit inventory, evidence, findings and verification limits', () => {
-  assert.ok(read(guide).includes(review));
-  const audit = read(review);
+  const link = read(guide).match(/\]\(([^)]+\/reviews\/existing-screens\.md)\)/)?.[1];
+  assert.ok(link, 'The style guide links its dated existing-screen review');
+  const audit = readFileSync(resolve(dirname(join(root, guide)), link), 'utf8');
   for (const heading of ['Baseline and method', 'Screen and state inventory', 'Findings', 'Executed checks', 'Remaining verification', 'Remediation order']) {
     assert.ok(audit.includes(`## ${heading}`), `The audit needs ${heading}`);
   }
@@ -86,4 +108,25 @@ test('The guide links an audit with explicit inventory, evidence, findings and v
   assert.match(audit, /not verified/i);
   assert.match(audit, /production.*(?:separate|follow-up)/i);
   for (let number = 1; number <= 12; number++) assert.ok(read(guide).includes(`G-${String(number).padStart(2, '0')}`));
+});
+
+// covers: interface-guidance: An agent designs an H2 public or participant task
+test('UI routing includes audience-specific H2 patterns and separates target UX from feature approval', () => {
+  const document = read(experiences);
+  for (const word of ['organiser', 'participant', 'public', 'representative', 'not implemented', 'D-30', 'D-38']) {
+    assert.ok(document.includes(word), `The experience reference covers ${word}`);
+  }
+  for (let number = 1; number <= 9; number++) assert.ok(document.includes(`## XP-${String(number).padStart(2, '0')}`));
+  for (const heading of ['Supplied-document traceability and scope', 'H2 design review and handoff']) {
+    assert.ok(document.includes(`## ${heading}`));
+  }
+  for (const concept of ['calendar/ICS', 'magic link', 'wizard', 'CRM', 'global public', 'confirmation by silence']) {
+    assert.ok(document.toLowerCase().includes(concept.toLowerCase()), `The source aspiration/boundary for ${concept} is explicit`);
+  }
+  for (const path of ['AGENTS.md', 'CLAUDE.md', 'web/CLAUDE.md', '.claude/skills/herald-screens/SKILL.md', 'openspec/config.yaml']) {
+    assert.ok(read(path).includes(experiences), `${path} routes to audience-specific UX`);
+  }
+  assert.ok(read(guide).includes('experience-patterns.md'));
+  assert.ok(read(components).includes('experience-patterns.md'));
+  assert.ok(read(icons).includes('experience-patterns.md'));
 });

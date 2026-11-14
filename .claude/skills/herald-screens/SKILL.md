@@ -9,6 +9,8 @@ description: Herald's rules for screens, UI states, layout and mockups. Use when
 
 For every UI proposal, mockup, implementation and review, load the repository-owned `refactoring-ui` skill and start at `docs/ui/style-guide.md`. Use `docs/ui/components.md` for intent, alternatives and supported APIs and `docs/ui/icons.md` for icon meaning and placement. These apply to agents producing mockups as well as those writing Angular. Do not infer usage solely from the catalogue's state examples.
 
+Read `docs/ui/experience-patterns.md` and state the audience/acting context and relevant XP patterns. Organiser, visitor and participant/representative flows share foundations but have different navigation, hierarchy and density. Include H2 public/participant target states in relevant proposals without presenting them as implemented or treating the supplied UX aspirations as settled product policy. The D-30–38 statuses and the existing visual-input process still apply.
+
 ## When proposing a change
 
 In a batch (ADR 0018), the agent does not ask for mockups: it generates navigable prototypes of every affected screen and state in `prototypes/frontend/`, following the layout rules below and visual direction §4 and §7.2, and the maintainer reviews them in the batch's proposals pull request. The steps below apply to work outside a batch.

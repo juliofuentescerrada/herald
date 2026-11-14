@@ -4,6 +4,8 @@ Status: documentation proposal, checked against the `@herald/ui` [public API](..
 
 Run the live state catalogue with `cd web && pnpm exec ng serve catalogue --port 4400`, then open `http://localhost:4400`. It is development tooling. The current examples show states, not a complete intent reference; use this document when choosing a control.
 
+Select the audience's [experience pattern](experience-patterns.md) first. An organiser's dense operational list and a participant's next-match task can use the same Button, Notice and StatusLabel without sharing the same page hierarchy. Public browsing, account transitions and signed-in participant work must not inherit the admin rail or its permissions from a copied example.
+
 ## Choose by intent
 
 | Person's need | Use | Avoid |
@@ -80,7 +82,7 @@ Run the live state catalogue with `cd web && pnpm exec ng serve catalogue --port
 
 **Contract:** `<herald-status-label>`; `tone: StatusTone = 'neutral'`; optional `icon: IconName`; projected text. The caller chooses the icon by meaning. `ui` sets explicit foreground/background pairs and metadata icon size, without domain logic or a tone-to-status mapping.
 
-**States:** the domain supplies the text/tone/icon; there are no interactive states or live-region announcements. Place lifecycle labels beside the record title and allow the group to wrap. Unknown lifecycle values keep readable text without an invented icon. Long single labels currently do not wrap internally; see audit A-08.
+**States:** the domain supplies the text/tone/icon; there are no interactive states or live-region announcements. Place lifecycle labels beside the record title and allow the group to wrap. Unknown lifecycle values keep readable text without an invented icon. Individual labels currently stay on one line internally; verify the narrow layout when introducing longer status text.
 
 **Avoid:** using success tone for every published state, conflating lifecycle dimensions or removing text because the icon looks recognisable.
 
@@ -98,6 +100,8 @@ Run the live state catalogue with `cd web && pnpm exec ng serve catalogue --port
 **Contract:** `<herald-notice>`; `tone: NoticeTone = 'info'`, optional `heading: string`, optional `iconName: IconName`, `dismissible: boolean = false`, `dismissLabel: string = 'Dismiss'`; output `dismissed: void`. Content is projected; a parent decides whether to remove it after dismissal. Supply the recovery action in the content. The heading states what happened and the body states the effect and next action.
 
 **States:** danger is `role="alert"`; other tones are `role="status"`. Default tone icons are in the [meaning table](icons.md#meaning-table); an explicit meaning such as offline/reload may override one. Only make optional context dismissible. A blocker must remain visible while it applies.
+
+The existing organisation-creation landing retains its created notice under the implemented end-to-end journey contract. The general toast rule does not silently remove that specific behaviour; A-03 in the [style guide's dated audit](style-guide.md#start-here) records the contract tension and proposed review. Roster updates have their own no-toast contract below.
 
 **Avoid:** a notice as the only field error, a dismissible unresolved permission/conflict problem or repeated render-driven announcements. A notice's tone never decides business availability.
 

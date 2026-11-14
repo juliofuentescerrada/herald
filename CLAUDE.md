@@ -8,7 +8,7 @@ Herald runs tournaments (league, knockout, single match) and is game-agnostic: g
 
 - `src/CLAUDE.md`: modules, CQRS, events, notifications, durable history and backend commands. `tests/CLAUDE.md`: tests. `web/CLAUDE.md`: frontend. They load when you work in those folders.
 - The `herald-screens` skill: screens, UI states, layout and mockups, including on every proposal.
-- The repository-owned `refactoring-ui` skill: design/review practices for UI work. Start at `docs/ui/style-guide.md` for the criteria, then its component-intent and icon references. Claude Code discovers `.claude/skills/`; Codex uses `AGENTS.md` and the links in `.agents/skills/` to the same sources. No Impeccable dependency.
+- The repository-owned `refactoring-ui` skill: design/review practices for UI work. Start at `docs/ui/style-guide.md` for the criteria, `docs/ui/experience-patterns.md` for organiser/participant and H2 public patterns, then the component-intent and icon references. Claude Code discovers `.claude/skills/`; Codex uses `AGENTS.md` and the links in `.agents/skills/` to the same sources. No Impeccable dependency.
 - The `herald-docs` skill: documentation sources, ADRs, decisions, archiving and status. Detailed extensions are `docs/herald-h2-functional-discovery.md`, `docs/herald-h3-functional-discovery.md`, `docs/herald-h4-functional-discovery.md` and `docs/herald-h5-functional-discovery.md`; the shared baseline retains the single decision register (§15).
 - `openspec/config.yaml`: the context and per-artifact rules OpenSpec gives proposals.
 

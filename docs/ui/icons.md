@@ -10,6 +10,8 @@ In the admin application, use icons for global navigation, lifecycle/check-in st
 
 Shared notices/toasts keep their existing feedback icons. Account disclosure, mobile menu, organisation switch and dismiss controls keep their functional cues. The public mobile Menu cue already exists; the admin placement rule does not authorise adding a new public icon treatment. Documentation prototypes remain exempt from installing Tabler, as visual direction §4 states.
 
+For the H2 public/participant target, follow [experience patterns](experience-patterns.md): use supporting icons for repeated navigation/metadata only where they improve scanning, with visible labels for unfamiliar meanings and all consequential actions. Keep the same family, scale, stroke, semantics and registry; do not copy the admin rail or imply that a participant has staff powers. Choose any new public event/filter/team/match symbols in the owning reviewed screen proposal and extend the meaning table before implementation. A compact mobile action still needs its visible purpose and adequate target; a live-looking icon is not proof of freshness or delivery.
+
 Choose by meaning: Published is `world`, even if the badge uses a different tone; success green does not automatically mean `circle-check` for every domain state. A new, unknown state keeps its text until a meaning is reviewed. Do not invent a symbol by matching only its colour or visual balance.
 
 ## Meaning table
