@@ -15,8 +15,8 @@
 
 ## 4. Competition
 
-- [ ] 4.1 Circle-method generator in `Domain` with seeding by admission order or recorded seed (D-6); tests for 2 to 9 entrants (every pair once, one rest each when odd, determinism by seed)
-- [ ] 4.2 `Schedule` aggregate (D-1): eligible-field projection, generate, regenerate, stale, publish, repeat, withdraw with reason, crossed field (D-5); domain tests for every `round-robin-pairings` scenario
+- [x] 4.1 Circle-method generator in `Domain` with seeding by admission order or recorded seed (D-6); tests for 2 to 9 entrants (every pair once, one rest each when odd, determinism by seed)
+- [x] 4.2 `Schedule` aggregate (D-1): eligible-field projection, generate, regenerate, stale, publish, repeat, withdraw with reason, crossed field (D-5); domain tests for every `round-robin-pairings` scenario
 - [ ] 4.3 Persistence and first model migration; handler for `TournamentEligibleFieldChanged`; features `GenerateSchedule`, `PublishSchedule`, `WithdrawSchedule`, `GetSchedule` with revisions and operation identities (D-8); `TournamentScheduleChanged` through the outbox
 - [ ] 4.4 API tests against PostgreSQL for the `round-robin-pairings` scenarios, including conflicts, repeats and another organisation's 404s
 

@@ -118,9 +118,11 @@ public sealed class Field : AggregateRoot<TournamentId>
     public int EligibleRevision { get; private set; }
 
     // Admitted entries still to check in under a mandatory policy; they block drafting (F-05).
-    public int Pending => Terms.CheckIn == CheckInPolicy.Mandatory
-        ? _entries.Count(entry => entry.State == EntryState.Admitted && !entry.IsCheckedIn)
-        : 0;
+    public int Pending => PendingEntries.Count;
+
+    public IReadOnlyList<Entry> PendingEntries => Terms.CheckIn == CheckInPolicy.Mandatory
+        ? [.. _entries.Where(entry => entry.State == EntryState.Admitted && !entry.IsCheckedIn).OrderBy(entry => entry.AdmittedAt).ThenBy(entry => entry.Sequence)]
+        : [];
 
     public IReadOnlyList<EligibleEntry> Eligible => [.. _entries
         .Where(entry => entry.State == EntryState.Admitted && (Terms.CheckIn == CheckInPolicy.Optional || entry.IsCheckedIn))
@@ -462,7 +464,7 @@ public sealed class Field : AggregateRoot<TournamentId>
 
     // What the eligible revision follows; compared before and after a write, never stored.
     private string EligibilityKey =>
-        $"{Terms.Registration == RegistrationState.Closed}|{Pending}|{string.Join(',', Eligible.Select(eligible => eligible.Entry.Id.Value))}";
+        $"{Terms.Registration == RegistrationState.Closed}|{string.Join(',', PendingEntries.Select(entry => entry.Id.Value))}|{string.Join(',', Eligible.Select(eligible => eligible.Entry.Id.Value))}";
 
     private void Changed(string before)
     {

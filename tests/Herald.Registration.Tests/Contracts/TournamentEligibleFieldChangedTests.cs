@@ -10,13 +10,13 @@ public class TournamentEligibleFieldChangedTests
     public void A_message_survives_a_round_trip_with_its_entrants()
     {
         var message = new TournamentEligibleFieldChanged(
-            Guid.NewGuid(), Guid.NewGuid(), 3, RegistrationClosed: true, Pending: 1, [new(Guid.NewGuid(), "Ana Ruiz", 1), new(Guid.NewGuid(), "Leo Martín", 2)]);
+            Guid.NewGuid(), Guid.NewGuid(), 3, RegistrationClosed: true, Pending: [new(Guid.NewGuid(), "Sam Reed")], [new(Guid.NewGuid(), "Ana Ruiz", 1), new(Guid.NewGuid(), "Leo Martín", 2)]);
 
         var read = JsonSerializer.Deserialize<TournamentEligibleFieldChanged>(JsonSerializer.Serialize(message))!;
 
         read.Revision.ShouldBe(3);
         read.RegistrationClosed.ShouldBeTrue();
-        read.Pending.ShouldBe(1);
+        read.Pending.ShouldBe(message.Pending);
         read.Entrants.ShouldBe(message.Entrants);
     }
 }

@@ -103,7 +103,8 @@ public sealed record FieldDetails(
     public static async Task<TournamentEligibleFieldChanged> EligibleAsync(Guid organisationId, Field field, RegistrationDbContext db, CancellationToken cancellationToken)
     {
         var eligible = field.Eligible;
-        var guestIds = eligible.Select(entry => entry.Entry.GuestId).ToList();
+        var pending = field.PendingEntries;
+        var guestIds = eligible.Select(entry => entry.Entry.GuestId).Concat(pending.Select(entry => entry.GuestId)).ToList();
         var names = await db.Guests.AsNoTracking()
             .Where(guest => guestIds.Contains(guest.Id))
             .ToDictionaryAsync(guest => guest.Id, guest => guest.Name, cancellationToken);
@@ -112,7 +113,7 @@ public sealed record FieldDetails(
             field.Id.Value,
             field.EligibleRevision,
             field.Terms.Registration == RegistrationState.Closed,
-            field.Pending,
+            [.. pending.Select(entry => new PendingEntrant(entry.Id.Value, names.GetValueOrDefault(entry.GuestId, "")))],
             [.. eligible.Select(entry => new EligibleEntrant(entry.Entry.Id.Value, names.GetValueOrDefault(entry.Entry.GuestId, ""), entry.AdmissionOrder))]);
     }
 
