@@ -34,6 +34,7 @@ namespace Internal.Generated.WolverineHandlers
             await using var registrationDbContext = new Herald.Registration.Persistence.RegistrationDbContext(_dbContextOptionsOfRegistrationDbContext, organisationContext);
             var messageContext = new Wolverine.Runtime.MessageContext(_wolverineRuntime);
             Wolverine.Http.HttpHandler.RequestActivity(httpContext)?.SetTag("handler.type", "Herald.Registration.Features.AddRosterMember.AddRosterMemberEndpoint").SetTag("http.route", "/api/organisations/{organisationId}/tournaments/{tournamentId}/entries/{entryId}/roster/members/{guestId}").SetTag("http.request.method", "PUT");
+            Wolverine.Http.Runtime.RequestIdMiddleware.Apply(httpContext, messageContext);
             
             // Enroll the DbContext & IMessagingContext in the outgoing Wolverine outbox transaction
             var efCoreEnvelopeTransaction = new Wolverine.EntityFrameworkCore.Internals.EfCoreEnvelopeTransaction(registrationDbContext, messageContext, _domainEventScraperIEnumerable);
@@ -99,7 +100,7 @@ namespace Internal.Generated.WolverineHandlers
                 if (jsonContinue == Wolverine.HandlerContinuation.Stop) return;
                 
                 // The actual HTTP request handler execution
-                var result = await Herald.Registration.Features.AddRosterMember.AddRosterMemberEndpoint.Put(organisationId, tournamentId, entryId, guestId, command, organisationContext, registrationDbContext, httpContext.RequestAborted).ConfigureAwait(false);
+                var result = await Herald.Registration.Features.AddRosterMember.AddRosterMemberEndpoint.Put(organisationId, tournamentId, entryId, guestId, command, organisationContext, registrationDbContext, messageContext, httpContext.RequestAborted).ConfigureAwait(false);
 
                 
                 // Added by EF Core Transaction Middleware

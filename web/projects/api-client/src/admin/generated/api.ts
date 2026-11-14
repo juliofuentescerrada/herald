@@ -98,6 +98,39 @@ export interface CloseRegistration {
   expectedRevision: number;
 }
 
+export interface StartCondition {
+  rule?: string;
+  met?: boolean;
+}
+
+export interface RosterOutsideBounds {
+  entryId: string;
+  teamName: string;
+  members: number;
+}
+
+export interface SharedMemberName {
+  name: string;
+  teamNames: string[];
+}
+
+export interface CompetitionDetails {
+  conditions: StartCondition[];
+  /** @nullable */
+  eligible: number | null;
+  /** @nullable */
+  pending: number | null;
+  /** @nullable */
+  rostersOutsideBounds: RosterOutsideBounds[] | null;
+  sharedMemberNames: SharedMemberName[];
+  /** @nullable */
+  publishedScheduleRevision: number | null;
+  /** @nullable */
+  startedAt: string | null;
+  /** @nullable */
+  startedOnScheduleRevision: number | null;
+}
+
 export interface CreatedOrganisation {
   id: string;
   name: string;
@@ -302,6 +335,7 @@ export interface EntryTerms {
   maximumRosterSize?: number | null;
   checkIn?: CheckInPolicy;
   fieldLocked?: boolean;
+  competitionStarted?: boolean;
 }
 
 export interface FieldChangeDetails {
@@ -469,6 +503,10 @@ export interface RosterDetails {
   readiness: RosterReadiness;
   members: RosterMemberDetails[];
   history: RosterChangeDetails[];
+  /** @nullable */
+  frozenRevision: number | null;
+  /** @nullable */
+  frozenAt: string | null;
 }
 
 export interface SaveTournament {
@@ -488,11 +526,20 @@ export interface ScheduleDetails {
   current: null | PublicationDetails;
   crossedChange: null | FieldChangeDetails;
   history: PublicationDetails[];
+  /** @nullable */
+  startedOnRevision: number | null;
+  /** @nullable */
+  startedAt: string | null;
+  startCrossedWithdrawal: boolean;
 }
 
 export interface SignedInPerson {
   displayName: string;
   organisations: OwnedOrganisation[];
+}
+
+export interface StartCompetition {
+  expectedRevision: number;
 }
 
 export interface TournamentDetails {
@@ -511,6 +558,7 @@ export interface TournamentDetails {
   waitingEntries: number;
   checkedInEntries: number;
   schedulePublished: boolean;
+  start: CompetitionDetails;
 }
 
 export interface TournamentSummary {
@@ -774,6 +822,52 @@ export class HeraldHostAdminService {
     return this.http.post<TData>(
       `/api/organisations`,
       createOrganisationBody,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'body',
+      }
+    );
+  }
+
+/**
+ * POST_api_organisations_organisationId_tournaments_tournamentId_competition_start
+ * @summary POST_api_organisations_organisationId_tournaments_tournamentId_competition_start
+ */
+ startCompetition<TData = TournamentDetails>(organisationId: string,
+    tournamentId: string,
+    startCompetitionBody: StartCompetition, options?: HttpClientBodyOptions): Observable<TData>;
+ startCompetition<TData = TournamentDetails>(organisationId: string,
+    tournamentId: string,
+    startCompetitionBody: StartCompetition, options?: HttpClientEventOptions): Observable<HttpEvent<TData>>;
+ startCompetition<TData = TournamentDetails>(organisationId: string,
+    tournamentId: string,
+    startCompetitionBody: StartCompetition, options?: HttpClientResponseOptions): Observable<AngularHttpResponse<TData>>;
+  startCompetition<TData = TournamentDetails>(
+    organisationId: string,
+    tournamentId: string,
+    startCompetitionBody: StartCompetition, options?: HttpClientObserveOptions): Observable<TData | HttpEvent<TData> | AngularHttpResponse<TData>> {
+    if (options?.observe === 'events') {
+      return this.http.post<TData>(
+      `/api/organisations/${organisationId}/tournaments/${tournamentId}/competition/start`,
+      startCompetitionBody,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'events',
+      }
+    );
+    }
+
+    if (options?.observe === 'response') {
+      return this.http.post<TData>(
+      `/api/organisations/${organisationId}/tournaments/${tournamentId}/competition/start`,
+      startCompetitionBody,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'response',
+      }
+    );
+    }
+
+    return this.http.post<TData>(
+      `/api/organisations/${organisationId}/tournaments/${tournamentId}/competition/start`,
+      startCompetitionBody,{
         ...(options as Omit<NonNullable<typeof options>, 'observe'>),
         observe: 'body',
       }
@@ -1837,6 +1931,7 @@ export class HeraldHostAdminService {
 export type GetOrganisationClientResult = NonNullable<OrganisationSummary>
 export type GetMeClientResult = NonNullable<SignedInPerson>
 export type CreateOrganisationClientResult = NonNullable<IResult | CreatedOrganisation>
+export type StartCompetitionClientResult = NonNullable<TournamentDetails>
 export type SaveTournamentClientResult = NonNullable<TournamentDetails>
 export type GetTournamentClientResult = NonNullable<TournamentDetails>
 export type PublishTournamentClientResult = NonNullable<TournamentDetails>
