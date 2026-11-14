@@ -4,6 +4,7 @@ using Herald.Registration.Persistence;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using Wolverine;
 using Wolverine.Http;
 
 namespace Herald.Registration.Features.RemoveRosterMember;
@@ -26,12 +27,13 @@ public static class RemoveRosterMemberEndpoint
         [FromQuery] int expectedRevision,
         OrganisationContext context,
         RegistrationDbContext db,
+        IMessageBus bus,
         CancellationToken cancellationToken)
     {
         var actor = context.ActorId ?? throw new InvalidOperationException($"No acting person in organisation {organisationId}.");
         var id = new EntryId(entryId);
         var player = new GuestId(guestId);
-        return await db.WriteAsync(tournamentId, id, player,
+        return await db.WriteAsync(bus, organisationId, tournamentId, id, player,
             field => field.RemoveRosterMember(id, player, expectedRevision, actor, DateTimeOffset.UtcNow), cancellationToken);
     }
 }

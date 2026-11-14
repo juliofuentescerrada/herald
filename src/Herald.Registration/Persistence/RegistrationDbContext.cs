@@ -38,6 +38,7 @@ public sealed class RegistrationDbContext(DbContextOptions<RegistrationDbContext
             field.Ignore(f => f.Eligible);
             field.Ignore(f => f.Pending);
             field.Ignore(f => f.PendingEntries);
+            field.Ignore(f => f.RostersOutsideBounds);
             field.Property(f => f.Id).HasConversion(id => id.Value, value => new TournamentId(value));
             // Two writes based on the same field cannot both succeed: the last slot is decided once (EN-9).
             field.Property(f => f.Revision).IsConcurrencyToken();

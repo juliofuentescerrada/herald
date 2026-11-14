@@ -66,6 +66,9 @@ namespace Herald.Registration.Persistence.Migrations
                     b.Property<Guid>("EnteredBy")
                         .HasColumnType("uuid");
 
+                    b.Property<int?>("FrozenRosterRevision")
+                        .HasColumnType("integer");
+
                     b.Property<Guid>("GuestId")
                         .HasColumnType("uuid");
 
@@ -79,6 +82,9 @@ namespace Herald.Registration.Persistence.Migrations
 
                     b.Property<int>("Revision")
                         .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset?>("RosterFrozenAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("RosterRevision")
                         .HasColumnType("integer");
@@ -145,6 +151,9 @@ namespace Herald.Registration.Persistence.Migrations
                                 .IsRequired()
                                 .HasMaxLength(20)
                                 .HasColumnType("character varying(20)");
+
+                            b1.Property<bool>("CompetitionStarted")
+                                .HasColumnType("boolean");
 
                             b1.Property<string>("EntryKind")
                                 .IsRequired()
