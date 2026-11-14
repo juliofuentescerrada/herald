@@ -42,4 +42,4 @@
 - [x] 8.1 `covers` markers for every scenario this change adds; `node scripts/spec-coverage.mjs` passes
 - [x] 8.2 Full run (`scripts/check all` and the e2e suite); record in design.md
 - [x] 8.3 Capture the Visual input states at 1440 and 390 px, compare with the prototypes and record the differences in design.md
-- [ ] 8.4 Docs: visual direction §9.3 inventory, ADR 0017 inventory (schedule published and withdrawn; cancellation cause); herald-reviewer review of the diff; sync the specs and archive the change in the slice's pull request
+- [x] 8.4 Docs: visual direction §9.3 inventory, ADR 0017 inventory (schedule published and withdrawn; cancellation cause); herald-reviewer review of the diff; sync the specs and archive the change in the slice's pull request
