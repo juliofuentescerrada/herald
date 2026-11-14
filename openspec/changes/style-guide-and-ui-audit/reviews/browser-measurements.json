@@ -1,0 +1,367 @@
+{
+  "method": "Anonymous local Chromium review; no host, identity provider or composed E2E",
+  "browser": "156.0.8078.79",
+  "pages": [
+    {
+      "name": "public-home",
+      "width": 320,
+      "scrollWidth": 320,
+      "viewport": 320,
+      "main": {
+        "x": 0,
+        "width": 320
+      },
+      "type": {
+        "family": "Inter, system-ui, -apple-system, \"Segoe UI\", Roboto, Arial, sans-serif",
+        "numerals": "normal",
+        "heading": "40px"
+      },
+      "iconCount": 1,
+      "duplicateIcons": 0
+    },
+    {
+      "name": "public-home",
+      "width": 390,
+      "scrollWidth": 390,
+      "viewport": 390,
+      "main": {
+        "x": 0,
+        "width": 390
+      },
+      "type": {
+        "family": "Inter, system-ui, -apple-system, \"Segoe UI\", Roboto, Arial, sans-serif",
+        "numerals": "normal",
+        "heading": "40px"
+      },
+      "iconCount": 1,
+      "duplicateIcons": 0,
+      "axe": []
+    },
+    {
+      "name": "public-home",
+      "width": 699,
+      "scrollWidth": 699,
+      "viewport": 699,
+      "main": {
+        "x": 0,
+        "width": 699
+      },
+      "type": {
+        "family": "Inter, system-ui, -apple-system, \"Segoe UI\", Roboto, Arial, sans-serif",
+        "numerals": "normal",
+        "heading": "40px"
+      },
+      "iconCount": 1,
+      "duplicateIcons": 0
+    },
+    {
+      "name": "public-home",
+      "width": 700,
+      "scrollWidth": 700,
+      "viewport": 700,
+      "main": {
+        "x": 0,
+        "width": 700
+      },
+      "type": {
+        "family": "Inter, system-ui, -apple-system, \"Segoe UI\", Roboto, Arial, sans-serif",
+        "numerals": "normal",
+        "heading": "56px"
+      },
+      "iconCount": 1,
+      "duplicateIcons": 0
+    },
+    {
+      "name": "public-home",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "viewport": 1440,
+      "main": {
+        "x": 0,
+        "width": 1440
+      },
+      "type": {
+        "family": "Inter, system-ui, -apple-system, \"Segoe UI\", Roboto, Arial, sans-serif",
+        "numerals": "normal",
+        "heading": "56px"
+      },
+      "iconCount": 1,
+      "duplicateIcons": 0,
+      "axe": []
+    },
+    {
+      "name": "public-home",
+      "width": 2560,
+      "scrollWidth": 2560,
+      "viewport": 2560,
+      "main": {
+        "x": 0,
+        "width": 2560
+      },
+      "type": {
+        "family": "Inter, system-ui, -apple-system, \"Segoe UI\", Roboto, Arial, sans-serif",
+        "numerals": "normal",
+        "heading": "56px"
+      },
+      "iconCount": 1,
+      "duplicateIcons": 0
+    },
+    {
+      "name": "public-not-found",
+      "width": 320,
+      "scrollWidth": 320,
+      "viewport": 320,
+      "main": {
+        "x": 0,
+        "width": 320
+      },
+      "type": {
+        "family": "Inter, system-ui, -apple-system, \"Segoe UI\", Roboto, Arial, sans-serif",
+        "numerals": "normal",
+        "heading": "32px"
+      },
+      "iconCount": 1,
+      "duplicateIcons": 0
+    },
+    {
+      "name": "public-not-found",
+      "width": 390,
+      "scrollWidth": 390,
+      "viewport": 390,
+      "main": {
+        "x": 0,
+        "width": 390
+      },
+      "type": {
+        "family": "Inter, system-ui, -apple-system, \"Segoe UI\", Roboto, Arial, sans-serif",
+        "numerals": "normal",
+        "heading": "32px"
+      },
+      "iconCount": 1,
+      "duplicateIcons": 0,
+      "axe": []
+    },
+    {
+      "name": "public-not-found",
+      "width": 699,
+      "scrollWidth": 699,
+      "viewport": 699,
+      "main": {
+        "x": 0,
+        "width": 520.515625
+      },
+      "type": {
+        "family": "Inter, system-ui, -apple-system, \"Segoe UI\", Roboto, Arial, sans-serif",
+        "numerals": "normal",
+        "heading": "32px"
+      },
+      "iconCount": 1,
+      "duplicateIcons": 0
+    },
+    {
+      "name": "public-not-found",
+      "width": 700,
+      "scrollWidth": 700,
+      "viewport": 700,
+      "main": {
+        "x": 0,
+        "width": 520.515625
+      },
+      "type": {
+        "family": "Inter, system-ui, -apple-system, \"Segoe UI\", Roboto, Arial, sans-serif",
+        "numerals": "normal",
+        "heading": "40px"
+      },
+      "iconCount": 1,
+      "duplicateIcons": 0
+    },
+    {
+      "name": "public-not-found",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "viewport": 1440,
+      "main": {
+        "x": 0,
+        "width": 520.515625
+      },
+      "type": {
+        "family": "Inter, system-ui, -apple-system, \"Segoe UI\", Roboto, Arial, sans-serif",
+        "numerals": "normal",
+        "heading": "40px"
+      },
+      "iconCount": 1,
+      "duplicateIcons": 0,
+      "axe": []
+    },
+    {
+      "name": "public-not-found",
+      "width": 2560,
+      "scrollWidth": 2560,
+      "viewport": 2560,
+      "main": {
+        "x": 0,
+        "width": 520.515625
+      },
+      "type": {
+        "family": "Inter, system-ui, -apple-system, \"Segoe UI\", Roboto, Arial, sans-serif",
+        "numerals": "normal",
+        "heading": "40px"
+      },
+      "iconCount": 1,
+      "duplicateIcons": 0
+    },
+    {
+      "name": "catalogue",
+      "width": 320,
+      "scrollWidth": 320,
+      "viewport": 320,
+      "main": {
+        "x": 0,
+        "width": 320
+      },
+      "type": {
+        "family": "Inter, system-ui, -apple-system, \"Segoe UI\", Roboto, Arial, sans-serif",
+        "numerals": "normal",
+        "heading": "28px"
+      },
+      "iconCount": 16,
+      "duplicateIcons": 0
+    },
+    {
+      "name": "catalogue",
+      "width": 390,
+      "scrollWidth": 390,
+      "viewport": 390,
+      "main": {
+        "x": 0,
+        "width": 390
+      },
+      "type": {
+        "family": "Inter, system-ui, -apple-system, \"Segoe UI\", Roboto, Arial, sans-serif",
+        "numerals": "normal",
+        "heading": "28px"
+      },
+      "iconCount": 16,
+      "duplicateIcons": 0,
+      "axe": []
+    },
+    {
+      "name": "catalogue",
+      "width": 699,
+      "scrollWidth": 699,
+      "viewport": 699,
+      "main": {
+        "x": 0,
+        "width": 699
+      },
+      "type": {
+        "family": "Inter, system-ui, -apple-system, \"Segoe UI\", Roboto, Arial, sans-serif",
+        "numerals": "normal",
+        "heading": "28px"
+      },
+      "iconCount": 16,
+      "duplicateIcons": 0
+    },
+    {
+      "name": "catalogue",
+      "width": 700,
+      "scrollWidth": 700,
+      "viewport": 700,
+      "main": {
+        "x": 0,
+        "width": 700
+      },
+      "type": {
+        "family": "Inter, system-ui, -apple-system, \"Segoe UI\", Roboto, Arial, sans-serif",
+        "numerals": "normal",
+        "heading": "28px"
+      },
+      "iconCount": 16,
+      "duplicateIcons": 0
+    },
+    {
+      "name": "catalogue",
+      "width": 1440,
+      "scrollWidth": 1440,
+      "viewport": 1440,
+      "main": {
+        "x": 120,
+        "width": 1200
+      },
+      "type": {
+        "family": "Inter, system-ui, -apple-system, \"Segoe UI\", Roboto, Arial, sans-serif",
+        "numerals": "normal",
+        "heading": "28px"
+      },
+      "iconCount": 16,
+      "duplicateIcons": 0,
+      "axe": []
+    },
+    {
+      "name": "catalogue",
+      "width": 2560,
+      "scrollWidth": 2560,
+      "viewport": 2560,
+      "main": {
+        "x": 680,
+        "width": 1200
+      },
+      "type": {
+        "family": "Inter, system-ui, -apple-system, \"Segoe UI\", Roboto, Arial, sans-serif",
+        "numerals": "normal",
+        "heading": "28px"
+      },
+      "iconCount": 16,
+      "duplicateIcons": 0
+    }
+  ],
+  "interactions": {
+    "loadingWidths": [
+      {
+        "text": "Publish",
+        "width": 85.5625,
+        "busy": null
+      },
+      {
+        "text": "Publish",
+        "width": 85.5625,
+        "busy": null
+      },
+      {
+        "text": "Publish",
+        "width": 107.5625,
+        "busy": "true"
+      }
+    ],
+    "dialog": {
+      "initialFocus": "Keep entry",
+      "escapeClosed": true,
+      "focusReturned": true
+    },
+    "busyEscapeIgnored": true,
+    "narrowDrawer": {
+      "x": 0,
+      "y": 0,
+      "width": 390,
+      "height": 844
+    },
+    "toasts": 3,
+    "toastReserve": "226px",
+    "toastDismissNames": [
+      "Dismiss notification",
+      "Dismiss notification",
+      "Dismiss notification"
+    ],
+    "reducedMotion": "0s",
+    "publicAlignment2560": {
+      ".brand": 128,
+      ".hero h1": 680,
+      ".points h2": 680,
+      ".footer": 0
+    },
+    "publicMenu": {
+      "expanded": "true",
+      "signInVisible": true
+    }
+  }
+}
