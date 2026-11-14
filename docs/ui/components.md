@@ -1,6 +1,6 @@
 # UI component intent and usage
 
-Status: documentation proposal, checked against the `@herald/ui` [public API](../../web/projects/ui/src/public-api.ts) on 14 November 2026. This is the intent and integration reference; [visual direction §5](../herald-visual-direction.md#5-shared-component-contracts) owns shared visual/state contracts. Import public symbols from `@herald/ui`; `ng-primitives` and Tabler imports belong inside `ui`.
+Status: maintained guidance, accepted and checked against the `@herald/ui` [public API](../../web/projects/ui/src/public-api.ts) on 14 November 2026. This is the intent and integration reference; [visual direction §5](../herald-visual-direction.md#5-shared-component-contracts) owns shared visual/state contracts. Import public symbols from `@herald/ui`; `ng-primitives` and Tabler imports belong inside `ui`.
 
 Run the live state catalogue with `cd web && pnpm exec ng serve catalogue --port 4400`, then open `http://localhost:4400`. It is development tooling. The current examples show states, not a complete intent reference; use this document when choosing a control.
 

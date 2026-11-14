@@ -1,6 +1,6 @@
 # Experience patterns: organiser, participant and public portal
 
-Status: design guidance proposal, 14 November 2026. Informed by the maintainer's supplied `user-experience-perspectives.md` (v1.0, November 2026). That document supplies motivations, anxieties and aspirations; its feature examples are not automatically approved product requirements or implementation instructions.
+Status: maintained UX guidance, accepted 14 November 2026. Informed by the maintainer's supplied `user-experience-perspectives.md` (v1.0, November 2026). That document supplies motivations, anxieties and aspirations; its feature examples are not automatically approved product requirements or implementation instructions.
 
 Use this document with the [style guide](style-guide.md), [component intent](components.md), [icons](icons.md) and [visual foundations](../herald-visual-direction.md). The [H2 functional discovery](../herald-h2-functional-discovery.md) and the [single decision register](../herald-functional-discovery.md#15-decision-register-and-development-gates) own functional scope and decision status. The [roadmap](../roadmap.md) owns sequencing. H2 patterns below describe targets, not implemented screens, approved mockups or permission grants.
 

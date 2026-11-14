@@ -1,6 +1,6 @@
 # Herald UI style guide
 
-Status: documentation proposal, 14 November 2026. Applies to mockups, prototypes, the shared catalogue and production screens. Read alongside the [visual direction](../herald-visual-direction.md), which owns the numeric foundations, page compositions and screen/state inventory. A documented target is not a claim that every existing screen meets it.
+Status: maintained guidance, accepted 14 November 2026. Applies to mockups, prototypes, the shared catalogue and production screens. Read alongside the [visual direction](../herald-visual-direction.md), which owns the numeric foundations, page compositions and screen/state inventory. A documented target is not a claim that every existing screen meets it.
 
 ## Start here
 
@@ -12,7 +12,7 @@ Before designing or implementing a screen:
 4. Specify every relevant state and its recovery, including permission changes, conflicts and long content. Apply the review criteria below to mockups as well as code.
 5. Record decisions, reference links, comparisons and exceptions in the change's `design.md`. Reuse the [review format](#review-and-handoff); never turn a proposed product rule into a UI default.
 
-The first implementation audit is [Existing screens, 14 November 2026](../../openspec/changes/style-guide-and-ui-audit/reviews/existing-screens.md). It is dated evidence, not a second style guide.
+The first implementation audit is [Existing screens, 14 November 2026](../../openspec/changes/archive/2026-11-14-style-guide-and-ui-audit/reviews/existing-screens.md). It is dated evidence, not a second style guide.
 
 ## Sources and precedence
 

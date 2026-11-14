@@ -48,7 +48,7 @@ The organiser's operational safety-net model, participant's competition companio
 
 ## Migration Plan
 
-Read the new entry point, follow its links and run the harness checks. No deployment or data migration. The change remains active while the maintainer reviews the proposal and remediation priorities; do not sync target deltas to implemented specifications or archive it before acceptance. After acceptance, archive the documentation/harness capability with its scenario markers and update the live guide's link to the moved review; the harness follows that link rather than retaining an active-change path. Production corrections can be proposed as separately scoped UI changes with their visual references.
+The maintainer accepted the documentation/harness delivery and requested archive and merge together on 14 November 2026. No deployment or data migration. The four interface-guidance requirements and one agent-harness requirement were synced to the maintained specifications before running the archive command with `--skip-specs`; that flag avoids a second sync, not acceptance or verification. The live guide now links to the moved review, relative links and the browser utility's dependency path follow the archive's extra directory level, and the harness follows the guide's link. Production corrections remain separately scoped UI changes with their visual references.
 
 ## Open Questions
 
@@ -61,7 +61,7 @@ Executed checks, browser measurements and remaining limits are recorded in [the 
 - UI baseline unit suites: `ui` 35, catalogue 7, admin 203 and public 13 tests passed (258 total). These use the project's Angular/Vitest configuration and do not replace composed browser journeys.
 - Final Node harness suite: 80 passed, zero failed, one pre-existing bootstrap test skipped by its environment condition; six new inventory/routing/review checks passed, including unsupported export forms and H2 audience guidance. The initial sandbox run could not spawn Git for temporary repositories; the suite passed outside that restriction.
 - Changed-file repository checks passed (terms, private data and British spelling); no dependency/lockfile changed. Full .NET/package-licence checks were not run because the SDK is absent.
-- OpenSpec validation and local Markdown link/whitespace checks passed. The proposal remains unapproved for production edits.
+- OpenSpec validation and local Markdown link/whitespace checks passed. The maintainer subsequently accepted this documentation/harness delivery for archive and merge; production-screen remediation remains outside this change.
 
 ### Independent review
 
@@ -75,3 +75,7 @@ The read-only `herald-reviewer` reviewed the complete baseline diff and incremen
 | StatusLabel cited unrelated audit finding A-08 | Remove the incorrect reference and state the actual single-line limitation accurately |
 
 The expanded experience patterns and routing were also reviewed; H2 remains target guidance, and exploratory source features do not gain implementation approval.
+
+### Archive verification
+
+The final acceptance mapping and archive checks are recorded in [validation.md](validation.md). The canonical specifications describe the delivered documentation/harness, not completion of H2 or resolution of the audit's production findings.

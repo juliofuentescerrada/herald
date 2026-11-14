@@ -7,5 +7,6 @@
 ## 2. Independent review and handoff
 
 - [x] 2.1 Run the read-only herald-reviewer against the branch diff, resolve material findings, record validation and review, and publish the draft proposal pull request.
+- [x] 2.2 Verify the accepted delivery, sync canonical specifications, archive the change with repaired links/utility paths and rerun archive validation and read-only review before publishing the archive checkpoint.
 
-Production remediation is outside these documentation-delivery tasks. The proposal stays active for maintainer review; archive/sync only after acceptance through the normal process. No endpoint/handler or user flow changes, so code generation and a new E2E journey are not applicable. Existing synthetic E2E checks are required in subsequent production remediation changes as the audit specifies.
+Production remediation is outside these documentation-delivery tasks. The maintainer accepted the delivery on 14 November 2026 and requested archive and merge together; canonical specifications are synced in the same pull request. No endpoint/handler or user flow changes, so code generation and a new E2E journey are not applicable. Existing synthetic E2E checks are required in subsequent production remediation changes as the audit specifies.

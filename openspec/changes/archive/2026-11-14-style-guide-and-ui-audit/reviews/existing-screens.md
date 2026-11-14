@@ -1,16 +1,16 @@
 # Existing-screen conformance review
 
-Date: 14 November 2026. Status: initial audit for the documentation proposal; production remediation is separate follow-up. Criteria: [G-01–12](../../../../docs/ui/style-guide.md#review-criteria) and [RU-01–10](../../../../.claude/skills/refactoring-ui/SKILL.md).
+Date: 14 November 2026. Status: initial audit for the documentation proposal; production remediation is separate follow-up. Criteria: [G-01–12](../../../../../docs/ui/style-guide.md#review-criteria) and [RU-01–10](../../../../../.claude/skills/refactoring-ui/SKILL.md).
 
 ## Baseline and method
 
 Inspected `main` at `b017628cc643b3f68b017e6e37aefb0a13f1bedc`. No production source changes are included in this branch. Inventory came from admin/public/catalogue route definitions, their templates/styles, shared UI sources and relevant implemented specifications. CodeGraph was initialised and used before reading implementation areas.
 
-Source review covered the current surfaces below against visual direction §§3–5, §7.2, §8 and §10. Current [screen/state references](../../../../docs/herald-visual-direction.md#93-h1-screenstate-inventory) include [access](../../../../docs/assets/mockups/access/README.md), [tournament setup](../../../../docs/assets/mockups/tournament-setup/README.md), [registration](../../../../docs/assets/mockups/registration-window/README.md), [entries](../../../../docs/assets/mockups/entries/README.md), [feedback/layout](../../../../docs/assets/mockups/feedback-layout/README.md), [rosters](../../../../docs/assets/mockups/team-rosters/README.md) and [check-in](../../../../docs/assets/mockups/check-in/README.md). Old raster widths/asides do not override current composition. No new mockups are needed for this documentation-only change.
+Source review covered the current surfaces below against visual direction §§3–5, §7.2, §8 and §10. Current [screen/state references](../../../../../docs/herald-visual-direction.md#93-h1-screenstate-inventory) include [access](../../../../../docs/assets/mockups/access/README.md), [tournament setup](../../../../../docs/assets/mockups/tournament-setup/README.md), [registration](../../../../../docs/assets/mockups/registration-window/README.md), [entries](../../../../../docs/assets/mockups/entries/README.md), [feedback/layout](../../../../../docs/assets/mockups/feedback-layout/README.md), [rosters](../../../../../docs/assets/mockups/team-rosters/README.md) and [check-in](../../../../../docs/assets/mockups/check-in/README.md). Old raster widths/asides do not override current composition. No new mockups are needed for this documentation-only change.
 
 Browser review used the unchanged local Angular public app and catalogue, anonymous Chromium, Node 26 and the pinned workspace/Playwright/axe dependencies. It covered 320, 390, 699, 700, 1440 and 2560 CSS px; axe ran on the home page, public not-found and catalogue resting state at 390 and 1440. Measurements are in [browser-measurements.json](browser-measurements.json). The small local audit utility used Playwright directly; it was not the composed E2E suite. No host, database, identity provider or synthetic signed-in admin journey ran. Local anonymous screenshots were inspected but are not committed or attached as E2E evidence.
 
-To reproduce, install `web/` and `e2e/` with their pinned pnpm version, run `pnpm exec ng serve catalogue --port 4400` and `pnpm exec ng serve public --port 4300` in separate terminals under `web/`, then run `node openspec/changes/style-guide-and-ui-audit/reviews/browser-review.mjs` from the repository root. Use `HERALD_CHROMIUM` to select an installed compatible Chromium if needed. The [dated utility](browser-review.mjs) updates only the measurement file; it creates no screenshots and never signs in.
+To reproduce, install `web/` and `e2e/` with their pinned pnpm version, run `pnpm exec ng serve catalogue --port 4400` and `pnpm exec ng serve public --port 4300` in separate terminals under `web/`, then run `node openspec/changes/archive/2026-11-14-style-guide-and-ui-audit/reviews/browser-review.mjs` from the repository root. Use `HERALD_CHROMIUM` to select an installed compatible Chromium if needed. The [dated utility](browser-review.mjs) updates only the measurement file; it creates no screenshots and never signs in.
 
 `pass (source)` means the inspected contract is present in code, not that runtime behaviour passed. `gap` names a repeatable mismatch. `not verified` identifies missing execution evidence, not a discovered failure. No screen is declared fully conformant from these samples.
 
@@ -42,7 +42,7 @@ Admin paths below are relative to the app; `:organisationId` and `:tournamentId`
 
 H2–H5 discovery, participant, match, round, standings and live-update screens are future prototypes/targets, not implemented routes in this baseline. They are excluded from current-screen pass counts; their coverage remains in visual direction §9. The audit did not treat an absent future route as a regression.
 
-The supplied organiser/participant perspectives are covered by [experience patterns](../../../../docs/ui/experience-patterns.md), including the H2 public portal and the mapping of exploratory features to scope. That design guidance extends the review criteria for future H2 slices; this baseline audit does not imply those experiences were implemented or tested.
+The supplied organiser/participant perspectives are covered by [experience patterns](../../../../../docs/ui/experience-patterns.md), including the H2 public portal and the mapping of exploratory features to scope. That design guidance extends the review criteria for future H2 slices; this baseline audit does not imply those experiences were implemented or tested.
 
 ## Findings
 

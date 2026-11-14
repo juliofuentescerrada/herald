@@ -2,7 +2,7 @@
 import { writeFileSync } from 'node:fs';
 import { createRequire } from 'node:module';
 
-const require = createRequire(new URL('../../../../e2e/package.json', import.meta.url));
+const require = createRequire(new URL('../../../../../e2e/package.json', import.meta.url));
 const { chromium, expect } = require('@playwright/test');
 const { AxeBuilder } = require('@axe-core/playwright');
 const browser = await chromium.launch({

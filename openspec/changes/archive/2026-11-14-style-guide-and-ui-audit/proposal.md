@@ -1,3 +1,7 @@
+## Acceptance
+
+The maintainer accepted the implemented documentation/harness and requested archive and merge together on 14 November 2026. This acceptance covers the delivered guides, skills, routing and existing-screen audit. It does not authorise or claim completion of the audit's production remediation or future H2 screens.
+
 ## Why
 
 Herald has visual foundations and a working component/state catalogue, but agents cannot yet find a complete guide to component intent, icon selection or repeatable design review. Refactoring UI is mentioned without a repository-owned skill, and existing screens need an explicit assessment against the same criteria used for new designs.
@@ -27,4 +31,4 @@ Documentation and harness only: `docs/`, agent instructions/skills, `openspec/co
 
 No product decision-register row changes. This work preserves confirmed visual constraints in visual direction §§4–5 and §7.2 and the confirmed icon choices from `ui-icons`. H2 patterns depend on D-30 and D-35's confirmed direction (provider/coordination design pending), D-31 and D-36's partial decisions, D-32/33/34/37's proposed detail and D-38's proposed detail with cancellation delivery confirmed under D-35. Those rows retain their authoritative statuses. The guide documents the current token set and different audience workflows without approving new product features, branding or portal implementation.
 
-No screens are created or modified: mockups are not applicable to this documentation proposal. The existing-screen inventory and evidence are in `reviews/existing-screens.md`; any resulting production fix must follow the normal screen/mockup and implementation-approval process. This proposal is prepared for maintainer review, not approval for production edits.
+No screens are created or modified: mockups are not applicable to this documentation change. The existing-screen inventory and evidence are in `reviews/existing-screens.md`; any resulting production fix must follow the normal screen/mockup and implementation-approval process.

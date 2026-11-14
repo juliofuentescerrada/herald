@@ -1,6 +1,6 @@
 # Icon intent and usage
 
-Status: documentation proposal, 14 November 2026. This is the maintained icon meaning and integration reference. The confirmed family, sizes and geometry are in [visual direction §4](../herald-visual-direction.md#4-typography-space-and-geometry). The initial choices were reviewed in `ui-icons`; the table below brings them into live documentation.
+Status: maintained guidance, accepted 14 November 2026. This is the maintained icon meaning and integration reference. The confirmed family, sizes and geometry are in [visual direction §4](../herald-visual-direction.md#4-typography-space-and-geometry). The initial choices were reviewed in `ui-icons`; the table below brings them into live documentation.
 
 ## When to use an icon
 
