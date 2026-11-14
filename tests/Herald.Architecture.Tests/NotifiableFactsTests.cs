@@ -16,6 +16,8 @@ public partial class NotifiableFactsTests
         ["Organisation"] = "Creating an organisation is not a notifiable fact in F-10.",
         ["Guest"] = "Creating a guest is not a notifiable fact in F-10.",
         ["CheckInChange"] = "Check-in is not a notifiable fact in F-10 (h1-check-in R-8).",
+        ["Draft"] = "A draft is not a notifiable fact: generating and regenerating send nothing (F-06, h1-round-robin-pairings).",
+        ["FieldChange"] = "Computed when read from the field and the pairings, never stored (h1-round-robin-pairings D-5).",
         ["Tournament"] = "Publication and registration opening or closing join the inventory when their owning change confirms what is recorded (ADR 0017).",
     };
 

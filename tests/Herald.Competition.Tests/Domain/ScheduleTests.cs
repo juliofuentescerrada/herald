@@ -152,6 +152,7 @@ public class ScheduleTests
     }
 
     [Fact]
+    [Trait("covers", "round-robin-pairings: An older report changes nothing")]
     public void An_older_field_changes_nothing()
     {
         var schedule = Track();

@@ -86,3 +86,38 @@ Accepted by the maintainer on 14 November 2026 (#55).
 - [Asynchronous lock] → crossed changes are visible and blocking (D-5); start readiness requires the publication to match the eligible revision.
 - [Competition's first model] → the schema starts with schedule tables only; batch 2 adds matches as their own state and may move pairings, migration included.
 - [Two new contracts] → both v1 snapshots with tests reading them; additions to `TournamentEntryTermsChanged` are optional members.
+
+## Implementation notes
+
+- **Terms revision (D-3):** the schedule's lock changes the entry terms without changing the tournament, so Tournaments numbers the terms it sends with their own sequence (`TermsRevision`), started from each tournament's revision by the migration so Registration keeps accepting them.
+- **Pending names (D-2):** `TournamentEligibleFieldChanged` carries the pending entries (identifier and name), not only their count, so a rejected generation names them (spec "Entries are pending").
+- **Storage (D-1):** the eligible field, the draft and the publications are `jsonb` documents on the schedule's row: they are always read and written whole with it.
+- **Seed (D-6):** the draw's seed is chosen by the endpoint and recorded; the shuffle uses its own linear congruential generator, so a seed gives the same order on any runtime.
+- **No schedule yet:** a tournament published before this change has no schedule until Registration next reports its field (any entry write, or new terms). The Schedule page says "No eligible field reported yet" for a 404. *shortcut: no backfill of existing fields; acceptable while every environment is reseeded, revisit before the pilot (D-14).*
+
+## Verification (task 8.2, 14 November 2026)
+
+| Check | Result |
+|---|---|
+| `scripts/check all` (format, build, all .NET tests, web install, OpenAPI client, lint, boundaries, Vitest, SSR isolation, builds) | pass after adding the inventory row (the architecture test caught it) |
+| `scripts/check rules` (rules, spec coverage, rules tests) | pass |
+| End-to-end suite (17 journeys, journey 17 included) | pass, run with the preinstalled Chromium |
+| Test scripts (`pnpm test:scripts`, the new `seeded-schedule` included) | pass |
+| Admin bundle budget warning (952 kB of 900 kB) | already present on `main`; not introduced here |
+
+## Visual comparison (task 8.3)
+
+Compared the `seeded-schedule` script's screenshots at the desktop viewport (Playwright's Desktop Chrome, 1280 px) and at 390 px with `prototypes/frontend/start-and-pair-states.html` and the maintainer's feedback of 14 November 2026 (#55). Method: screenshots read by the agent; no screen reader or manual keyboard pass. Vitest runs `axe-core` (contrast disabled) on the Schedule page's blocked, generated, stale and withdrawn states and on the entries page's absence review and locked field.
+
+| Point | Result |
+|---|---|
+| Check-in states as badges with tone and icon | pass: the existing `StatusLabel` with `circle-check` / `circle-dashed` |
+| Schedule state badge beside the summary heading, same scale | pass |
+| Publication time and its zone on one line | pass after a fix found in the first capture (the zone wrapped alone) |
+| Matches symmetric about "vs" | pass at 1280 and 390 px |
+| Generation blockers: condition left, state right | pass |
+| Tournament tabs (Configuration · Entries · Schedule) | gap, deliberate: not implemented. The pages keep the existing "Back to configuration" link, and the configuration page gains a Schedule summary with "View schedule" beside the Entries one, so no other page's header changes. Tabs belong in a change that reviews tournament navigation as a whole. |
+| "published by Alex Morgan" | gap, deliberate: Competition stores the person but cannot name them (as Tournaments, design W-1 of `h1-registration-window`); the time is shown |
+| Narrow layout | pass: summary, operation and rounds stack; toasts overlap content while shown, as on the other pages |
+| 699/700 px boundary, 200 % zoom, keyboard-only pass | not verified |
+

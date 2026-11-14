@@ -144,6 +144,21 @@ public class AbsenceReviewTests
     }
 
     [Fact]
+    [Trait("covers", "round-robin-pairings: A roster change leaves the field as it was")]
+    public void A_roster_change_leaves_the_eligible_revision_alone()
+    {
+        var teams = _open with { EntryKind = EntryKind.Team, CheckIn = CheckInPolicy.Optional, MinimumRosterSize = 1, MaximumRosterSize = 5 };
+        var field = Track(teams);
+        var id = new EntryId(Guid.NewGuid());
+        field.Enter(id, new GuestId(Guid.NewGuid()), GuestKind.Team, _owner, _at);
+        var revision = field.EligibleRevision;
+
+        field.AddRosterMember(id, new GuestId(Guid.NewGuid()), GuestKind.Player, 0, _owner, _at).Outcome.ShouldBe(WriteOutcome.Applied);
+
+        field.EligibleRevision.ShouldBe(revision);
+    }
+
+    [Fact]
     public void Closing_registration_changes_the_eligible_revision()
     {
         var field = Track();
