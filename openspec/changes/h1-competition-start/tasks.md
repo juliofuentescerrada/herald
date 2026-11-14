@@ -16,7 +16,7 @@
 ## 4. Registration and Competition
 
 - [x] 4.1 Registration: extended counts, frozen roster revision, rejections after start, crossed roster report (D-3, D-4); domain and API tests for the `team-rosters` and "Start fixes the field" scenarios
-- [ ] 4.2 Competition: start projection, rejections after start, crossed withdrawal (D-4); tests for the modified `round-robin-pairings` scenario
+- [x] 4.2 Competition: start projection, rejections after start, crossed withdrawal (D-4); tests for the modified `round-robin-pairings` scenario
 - [ ] 4.3 Regenerate Wolverine code (`codegen write`) and the OpenAPI documents and client (`pnpm api:generate`); CI drift checks pass
 
 ## 5. Admin application

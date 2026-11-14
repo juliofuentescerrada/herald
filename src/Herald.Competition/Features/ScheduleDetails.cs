@@ -23,6 +23,7 @@ public sealed record FieldChangeDetails(IReadOnlyList<EntrantDetails> Added, IRe
 public sealed record PublicationDetails(int Number, PairingsDetails Pairings, DateTimeOffset PublishedAt, string? WithdrawalReason, DateTimeOffset? WithdrawnAt);
 
 // What every schedule write and the schedule read answer with. Blockers say why a draft cannot be generated now.
+// Once the competition started, the revision it started on, and whether a withdrawal crossed it (h1-competition-start D-4).
 public sealed record ScheduleDetails(
     Guid TournamentId,
     int Revision,
@@ -34,7 +35,10 @@ public sealed record ScheduleDetails(
     FieldChangeDetails? DraftChange,
     PublicationDetails? Current,
     FieldChangeDetails? CrossedChange,
-    IReadOnlyList<PublicationDetails> History)
+    IReadOnlyList<PublicationDetails> History,
+    int? StartedOnRevision,
+    DateTimeOffset? StartedAt,
+    bool StartCrossedWithdrawal)
 {
     public static ScheduleDetails Of(Schedule schedule) => new(
         schedule.Id.Value,
@@ -47,7 +51,10 @@ public sealed record ScheduleDetails(
         ChangeOf(schedule.DraftChange),
         schedule.Current is { } current ? PublicationOf(current) : null,
         ChangeOf(schedule.CrossedChange),
-        [.. schedule.Publications.Reverse().Select(PublicationOf)]);
+        [.. schedule.Publications.Reverse().Select(PublicationOf)],
+        schedule.StartedOnRevision,
+        schedule.StartedAt,
+        schedule.StartCrossedWithdrawal);
 
     // The snapshot Tournaments keeps to lock the field and, later, to check start (D-4).
     public static TournamentScheduleChanged Changed(Guid organisationId, Schedule schedule) =>

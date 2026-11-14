@@ -75,6 +75,14 @@ public sealed class Schedule : AggregateRoot<TournamentId>
 
     public Publication? Current => _publications.LastOrDefault(publication => !publication.IsWithdrawn);
 
+    // The published revision the competition started on, and when Competition learned of it (h1-competition-start D-3).
+    public int? StartedOnRevision { get; private set; }
+
+    public DateTimeOffset? StartedAt { get; private set; }
+
+    // The start was decided on a revision withdrawn just before Competition learned of it (D-4).
+    public bool StartCrossedWithdrawal => StartedOnRevision is { } number && _publications.Exists(publication => publication.Number == number && publication.IsWithdrawn);
+
     public bool IsDraftStale => Draft is { } draft && draft.Pairings.EligibleRevision != Field.Revision;
 
     // Set while the draft is stale, or while the published revision no longer matches the field (D-5).
@@ -83,6 +91,20 @@ public sealed class Schedule : AggregateRoot<TournamentId>
     public FieldChange? CrossedChange => Current is { } current && current.Pairings.EligibleRevision != Field.Revision ? ChangeFrom(current.Pairings) : null;
 
     public static Schedule Track(TournamentId id, EligibleField field) => new(id, field);
+
+    // Once only: a later start report changes nothing. Nothing is repaired here (D-4).
+    public bool ApplyStart(int scheduleRevision, DateTimeOffset at)
+    {
+        if (StartedOnRevision is not null)
+        {
+            return false;
+        }
+
+        StartedOnRevision = scheduleRevision;
+        StartedAt = at;
+        Revision++;
+        return true;
+    }
 
     // Newer reports replace the field; older ones change nothing. Nothing else changes with it.
     public bool ApplyField(EligibleField field)
@@ -133,6 +155,11 @@ public sealed class Schedule : AggregateRoot<TournamentId>
         if (expectedRevision != Revision)
         {
             return WriteOutcome.Stale;
+        }
+
+        if (StartedAt is not null)
+        {
+            return Started;
         }
 
         if (Current is not null)
@@ -202,6 +229,11 @@ public sealed class Schedule : AggregateRoot<TournamentId>
             return WriteOutcome.Stale;
         }
 
+        if (StartedAt is not null)
+        {
+            return Started;
+        }
+
         reason = reason?.Trim();
         if (string.IsNullOrEmpty(reason))
         {
@@ -220,6 +252,8 @@ public sealed class Schedule : AggregateRoot<TournamentId>
         Revision++;
         return WriteOutcome.Applied;
     }
+
+    private static WriteResult Started => WriteResult.Reject("schedule", "competition-started");
 
     private FieldChange ChangeFrom(Pairings pairings) => new(
         [.. Field.Entrants.Where(entrant => pairings.Entrants.All(paired => paired.EntryId != entrant.EntryId))],
