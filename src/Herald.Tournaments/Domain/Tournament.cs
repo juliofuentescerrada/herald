@@ -90,9 +90,15 @@ public sealed class Tournament : AggregateRoot<TournamentId>
     public RegistrationWindow Registration { get; private set; }
 
     // The last opening or closing only: no entrant exists yet whom a history would serve (design A-1).
+    // Grows with each entry terms snapshot sent to Registration, which keeps the highest (ADR 0016); a schedule's
+    // lock changes the terms without changing the tournament, so it cannot be the tournament's revision.
+    public int TermsRevision { get; private set; }
+
     public Guid? RegistrationChangedBy { get; private set; }
 
     public DateTimeOffset? RegistrationChangedAt { get; private set; }
+
+    public int NextTermsRevision() => ++TermsRevision;
 
     public static Tournament Draft(TournamentId id, TournamentConfiguration configuration, Guid actor, DateTimeOffset at)
     {
@@ -172,7 +178,8 @@ public sealed class Tournament : AggregateRoot<TournamentId>
     }
 
     // Opens, or reopens, by the owner's action only: the announced dates are required but no clock is read (RW-1, RW-2, RW-4).
-    public WriteResult OpenRegistration(int expectedRevision, Guid actor, DateTimeOffset at)
+    // A published schedule must be withdrawn first (§5.1 row 2).
+    public WriteResult OpenRegistration(int expectedRevision, Guid actor, DateTimeOffset at, bool schedulePublished = false)
     {
         if (Registration == RegistrationWindow.Open)
         {
@@ -192,6 +199,11 @@ public sealed class Tournament : AggregateRoot<TournamentId>
         if (Configuration.MissingForRegistration() is { Count: > 0 } missing)
         {
             return new(WriteOutcome.Rejected, [.. missing.Select(field => new BrokenRule(field, "required"))]);
+        }
+
+        if (schedulePublished)
+        {
+            return new(WriteOutcome.Rejected, [new("registration", "schedule-published")]);
         }
 
         ChangeRegistration(RegistrationWindow.Open, actor, at);

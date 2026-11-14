@@ -21,7 +21,7 @@ public static class GetTournamentEndpoint
         // The organisation filter hides another organisation's tournament: it is as absent as a missing one.
         var id = new TournamentId(tournamentId);
         return await db.Tournaments.AsNoTracking().SingleOrDefaultAsync(tournament => tournament.Id == id, cancellationToken) is { } tournament
-            ? Results.Ok(TournamentDetails.Of(tournament, await db.EntryCountsAsync(id, cancellationToken)))
+            ? Results.Ok(TournamentDetails.Of(tournament, await db.EntryCountsAsync(id, cancellationToken), await db.SchedulePublishedAsync(id, cancellationToken)))
             : TournamentResults.NotFound();
     }
 }

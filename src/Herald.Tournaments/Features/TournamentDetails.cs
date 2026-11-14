@@ -23,7 +23,8 @@ public sealed record TournamentDetails(
     DateTimeOffset? RegistrationChangedAt,
     int AdmittedEntries,
     int WaitingEntries,
-    int CheckedInEntries)
+    int CheckedInEntries,
+    bool SchedulePublished)
 {
     // A constant until its slice exists: nothing can start competition yet.
     public const string CompetitionPreparation = "preparation";
@@ -31,7 +32,7 @@ public sealed record TournamentDetails(
     // The only H1 profile (D-04): single round-robin, 3 / 1 / 0.
     public const string RoundRobinProfile = "singleRoundRobin-3-1-0";
 
-    public static TournamentDetails Of(Tournament tournament, EntryCounts entries) => new(
+    public static TournamentDetails Of(Tournament tournament, EntryCounts entries, bool schedulePublished = false) => new(
         tournament.Id.Value,
         tournament.Revision,
         tournament.Publication,
@@ -45,7 +46,8 @@ public sealed record TournamentDetails(
         tournament.RegistrationChangedAt,
         entries.Admitted,
         entries.Waiting,
-        entries.CheckedIn);
+        entries.CheckedIn,
+        schedulePublished);
 }
 
 internal static class TournamentResults
@@ -76,6 +78,12 @@ internal static class TournamentResults
             case WriteOutcome.Stale:
                 return Stale(tournament.Revision);
             case WriteOutcome.Applied:
+                var locked = await db.SchedulePublishedAsync(tournament.Id, cancellationToken);
+                if (tournament.Publication == Publication.Published)
+                {
+                    tournament.NextTermsRevision();
+                }
+
                 try
                 {
                     await db.SaveChangesAsync(cancellationToken);
@@ -88,20 +96,21 @@ internal static class TournamentResults
 
                 if (tournament.Publication == Publication.Published)
                 {
-                    await bus.PublishAsync(EntryTerms(organisationId, tournament));
+                    await bus.PublishAsync(EntryTerms(organisationId, tournament, locked));
                 }
 
                 break;
         }
 
-        return Results.Ok(TournamentDetails.Of(tournament, await db.EntryCountsAsync(tournament.Id, cancellationToken)));
+        return Results.Ok(TournamentDetails.Of(
+            tournament, await db.EntryCountsAsync(tournament.Id, cancellationToken), await db.SchedulePublishedAsync(tournament.Id, cancellationToken)));
     }
 
     // A published tournament is complete, so its entry terms are all present (R-5).
-    public static TournamentEntryTermsChanged EntryTerms(Guid organisationId, Tournament tournament) => new(
+    public static TournamentEntryTermsChanged EntryTerms(Guid organisationId, Tournament tournament, bool fieldLocked) => new(
         organisationId,
         tournament.Id.Value,
-        tournament.Revision,
+        tournament.TermsRevision,
         tournament.Registration switch
         {
             RegistrationWindow.Open => RegistrationState.Open,
@@ -112,7 +121,9 @@ internal static class TournamentResults
         tournament.Configuration.EntryKind == Domain.EntryKind.Team ? Contract.EntryKind.Team : Contract.EntryKind.Individual,
         tournament.Configuration.Admission == Domain.Admission.Manual ? Contract.Admission.Manual : Contract.Admission.Automatic,
         tournament.Configuration.EntryKind == Domain.EntryKind.Team ? tournament.Configuration.MinimumRosterSize : null,
-        tournament.Configuration.EntryKind == Domain.EntryKind.Team ? tournament.Configuration.MaximumRosterSize : null);
+        tournament.Configuration.EntryKind == Domain.EntryKind.Team ? tournament.Configuration.MaximumRosterSize : null,
+        tournament.Configuration.CheckIn == Domain.CheckIn.Mandatory ? Contract.CheckInPolicy.Mandatory : Contract.CheckInPolicy.Optional,
+        fieldLocked);
 
     public static bool IsDuplicateKey(this DbUpdateException exception) =>
         exception.InnerException is PostgresException { SqlState: PostgresErrorCodes.UniqueViolation };

@@ -17,13 +17,13 @@
 
 - [x] 4.1 Circle-method generator in `Domain` with seeding by admission order or recorded seed (D-6); tests for 2 to 9 entrants (every pair once, one rest each when odd, determinism by seed)
 - [x] 4.2 `Schedule` aggregate (D-1): eligible-field projection, generate, regenerate, stale, publish, repeat, withdraw with reason, crossed field (D-5); domain tests for every `round-robin-pairings` scenario
-- [ ] 4.3 Persistence and first model migration; handler for `TournamentEligibleFieldChanged`; features `GenerateSchedule`, `PublishSchedule`, `WithdrawSchedule`, `GetSchedule` with revisions and operation identities (D-8); `TournamentScheduleChanged` through the outbox
-- [ ] 4.4 API tests against PostgreSQL for the `round-robin-pairings` scenarios, including conflicts, repeats and another organisation's 404s
+- [x] 4.3 Persistence and first model migration; handler for `TournamentEligibleFieldChanged`; features `GenerateSchedule`, `PublishSchedule`, `WithdrawSchedule`, `GetSchedule` with revisions and operation identities (D-8); `TournamentScheduleChanged` through the outbox
+- [x] 4.4 API tests against PostgreSQL for the `round-robin-pairings` scenarios, including conflicts, repeats and another organisation's 404s
 
 ## 5. Tournaments
 
-- [ ] 5.1 Schedule projection from `TournamentScheduleChanged` (D-4); terms carry `CheckIn` and `FieldLocked`; reopening rejected while published; migration; tests for the modified `registration-window` scenario
-- [ ] 5.2 Regenerate Wolverine code (`codegen write`) and the OpenAPI documents and client (`pnpm api:generate`); CI drift checks pass
+- [x] 5.1 Schedule projection from `TournamentScheduleChanged` (D-4); terms carry `CheckIn` and `FieldLocked`; reopening rejected while published; migration; tests for the modified `registration-window` scenario
+- [x] 5.2 Regenerate Wolverine code (`codegen write`) and the OpenAPI documents and client (`pnpm api:generate`); CI drift checks pass
 
 ## 6. Admin application
 

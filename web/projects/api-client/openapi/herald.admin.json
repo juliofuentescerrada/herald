@@ -1017,6 +1017,97 @@
         }
       }
     },
+    "/api/organisations/{organisationId}/tournaments/{tournamentId}/entries/{entryId}/absence": {
+      "post": {
+        "tags": [
+          "Herald.Registration.Features.MarkAbsent.MarkAbsentEndpoint"
+        ],
+        "summary": "POST_api_organisations_organisationId_tournaments_tournamentId_entries_entryId_absence",
+        "description": "POST_api_organisations_organisationId_tournaments_tournamentId_entries_entryId_absence",
+        "operationId": "markAbsent",
+        "parameters": [
+          {
+            "name": "organisationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "tournamentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "entryId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MarkAbsent"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FieldDetails"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/organisations/{organisationId}/tournaments/{tournamentId}/entries/{entryId}/roster": {
       "get": {
         "tags": [
@@ -1419,6 +1510,16 @@
               }
             }
           },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
           "404": {
             "description": "Not Found",
             "content": {
@@ -1532,6 +1633,304 @@
           }
         }
       }
+    },
+    "/api/organisations/{organisationId}/tournaments/{tournamentId}/schedule/withdrawal": {
+      "post": {
+        "tags": [
+          "Herald.Competition.Features.WithdrawSchedule.WithdrawScheduleEndpoint"
+        ],
+        "summary": "POST_api_organisations_organisationId_tournaments_tournamentId_schedule_withdrawal",
+        "description": "POST_api_organisations_organisationId_tournaments_tournamentId_schedule_withdrawal",
+        "operationId": "withdrawSchedule",
+        "parameters": [
+          {
+            "name": "organisationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "tournamentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/WithdrawSchedule"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScheduleDetails"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/organisations/{organisationId}/tournaments/{tournamentId}/schedule/publication": {
+      "post": {
+        "tags": [
+          "Herald.Competition.Features.PublishSchedule.PublishScheduleEndpoint"
+        ],
+        "summary": "POST_api_organisations_organisationId_tournaments_tournamentId_schedule_publication",
+        "description": "POST_api_organisations_organisationId_tournaments_tournamentId_schedule_publication",
+        "operationId": "publishSchedule",
+        "parameters": [
+          {
+            "name": "organisationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "tournamentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PublishSchedule"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScheduleDetails"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/organisations/{organisationId}/tournaments/{tournamentId}/schedule": {
+      "get": {
+        "tags": [
+          "Herald.Competition.Features.GetSchedule.GetScheduleEndpoint"
+        ],
+        "summary": "GET_api_organisations_organisationId_tournaments_tournamentId_schedule",
+        "description": "GET_api_organisations_organisationId_tournaments_tournamentId_schedule",
+        "operationId": "getSchedule",
+        "parameters": [
+          {
+            "name": "organisationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "tournamentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScheduleDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/organisations/{organisationId}/tournaments/{tournamentId}/schedule/draft": {
+      "post": {
+        "tags": [
+          "Herald.Competition.Features.GenerateDraft.GenerateDraftEndpoint"
+        ],
+        "summary": "POST_api_organisations_organisationId_tournaments_tournamentId_schedule_draft",
+        "description": "POST_api_organisations_organisationId_tournaments_tournamentId_schedule_draft",
+        "operationId": "generateDraft",
+        "parameters": [
+          {
+            "name": "organisationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "tournamentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GenerateDraft"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScheduleDetails"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
     }
   },
   "components": {
@@ -1593,6 +1992,13 @@
           }
         }
       },
+      "CancellationCause": {
+        "enum": [
+          "owner",
+          "absentAtStart",
+          null
+        ]
+      },
       "CheckIn": {
         "enum": [
           "optional",
@@ -1611,6 +2017,13 @@
             "format": "int32"
           }
         }
+      },
+      "CheckInPolicy": {
+        "enum": [
+          "optional",
+          "mandatory"
+        ],
+        "default": "optional"
       },
       "CheckInState": {
         "enum": [
@@ -1708,6 +2121,26 @@
           }
         }
       },
+      "DraftDetails": {
+        "required": [
+          "pairings",
+          "generatedAt",
+          "stale"
+        ],
+        "type": "object",
+        "properties": {
+          "pairings": {
+            "$ref": "#/components/schemas/PairingsDetails"
+          },
+          "generatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "stale": {
+            "type": "boolean"
+          }
+        }
+      },
       "EnterGuest": {
         "required": [
           "guestId"
@@ -1717,6 +2150,22 @@
           "guestId": {
             "type": "string",
             "format": "uuid"
+          }
+        }
+      },
+      "EntrantDetails": {
+        "required": [
+          "entryId",
+          "name"
+        ],
+        "type": "object",
+        "properties": {
+          "entryId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
           }
         }
       },
@@ -1854,6 +2303,16 @@
               "string"
             ],
             "format": "date-time"
+          },
+          "cancellationCause": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/CancellationCause"
+              }
+            ]
           }
         }
       },
@@ -1906,6 +2365,34 @@
               "integer"
             ],
             "format": "int32"
+          },
+          "checkIn": {
+            "$ref": "#/components/schemas/CheckInPolicy"
+          },
+          "fieldLocked": {
+            "type": "boolean",
+            "default": false
+          }
+        }
+      },
+      "FieldChangeDetails": {
+        "required": [
+          "added",
+          "removed"
+        ],
+        "type": "object",
+        "properties": {
+          "added": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EntrantDetails"
+            }
+          },
+          "removed": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EntrantDetails"
+            }
           }
         }
       },
@@ -1918,6 +2405,7 @@
           "admitted",
           "waiting",
           "checkedIn",
+          "pending",
           "overCapacityBy",
           "kindMismatch",
           "entries"
@@ -1951,6 +2439,10 @@
             "type": "integer",
             "format": "int32"
           },
+          "pending": {
+            "type": "integer",
+            "format": "int32"
+          },
           "overCapacityBy": {
             "type": "integer",
             "format": "int32"
@@ -1963,6 +2455,27 @@
             "items": {
               "$ref": "#/components/schemas/EntryDetails"
             }
+          }
+        }
+      },
+      "GenerateDraft": {
+        "required": [
+          "operationId",
+          "expectedRevision",
+          "seeding"
+        ],
+        "type": "object",
+        "properties": {
+          "operationId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "expectedRevision": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "seeding": {
+            "$ref": "#/components/schemas/Seeding"
           }
         }
       },
@@ -2089,6 +2602,33 @@
           null
         ]
       },
+      "MarkAbsent": {
+        "required": [
+          "expectedRevision"
+        ],
+        "type": "object",
+        "properties": {
+          "expectedRevision": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "MatchDetails": {
+        "required": [
+          "first",
+          "second"
+        ],
+        "type": "object",
+        "properties": {
+          "first": {
+            "$ref": "#/components/schemas/EntrantDetails"
+          },
+          "second": {
+            "$ref": "#/components/schemas/EntrantDetails"
+          }
+        }
+      },
       "OpenRegistration": {
         "required": [
           "expectedRevision"
@@ -2133,6 +2673,42 @@
           }
         }
       },
+      "PairingsDetails": {
+        "required": [
+          "seeding",
+          "seed",
+          "entrants",
+          "matches",
+          "rounds"
+        ],
+        "type": "object",
+        "properties": {
+          "seeding": {
+            "$ref": "#/components/schemas/Seeding"
+          },
+          "seed": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "entrants": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "matches": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "rounds": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/RoundDetails"
+            }
+          }
+        }
+      },
       "ProblemDetails": {
         "type": "object",
         "properties": {
@@ -2174,6 +2750,54 @@
           "draft",
           "published"
         ]
+      },
+      "PublicationDetails": {
+        "required": [
+          "number",
+          "pairings",
+          "publishedAt",
+          "withdrawalReason",
+          "withdrawnAt"
+        ],
+        "type": "object",
+        "properties": {
+          "number": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pairings": {
+            "$ref": "#/components/schemas/PairingsDetails"
+          },
+          "publishedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "withdrawalReason": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "withdrawnAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          }
+        }
+      },
+      "PublishSchedule": {
+        "required": [
+          "expectedRevision"
+        ],
+        "type": "object",
+        "properties": {
+          "expectedRevision": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
       },
       "PublishTournament": {
         "required": [
@@ -2358,6 +2982,36 @@
           }
         }
       },
+      "RoundDetails": {
+        "required": [
+          "number",
+          "matches",
+          "rest"
+        ],
+        "type": "object",
+        "properties": {
+          "number": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "matches": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/MatchDetails"
+            }
+          },
+          "rest": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/EntrantDetails"
+              }
+            ]
+          }
+        }
+      },
       "SaveTournament": {
         "required": [
           "expectedRevision",
@@ -2373,6 +3027,103 @@
             "$ref": "#/components/schemas/TournamentConfiguration"
           }
         }
+      },
+      "ScheduleDetails": {
+        "required": [
+          "tournamentId",
+          "revision",
+          "registrationClosed",
+          "pending",
+          "eligible",
+          "blockers",
+          "draft",
+          "draftChange",
+          "current",
+          "crossedChange",
+          "history"
+        ],
+        "type": "object",
+        "properties": {
+          "tournamentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "revision": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "registrationClosed": {
+            "type": "boolean"
+          },
+          "pending": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/EntrantDetails"
+            }
+          },
+          "eligible": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "blockers": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "draft": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/DraftDetails"
+              }
+            ]
+          },
+          "draftChange": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/FieldChangeDetails"
+              }
+            ]
+          },
+          "current": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/PublicationDetails"
+              }
+            ]
+          },
+          "crossedChange": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/FieldChangeDetails"
+              }
+            ]
+          },
+          "history": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PublicationDetails"
+            }
+          }
+        }
+      },
+      "Seeding": {
+        "enum": [
+          "admissionOrder",
+          "draw"
+        ]
       },
       "SignedInPerson": {
         "required": [
@@ -2534,7 +3285,8 @@
           "registrationChangedAt",
           "admittedEntries",
           "waitingEntries",
-          "checkedInEntries"
+          "checkedInEntries",
+          "schedulePublished"
         ],
         "type": "object",
         "properties": {
@@ -2591,6 +3343,9 @@
           "checkedInEntries": {
             "type": "integer",
             "format": "int32"
+          },
+          "schedulePublished": {
+            "type": "boolean"
           }
         }
       },
@@ -2705,6 +3460,25 @@
           "admissionPending",
           null
         ]
+      },
+      "WithdrawSchedule": {
+        "required": [
+          "expectedRevision",
+          "reason"
+        ],
+        "type": "object",
+        "properties": {
+          "expectedRevision": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "reason": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
       }
     }
   },
@@ -2752,6 +3526,9 @@
       "name": "Herald.Registration.Features.AddRosterMember.AddRosterMemberEndpoint"
     },
     {
+      "name": "Herald.Registration.Features.MarkAbsent.MarkAbsentEndpoint"
+    },
+    {
       "name": "Herald.Registration.Features.GetRoster.GetRosterEndpoint"
     },
     {
@@ -2771,6 +3548,18 @@
     },
     {
       "name": "Herald.Registration.Features.AdmitEntry.AdmitEntryEndpoint"
+    },
+    {
+      "name": "Herald.Competition.Features.WithdrawSchedule.WithdrawScheduleEndpoint"
+    },
+    {
+      "name": "Herald.Competition.Features.PublishSchedule.PublishScheduleEndpoint"
+    },
+    {
+      "name": "Herald.Competition.Features.GetSchedule.GetScheduleEndpoint"
+    },
+    {
+      "name": "Herald.Competition.Features.GenerateDraft.GenerateDraftEndpoint"
     }
   ]
 }

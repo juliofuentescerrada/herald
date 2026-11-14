@@ -176,6 +176,18 @@ public class TournamentRegistrationTests
     }
 
     [Fact]
+    [Trait("covers", "registration-window: Reopening a published schedule's tournament")]
+    public void A_closed_registration_cannot_reopen_while_the_schedule_is_published()
+    {
+        var tournament = Closed();
+
+        var result = tournament.OpenRegistration(4, _owner, _later, schedulePublished: true);
+
+        result.Broken.ShouldBe([new BrokenRule("registration", "schedule-published")]);
+        tournament.Registration.ShouldBe(RegistrationWindow.Closed);
+    }
+
+    [Fact]
     public void A_closed_registration_that_lost_a_date_cannot_reopen()
     {
         var tournament = Closed();

@@ -33,7 +33,7 @@ public static class OpenRegistrationEndpoint
         }
 
         var actor = context.ActorId ?? throw new InvalidOperationException($"No acting person in organisation {organisationId}.");
-        var result = tournament.OpenRegistration(command.ExpectedRevision, actor, DateTimeOffset.UtcNow);
+        var result = tournament.OpenRegistration(command.ExpectedRevision, actor, DateTimeOffset.UtcNow, await db.SchedulePublishedAsync(id, cancellationToken));
         return await db.SavedAsync(bus, organisationId, tournament, result, cancellationToken);
     }
 }
