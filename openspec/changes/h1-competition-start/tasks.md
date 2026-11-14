@@ -21,7 +21,7 @@
 
 ## 5. Admin application
 
-- [ ] 5.1 `tournaments` feature: Competition panel with readiness, confirmation, starting, started, conflict and crossed states; "Running" label in the page and list
+- [x] 5.1 `tournaments` feature: Competition panel with readiness, confirmation, starting, started, conflict and crossed states; "Running" label in the page and list
 - [ ] 5.2 `entries` and `schedule` features: read-only once running, frozen roster in the roster dialog
 - [ ] 5.3 Vitest for each Visual input state and `axe-core`; lint and boundary checks pass
 

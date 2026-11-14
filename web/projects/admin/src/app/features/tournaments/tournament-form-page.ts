@@ -18,6 +18,7 @@ import {
   tournamentsKey,
   tournamentsPath,
 } from './tournaments';
+import { CompetitionArea } from './competition-area';
 import { RegistrationArea } from './registration-area';
 
 const names = [
@@ -110,7 +111,7 @@ const zones = (): string[] => {
 /** Creates a draft, edits it, and edits a published tournament: one form, three moments. */
 @Component({
   selector: 'app-tournament-form-page',
-  imports: [Button, Icon, Notice, RegistrationArea, RouterLink, StatusLabel],
+  imports: [Button, CompetitionArea, Icon, Notice, RegistrationArea, RouterLink, StatusLabel],
   templateUrl: './tournament-form-page.html',
   styleUrl: './tournament-form-page.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
