@@ -36,6 +36,11 @@ namespace Herald.Tournaments.Persistence.Migrations
                     b.Property<Guid>("ChangedBy")
                         .HasColumnType("uuid");
 
+                    b.Property<string>("Competition")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -71,7 +76,20 @@ namespace Herald.Tournaments.Persistence.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("integer");
 
+                    b.Property<DateTimeOffset?>("StartedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("StartedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<int?>("StartedOnEligibleRevision")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("StartedOnScheduleRevision")
+                        .HasColumnType("integer");
+
                     b.Property<int>("TermsRevision")
+                        .IsConcurrencyToken()
                         .HasColumnType("integer");
 
                     b.ComplexProperty(typeof(Dictionary<string, object>), "Configuration", "Herald.Tournaments.Domain.Tournament.Configuration#TournamentConfiguration", b1 =>
@@ -157,8 +175,23 @@ namespace Herald.Tournaments.Persistence.Migrations
                     b.Property<int>("CheckedIn")
                         .HasColumnType("integer");
 
+                    b.Property<int?>("Eligible")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("EligibleRevision")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("Pending")
+                        .HasColumnType("integer");
+
                     b.Property<int>("Revision")
                         .HasColumnType("integer");
+
+                    b.Property<string>("RostersOutsideBounds")
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("SharedMemberNames")
+                        .HasColumnType("jsonb");
 
                     b.Property<int>("Waiting")
                         .HasColumnType("integer");

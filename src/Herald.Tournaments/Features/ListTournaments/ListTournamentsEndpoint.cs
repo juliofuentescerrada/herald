@@ -36,7 +36,7 @@ public static class ListTournamentsEndpoint
         // shortcut: no paging, an organisation's list is short in H1; add it when tournaments can be archived.
         var tournaments = await db.Tournaments.AsNoTracking()
             .OrderByDescending(tournament => tournament.CreatedAt)
-            .Select(tournament => new { tournament.Id, tournament.Configuration, tournament.Publication, tournament.Registration })
+            .Select(tournament => new { tournament.Id, tournament.Configuration, tournament.Publication, tournament.Registration, tournament.Competition })
             .ToListAsync(cancellationToken);
         var ids = tournaments.Select(tournament => tournament.Id).ToList();
         var counts = await db.FieldCounts.AsNoTracking()
@@ -55,7 +55,7 @@ public static class ListTournamentsEndpoint
             tournament.Configuration.Venue,
             tournament.Publication,
             tournament.Registration,
-            TournamentDetails.CompetitionPreparation,
+            TournamentDetails.CompetitionOf(tournament.Competition),
             counts.GetValueOrDefault(tournament.Id).Admitted,
             counts.GetValueOrDefault(tournament.Id).Waiting))];
     }

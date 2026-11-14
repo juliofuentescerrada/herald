@@ -10,7 +10,7 @@
 ## 3. Tournaments
 
 - [x] 3.1 `Tournament` competition state and `Start` (design D-1); readiness from the projections (D-2); domain tests for every `competition-start` scenario
-- [ ] 3.2 Migration; feature `StartCompetition`; details expose readiness and start; terms and `TournamentCompetitionStarted` through the outbox
+- [x] 3.2 Migration; feature `StartCompetition`; details expose readiness and start; terms and `TournamentCompetitionStarted` through the outbox
 - [ ] 3.3 API tests against PostgreSQL, including conflicts, repeats and another organisation's 404s
 
 ## 4. Registration and Competition

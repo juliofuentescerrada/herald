@@ -61,7 +61,7 @@ public static class CreateTournamentEndpoint
     }
 
     private static IResult Created(Guid organisationId, Tournament tournament) => Results.Created(
-        $"/api/organisations/{organisationId}/tournaments/{tournament.Id.Value}", TournamentDetails.Of(tournament, EntryCounts.None));
+        $"/api/organisations/{organisationId}/tournaments/{tournament.Id.Value}", TournamentDetails.Of(tournament, EntryCounts.None, StartReadiness.Unknown));
 
     private static IResult Conflict() => Results.Problem(statusCode: StatusCodes.Status409Conflict, title: "Conflict");
 }
