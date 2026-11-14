@@ -86,9 +86,10 @@ export class SchedulePage {
   protected readonly meta = computed(() => {
     const pairings = this.pairings();
     if (!pairings) return `Single round-robin · ${this.schedule.data()!.eligible} eligible ${this.teams() ? 'teams' : 'players'}. Generating sends nothing and creates no result.`;
-    const when = this.current() ? `published ${this.zoned(this.current()!.publishedAt)}` : `generated ${this.zoned(this.draft()!.generatedAt)}`;
-    return `Single round-robin · ${seedingText(pairings)} · ${when}`;
+    return `Single round-robin · ${seedingText(pairings)} · ${this.current() ? 'published' : 'generated'}`;
   });
+  /** Kept on one line with its time zone (#55). */
+  protected readonly when = computed(() => (this.current() ? this.zoned(this.current()!.publishedAt) : this.draft() ? this.zoned(this.draft()!.generatedAt) : ''));
   /** Why generating is unavailable now, or null. */
   protected readonly generateBlocked = computed(() => {
     if (this.state() === 'busy') return 'Request in progress. Please wait; do not submit again.';

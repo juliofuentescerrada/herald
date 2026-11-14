@@ -51,7 +51,7 @@
             <h2 id="summary-heading">{{ heading() }}</h2>
             <herald-status-label [tone]="statusTone()" [icon]="current() ? 'circle-check' : draft()?.stale ? 'alert-triangle' : undefined">{{ statusText() }}</herald-status-label>
           </div>
-          <p class="help">{{ meta() }}</p>
+          <p class="help">{{ meta() }} @if (when()) {<span class="when">{{ when() }}</span>}</p>
           @if (teams()) {
             <p class="help">Each team is one entrant; lineups are chosen per match.</p>
           }

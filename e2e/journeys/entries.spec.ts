@@ -2,7 +2,7 @@ import type { Page } from '@playwright/test';
 import { createOrganisation, expect, test } from '../fixtures.ts';
 
 /** Creates, completes and publishes a tournament, opens its registration and goes to its entries. */
-const openForEntries = async (page: Page, title: string, terms: { team: boolean; capacity: number; admission: 'Automatic' | 'Manual' }) => {
+const openForEntries = async (page: Page, title: string, terms: { team: boolean; capacity: number; admission: 'Automatic' | 'Manual'; checkIn?: 'Optional' | 'Mandatory' }) => {
   await page.getByRole('link', { name: 'Tournaments', exact: true }).click();
   await page.getByRole('link', { name: 'Create tournament' }).click();
   await page.getByLabel('Title', { exact: true }).fill(title);
@@ -20,7 +20,7 @@ const openForEntries = async (page: Page, title: string, terms: { team: boolean;
   await page.getByLabel('Reference time zone', { exact: true }).selectOption('Europe/Madrid');
   await page.getByLabel('Location mode', { exact: true }).selectOption('Online');
   await page.getByLabel('Admission', { exact: true }).selectOption(terms.admission);
-  await page.getByLabel('Check-in', { exact: true }).selectOption('Optional');
+  await page.getByLabel('Check-in', { exact: true }).selectOption(terms.checkIn ?? 'Optional');
   await page.getByLabel('Visibility', { exact: true }).selectOption('Public');
   await page.getByRole('button', { name: 'Save draft' }).click();
   await page.getByRole('link', { name: 'Review and publish' }).click();
@@ -196,4 +196,62 @@ test('An owner checks in two admitted players, undoes one check-in, and sees 1 o
   await expect(sam.getByText('Check-in pending')).toBeVisible();
   await expect(sam.getByRole('button', { name: 'Check in: Sam Reed' })).toBeVisible();
   await expect(admitted.getByRole('listitem').filter({ hasText: 'Robin Vale' }).getByText(/^Checked in .* · Europe\/Madrid$/)).toBeVisible();
+});
+
+test('An owner marks a pending player absent, publishes a five-player schedule with one rest each, withdraws it with a reason and publishes it again', async ({ page, signIn, expectAccessible }) => {
+  await signIn();
+  await createOrganisation(page);
+  await openForEntries(page, 'Friday League', { team: false, capacity: 6, admission: 'Automatic', checkIn: 'Mandatory' });
+  const players = ['Robin Vale', 'Sam Reed', 'Jamie Brook', 'Taylor Finch', 'Rowan Lake', 'Ellis Stone'];
+  for (const player of players) {
+    await addNew(page, 'player', player);
+  }
+  const admitted = page.getByRole('list', { name: 'Admitted · 6' });
+  for (const player of players.filter((name) => name !== 'Ellis Stone')) {
+    await admitted.getByRole('button', { name: `Check in: ${player}` }).click();
+    await expect(page.getByText(`${player} checked in.`)).toBeVisible();
+  }
+
+  // Closing registration starts the absence review: the pending player blocks the schedule.
+  await page.getByRole('link', { name: 'Back to configuration' }).click();
+  await page.getByRole('region', { name: 'Registration' }).getByRole('button', { name: 'Close registration' }).click();
+  await page.getByRole('link', { name: 'View entries' }).click();
+  const markAbsent = page.getByRole('button', { name: 'Mark absent: Ellis Stone' });
+  await expect(async () => {
+    await page.reload();
+    await expect(markAbsent).toBeVisible({ timeout: 1_000 });
+  }).toPass();
+  await expect(page.getByText('1 entry is pending check-in')).toBeVisible();
+  await markAbsent.click();
+  await page.getByRole('dialog').getByRole('button', { name: 'Mark absent' }).click();
+  await expect(page.getByText('Ellis Stone marked absent.')).toBeVisible();
+  await expectAccessible();
+
+  // Competition learns the eligible field through a local queue: reload until generating is offered.
+  await page.getByRole('link', { name: 'Back to configuration' }).click();
+  await page.getByRole('link', { name: 'View schedule' }).click();
+  await expect(page.getByRole('heading', { name: 'Schedule · Friday League' })).toBeVisible();
+  const admissionOrder = page.getByRole('radio', { name: 'Admission order' });
+  await expect(async () => {
+    await page.reload();
+    await expect(admissionOrder).toBeVisible({ timeout: 1_000 });
+  }).toPass();
+  await admissionOrder.check();
+  await page.getByRole('button', { name: 'Generate draft' }).click();
+  await expect(page.getByRole('heading', { name: '5 players · 5 rounds · 10 matches' })).toBeVisible();
+  await expect(page.getByText(/^Rest: .* · no points$/)).toHaveCount(5);
+  await expectAccessible();
+
+  await page.getByRole('button', { name: 'Publish' }).click();
+  await expect(page.getByText('Schedule published · revision 1.')).toBeVisible();
+  await page.getByRole('button', { name: 'Withdraw' }).click();
+  await page.getByLabel('Reason (required)').fill('Late absence reported');
+  await page.getByRole('dialog').getByRole('button', { name: 'Withdraw' }).click();
+  await expect(page.getByText('Revision 1 withdrawn.')).toBeVisible();
+  await expect(page.getByText(/Reason: Late absence reported/)).toBeVisible();
+
+  await page.getByRole('button', { name: 'Publish' }).click();
+  await expect(page.getByText('Schedule published · revision 2.')).toBeVisible();
+  await expect(page.getByText('Published · revision 2', { exact: true })).toBeVisible();
+  await expectAccessible();
 });

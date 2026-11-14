@@ -54,6 +54,23 @@ public static class Scenarios
 
         await admin.CloseRegistrationAsync(organisation, closed);
 
+        // Ready to pair: registration closed under mandatory check-in, four players checked in and one still pending,
+        // so the absence review blocks the schedule (h1-round-robin-pairings).
+        var league = Ids.For("tournament", "league");
+        await admin.CreateTournamentAsync(organisation, league, Configuration(clock, "Lantern League", opens: -6, closes: -1, starts: 3, capacity: 6, checkIn: "mandatory"));
+        await admin.PublishAsync(organisation, league);
+        await admin.OpenRegistrationAsync(organisation, league);
+        foreach (var name in Names.Players[11..16])
+        {
+            var entry = await admin.EnterAsync(organisation, league, await admin.CreateGuestAsync(organisation, "player", name));
+            if (name != Names.Players[15])
+            {
+                await admin.CheckInAsync(organisation, league, entry);
+            }
+        }
+
+        await admin.CloseRegistrationAsync(organisation, league);
+
         // Teams: one complete roster, one incomplete, one between the bounds and one with no players yet.
         var teams = Ids.For("tournament", "teams");
         await admin.CreateTournamentAsync(organisation, teams, Configuration(clock, "Harbour Team League", opens: -2, closes: 6, starts: 8, capacity: 4, team: true));
@@ -83,7 +100,7 @@ public static class Scenarios
         }
     }
 
-    private static object Configuration(Clock clock, string title, int opens, int closes, int starts, int capacity = 16, bool team = false) => new
+    private static object Configuration(Clock clock, string title, int opens, int closes, int starts, int capacity = 16, bool team = false, string checkIn = "optional") => new
     {
         title,
         gameVariant = team ? "Team strategy · Standard" : "Strategy game · Standard",
@@ -99,7 +116,7 @@ public static class Scenarios
         location = "onSite",
         venue = "Lantern Hall",
         admission = "automatic",
-        checkIn = "optional",
+        checkIn,
         visibility = "public",
     };
 }

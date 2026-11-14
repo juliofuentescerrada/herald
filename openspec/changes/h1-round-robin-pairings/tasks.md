@@ -33,9 +33,9 @@
 
 ## 7. End-to-end journey and seeds
 
-- [ ] 7.1 `tools/Herald.Seed`: a closed individual tournament with five admitted players, one pending under mandatory check-in
-- [ ] 7.2 Journey 17; the suite passes
-- [ ] 7.3 Test script in `e2e/scripts/` (seeded data, `scriptPersona`) with a screenshot per step: absence review, draft with rests, publication, withdrawal with reason, republication
+- [x] 7.1 `tools/Herald.Seed`: a closed individual tournament with five admitted players, one pending under mandatory check-in
+- [x] 7.2 Journey 17; the suite passes
+- [x] 7.3 Test script in `e2e/scripts/` (seeded data, `scriptPersona`) with a screenshot per step: absence review, draft with rests, publication, withdrawal with reason, republication
 
 ## 8. Validation and completion
 
