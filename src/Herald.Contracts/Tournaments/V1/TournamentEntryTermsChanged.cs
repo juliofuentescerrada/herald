@@ -30,7 +30,8 @@ public enum CheckInPolicy
 /// the one with the highest revision and ignores older ones (ADR 0016). The roster sizes are present
 /// for a team tournament only; they were added later as optional members, so older messages lack them.
 /// The check-in policy and the field lock were added later too: older messages read as optional and unlocked.
-/// The field is locked while the tournament's schedule is published.
+/// The field is locked while the tournament's schedule is published. CompetitionStarted, added later, reads as
+/// false in older messages; once true, the field and the team rosters are fixed.
 /// </summary>
 public sealed record TournamentEntryTermsChanged(
     Guid OrganisationId,
@@ -43,4 +44,5 @@ public sealed record TournamentEntryTermsChanged(
     int? MinimumRosterSize = null,
     int? MaximumRosterSize = null,
     CheckInPolicy CheckIn = CheckInPolicy.Optional,
-    bool FieldLocked = false);
+    bool FieldLocked = false,
+    bool CompetitionStarted = false);

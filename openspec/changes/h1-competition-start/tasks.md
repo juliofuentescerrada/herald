@@ -4,7 +4,7 @@
 
 ## 2. Contracts
 
-- [ ] 2.1 `TournamentFieldChanged` gains optional `EligibleRevision`, `Eligible`, `Pending`, `RostersOutsideBounds`; `TournamentEntryTermsChanged` gains optional `CompetitionStarted`; tests read older messages as unknown or not started
+- [x] 2.1 `TournamentFieldChanged` gains optional `EligibleRevision`, `Eligible`, `Pending`, `RostersOutsideBounds`; `TournamentEntryTermsChanged` gains optional `CompetitionStarted`; tests read older messages as unknown or not started
 - [ ] 2.2 `TournamentCompetitionStarted` v1 (Tournaments → Competition) with a serialisation test
 
 ## 3. Tournaments
