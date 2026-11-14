@@ -4,8 +4,8 @@
 
 ## 2. Contracts
 
-- [ ] 2.1 `TournamentEntryTermsChanged` gains optional `CheckIn` and `FieldLocked`; tests read a v1 message without them as optional and unlocked
-- [ ] 2.2 `TournamentEligibleFieldChanged` v1 (Registration → Competition) and `TournamentScheduleChanged` v1 (Competition → Tournaments), with serialisation tests
+- [x] 2.1 `TournamentEntryTermsChanged` gains optional `CheckIn` and `FieldLocked`; tests read a v1 message without them as optional and unlocked
+- [x] 2.2 `TournamentEligibleFieldChanged` v1 (Registration → Competition) and `TournamentScheduleChanged` v1 (Competition → Tournaments), with serialisation tests
 
 ## 3. Registration
 
