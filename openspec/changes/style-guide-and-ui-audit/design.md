@@ -32,6 +32,8 @@ The [existing-screen review](reviews/existing-screens.md) inventories actual rou
 
 `scripts/ui-guidance.test.mjs` compares public exports/types and registered icon names/sizes with the documentation and verifies canonical discovery/routing. It checks required review structure too. It does not claim to test the quality of design judgement or prove runtime accessibility. No domain, endpoint, module, event or integration contract changes; no code generation is needed.
 
+Component and icon inventories record what has been needed to date, not a closed set of permitted choices. The maintainer clarified that new components/icons are welcome when they add value or express an intent/meaning the current set does not cover well. The usage guides state this explicitly; the shared foundations, responsibility boundaries and documentation/state checks still apply to additions.
+
 ### D-6 Shared foundations do not impose the same UX
 
 The organiser's operational safety-net model, participant's competition companion and visitor's anonymous event assessment use the same primitives with distinct content order/navigation. The H2 patterns cover both public and authenticated/represented contexts and their recovery states; agents must identify the relevant XP patterns in the handoff. The source's examples inform UX goals, not new roles, unsupported identity claims, feature promises or timing guarantees. Review remains under the existing screen/mockup process when actual H2 slices are proposed.

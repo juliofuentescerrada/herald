@@ -6,6 +6,8 @@ Status: documentation proposal, 14 November 2026. This is the maintained icon me
 
 Use Tabler outline icons through `Icon` from `@herald/ui`. Icons improve scanning when the same concept recurs; they do not replace the words that explain status, permissions, eligibility or a consequence.
 
+The current registry contains the icons needed to date, not every icon future screens may use. Add another Tabler outline icon when it improves understanding or expresses a meaning the existing icons do not convey clearly. The current list is not a restriction against new symbols: preserve the shared visual/accessibility rules, add the selected icon to the registry and document its meaning through the extension process below.
+
 In the admin application, use icons for global navigation, lifecycle/check-in status labels, back links, links to entries and empty panels. Keep ordinary operation buttons text only: Add, Admit, Save, Publish, Check in, Undo check-in, Cancel entry and Roster do not gain decorative action icons. The reviewed exception is a drawer's `Back to entries` / `Back to roster` button, which closes/steps back and carries the back arrow.
 
 Shared notices/toasts keep their existing feedback icons. Account disclosure, mobile menu, organisation switch and dismiss controls keep their functional cues. The public mobile Menu cue already exists; the admin placement rule does not authorise adding a new public icon treatment. Documentation prototypes remain exempt from installing Tabler, as visual direction §4 states.
@@ -82,7 +84,7 @@ Use `currentColor` through the surrounding semantic token. Keep adequate contras
 
 ## Extending the registry
 
-1. Identify the meaning and why existing entries cannot express it. Check that the placement is allowed; a registry entry is not approval to decorate new action categories.
+1. Identify the value the icon adds or the meaning existing entries do not express clearly. Reuse an existing icon when it fits, and add a new one when it serves the task better. Check that the placement is allowed; a registry entry is not approval to decorate new action categories.
 2. Record the proposed meaning, name, size, adjacent text and affected states in the change's design; have any visual choice reviewed through the normal screen process.
 3. Import only the selected outline icon in `web/projects/ui/src/lib/icon.ts`, add its typed name and update this meaning table. Keep a single registry and stroke.
 4. Add live catalogue examples for the new meaning/size where needed, then verify decorative/labelled semantics, no duplicate hydrated SVG, no extra focus target, label wrapping and bundle impact.

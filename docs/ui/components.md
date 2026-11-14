@@ -4,6 +4,8 @@ Status: documentation proposal, checked against the `@herald/ui` [public API](..
 
 Run the live state catalogue with `cd web && pnpm exec ng serve catalogue --port 4400`, then open `http://localhost:4400`. It is development tooling. The current examples show states, not a complete intent reference; use this document when choosing a control.
 
+The current catalogue records the components needed to date; it is not a closed set or a limit on future designs. Reuse a control when it fits the task, and define a new component when it adds useful behaviour, clarifies an interaction or expresses an intent the existing controls do not cover well. Do not force an unsuitable control into a new purpose merely to stay within today's inventory. New components follow the shared foundations and belong in shared UI or app-local presentation according to their responsibility and reuse.
+
 Select the audience's [experience pattern](experience-patterns.md) first. An organiser's dense operational list and a participant's next-match task can use the same Button, Notice and StatusLabel without sharing the same page hierarchy. Public browsing, account transitions and signed-in participant work must not inherit the admin rail or its permissions from a copied example.
 
 ## Choose by intent
@@ -235,4 +237,4 @@ The visual direction also names contracts that are not exported components. Do n
 
 ## Adding or changing a control
 
-Document the person's intent, when to choose an alternative, all supported inputs/outputs, projected slots and state ownership. Add a minimal integration example and observable acceptance checks. Check SSR, keyboard, focus, reduced motion and narrow-width behaviour as applicable. Update the live catalogue and this inventory in the same change. An API type or catalogue state alone is not a usage rationale.
+Start with the value or intent the new component contributes; the catalogue's current contents are not a restriction against adding it. Document the person's intent, when to choose an alternative, all supported inputs/outputs, projected slots and state ownership. Add a minimal integration example and observable acceptance checks. Check SSR, keyboard, focus, reduced motion and narrow-width behaviour as applicable. Update the live catalogue and this inventory in the same change. An API type or catalogue state alone is not a usage rationale.
