@@ -1,6 +1,6 @@
 ## 1. Review gates
 
-- [ ] 1.1 Record in proposal.md that merging the batch 1 proposals pull request approved this change, with any change the review asked for (ADR 0018); verify with `openspec validate h1-round-robin-pairings`
+- [x] 1.1 Record in proposal.md that merging the batch 1 proposals pull request approved this change, with any change the review asked for (ADR 0018); verify with `openspec validate h1-round-robin-pairings`
 
 ## 2. Contracts
 
