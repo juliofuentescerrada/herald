@@ -107,7 +107,7 @@ describe('The registration area', () => {
 
     action().click();
     await vi.waitFor(() => expect(action().textContent?.trim()).toBe('Close registration'));
-    expect(texts('herald-status-label')).toEqual(['Published', 'Registration open', 'Preparing']);
+    expect(texts('.labels herald-status-label')).toEqual(['Published', 'Registration open', 'Preparing']);
     // W-1: the time in the reference zone, without the person's name.
     expect(area()!.querySelector('.last')?.textContent).toBe('Opened 11 November 2026, 09:30 · Europe/Madrid');
 
