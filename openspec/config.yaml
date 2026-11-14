@@ -14,6 +14,11 @@ context: |
     notifications (ADR 0017 inventory), durable history. tests/CLAUDE.md: tests.
   - web/CLAUDE.md: UI sharing, rendering modes, feature boundaries and the import matrix.
   - herald-screens skill: screens, states, layout rules and mockups.
+  - refactoring-ui skill: repository-owned design/review practices; read docs/ui/style-guide.md,
+    docs/ui/components.md and docs/ui/icons.md for criteria, control intent and icon meaning.
+  - docs/ui/experience-patterns.md: organiser versus participant/representative UX and anonymous
+    H2 public-portal targets; shared foundations do not imply identical workflows. UX aspirations
+    do not settle proposed D-30–38 product policies or imply implemented H2 screens.
   - herald-docs skill: documentation sources, ADRs, decisions, archiving and status.
   - docs/herald-functional-discovery.md: product rules, journeys and the decision register (§15);
     read the sections the change needs, not the whole file.
@@ -35,13 +40,21 @@ rules:
     - List every screen created or modified and its states, or state that mockups are not
       applicable (herald-screens skill).
     - List the notifiable facts the change introduces, or state that it introduces none (ADR 0017).
+    - For UI work, use herald-screens and refactoring-ui, select controls by documented intent and
+      identify icon meanings; a documentation-only audit lists inspected screens without implying edits.
+    - For UI work, identify the audience/acting context and relevant XP experience patterns; cover
+      visitor and signed-in participant states for H2 portal flows and preserve decision statuses.
   design:
     - Reference the mockups or prototypes of each affected screen, as the herald-screens skill
       requires in a batch and outside one.
     - Explain any change to a module boundary, cross-module transition or integration contract,
       with its owner, authoritative conditions and revisions.
     - Measurements, visual comparisons and acceptance reviews are recorded here.
+    - For UI work, record the style guide's G-/RU- criteria, component/icon choices, existing-screen
+      gaps and the evidence actually checked; distinguish source inspection from browser verification.
   tasks:
     - Include regenerating Wolverine's code and the OpenAPI client when handlers or endpoints change,
       a Playwright journey for each new user-visible flow, and the documentation updates the
       herald-docs skill requires on archive.
+    - When a UI control or icon changes, update its intent/meaning documentation and catalogue;
+      include narrow/wide comparison and relevant interaction/accessibility checks.
