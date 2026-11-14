@@ -90,6 +90,8 @@ const plural = (count: number, one: string, many: string): string => `${count} $
     .area { padding: var(--herald-space-6); background: var(--herald-color-surface-default); border: 1px solid var(--herald-color-border-default); }
     h2 { font-size: 20px; margin: 0 0 var(--herald-space-2); }
     .badge { margin: 0 0 var(--herald-space-4); }
+    /* A blocker sentence can be longer than a phone is wide. */
+    .badge herald-status-label { white-space: normal; }
     p { margin: 0 0 var(--herald-space-4); }
     .help { color: var(--herald-color-text-secondary); max-inline-size: 75ch; }
     .checks { list-style: none; margin: 0 0 var(--herald-space-4); padding: 0; }

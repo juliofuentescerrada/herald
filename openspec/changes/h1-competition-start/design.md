@@ -70,3 +70,32 @@ Accepted by the maintainer on 14 November 2026 (#55).
 
 - [Projections lag] → Start re-checks readiness from the projections, and crossed changes are reported (D-4). A start decided on a stale projection is visible, not hidden.
 - [Unknown counts from older messages] → they block start until Registration reports again; any field write republishes them.
+
+## Implementation notes
+
+Deviations from the plan above, each kept small:
+
+- **Readiness names, not counts (D-2).** `TournamentFieldChanged` carries `RostersOutsideBounds` as the list of admitted teams outside their bounds (entry, team name, members) and adds `SharedMemberNames` (name, team names), so the panel can name the team and the bound and show the same-name warning, as the scenarios require. Both are optional and read as unknown in older messages.
+- **No starter's name.** Tournaments stores who started but cannot name them (W-1, as for registration): the panel says "Started 21 November 2026, 10:05 · Europe/Madrid", without "by Alex Morgan".
+- **Crossed roster report (D-4).** After start, Registration's counts report frozen rosters outside their bounds; the Competition panel and the roster dialog report them. A frozen revision that differs from the one readiness saw but stays within bounds is not reported: readiness does not record per-team revisions.
+- **Crossed withdrawal (A-2).** Competition records the revision the start was decided on; when that revision was already withdrawn, the schedule says so and publishing the draft remains possible. Generating and withdrawing are rejected after start, so the republication happens at most once.
+- **A rejected start (400) reads as a conflict** on the panel: a condition the owner saw as met no longer holds, so the readiness on screen is out of date and is reloaded.
+- **Once running, Registration offers no action** (no "Reopen registration"), as in the prototype's `started` state.
+- **Stale writes return the current tournament.** Every tournament 409 now carries `tournament` beside `currentRevision` (additive).
+
+## Verification
+
+14 November 2026, on the slice branch:
+
+- `scripts/check all`: every step passed (rules, spec coverage, format, build, codegen, .NET tests, OpenAPI client, lint, boundaries, Vitest, SSR isolation, build).
+- End-to-end suite: 18 journeys passed, journey 18 included; test scripts: 5 passed, `seeded-start` included.
+- `node scripts/spec-coverage.mjs`: every scenario this change adds has a marker.
+
+## Visual comparison
+
+Captured by the `seeded-start` test script at the default desktop width and at 390 px, against `start-and-pair-states.html` (`start-blocked-rosters`, `start-ready`, `start-confirm`, `started`, `entries-running`):
+
+- Panel composition, badge under the heading, checklist with the state badge on the right and rules between rows: as the prototype.
+- The badge's blocker sentence wrapped past the panel at 390 px; it now wraps inside it (`white-space: normal` for this badge only).
+- The tournament has no Configuration/Entries/Schedule tabs (as in `h1-round-robin-pairings`): the panel's "Open entries" and "Open schedule" links and the page's "View entries"/"View schedule" serve instead.
+- Not verified: 200 % zoom and a keyboard-only pass.
