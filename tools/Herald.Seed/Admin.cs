@@ -69,6 +69,22 @@ public sealed class Admin(Seeding seeding, Persona persona)
         });
     }
 
+    // Drafts in admission order and publishes it; the operation identifier is stable, so a rerun repeats.
+    public async Task PublishScheduleAsync(Guid organisation, Guid tournament)
+    {
+        var schedule = $"{Path(organisation, tournament)}/schedule";
+        await WriteAsync($"draft the schedule of {tournament}", async () => await _client.PostAsJsonAsync($"{schedule}/draft", new
+        {
+            operationId = Ids.For(tournament.ToString(), "draft"),
+            expectedRevision = (await ReadAsync(await _client.GetAsync(schedule), "read a schedule")).GetProperty("revision").GetInt32(),
+            seeding = "admissionOrder",
+        }));
+        await WriteAsync($"publish the schedule of {tournament}", async () => await _client.PostAsJsonAsync($"{schedule}/publication", new
+        {
+            expectedRevision = (await ReadAsync(await _client.GetAsync(schedule), "read a schedule")).GetProperty("revision").GetInt32(),
+        }));
+    }
+
     private static string Path(Guid organisation, Guid tournament) => $"/api/organisations/{organisation}/tournaments/{tournament}";
 
     private async Task<int> RevisionAsync(Guid organisation, Guid tournament) =>

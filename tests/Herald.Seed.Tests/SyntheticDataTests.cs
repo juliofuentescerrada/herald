@@ -35,7 +35,22 @@ public class SyntheticDataTests(SeededDatabases databases)
             join registration."Entries" entry on entry."Id" = change."EntryId"
             where change."ChangedBy" <> entry."EnteredBy"
             """)).ShouldBe(0);
-        (await SeededDatabases.CountAsync(database, """select count(*) from registration."RosterChanges" """)).ShouldBe(8);
+        // Eight in the team league and eight in the cup.
+        (await SeededDatabases.CountAsync(database, """select count(*) from registration."RosterChanges" """)).ShouldBe(16);
+    }
+
+    [Fact]
+    public async Task The_seeded_cup_has_its_schedule_published_and_its_start_blocked_by_one_roster()
+    {
+        var database = await databases.NewDatabaseAsync();
+        await SeededDatabases.SeedAsync(database);
+
+        await using var reader = new Reader(database);
+        var start = (await reader.GetAsync(Main, Tournament("tournaments-by-state", "cup"))).GetProperty("start");
+
+        start.GetProperty("conditions").EnumerateArray().Where(condition => !condition.GetProperty("met").GetBoolean())
+            .Select(condition => condition.GetProperty("rule").GetString()).ShouldBe(["rosters-within-bounds"]);
+        start.GetProperty("rostersOutsideBounds")[0].GetProperty("teamName").GetString().ShouldBe("Granite Herons");
     }
 
     [Fact]

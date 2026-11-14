@@ -86,6 +86,26 @@ public static class Scenarios
                 await admin.AddRosterMemberAsync(organisation, teams, entry, await admin.CreateGuestAsync(organisation, "player", Names.Players[player++]));
             }
         }
+
+        // Start blocked by one roster: registration closed and the schedule published, with one team below the
+        // minimum (h1-competition-start). Its players are on other tournaments' rosters too, which is allowed.
+        var cup = Ids.For("tournament", "cup");
+        await admin.CreateTournamentAsync(organisation, cup, Configuration(clock, "Harbour Cup", opens: -5, closes: -1, starts: 2, capacity: 4, team: true));
+        await admin.PublishAsync(organisation, cup);
+        await admin.OpenRegistrationAsync(organisation, cup);
+        int[] cupRosters = [3, 3, 2];
+        player = 0;
+        for (var team = 0; team < cupRosters.Length; team++)
+        {
+            var entry = await admin.EnterAsync(organisation, cup, await admin.CreateGuestAsync(organisation, "team", Names.Teams[team]));
+            for (var member = 0; member < cupRosters[team]; member++)
+            {
+                await admin.AddRosterMemberAsync(organisation, cup, entry, await admin.CreateGuestAsync(organisation, "player", Names.Players[player++]));
+            }
+        }
+
+        await admin.CloseRegistrationAsync(organisation, cup);
+        await admin.PublishScheduleAsync(organisation, cup);
     }
 
     private static async Task SecondOrganisationAsync(Admin admin, Guid organisation, Clock clock)

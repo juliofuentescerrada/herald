@@ -27,7 +27,7 @@
 
 ## 6. End-to-end journey and seeds
 
-- [ ] 6.1 `tools/Herald.Seed`: a team tournament with a published schedule and one roster below the minimum
+- [x] 6.1 `tools/Herald.Seed`: a team tournament with a published schedule and one roster below the minimum
 - [ ] 6.2 Journey 18; the suite passes
 - [ ] 6.3 Test script in `e2e/scripts/` (seeded data, `scriptPersona`) with a screenshot per step: readiness blocked, roster completed, ready, confirmation, running, frozen roster
 
