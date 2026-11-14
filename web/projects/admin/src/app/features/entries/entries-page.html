@@ -62,7 +62,11 @@
         </div>
       </section>
 
-      @if (locked()) {
+      @if (running()) {
+        <herald-notice heading="Running · entries are read-only">
+          The competition has started. Leaving now is a competitive withdrawal, handled from the round operations.
+        </herald-notice>
+      } @else if (locked()) {
         <herald-notice heading="Field locked by the published schedule">
           Entries cannot be admitted, cancelled or checked in while the schedule is published. Withdraw it to change the field.
           <span class="notice-action"><a herald-button routerLink="../schedule">Open schedule</a></span>

@@ -27,6 +27,7 @@ export const ruleText = (field: string, rule: string): string => {
     case 'entrants/fewer-than-two': return 'At least two eligible entrants are needed.';
     case 'schedule/published': return 'A schedule is published. Withdraw it first.';
     case 'schedule/not-published': return 'No schedule is published.';
+    case 'schedule/competition-started': return 'The competition has started.';
     case 'draft/none': return 'There is no draft to publish.';
     case 'draft/stale': return 'The field changed after this draft. Regenerate it first.';
     case 'reason/required': return 'Enter a reason.';

@@ -72,6 +72,8 @@ export class SchedulePage {
   protected readonly teams = computed(() => this.tournament.data()?.configuration.entryKind === 'team');
 
   protected readonly current = computed(() => this.schedule.data()?.current ?? null);
+  /** Started: the schedule keeps its revision; no withdrawal or generation (h1-competition-start D-3). */
+  protected readonly started = computed(() => this.schedule.data()?.startedAt != null);
   protected readonly draft = computed(() => this.schedule.data()?.draft ?? null);
   /** What the page shows: the published revision, otherwise the draft. */
   protected readonly pairings = computed(() => this.current()?.pairings ?? this.draft()?.pairings ?? null);

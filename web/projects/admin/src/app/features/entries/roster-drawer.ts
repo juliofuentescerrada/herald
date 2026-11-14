@@ -81,7 +81,9 @@ export class RosterDrawer {
   });
 
   protected readonly heading = computed(() => `Roster · ${this.roster.data()?.teamName ?? this.teamName()}`);
-  protected readonly readOnly = computed(() => this.roster.data()?.entryState === 'cancelled');
+  /** Frozen at start (h1-competition-start D-3): kept, never changed. */
+  protected readonly frozen = computed(() => this.roster.data()?.frozenRevision != null);
+  protected readonly readOnly = computed(() => this.roster.data()?.entryState === 'cancelled' || this.frozen());
   protected readonly context = computed(() => {
     const state = this.roster.data()?.entryState;
     const team = state === 'cancelled' ? 'Cancelled team' : state === 'waiting' ? 'Waiting team' : 'Admitted team';
