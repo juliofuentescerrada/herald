@@ -2,6 +2,8 @@
 
 **Proposed in H1 batch 1's proposals pull request (#39), 13 November 2026.** The rules come from the batch's decision session of the same day, recorded in the functional discovery (F-05, F-06, §5.1, §15 rows D-04, D-27 and D-29). Merging the proposals pull request approves this change (ADR 0018); task 1.1 records that approval.
 
+**Review answers, 14 November 2026 (#55):** the maintainer accepted Q1 to Q4 as proposed (§5.1 row 6, the assumptions and the module coordination) and asked for screen changes, applied to the prototypes and recorded in design.md's Visual input.
+
 ## Why
 
 An owner can fill a tournament, check its entries in and close registration, but cannot produce what a league is played from: its schedule. §5.1 confirms the order: the owner reviews absences, drafts the round-robin from the eligible field, reviews and publishes it, and only then starts the competition (`h1-competition-start`, which depends on this change). This is Competition's first slice: the module exists with an empty model.

@@ -51,9 +51,16 @@ Prototypes: `prototypes/frontend/start-and-pair-states.html`, shared with `h1-ro
 | Entries page and roster dialog | `entries-running` (read-only with reason, frozen roster) |
 | Schedule page | `schedule-running` (no withdraw) |
 
-Visual choices for review: the Competition panel follows the Registration panel and uses the same composition; readiness is a checklist of conditions, each with a status label and a link to where it is fixed; "Start competition" is the panel's primary action, disabled with the first blocker as its description; start asks for confirmation because it cannot be undone.
+Visual choices: the Competition panel follows the Registration panel and uses the same composition; "Start competition" is the panel's primary action; start asks for confirmation because it cannot be undone.
+
+Maintainer feedback of 14 November 2026 (#55), applied to the prototypes:
+
+- Under the panel's heading, a status badge gives the panel's state: the first unmet condition ("Registration is still open"), "Ready to start", "Starting" or "Running"; a disabled "Start competition" is described by it.
+- The readiness checklist puts the condition and its explanation on the left and its state on the right, as a badge with tone and icon ("Met" success, "Not met" danger), rows separated by a rule.
 
 ## Assumptions for review
+
+Accepted by the maintainer on 14 November 2026 (#55).
 
 - **A-1** Start asks for a confirmation stating what it fixes (field, schedule, rosters) and that it cannot be undone in H1.
 - **A-2** The crossed withdrawal in D-4 allows one republication after start; otherwise a schedule cannot be published after start.

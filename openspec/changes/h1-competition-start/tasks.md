@@ -1,6 +1,6 @@
 ## 1. Review gates
 
-- [ ] 1.1 Record in proposal.md that merging the batch 1 proposals pull request approved this change, with the answer to its open question and any change the review asked for (ADR 0018); verify with `openspec validate h1-competition-start`
+- [ ] 1.1 Record in proposal.md that merging the batch 1 proposals pull request approved this change, with any change the review asked for (ADR 0018); verify with `openspec validate h1-competition-start`
 
 ## 2. Contracts
 
@@ -36,4 +36,4 @@
 - [ ] 7.1 `covers` markers for every scenario this change adds; `node scripts/spec-coverage.mjs` passes
 - [ ] 7.2 Full run (`scripts/check all` and the e2e suite); record in design.md
 - [ ] 7.3 Capture the Visual input states at 1440 and 390 px, compare with the prototypes and record the differences in design.md
-- [ ] 7.4 Docs: visual direction §9.3 inventory, the discovery's D-27 row for §5.1 row 6 as the review settled it; herald-reviewer review of the diff; sync the specs and archive the change in the slice's pull request
+- [ ] 7.4 Docs: visual direction §9.3 inventory, herald-reviewer review of the diff; sync the specs and archive the change in the slice's pull request

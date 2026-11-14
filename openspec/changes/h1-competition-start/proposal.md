@@ -2,6 +2,8 @@
 
 **Proposed in H1 batch 1's proposals pull request (#39), 13 November 2026.** The rules come from the batch's decision session of the same day, recorded in the functional discovery (F-05, CP-04, §5.1, §10.2, §15 rows D-17, D-18, D-23 and D-29). It depends on `h1-round-robin-pairings`. Merging the proposals pull request approves this change (ADR 0018); task 1.1 records that approval.
 
+**Review answers, 14 November 2026 (#55):** the maintainer accepted Q1 to Q4 as proposed (§5.1 row 6, the assumptions and the module coordination) and asked for screen changes, applied to the prototypes and recorded in design.md's Visual input.
+
 ## Why
 
 With a published schedule, the owner still cannot start the league: the competition state is always "Preparing". CP-04 and §5.1 row 6 make start the step that fixes the field, the schedule and the team rosters, after a readiness check the owner can read. Batch 2 plays matches only in a started competition.
@@ -26,10 +28,10 @@ Out of scope: match start, lineups and results (batch 2), competitive withdrawal
 | D-18 Team start | Partial; H1 start confirmed 13 Nov 2026 | Rosters within bounds; lineups stay with match start |
 | D-23 Frozen-roster eligibility | Partial; freeze confirmed, §10.2.1 for batch 2 | No additions or removals after start |
 | D-29 Check-in | Partial; absence review confirmed 13 Nov 2026 | Pending entries block start |
-| D-27 Lifecycle | Partial; order of §5.1 rows 4 to 6 confirmed 13 Nov 2026 | Start after publication; row 6's other effects (below) |
+| D-27 Lifecycle | Partial; order of §5.1 rows 4 to 6 confirmed 13 Nov 2026, row 6 confirmed 14 Nov 2026 | Start after publication and its effects |
 | D-08 Lifecycle ownership | Confirmed ownership; start coordination specified here | Tournaments decides; Registration and Competition follow |
 
-Open question for the maintainer: §5.1 row 6's effects other than the order remain proposed ("field and rule versions become fixed; do not implicitly start every match"). This change implements them as written; the review of this pull request confirms or changes them.
+§5.1 row 6's other effects ("field and rule versions become fixed; do not implicitly start every match") were confirmed as written on 14 November 2026 (#55).
 
 ## Screens
 

@@ -63,9 +63,18 @@ Prototypes: `prototypes/frontend/start-and-pair-states.html`, generated for this
 | Schedule page | `schedule-blocked` (blockers: registration open, pending, fewer than two), `schedule-empty` (seeding choice, Generate), `schedule-generating`, `schedule-draft` (four entrants: three rounds), `schedule-draft-odd` (five: five rounds, one rest each), `schedule-draft-teams`, `schedule-stale`, `schedule-published`, `withdraw-confirm` (reason required), `schedule-withdrawn` (draft back, history), `schedule-crossed` (field changed since publication), `schedule-conflict`, `schedule-load-failed` |
 | Configuration page | `reopen-locked` (reopen disabled while published) |
 
-Visual choices for review: the Schedule page is a sibling of Entries in the tournament's navigation; rounds are stacked groups, matches as rows "A vs B", the resting entrant as row meta of its round; status label beside the title ("Draft", "Published · revision 2", "Stale"); publish and withdraw are summary actions on the right; publication history after the rounds, read-only.
+Visual choices: the Schedule page is a sibling of Entries in the tournament's navigation; rounds are stacked groups, the resting entrant as row meta of its round; publish and withdraw are summary actions on the right; publication history after the rounds, read-only.
+
+Maintainer feedback of 14 November 2026 (#55), applied to the prototypes:
+
+- Check-in states on the entries page are status badges with tone and icon ("Checked in" success, "Check-in pending" pending; "Absent at start" neutral).
+- The schedule's state ("Draft", "Published · revision 1", "Stale") is a badge beside the summary heading, aligned with it, not a smaller label inside it; the publication time and its time zone stay together on one line.
+- Matches are symmetric about "vs": the first entrant aligned to the right, the second to the left, so the names sit next to "vs" with no gap.
+- Generation blockers use the same checklist as start readiness (condition left, state right).
 
 ## Assumptions for review
+
+Accepted by the maintainer on 14 November 2026 (#55).
 
 - **A-1** A team schedule shows team names only; rosters are not shown on the schedule.
 - **A-2** Generating requires the owner to choose seeding each time (nothing preselected, as configuration choices are).
