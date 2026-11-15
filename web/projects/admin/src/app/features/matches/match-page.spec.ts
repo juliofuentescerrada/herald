@@ -148,7 +148,7 @@ describe('The match page', () => {
     await settle();
 
     expect(recordLineup).toHaveBeenCalledWith(organisation, tournamentId, matchId, 'first', { expectedRevision: 1, players: falcons.slice(0, 5).map((p) => p.playerId) });
-    expect(toasts()).toEqual(['River Falcons’s lineup saved.']);
+    expect(toasts()).toEqual(['River Falcons’ lineup saved.']);
     await vi.waitFor(() => expect(text('#start-why')).toBe('North Stars has no lineup.'));
   });
 

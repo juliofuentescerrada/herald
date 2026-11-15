@@ -7,7 +7,7 @@ import { injectQuery } from '@tanstack/angular-query-experimental';
 import { firstValueFrom } from 'rxjs';
 import { AccessState, AppContext, QUERY_CLIENT } from '../../platform';
 import { instantText, lifecycleLabels } from '../../shared';
-import { matchKey, ruleText, scheduleKey, splitBlocker, tournamentKey } from './matches';
+import { matchKey, possessive, ruleText, scheduleKey, splitBlocker, tournamentKey } from './matches';
 
 type SideName = 'first' | 'second';
 
@@ -100,9 +100,9 @@ export class MatchPage {
     const match = this.match.data()!;
     const players = [...this.selection(side)];
     void this.run(
-      `${this.names()[side]}’s lineup was not saved`,
+      `${possessive(this.names()[side])} lineup was not saved`,
       () => firstValueFrom(this.api.recordLineup<MatchView>(this.organisation, this.tournamentId, this.matchId, side, { expectedRevision: match.revision, players })),
-      () => `${this.names()[side]}’s lineup saved.`,
+      () => `${possessive(this.names()[side])} lineup saved.`,
       () => this.discard(side),
     );
   }

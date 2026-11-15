@@ -38,7 +38,7 @@ public sealed record MatchView(
             var roster = match.IsTeamMatch ? schedule.Rosters?.Teams.SingleOrDefault(team => team.EntryId == entry) : null;
             return new(
                 new(entry, names.GetValueOrDefault(entry, "")),
-                roster is null ? null : [.. roster.Players.Select(player => new PlayerDetails(player.PlayerId, player.Name))],
+                roster is null ? null : [.. roster.Players.OrderBy(player => player.Name, StringComparer.InvariantCulture).Select(player => new PlayerDetails(player.PlayerId, player.Name))],
                 [.. lineups.Select(lineup => new LineupDetails(lineup.Number, [.. lineup.Players.Select(Player)], lineup.RecordedAt))]);
         }
 

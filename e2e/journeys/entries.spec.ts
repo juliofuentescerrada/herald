@@ -415,7 +415,7 @@ test('An owner records a team match’s lineups from seven-player frozen rosters
 
   for (const player of squads['North Stars'].slice(0, 5)) await stars.getByRole('checkbox', { name: player }).check();
   await stars.getByRole('button', { name: 'Save lineup' }).click();
-  await expect(page.getByText('North Stars’s lineup saved.')).toBeVisible();
+  await expect(page.getByText('North Stars’ lineup saved.')).toBeVisible();
   for (const player of squads['River Falcons'].slice(0, 4)) await falcons.getByRole('checkbox', { name: player }).check();
   await expect(falcons.getByText('4 of 5 selected')).toBeVisible();
   await expect(falcons.getByRole('button', { name: 'Save lineup' })).toBeDisabled();
@@ -425,7 +425,7 @@ test('An owner records a team match’s lineups from seven-player frozen rosters
 
   await falcons.getByRole('checkbox', { name: 'Frankie Cole' }).check();
   await falcons.getByRole('button', { name: 'Save lineup' }).click();
-  await expect(page.getByText('River Falcons’s lineup saved.')).toBeVisible();
+  await expect(page.getByText('River Falcons’ lineup saved.')).toBeVisible();
   await page.getByRole('button', { name: 'Start match' }).click();
   const confirm = page.getByRole('dialog', { name: 'Start this match?' });
   await expect(confirm.getByText('Starting locks both lineups: North Stars and River Falcons with 5 players each.', { exact: false })).toBeVisible();
