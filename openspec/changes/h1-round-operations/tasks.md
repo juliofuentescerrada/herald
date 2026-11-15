@@ -12,7 +12,7 @@
 ## 3. Contract and Standings
 
 - [x] 3.1 `TournamentResultsChanged` gains optional entrant status, read as active in older messages; Standings flags departures; tests for the `standings` scenario
-- [ ] 3.2 Regenerate Wolverine code (`codegen write`) and the OpenAPI documents and client (`pnpm api:generate`); CI drift checks pass
+- [x] 3.2 Regenerate Wolverine code (`codegen write`) and the OpenAPI documents and client (`pnpm api:generate`); CI drift checks pass
 
 ## 4. Admin application
 
