@@ -12,8 +12,9 @@ public sealed record LineupDetails(int Number, IReadOnlyList<PlayerDetails> Play
 // A side of a match: its entrant and, for a team match, its frozen roster (null while unknown) and lineups.
 public sealed record SideDetails(EntrantDetails Entrant, IReadOnlyList<PlayerDetails>? Roster, IReadOnlyList<LineupDetails> Lineups);
 
-// A match's effective result; appearances are named on the match view only (h1-operator-results D-2).
-public sealed record ResultDetails(Outcome Outcome, Cause Cause, bool Played, DateTimeOffset RecordedAt);
+// A match's effective result; appearances are named on the match view only (h1-operator-results D-2). The reason is a no contest's,
+// private to the organisation: admin API only.
+public sealed record ResultDetails(Outcome Outcome, Cause Cause, bool Played, string? Reason, DateTimeOffset RecordedAt);
 
 public sealed record MatchStartDetails(DateTimeOffset StartedAt, int? FirstLineup, int? SecondLineup);
 
@@ -64,7 +65,7 @@ public sealed record MatchView(
     }
 
     public static ResultDetails? ResultOf(Match match) =>
-        match.Resolution is { } resolution ? new(resolution.Outcome, resolution.Cause, resolution.Played, resolution.RecordedAt) : null;
+        match.Resolution is { } resolution ? new(resolution.Outcome, resolution.Cause, resolution.Played, resolution.Reason, resolution.RecordedAt) : null;
 }
 
 internal static class MatchResults

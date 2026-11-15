@@ -28,6 +28,8 @@ The resolution keeps: cause; outcome (first, second, draw or none); whether play
 
 Points follow from the outcome alone under 3/1/0 (a win 3, a draw 1 each, none 0 each), so `h1-standings` needs no cause-specific rule. "None" is never shown as a draw.
 
+Implementation note (task 2.2): the resolution is already one `jsonb` document with its enums stored by number, so the reason and the new `Outcome` and `Cause` members (appended) need no schema migration, and earlier resolutions read with no reason. The API's `cause` defaults to "played", so a played result is written as before.
+
 ### D-2 Play and start evidence
 
 "Play took place" on a team match requires the match in play; otherwise the write is rejected ("Start the match first: an administrative outcome cannot record play"). Appearances are credited only when play took place (the locked lineups, as `h1-operator-results` D-2). Recording any cause on a scheduled match does not start it, except a played individual result.
