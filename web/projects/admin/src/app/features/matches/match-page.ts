@@ -1,3 +1,5 @@
+import { NgTemplateOutlet } from '@angular/common';
+import { TournamentNav } from '../../shared';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, computed, inject, signal, TemplateRef, viewChild, ViewContainerRef } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
@@ -19,10 +21,11 @@ interface Failure {
 /** A match of a running competition: its lineups, for a team match, and its start (match-lineups). */
 @Component({
   selector: 'app-match-page',
-  imports: [Button, Dialog, Icon, Notice, RouterLink, StatusLabel],
+  imports: [NgTemplateOutlet, TournamentNav, Button, Dialog, Icon, Notice, RouterLink, StatusLabel],
   templateUrl: './match-page.html',
   styleUrl: './match-page.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
+  host: { '(window:beforeunload)': 'beforeUnload($event)' },
 })
 export class MatchPage {
   private readonly api = inject(HeraldHostAdminService);
@@ -93,7 +96,28 @@ export class MatchPage {
     if (this.dirty()) return 'Save or discard the lineup changes first.';
     return this.blockers()[0] ?? null;
   });
-  protected readonly dirty = computed(() => this.chosen().first !== null || this.chosen().second !== null);
+  protected readonly dirty = computed(() => this.lineupDirty('first') || this.lineupDirty('second'));
+
+  private lineupDirty(side: SideName): boolean {
+    const chosen = this.chosen()[side];
+    if (chosen === null) return false;
+    const saved = this.match.data()?.[side].lineups.at(-1)?.players.map((player) => player.playerId) ?? [];
+    return JSON.stringify([...chosen].sort()) !== JSON.stringify([...saved].sort());
+  }
+
+  constructor() {
+    this.access.keepDraft(() => this.dirty() ? this.sides().filter((side) => side.dirty).map((side) =>
+      `${side.entrant}: ${side.roster.filter((player) => side.selected.has(player.playerId)).map((player) => player.name).join(', ')}`,
+    ).join('\n') : '');
+  }
+
+  protected beforeUnload(event: BeforeUnloadEvent): void {
+    if (this.dirty()) event.preventDefault();
+  }
+
+  protected async retryLoad(): Promise<void> {
+    await Promise.all([this.match.refetch(), this.tournament.refetch()]);
+  }
 
   protected readonly sides = computed(() => {
     const match = this.match.data();
@@ -174,7 +198,8 @@ export class MatchPage {
 
   protected async reload(): Promise<void> {
     this.chosen.set({ first: null, second: null });
-    await this.match.refetch();
+    await this.retryLoad();
+    if (this.match.isError() || this.tournament.isError()) return;
     this.state.set('ready');
     this.failure.set(null);
   }
@@ -200,7 +225,7 @@ export class MatchPage {
       count: selected.length,
       required,
       complete: selected.length === required,
-      dirty: this.chosen()[name] !== null,
+      dirty: this.lineupDirty(name),
       lineup,
       locked,
       reserves: locked ? (side.roster ?? []).filter((player) => !lockedIds.has(player.playerId)) : [],

@@ -18,7 +18,7 @@
       <h1>Entries · {{ tournament.data()!.configuration.title }}</h1>
       <p class="labels">
         @for (label of labels(); track label.text) {
-          <herald-status-label [icon]="label.icon">{{ label.text }}</herald-status-label>
+          <herald-status-label [icon]="label.icon" [tone]="label.tone ?? 'neutral'">{{ label.text }}</herald-status-label>
         }
       </p>
     </div>
@@ -26,8 +26,8 @@
     @if (starts()) {
       <p class="lead">{{ starts() }}</p>
     }
-    <app-tournament-tabs [organisation]="organisation" [tournament]="tournamentId" />
   </header>
+  <app-tournament-nav current="Entries" />
 
   @if (field.isPending()) {
     <section class="operation" role="status" aria-busy="true">
@@ -111,6 +111,7 @@
           <p>Admitted and waiting entries will appear here. Each {{ kind() === 'team' ? 'team' : 'individual entry' }} takes one slot.</p>
         </section>
       }
+      @if (admitted().length || waiting().length) {
       <section class="group" aria-labelledby="admitted-heading">
         <h2 id="admitted-heading">Admitted · {{ admitted().length }}</h2>
         @if (admitted().length) {
@@ -204,6 +205,7 @@
         }
       </section>
 
+      }
       @if (cancelled().length) {
         <details class="cancelled">
           <summary>Cancelled · {{ cancelled().length }}</summary>
@@ -280,7 +282,7 @@
         @if (guests.isPending()) {
           <p class="help" role="status">Searching…</p>
         } @else if (guests.isError()) {
-          <p class="help" role="status">The search failed. Change the name to try again.</p>
+          <p class="help" role="status">The search failed. Your query has been kept. <button herald-button type="button" [loading]="guests.isFetching()" (click)="guests.refetch()">Try again</button></p>
         } @else if (!results.length) {
           <p class="help" role="status">No {{ kind() }} guest starts with “{{ name().trim() }}”. Choose “Create new” to add one.</p>
         }
@@ -296,7 +298,7 @@
               @if (activeGuests().has(guest.id)) {
                 <p class="help">Already entered in this tournament</p>
               } @else {
-                <button herald-button variant="primary" type="button" [disabled]="state() === 'busy'" (click)="enterExisting(guest)">
+                <button herald-button type="button" [disabled]="state() === 'busy'" (click)="enterExisting(guest)">
                   Enter this {{ kind() }}
                 </button>
               }

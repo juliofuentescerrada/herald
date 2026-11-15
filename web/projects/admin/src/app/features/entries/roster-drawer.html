@@ -98,6 +98,7 @@
         </div>
       }
 
+      @if (current.history.length) {
       <details class="cancelled history">
         <summary>History · {{ current.history.length }}</summary>
         @if (current.history.length) {
@@ -113,6 +114,7 @@
           <p class="help">No changes yet.</p>
         }
       </details>
+      }
     } @else {
       <h3>Add player</h3>
       <p class="help">Choose a guest player of {{ organisationName() }} or create a new player.</p>
@@ -156,7 +158,7 @@
           @if (guests.isPending()) {
             <p class="help" role="status">Searching…</p>
           } @else if (guests.isError()) {
-            <p class="help" role="status">The search failed. Change the name to try again.</p>
+            <p class="help" role="status">The search failed. Your query has been kept. <button herald-button type="button" [loading]="guests.isFetching()" (click)="guests.refetch()">Try again</button></p>
           } @else if (!results.length) {
             <p class="help" role="status">No player guest starts with “{{ name().trim() }}”. Choose “Create new” to add one.</p>
           }
@@ -174,7 +176,7 @@
                 } @else if (onTeam(guest); as team) {
                   <p class="help">On {{ team.name }}</p>
                 } @else {
-                  <button herald-button variant="primary" type="button" [disabled]="state() === 'busy'" [attr.aria-label]="'Add player: ' + guest.name"
+                  <button herald-button type="button" [disabled]="state() === 'busy'" [attr.aria-label]="'Add player: ' + guest.name"
                     (click)="addExisting(guest)">Add player</button>
                 }
               </li>

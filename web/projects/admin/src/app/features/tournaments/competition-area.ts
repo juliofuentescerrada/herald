@@ -179,7 +179,7 @@ export class CompetitionArea {
   private readonly firstUnmet = computed(() => this.conditions().find((condition) => !condition.met) ?? null);
 
   protected readonly badge = computed<{ text: string; tone: StatusTone; icon: IconName }>(() => {
-    if (this.running()) return { text: 'Running', tone: 'success', icon: 'trophy' };
+    if (this.running()) return { text: 'Running', tone: 'info', icon: 'trophy' };
     if (this.state() === 'busy') return { text: 'Starting', tone: 'info', icon: 'hourglass' };
     const unmet = this.firstUnmet();
     if (!unmet) return { text: 'Ready to start', tone: 'success', icon: 'circle-check' };
@@ -203,7 +203,7 @@ export class CompetitionArea {
     const { start } = this.tournament();
     const rosters = this.team() ? ', team rosters' : '';
     // The eligible field it started on, not today's count: a crossed change would make that misleading.
-    return `Fixed at start: the eligible field, schedule revision ${start.startedOnScheduleRevision}${rosters}. No match has started.`;
+    return `Fixed at start: the eligible field, schedule revision ${start.startedOnScheduleRevision}${rosters}. Starting the competition does not start its matches.`;
   });
 
   /** Frozen rosters outside their bounds: a roster write crossed the start (design D-4). */

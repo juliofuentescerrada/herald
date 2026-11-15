@@ -22,8 +22,8 @@
         <herald-status-label>Provisional</herald-status-label>
       }
     </div>
-    <app-tournament-tabs [organisation]="organisation" [tournament]="tournamentId" />
   </header>
+  <app-tournament-nav current="Standings" />
 
   <div class="column">
     @if (!running()) {

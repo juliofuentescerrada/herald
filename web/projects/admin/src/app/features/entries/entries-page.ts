@@ -1,3 +1,4 @@
+import { TournamentNav } from '../../shared';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, computed, ElementRef, inject, signal, TemplateRef, viewChild, ViewContainerRef } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
@@ -15,7 +16,7 @@ import { Button, Dialog, DialogContext, DialogRef, Dialogs, Drawer, Icon, Notice
 import { injectQuery } from '@tanstack/angular-query-experimental';
 import { firstValueFrom } from 'rxjs';
 import { AccessState, AppContext, injectWorkingOrganisation, QUERY_CLIENT } from '../../platform';
-import { admittedText, dateTimeText, instantText, lifecycleLabels, locationText, TournamentTabs } from '../../shared';
+import { admittedText, dateTimeText, instantText, lifecycleLabels, locationText } from '../../shared';
 import { RosterDrawer } from './roster-drawer';
 import {
   cancellationEffect,
@@ -47,7 +48,7 @@ interface RowFailure {
 /** A published tournament's entries: added as guests, admitted and cancelled by the owner (EN-1 to EN-12). */
 @Component({
   selector: 'app-entries-page',
-  imports: [Button, Dialog, Drawer, Icon, Notice, RosterDrawer, RouterLink, StatusLabel, TournamentTabs],
+  imports: [TournamentNav, Button, Dialog, Drawer, Icon, Notice, RosterDrawer, RouterLink, StatusLabel],
   templateUrl: './entries-page.html',
   styleUrl: './entries-page.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -56,8 +57,8 @@ export class EntriesPage {
   private readonly api = inject(HeraldHostAdminService);
   private readonly queries = inject(QUERY_CLIENT);
   private readonly access = inject(AccessState);
-  protected readonly organisation = inject(AppContext).organisation()!;
-  protected readonly tournamentId = inject(ActivatedRoute).snapshot.paramMap.get('tournamentId')!;
+  private readonly organisation = inject(AppContext).organisation()!;
+  private readonly tournamentId = inject(ActivatedRoute).snapshot.paramMap.get('tournamentId')!;
   private readonly dialogs = inject(Dialogs);
   private readonly toasts = inject(Toasts);
   private readonly viewContainerRef = inject(ViewContainerRef);

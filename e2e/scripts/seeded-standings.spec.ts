@@ -10,7 +10,7 @@ test('The seeded owner reads a league’s provisional standings, a shared positi
   await page.getByRole('button', { name: 'Switch to Lantern Hall Players' }).click();
   await page.getByRole('link', { name: 'Tournaments', exact: true }).click();
   await page.getByRole('link', { name: 'Edit configuration: Harbour Cup' }).click();
-  const tabs = page.getByRole('navigation', { name: 'Tournament' });
+  const tabs = page.getByRole('navigation', { name: 'Tournament sections' });
   await tabs.getByRole('link', { name: 'Standings' }).click();
   await expect(page.getByText('Standings begin when the competition starts')).toBeVisible();
   await screen(page, info, 'before-start');

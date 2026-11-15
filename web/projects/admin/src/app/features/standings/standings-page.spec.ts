@@ -124,7 +124,7 @@ describe('The standings page', () => {
       expect(texts('thead th')).toEqual(['Position', 'Player', 'Resolved', 'Won', 'Drawn', 'Lost', 'Points']);
       expect(texts('tbody td:first-child .visually-hidden')).toEqual(['Position 1', 'Position 2, shared', 'Position 2, shared', 'Position 4']);
       expect(texts('tbody td:first-child [aria-hidden="true"]')).toEqual(['1', '2=', '2=', '4']);
-      expect(texts('nav[aria-label="Tournament"] a')).toEqual(['Configuration', 'Entries', 'Schedule', 'Standings']);
+      expect(texts('nav[aria-label="Tournament sections"] a')).toEqual(['Configuration', 'Entries', 'Schedule', 'Standings']);
       expect(page().querySelector('nav a[aria-current="page"]')?.textContent?.trim()).toBe('Standings');
       expect(await violations(page())).toEqual([]);
     });

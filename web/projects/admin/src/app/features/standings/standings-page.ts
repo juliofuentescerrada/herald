@@ -6,21 +6,21 @@ import { Button, Icon, Notice, StatusLabel } from '@herald/ui';
 import { injectQuery } from '@tanstack/angular-query-experimental';
 import { firstValueFrom } from 'rxjs';
 import { AppContext } from '../../platform';
-import { TournamentTabs } from '../../shared';
+import { TournamentNav } from '../../shared';
 import { lineText, pointsText, scheduleKey, standingsKey, tournamentKey } from './standings';
 
 /** A running tournament's provisional standings, each entrant's points explained (F-09, h1-standings D-3, D-4). */
 @Component({
   selector: 'app-standings-page',
-  imports: [Button, Icon, Notice, RouterLink, StatusLabel, TournamentTabs],
+  imports: [Button, Icon, Notice, RouterLink, StatusLabel, TournamentNav],
   templateUrl: './standings-page.html',
   styleUrl: './standings-page.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class StandingsPage {
   private readonly api = inject(HeraldHostAdminService);
-  protected readonly organisation = inject(AppContext).organisation()!;
-  protected readonly tournamentId = inject(ActivatedRoute).snapshot.paramMap.get('tournamentId')!;
+  private readonly organisation = inject(AppContext).organisation()!;
+  private readonly tournamentId = inject(ActivatedRoute).snapshot.paramMap.get('tournamentId')!;
 
   protected readonly tournament = injectQuery(() => ({
     queryKey: tournamentKey(this.organisation, this.tournamentId),
