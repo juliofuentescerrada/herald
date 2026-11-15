@@ -436,3 +436,71 @@ test('An owner records a team match’s lineups from seven-player frozen rosters
   await expect(falcons.getByText('Reserves: Gale Ross, Harper Quinn')).toBeVisible();
   await expectAccessible();
 });
+
+test('An owner records a win in an individual match, which starts and resolves it in one step, records a draw in another, and sees both results on the schedule', async ({ page, signIn, expectAccessible }) => {
+  await signIn();
+  await createOrganisation(page);
+  await openForEntries(page, 'Lantern Open', { team: false, capacity: 4, admission: 'Automatic' });
+  for (const player of ['Robin Vale', 'Sam Reed', 'Jamie Brook', 'Taylor Finch']) {
+    await addNew(page, 'player', player);
+    await expect(page.getByText(player, { exact: true })).toBeVisible();
+  }
+
+  // Close, publish and start; each module learns the others' changes through local queues.
+  await page.getByRole('link', { name: 'Back to configuration' }).click();
+  const registration = page.getByRole('region', { name: 'Registration' });
+  await registration.getByRole('button', { name: 'Close registration' }).click();
+  await expect(registration.getByRole('button', { name: 'Reopen registration' })).toBeVisible();
+  await page.getByRole('link', { name: 'View schedule' }).click();
+  await expect(page.getByRole('heading', { name: 'Schedule · Lantern Open' })).toBeVisible();
+  const admissionOrder = page.getByRole('radio', { name: 'Admission order' });
+  await expect(async () => {
+    await page.reload();
+    await expect(admissionOrder).toBeVisible({ timeout: 1_000 });
+  }).toPass();
+  await admissionOrder.check();
+  await page.getByRole('button', { name: 'Generate draft' }).click();
+  await page.getByRole('button', { name: 'Publish' }).click();
+  await expect(page.getByText('Schedule published · revision 1.')).toBeVisible();
+  await page.getByRole('link', { name: 'Back to configuration' }).click();
+  const competition = page.getByRole('region', { name: 'Competition' });
+  await expect(competition).toBeVisible();
+  await expect(async () => {
+    await page.reload();
+    await expect(competition.getByText('Ready to start')).toBeVisible({ timeout: 1_000 });
+  }).toPass();
+  await competition.getByRole('button', { name: 'Start competition' }).click();
+  await page.getByRole('dialog', { name: 'Start the competition?' }).getByRole('button', { name: 'Start competition' }).click();
+  await expect(competition.getByText('Running', { exact: true })).toBeVisible();
+
+  await page.getByRole('link', { name: 'View schedule' }).click();
+  await expect(page.getByRole('heading', { name: 'Schedule · Lantern Open' })).toBeVisible();
+  const first = page.getByRole('link', { name: 'Robin Vale vs Taylor Finch' });
+  await expect(async () => {
+    await page.reload();
+    await expect(first).toBeVisible({ timeout: 1_000 });
+  }).toPass();
+
+  // A win on a scheduled match starts and resolves it at once; nothing is preselected.
+  await first.click();
+  await expect(page.getByText('This match has not started: recording a played result also starts it.')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Record result' })).toBeDisabled();
+  await page.getByRole('radio', { name: 'Robin Vale wins' }).check();
+  await page.getByRole('button', { name: 'Record result' }).click();
+  await expect(page.getByText('Robin Vale won · played')).toBeVisible();
+  await expect(page.getByText('Resolved', { exact: true }).first()).toBeVisible();
+  await expectAccessible();
+
+  await page.getByRole('link', { name: 'Back to schedule' }).first().click();
+  await page.getByRole('link', { name: 'Sam Reed vs Jamie Brook' }).click();
+  await page.getByRole('radio', { name: 'Draw' }).check();
+  await page.getByRole('button', { name: 'Record result' }).click();
+  await expect(page.getByText('Draw · played')).toBeVisible();
+
+  await page.getByRole('link', { name: 'Back to schedule' }).first().click();
+  const round = page.getByRole('list', { name: 'Round 1' });
+  await expect(round.getByText('Robin Vale won')).toBeVisible();
+  await expect(round.getByText('Draw', { exact: true })).toBeVisible();
+  await expect(round.getByText('Resolved')).toHaveCount(2);
+  await expectAccessible();
+});
