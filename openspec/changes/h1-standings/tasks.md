@@ -4,7 +4,7 @@
 
 ## 2. Contract and Competition
 
-- [ ] 2.1 `TournamentResultsChanged` v1 with a serialisation test (design D-1)
+- [x] 2.1 `TournamentResultsChanged` v1 with a serialisation test (design D-1)
 - [ ] 2.2 Competition publishes it on start and on every resolution through the outbox; tests that each write publishes the next revision
 
 ## 3. Standings
