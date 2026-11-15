@@ -4,7 +4,7 @@
 
 ## 2. Contracts
 
-- [ ] 2.1 `TournamentFrozenRostersChanged` v1 (Registration → Competition) with a serialisation test; `TournamentCompetitionStarted` gains optional `ActivePlayersPerSide`, read as unknown in older messages
+- [x] 2.1 `TournamentFrozenRostersChanged` v1 (Registration → Competition) with a serialisation test; `TournamentCompetitionStarted` gains optional `ActivePlayersPerSide`, read as unknown in older messages
 
 ## 3. Competition
 
