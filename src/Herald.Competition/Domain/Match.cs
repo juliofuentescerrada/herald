@@ -77,6 +77,8 @@ public sealed class Match : AggregateRoot<MatchId>
 
     public MatchState State => Start is null ? MatchState.Scheduled : MatchState.InPlay;
 
+    // shortcut: a team start reported without its lineup size (a message from before h1-match-lineups) schedules
+    // individual matches; no such message exists outside local databases, so revisit only if one is found.
     public bool IsTeamMatch => ActivePlayers is not null;
 
     public static Match Schedule(TournamentId tournamentId, Pairing pairing, int? activePlayers) =>
@@ -195,10 +197,8 @@ public sealed class Match : AggregateRoot<MatchId>
             broken.Add(new("players", "duplicate"));
         }
 
-        if (players.Any(player => !roster.Contains(player)))
-        {
-            broken.Add(new("players", "not-on-roster"));
-        }
+        // One rule per player, so the rejection names each of them.
+        broken.AddRange(players.Where(player => !roster.Contains(player)).Distinct().Select(player => new BrokenRule($"player-{player}", "not-on-roster")));
 
         return broken;
     }

@@ -202,7 +202,12 @@ export class MatchPage {
     const [field, rules] = Object.entries((status === 400 ? problemOf<HttpValidationProblemDetails>(error)?.errors : null) ?? {})[0] ?? [];
     if (field) {
       const match = this.match.data();
-      this.failure.set({ heading, text: `${ruleText(field, rules[0], match?.activePlayers ?? null, this.names().first, this.names().second)} Nothing changed.` });
+      // A player outside the frozen roster comes back named by identifier: say who it is.
+      const player = field.startsWith('player-')
+        ? [...(match?.first.roster ?? []), ...(match?.second.roster ?? [])].find((each) => `player-${each.playerId}` === field)?.name
+        : undefined;
+      const text = player ? `${player} is not on that team’s frozen roster.` : ruleText(field, rules[0], match?.activePlayers ?? null, this.names().first, this.names().second);
+      this.failure.set({ heading, text: `${text} Nothing changed.` });
       void this.match.refetch();
     } else {
       this.failure.set({ heading, text: 'The request failed. Nothing changed. Try again.' });

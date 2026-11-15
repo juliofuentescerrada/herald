@@ -45,7 +45,7 @@ public class MatchTests
         var schedule = Started(5);
 
         schedule.ScheduleMatches().Count.ShouldBe(10);
-        schedule.StartedPairings!.Rests.Count.ShouldBe(5);
+        schedule.StartedPairings!.Rests.Select(rest => rest.EntryId).Order().ShouldBe(schedule.Field.Entrants.Select(entrant => entrant.EntryId).Order());
     }
 
     [Fact]
@@ -90,7 +90,7 @@ public class MatchTests
     {
         var match = TeamMatch();
 
-        Record(match, Side.First, [.. _falcons[..4], _stars[0]]).Broken.ShouldBe([new BrokenRule("players", "not-on-roster")]);
+        Record(match, Side.First, [.. _falcons[..4], _stars[0]]).Broken.ShouldBe([new BrokenRule($"player-{_stars[0]}", "not-on-roster")]);
     }
 
     [Fact]

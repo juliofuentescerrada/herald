@@ -181,8 +181,9 @@ describe('The match page', () => {
       expect(button('Start match')).toBeUndefined();
     });
 
-  it('says when the frozen rosters have not arrived yet', async () => {
-    const { page, text } = await open({ getMatch: () => of(teamMatch({ first: { ...teamMatch().first, roster: null }, blockers: ['first-lineup-roster-unknown', 'second-lineup-missing'] })) });
+  it('says when the frozen rosters have not arrived yet',
+    { meta: { type: 'covers', description: 'match-lineups: Rosters not yet reported' } }, async () => {
+    const { page, text } = await open({ getMatch: () => of(teamMatch({ first: { ...teamMatch().first, roster: null }, blockers: ['first-lineup-unknown', 'second-lineup-missing'] })) });
     await vi.waitFor(() => expect(text('herald-notice')).toContain('Waiting for the frozen rosters'));
     expect(page().querySelector('input[type=checkbox]')).toBeNull();
   });
@@ -205,8 +206,8 @@ describe('The match page', () => {
     expect(getMatch).toHaveBeenCalledTimes(2);
   });
 
-  it('reports a rejected lineup in words', async () => {
-    const recordLineup = vi.fn(() => throwError(() => problem(400, { errors: { players: ['not-on-roster'] } })));
+  it('names a player who is not on the frozen roster', async () => {
+    const recordLineup = vi.fn(() => throwError(() => problem(400, { errors: { [`player-${stars[0].playerId}`]: ['not-on-roster'] } })));
     const { buttons, check, text, settle } = await open({ getMatch: () => of(teamMatch()), recordLineup });
     await vi.waitFor(() => expect(buttons('Save lineup').length).toBe(2));
     [0, 1, 2, 3, 4].forEach(check);
@@ -215,7 +216,7 @@ describe('The match page', () => {
     buttons('Save lineup')[0].click();
     await settle();
 
-    expect(text('herald-notice')).toContain('A player is not on the team’s frozen roster. Nothing changed.');
+    expect(text('herald-notice')).toContain('Star 1 is not on that team’s frozen roster. Nothing changed.');
   });
 
   it('says when the match cannot be loaded', async () => {

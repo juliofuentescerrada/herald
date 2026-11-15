@@ -185,13 +185,40 @@ public class MatchLineupTests(OrganisationApi api)
     }
 
     [Fact]
+    public async Task A_repeated_lineup_and_a_repeated_start_return_the_match_as_it_is()
+    {
+        var league = await OpenAsync("team");
+        var falcons = await TeamAsync(league, "River Falcons");
+        var stars = await TeamAsync(league, "North Stars");
+        var path = MatchPath(league, (await StartAsync(league)).GetProperty("matches")[0]);
+        await LineupAsync(league, path, "first", falcons[..5], 1);
+
+        var repeatedLineup = await LineupAsync(league, path, "first", falcons[..5], 1);
+        var second = await JsonAsync(await LineupAsync(league, path, "second", stars[..5], 2));
+        await league.Client.PostAsJsonAsync($"{path}/start", new { expectedRevision = Revision(second) }, Cancellation);
+        var repeatedStart = await league.Client.PostAsJsonAsync($"{path}/start", new { expectedRevision = Revision(second) }, Cancellation);
+
+        repeatedLineup.StatusCode.ShouldBe(HttpStatusCode.OK);
+        var lineup = await JsonAsync(repeatedLineup);
+        Revision(lineup).ShouldBe(2);
+        lineup.GetProperty("first").GetProperty("lineups").GetArrayLength().ShouldBe(1);
+        repeatedStart.StatusCode.ShouldBe(HttpStatusCode.OK);
+        var started = await JsonAsync(repeatedStart);
+        started.GetProperty("state").GetString().ShouldBe("inPlay");
+        Revision(started).ShouldBe(Revision(second) + 1);
+    }
+
+    [Fact]
     public async Task Another_organisations_match_is_not_found()
     {
         var league = await OpenAsync("individual");
         await EnterAsync(league, "Robin Vale");
         await EnterAsync(league, "Sam Reed");
         var path = MatchPath(league, (await StartAsync(league)).GetProperty("matches")[0]);
+        var other = api.As(Guid.NewGuid());
 
-        (await api.As(Guid.NewGuid()).GetAsync(path, Cancellation)).StatusCode.ShouldBe(HttpStatusCode.NotFound);
+        (await other.GetAsync(path, Cancellation)).StatusCode.ShouldBe(HttpStatusCode.NotFound);
+        (await other.PutAsJsonAsync($"{path}/lineups/first", new { expectedRevision = 1, players = Array.Empty<Guid>() }, Cancellation)).StatusCode.ShouldBe(HttpStatusCode.NotFound);
+        (await other.PostAsJsonAsync($"{path}/start", new { expectedRevision = 1 }, Cancellation)).StatusCode.ShouldBe(HttpStatusCode.NotFound);
     }
 }

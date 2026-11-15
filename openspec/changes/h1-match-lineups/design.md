@@ -68,6 +68,9 @@ Deviations from the plan above, each kept small:
 - **Individual start.** The Start panel also starts an individual match, without confirmation (A-2), and says that recording a result later also starts it.
 - **No icons for "In play", "Scheduled" or "Locked".** `docs/ui/icons.md` has no reviewed meaning for these states; they are text with tone only (info for in play, success for locked, neutral for scheduled).
 - **Unsaved selection.** A side's unsaved selection offers "Discard changes", and "Start match" stays disabled until it is saved or discarded.
+- **No recorder's or starter's name.** Competition stores who recorded each lineup and who started the match, but cannot name them (W-1, as for registration and start): the Match page shows when, not "by Alex Morgan". The scenario "Starting from the Match page" says "with who and when"; the maintainer decides whether a later change names the actor.
+- **Lineup history in its panel.** Each side's history closes its own Lineups panel, before the Start panel, instead of after every actionable group (D-5): a side's revisions read beside the lineup they replaced.
+- **A player outside the roster is named.** The rejection names each such player (`player-<id>`: `not-on-roster`), and the page shows the player's name.
 - **End-to-end configuration.** `e2e/playwright.config.ts` accepts `HERALD_CHROMIUM`, as `scripts.config.ts` already did, so a machine whose preinstalled browser does not match the pinned Playwright can run the journeys.
 
 ## Verification

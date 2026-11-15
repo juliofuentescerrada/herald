@@ -340,7 +340,7 @@ test('An owner sees a team tournament’s start blocked by an incomplete roster,
   await expectAccessible();
 });
 
-test('An owner records a team match’s lineups from seven-player frozen rosters, is stopped from starting with four starters, completes the lineup and starts the match, which locks both lineups', async ({ page, signIn, expectAccessible }) => {
+test('An owner records a team match’s lineups from seven-player frozen rosters, is stopped from starting with four starters on one side, completes the lineup and starts the match, which locks both lineups', async ({ page, signIn, expectAccessible }) => {
   // Fourteen roster members are entered through the drawer, one by one.
   test.slow();
   await signIn();
