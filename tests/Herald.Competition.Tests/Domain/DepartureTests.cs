@@ -185,7 +185,7 @@ public class DepartureTests
     }
 
     [Fact]
-    [Trait("covers", "round-operations: No active entrant")]
+    [Trait("covers", "round-operations: All four withdraw")]
     public void When_all_four_withdraw_every_match_is_resolved_played_results_stay_and_the_competition_still_runs()
     {
         var played = Between("Robin Vale", "Sam Reed");
