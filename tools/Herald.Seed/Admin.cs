@@ -89,6 +89,20 @@ public sealed class Admin(Seeding seeding, Persona persona)
         await WriteAsync($"start the competition of {tournament}", async () =>
             await _client.PostAsJsonAsync($"{Path(organisation, tournament)}/competition/start", new { expectedRevision = await RevisionAsync(organisation, tournament) }));
 
+    // Records a played result on the schedule's first match; the operation identifier is stable, so a rerun repeats.
+    public async Task RecordFirstResultAsync(Guid organisation, Guid tournament, string outcome)
+    {
+        var schedule = await ReadAsync(await _client.GetAsync($"{Path(organisation, tournament)}/schedule"), "read a schedule");
+        var match = schedule.GetProperty("matches")[0].GetProperty("matchId").GetGuid();
+        var path = $"{Path(organisation, tournament)}/matches/{match}";
+        await WriteAsync($"record the result of {match}", async () => await _client.PostAsJsonAsync($"{path}/result", new
+        {
+            operationId = Ids.For(match.ToString(), "result"),
+            expectedRevision = (await ReadAsync(await _client.GetAsync(path), "read a match")).GetProperty("revision").GetInt32(),
+            outcome,
+        }));
+    }
+
     private static string Path(Guid organisation, Guid tournament) => $"/api/organisations/{organisation}/tournaments/{tournament}";
 
     private async Task<int> RevisionAsync(Guid organisation, Guid tournament) =>
