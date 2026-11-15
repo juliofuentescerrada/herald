@@ -2,6 +2,8 @@
 
 **Proposed in H1 batch 3's proposals pull request, 15 November 2026.** The rules come from the batch's decision session of the same day, recorded in the functional discovery (§5.1 rows "Cancel before start", "Cancel after start" and "Archive/unarchive", §5.2, F-02; §15 row D-27). It depends on `h1-finalisation` (Q1). Merging the proposals pull request approves this change (ADR 0018); task 1.1 records that approval.
 
+**Review answers, 15 November 2026 (#74):** the maintainer accepted Q1 to Q3 (after `h1-finalisation`; cancellation reaches Registration and Competition by event; dates of a published tournament only through "Change dates") and the prototypes as they are.
+
 ## Why
 
 A tournament can only move forward: it cannot be called off, its dates cannot be postponed safely once people are entered, finished tournaments clutter the list for ever and an abandoned draft cannot be removed. D-27, confirmed on 15 November 2026, settles cancellation, archiving, draft deletion and date changes. AT-09 and AT-11 test them.

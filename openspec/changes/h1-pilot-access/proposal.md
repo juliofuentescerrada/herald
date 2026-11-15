@@ -2,6 +2,8 @@
 
 **Proposed in H1 batch 3's proposals pull request, 15 November 2026, as a split of `h1-api-journey` (Q1).** The rules come from the batch's decision session of the same day, recorded in the functional discovery (F-01a, §13.1; §15 rows D-12, D-14 and D-21). It depends on batch 2 only and can run beside the batch's other slices: it changes the Organisations module and the host's authentication, not the competitive modules' models. Merging the proposals pull request approves this change (ADR 0018); task 1.1 records that approval.
 
+**Review answers, 15 November 2026 (#74):** the maintainer accepted Q1 and Q2 (the split from `h1-api-journey`; six operation groups) and the prototypes as they are.
+
 ## Why
 
 The API accepts only a person's token with the `Organiser` role. A server application that should record results for one tournament has no way in, and nothing scopes what it could do. D-12, confirmed on 15 November 2026, allows pilot server applications under a revocable grant the owner records in Herald. AT-12 and AT-14 test it.

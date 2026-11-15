@@ -314,6 +314,8 @@ The director reviews and finalises. History keeps tournament, title/variant, dat
 
 For a team entry, the rank and match outcome belong to that entrant. Team history and personal participation are separate: a roster member is not assumed to have played every match. Locked lineups identify intended starters; actual-play evidence establishes who appeared. A lock alone grants no appearance, and substitutes not fielded remain registered reserves. A later team rename or member departure does not rewrite those records.
 
+**Confirmed for H1 final standings (15 November 2026, review of the batch 3 proposals, #74):** final standings show "Final" and the positions as ranked, shared positions shared, with no winner label; when every entrant departed they add that no champion is declared.
+
 Acceptance: withdrawn entries retain previous results. Authorised correction revises standings/history with revision disclosure. Private-tournament history remains protected. Replacing one team player between eligible matches does not change the team's points or create a new entrant.
 
 ### F-10 Operational notifications

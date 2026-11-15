@@ -2,6 +2,8 @@
 
 **Proposed in H1 batch 3's proposals pull request, 15 November 2026.** The rules come from the batch's decision session of the same day, recorded in the functional discovery (§9.1, §9.3, §8.1; §15 rows D-07 and D-24). It depends on batch 2. Merging the proposals pull request approves this change (ADR 0018); task 1.1 records that approval.
 
+**Review answers, 15 November 2026 (#74):** the maintainer accepted Q1 and Q2 (the preview from Standings with Competition rejecting a stale revision; departure outcomes correctable, the entrant staying departed) and the prototypes as they are.
+
 ## Why
 
 A resolved match cannot change: a wrong result stays wrong, and the only way out is a departure or nothing. D-07, confirmed on 15 November 2026, lets the owner correct any effective resolution while the competition runs, with a reason and a preview of what changes. AT-08 tests it.

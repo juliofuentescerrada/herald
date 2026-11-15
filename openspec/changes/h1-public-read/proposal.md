@@ -2,6 +2,8 @@
 
 **Proposed in H1 batch 3's proposals pull request, 15 November 2026.** The rules come from the batch's decision session of the same day, recorded in the functional discovery (§5.2, F-02, F-10, UJ-07; §15 rows D-09, D-26 and D-27). It depends on `h1-tournament-cancel-and-dates` and `h1-change-log`, whose states and public entries it shows. Merging the proposals pull request approves this change (ADR 0018); task 1.1 records that approval.
 
+**Review answers, 15 November 2026 (#74):** the maintainer accepted Q1 and Q2 (Tournaments composes the page from projections; `no-store` responses) and the prototypes as they are.
+
 ## Why
 
 Visibility is stored but has no effect: nobody outside the organisation can follow a tournament. D-09 and D-27, confirmed on 15 November 2026, give H1 a public or unlisted page from publication, alias-only, and visibility changes that take effect at once. AT-10 and AT-13 test it; UJ-07 is its journey.

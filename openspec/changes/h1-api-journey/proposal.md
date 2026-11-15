@@ -2,6 +2,8 @@
 
 **Proposed in H1 batch 3's proposals pull request, 15 November 2026.** The rules come from the batch's decision session of the same day, recorded in the functional discovery (§13.1, UJ-08, F-11; §15 rows D-02, D-12 and D-15). The pilot grants it relies on are split out to `h1-pilot-access` (its Q1). It depends on `h1-finalisation`, `h1-change-log`, `h1-public-read` and `h1-pilot-access`. Merging the proposals pull request approves this change (ADR 0018); task 1.1 records that approval.
 
+**Review answers, 15 November 2026 (#74):** the maintainer accepted Q1 and Q2 (no `received` in H1, `not-found` safe to retry; the `Operation-Id` header).
+
 ## Why
 
 Some mutations accept an operation identity, others only an expected revision, and none lets a client that lost a response ask what happened. D-02 and D-15, confirmed on 15 November 2026, make queryable receipts and API-06's identifiers the H1 public contract. AT-14 and UJ-08 run a whole league without Angular.
