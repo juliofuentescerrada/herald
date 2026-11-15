@@ -105,6 +105,15 @@ async function open(api: Record<string, unknown>) {
 const violations = async (page: HTMLElement) =>
   (await axe.run(page, { rules: { 'color-contrast': { enabled: false } } })).violations.map((v) => v.id);
 
+/** Clicks the radio at that position of a named group, then lets the page render the next fields. */
+const choose = async (page: () => HTMLElement, settle: () => Promise<unknown>, name: string, index: number) => {
+  page().querySelectorAll<HTMLInputElement>(`input[name=${name}]`)[index].click();
+  await settle();
+};
+
+const resolvedAs = (result: Partial<NonNullable<MatchView['result']>>, over: Partial<MatchView> = {}) =>
+  individual({ revision: 2, state: 'resolved', result: { outcome: 'none', cause: 'played', played: false, reason: null, recordedAt: '2026-11-22T09:40:00Z', ...result }, ...over });
+
 describe('The match page', () => {
   afterEach(() => {
     TestBed.resetTestingModule();
@@ -232,8 +241,12 @@ describe('The match page', () => {
 
   it('chooses no outcome until the owner does',
     { meta: { type: 'covers', description: 'match-results: No preselected winner' } }, async () => {
-      const { page, button, text } = await open({ getMatch: () => of(individual()) });
+      const { page, button, text, settle } = await open({ getMatch: () => of(individual()) });
       await vi.waitFor(() => expect(text('#result-heading')).toBe('Result'));
+      expect([...page().querySelectorAll<HTMLInputElement>('input[name=cause]')].map((radio) => radio.checked)).toEqual([false, false, false, false]);
+      expect(text('#record-why')).toBe('Choose what happened first.');
+      await choose(page, settle, 'cause', 0);
+      await vi.waitFor(() => expect(page().querySelectorAll('input[name=outcome]').length).toBe(3));
       expect([...page().querySelectorAll<HTMLInputElement>('input[name=outcome]')].map((radio) => radio.checked)).toEqual([false, false, false]);
       expect(button('Record result')!.disabled).toBe(true);
       expect(text('#record-why')).toBe('Choose the outcome first.');
@@ -242,13 +255,13 @@ describe('The match page', () => {
     });
 
   it('records a win and shows it in words, and a retry reuses the same operation', async () => {
-    const resolved = individual({ revision: 2, state: 'resolved', start: { startedAt: '2026-11-22T09:40:00Z', firstLineup: null, secondLineup: null }, result: { outcome: 'first', cause: 'played', played: true, recordedAt: '2026-11-22T09:40:00Z' } });
+    const resolved = individual({ revision: 2, state: 'resolved', start: { startedAt: '2026-11-22T09:40:00Z', firstLineup: null, secondLineup: null }, result: { outcome: 'first', cause: 'played', played: true, reason: null, recordedAt: '2026-11-22T09:40:00Z' } });
     let calls = 0;
     const recordResult = vi.fn(() => (++calls === 1 ? throwError(() => problem(0)) : of(resolved)));
     const { page, button, text, texts, toasts, settle } = await open({ getMatch: () => of(individual()), recordResult });
     await vi.waitFor(() => expect(button('Record result')).toBeTruthy());
-    page().querySelector<HTMLInputElement>('input[name=outcome]')!.click();
-    await settle();
+    await choose(page, settle, 'cause', 0);
+    await choose(page, settle, 'outcome', 0);
 
     button('Record result')!.click();
     await settle();
@@ -267,8 +280,9 @@ describe('The match page', () => {
   });
 
   it('asks for the start before a played team result', async () => {
-    const { page, text, button } = await open({ getMatch: () => of(teamMatch()) });
+    const { page, text, button, settle } = await open({ getMatch: () => of(teamMatch()) });
     await vi.waitFor(() => expect(text('#result-heading')).toBe('Result'));
+    await choose(page, settle, 'cause', 0);
     expect(page().textContent).toContain('A played team result needs both lineups locked');
     expect(button('Record result')).toBeUndefined();
   });
@@ -281,7 +295,7 @@ describe('The match page', () => {
       second: { ...teamMatch().second, lineups: [lineup(1, stars.slice(0, 5))] },
       blockers: [],
       start: { startedAt: '2026-11-22T09:20:00Z', firstLineup: 1, secondLineup: 1 },
-      result: { outcome: 'draw', cause: 'played', played: true, recordedAt: '2026-11-22T10:40:00Z' },
+      result: { outcome: 'draw', cause: 'played', played: true, reason: null, recordedAt: '2026-11-22T10:40:00Z' },
       appearances: [...falcons.slice(0, 5), ...stars.slice(0, 5)],
     });
     const { page, texts } = await open({ getMatch: () => of(ready) });
@@ -295,8 +309,8 @@ describe('The match page', () => {
     const recordResult = vi.fn(() => throwError(() => problem(400, { errors: { match: ['resolved'] } })));
     const { page, button, text, settle } = await open({ getMatch: () => of(individual()), recordResult });
     await vi.waitFor(() => expect(button('Record result')).toBeTruthy());
-    page().querySelector<HTMLInputElement>('input[name=outcome]')!.click();
-    await settle();
+    await choose(page, settle, 'cause', 0);
+    await choose(page, settle, 'outcome', 0);
     button('Record result')!.click();
     await settle();
     await vi.waitFor(() => expect(text('herald-notice')).toContain('This match already has a result. Corrections come later. Nothing changed.'));
@@ -306,8 +320,8 @@ describe('The match page', () => {
     const recordResult = vi.fn(() => new Subject<MatchView>());
     const { page, button, text, settle } = await open({ getMatch: () => of(individual()), recordResult });
     await vi.waitFor(() => expect(button('Record result')).toBeTruthy());
-    page().querySelector<HTMLInputElement>('input[name=outcome]')!.click();
-    await settle();
+    await choose(page, settle, 'cause', 0);
+    await choose(page, settle, 'outcome', 0);
 
     button('Record result')!.click();
     await settle();
@@ -330,7 +344,10 @@ describe('The match page', () => {
       blockers: [],
       start: { startedAt: '2026-11-22T09:20:00Z', firstLineup: 1, secondLineup: 1 },
     });
-    const { page, texts, button } = await open({ getMatch: () => of(inPlay) });
+    const { page, texts, button, settle } = await open({ getMatch: () => of(inPlay) });
+    await vi.waitFor(() => expect(button('Record result')).toBeTruthy());
+    expect(texts('fieldset.options label')).toEqual(['Played', 'Concession', 'No contest']);
+    await choose(page, settle, 'cause', 0);
     await vi.waitFor(() => expect(texts('fieldset.outcomes label')).toEqual(['River Falcons wins', 'Draw', 'North Stars wins']));
     expect(page().textContent).not.toContain('recording a played result also starts it');
     expect(button('Start match')).toBeUndefined();
@@ -341,8 +358,8 @@ describe('The match page', () => {
     const recordResult = vi.fn(() => throwError(() => problem(409, { type: 'match-revision-conflict' })));
     const { page, button, text, settle } = await open({ getMatch: () => of(individual()), recordResult });
     await vi.waitFor(() => expect(button('Record result')).toBeTruthy());
-    page().querySelector<HTMLInputElement>('input[name=outcome]')!.click();
-    await settle();
+    await choose(page, settle, 'cause', 0);
+    await choose(page, settle, 'outcome', 0);
 
     button('Record result')!.click();
     await settle();
@@ -351,5 +368,92 @@ describe('The match page', () => {
     expect(button('Record result')!.disabled).toBe(true);
     expect(page().querySelector<HTMLInputElement>('input[name=outcome]')!.checked).toBe(true);
     expect(await violations(page())).toEqual([]);
+  });
+
+  describe('records an exceptional outcome', () => {
+    it('sends a concession before play with only its fields', async () => {
+      const recordResult = vi.fn(() => of(resolvedAs({ cause: 'concession', outcome: 'first' })));
+      const { page, button, text, texts, settle } = await open({ getMatch: () => of(individual()), recordResult });
+      await vi.waitFor(() => expect(button('Record result')).toBeTruthy());
+      await choose(page, settle, 'cause', 1);
+
+      expect(texts('fieldset.options legend')).toEqual(['What happened?', 'Who conceded?', 'Did play take place?']);
+      expect(page().querySelector('input[name=outcome]')).toBeNull();
+      expect(text('#record-why')).toBe('Choose who conceded.');
+      await choose(page, settle, 'conceding', 1);
+      expect(text('#record-why')).toBe('Choose whether play took place.');
+      expect(await violations(page())).toEqual([]);
+      await choose(page, settle, 'play', 1);
+      expect(button('Record result')!.disabled).toBe(false);
+      button('Record result')!.click();
+      await settle();
+
+      expect((recordResult.mock.calls[0] as unknown[])[3]).toEqual(expect.objectContaining({ cause: 'concession', entrant: 'second', played: false, expectedRevision: 1 }));
+    });
+
+    it('sends both absent as a double absence, and offers no absence once the match has started', async () => {
+      const recordResult = vi.fn(() => of(resolvedAs({ cause: 'doubleAbsence' })));
+      const { page, button, texts, settle } = await open({ getMatch: () => of(individual()), recordResult });
+      await vi.waitFor(() => expect(button('Record result')).toBeTruthy());
+      await choose(page, settle, 'cause', 2);
+
+      expect(texts('fieldset.options:nth-of-type(2) label')).toEqual(['Sam Reed', 'Jamie Brook', 'Both were absent']);
+      expect(page().querySelector('input[name=play]')).toBeNull();
+      expect(await violations(page())).toEqual([]);
+      await choose(page, settle, 'absent', 2);
+      button('Record result')!.click();
+      await settle();
+
+      const body = (recordResult.mock.calls[0] as unknown[])[3] as Record<string, unknown>;
+      expect(body).toEqual(expect.objectContaining({ cause: 'doubleAbsence' }));
+      expect(body).not.toHaveProperty('entrant');
+    });
+
+    it('asks a no contest for its reason before it can be recorded', async () => {
+      const recordResult = vi.fn(() => of(resolvedAs({ cause: 'noContest', reason: 'Venue closed' })));
+      const { page, button, text, settle } = await open({ getMatch: () => of(individual()), recordResult });
+      await vi.waitFor(() => expect(button('Record result')).toBeTruthy());
+      await choose(page, settle, 'cause', 3);
+      await choose(page, settle, 'play', 1);
+
+      expect(button('Record result')!.disabled).toBe(true);
+      expect(text('#record-why')).toBe('A no contest needs a reason.');
+      expect(text('#reason-help')).toBe('Private to the organisation. At most 500 characters.');
+      expect(page().querySelector('textarea')!.maxLength).toBe(500);
+      expect(await violations(page())).toEqual([]);
+      const reason = page().querySelector('textarea')!;
+      reason.value = 'Venue closed';
+      reason.dispatchEvent(new Event('input'));
+      await settle();
+      button('Record result')!.click();
+      await settle();
+
+      expect((recordResult.mock.calls[0] as unknown[])[3]).toEqual(expect.objectContaining({ cause: 'noContest', played: false, reason: 'Venue closed' }));
+    });
+
+    it('refuses play on a team match that has not started', async () => {
+      const { page, button, text, settle } = await open({ getMatch: () => of(teamMatch()) });
+      await vi.waitFor(() => expect(button('Record result')).toBeTruthy());
+      await choose(page, settle, 'cause', 1);
+      await choose(page, settle, 'conceding', 0);
+      await choose(page, settle, 'play', 0);
+
+      expect(text('.operation herald-notice')).toContain('An administrative outcome cannot record play on a team match that has not started.');
+      expect(button('Record result')!.disabled).toBe(true);
+      expect(text('#record-why')).toBe('Start the match first, or choose “No”.');
+      expect(await violations(page())).toEqual([]);
+    });
+
+    it.each([
+      [{ cause: 'concession', outcome: 'second' }, 'Sam Reed conceded before play · Jamie Brook wins · no play recorded'],
+      [{ cause: 'doubleAbsence' }, 'Both were absent · 0 each · no play recorded'],
+      [{ cause: 'noContest', played: true, reason: 'Venue closed' }, 'No contest: Venue closed · 0 each · play recorded'],
+    ] as const)('states a resolved %o in words with no score', async (result, words) => {
+      const { page, button } = await open({ getMatch: () => of(resolvedAs(result)) });
+      await vi.waitFor(() => expect(page().textContent).toContain(words));
+      expect(page().textContent).not.toContain('· played');
+      expect(button('Record result')).toBeUndefined();
+      expect(await violations(page())).toEqual([]);
+    });
   });
 });

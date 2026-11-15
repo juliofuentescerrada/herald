@@ -209,7 +209,7 @@ describe('The schedule page', () => {
     const matches = [
       { matchId: 'm-1', round: 1, first: robin, second: taylor, state: 'inPlay' as const, result: null },
       { matchId: 'm-2', round: 1, first: sam, second: jamie, state: 'scheduled' as const, result: null },
-      { matchId: 'm-3', round: 2, first: robin, second: jamie, state: 'resolved' as const, result: { outcome: 'second' as const, cause: 'played' as const, played: true, recordedAt: '2026-11-21T10:00:00Z' } },
+      { matchId: 'm-3', round: 2, first: robin, second: jamie, state: 'resolved' as const, result: { outcome: 'second' as const, cause: 'played' as const, played: true, reason: null, recordedAt: '2026-11-21T10:00:00Z' } },
     ];
     const { texts, page } = await open({ getSchedule: () => of(schedule({ revision: 7, current: publication(1), startedOnRevision: 1, startedAt: '2026-11-21T09:05:00Z', matches })) });
     await vi.waitFor(() => expect(texts('.running herald-status-label')).toEqual(['In play', 'Scheduled', 'Resolved']));
@@ -217,6 +217,25 @@ describe('The schedule page', () => {
     expect(page().querySelector('.running a')?.getAttribute('href')).toContain('/matches/m-1');
     expect(await violations(page())).toEqual([]);
   });
+
+  it('states each exceptional cause in words with no score',
+    { meta: { type: 'covers', description: 'match-results: A concession on the schedule' } }, async () => {
+      const resolved = (result: { outcome: 'first' | 'second' | 'none'; cause: 'concession' | 'doubleAbsence' | 'noContest'; played: boolean; reason: string | null }) =>
+        ({ state: 'resolved' as const, result: { ...result, recordedAt: '2026-11-21T10:00:00Z' } });
+      const matches = [
+        { matchId: 'm-1', round: 1, first: sam, second: jamie, ...resolved({ outcome: 'second', cause: 'concession', played: false, reason: null }) },
+        { matchId: 'm-2', round: 1, first: robin, second: taylor, ...resolved({ outcome: 'none', cause: 'doubleAbsence', played: false, reason: null }) },
+        { matchId: 'm-3', round: 2, first: robin, second: jamie, ...resolved({ outcome: 'none', cause: 'noContest', played: true, reason: 'Venue closed' }) },
+      ];
+      const { texts, page } = await open({ getSchedule: () => of(schedule({ revision: 7, current: publication(1), startedOnRevision: 1, startedAt: '2026-11-21T09:05:00Z', matches })) });
+      await vi.waitFor(() => expect(texts('.running .outcome')).toEqual([
+        'Both were absent · 0 each · no play recorded',
+        'Sam Reed conceded before play · Jamie Brook wins · no play recorded',
+        'No contest: Venue closed · 0 each · play recorded',
+      ]));
+      expect(page().textContent).not.toMatch(/\d+\s*[-–]\s*\d+/);
+      expect(await violations(page())).toEqual([]);
+    });
 
   it('reports a start on a withdrawn revision and offers to publish the draft once', async () => {
     const withdrawn = publication(1, { withdrawnAt: '2026-11-21T09:04:00Z', withdrawalReason: 'Late absence' });
