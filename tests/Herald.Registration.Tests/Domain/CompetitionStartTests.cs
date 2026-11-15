@@ -88,6 +88,55 @@ public class CompetitionStartTests
     }
 
     [Fact]
+    public void A_full_roster_after_start_is_rejected_as_frozen_rather_than_full()
+    {
+        var (field, first, _) = Started();
+        Change(field, _teams with { Registration = RegistrationState.Closed, FieldLocked = true, CompetitionStarted = true, MaximumRosterSize = 3 });
+
+        Add(field, first).Broken.ShouldBe([new BrokenRule("roster", "frozen")]);
+    }
+
+    [Fact]
+    public void Confirming_a_check_in_after_start_is_rejected_stating_the_competition_started()
+    {
+        var field = Field.Track(new TournamentId(Guid.NewGuid()), _teams, 3, _at);
+        var team = EnterTeam(field);
+        Change(field, _teams with { Registration = RegistrationState.Closed, FieldLocked = true, CompetitionStarted = true });
+
+        field.SetCheckIn(team.Id, checkedIn: true, team.CheckInRevision, _owner, _at).Broken.ShouldBe([new BrokenRule("field", "competition-started")]);
+    }
+
+    [Fact]
+    public void Admitting_after_start_is_rejected_stating_the_competition_started()
+    {
+        var manual = _teams with { Admission = Admission.Manual };
+        var field = Field.Track(new TournamentId(Guid.NewGuid()), manual, 3, _at);
+        var waiting = EnterTeam(field);
+        Change(field, manual with { Registration = RegistrationState.Closed, FieldLocked = true, CompetitionStarted = true });
+
+        field.Admit(waiting.Id, waiting.Revision, reason: null, _owner, _at).Broken.ShouldBe([new BrokenRule("field", "competition-started")]);
+    }
+
+    [Fact]
+    [Trait("covers", "competition-start: A roster edit crossed the start")]
+    public void A_removal_that_crossed_the_start_freezes_the_short_roster_and_reports_it()
+    {
+        var field = Field.Track(new TournamentId(Guid.NewGuid()), _teams, 3, _at);
+        var team = EnterTeam(field);
+        for (var i = 0; i < 3; i++)
+        {
+            Add(field, team);
+        }
+
+        // Start was decided on three members; the removal reached Registration before the start did.
+        field.RemoveRosterMember(team.Id, team.Members[0].GuestId, team.RosterRevision, _owner, _at).Outcome.ShouldBe(WriteOutcome.Applied);
+        Change(field, _teams with { Registration = RegistrationState.Closed, FieldLocked = true, CompetitionStarted = true });
+
+        team.FrozenRosterRevision.ShouldBe(4);
+        field.RostersOutsideBounds.ShouldBe([team]);
+    }
+
+    [Fact]
     public void A_roster_below_its_minimum_is_outside_its_bounds()
     {
         var field = Field.Track(new TournamentId(Guid.NewGuid()), _teams, 3, _at);

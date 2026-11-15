@@ -135,7 +135,6 @@ public class CompetitionStartTests(OrganisationApi api)
     }
 
     [Fact]
-    [Trait("covers", "competition-start: A tournament not yet ready")]
     public async Task A_league_with_open_registration_and_no_schedule_reports_and_rejects_each_unmet_condition()
     {
         var league = await OpenAsync();

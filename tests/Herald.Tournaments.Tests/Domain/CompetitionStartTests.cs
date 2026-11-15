@@ -112,6 +112,32 @@ public class CompetitionStartTests
         Closed().Start(3, _ready, _owner, _at).Outcome.ShouldBe(WriteOutcome.Stale);
 
     [Fact]
+    public void A_running_tournament_keeps_what_decides_its_entries_and_rosters()
+    {
+        var tournament = Closed(CompleteTeam);
+        tournament.Start(4, _ready, _owner, _at);
+
+        var result = tournament.Change(CompleteTeam with { CheckIn = CheckIn.Optional, MaximumRosterSize = 6 }, 5, _owner, _at);
+
+        result.Broken.ShouldBe([new BrokenRule("checkIn", "competition-started"), new BrokenRule("maximumRosterSize", "competition-started")]);
+    }
+
+    [Fact]
+    public void A_running_tournament_can_still_change_its_title() =>
+        Started().Change(CompleteIndividual with { Title = "Autumn League Finals" }, 5, _owner, _at).Outcome.ShouldBe(WriteOutcome.Applied);
+
+    [Fact]
+    public void Registration_cannot_reopen_once_running() =>
+        Started().OpenRegistration(5, _owner, _at).Broken.ShouldBe([new BrokenRule("registration", "competition-started")]);
+
+    private Tournament Started()
+    {
+        var tournament = Closed();
+        tournament.Start(4, _ready, _owner, _at).Outcome.ShouldBe(WriteOutcome.Applied);
+        return tournament;
+    }
+
+    [Fact]
     public void A_draft_cannot_start() =>
         Tournament.Draft(new TournamentId(Guid.NewGuid()), CompleteIndividual, _owner, _at).Start(1, _ready, _owner, _at)
             .Broken.ShouldBe([new BrokenRule("competition", "not-published")]);

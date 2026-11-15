@@ -783,6 +783,15 @@ describe('The roster of a team entry', () => {
     expect(harness.button('Add player')).toBeUndefined();
   });
 
+  it('keeps a waiting team’s roster read only once the competition started', async () => {
+    const harness = await page(() => of(roster(2, { entryState: 'waiting' })), {
+      getField: () => of(teams([team('Team A', 4, 'complete'), team('River Falcons', 2, 'incomplete')], { fieldLocked: true, competitionStarted: true })),
+    });
+    await openRoster(harness);
+    await vi.waitFor(() => expect(harness.text('.drawer-notice herald-notice')).toContain('The competition has started; this team’s roster cannot change.'));
+    expect(harness.button('Add player')).toBeUndefined();
+  });
+
   it('reports a frozen roster outside its bounds', async () => {
     const harness = await page(() => of(roster(2, { frozenRevision: 3, frozenAt: '2026-11-21T09:05:00Z' })));
     await openRoster(harness);

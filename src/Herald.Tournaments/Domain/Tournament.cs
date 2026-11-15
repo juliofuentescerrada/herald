@@ -205,6 +205,11 @@ public sealed class Tournament : AggregateRoot<TournamentId>
             broken = LockedByEntries(configuration, entries);
         }
 
+        if (broken.Count == 0)
+        {
+            broken = LockedByStart(configuration);
+        }
+
         if (broken.Count > 0)
         {
             return new(WriteOutcome.Rejected, broken);
@@ -263,6 +268,11 @@ public sealed class Tournament : AggregateRoot<TournamentId>
         if (Configuration.MissingForRegistration() is { Count: > 0 } missing)
         {
             return new(WriteOutcome.Rejected, [.. missing.Select(field => new BrokenRule(field, "required"))]);
+        }
+
+        if (Competition == CompetitionState.Running)
+        {
+            return new(WriteOutcome.Rejected, [new("registration", "competition-started")]);
         }
 
         if (schedulePublished)
@@ -324,6 +334,28 @@ public sealed class Tournament : AggregateRoot<TournamentId>
         }
 
         return broken;
+    }
+
+    // Start fixes the field and its rules (§5.1 row 6): what decides entries and rosters cannot change once running.
+    private List<BrokenRule> LockedByStart(TournamentConfiguration configuration)
+    {
+        if (Competition != CompetitionState.Running)
+        {
+            return [];
+        }
+
+        var current = Configuration;
+        (string Field, bool Changed)[] fixedFields =
+        [
+            ("capacity", configuration.Capacity != current.Capacity),
+            ("entryKind", configuration.EntryKind != current.EntryKind),
+            ("admission", configuration.Admission != current.Admission),
+            ("checkIn", configuration.CheckIn != current.CheckIn),
+            ("minimumRosterSize", configuration.MinimumRosterSize != current.MinimumRosterSize),
+            ("maximumRosterSize", configuration.MaximumRosterSize != current.MaximumRosterSize),
+            ("activePlayersPerSide", configuration.ActivePlayersPerSide != current.ActivePlayersPerSide),
+        ];
+        return [.. fixedFields.Where(field => field.Changed).Select(field => new BrokenRule(field.Field, "competition-started"))];
     }
 
     private static List<BrokenRule> Required(TournamentConfiguration configuration, bool withRegistrationDates) =>

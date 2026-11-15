@@ -202,7 +202,8 @@ export class CompetitionArea {
   protected readonly fixedText = computed(() => {
     const { start } = this.tournament();
     const rosters = this.team() ? ', team rosters' : '';
-    return `Fixed at start: ${plural(start.eligible ?? 0, 'entrant', 'entrants')}, schedule revision ${start.startedOnScheduleRevision}${rosters}. No match has started.`;
+    // The eligible field it started on, not today's count: a crossed change would make that misleading.
+    return `Fixed at start: the eligible field, schedule revision ${start.startedOnScheduleRevision}${rosters}. No match has started.`;
   });
 
   /** Frozen rosters outside their bounds: a roster write crossed the start (design D-4). */

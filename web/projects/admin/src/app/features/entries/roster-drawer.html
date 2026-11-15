@@ -32,6 +32,10 @@
           </herald-notice>
         </div>
       }
+    } @else if (started() && current.entryState !== 'cancelled') {
+      <div class="drawer-notice">
+        <herald-notice heading="Read only">The competition has started; this team’s roster cannot change.</herald-notice>
+      </div>
     } @else if (readOnly()) {
       <div class="drawer-notice">
         <herald-notice heading="Read only">This team’s entry was cancelled. Its roster is kept as a record and cannot change.</herald-notice>

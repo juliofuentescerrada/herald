@@ -88,7 +88,7 @@ describe('The competition area', () => {
       expect(calls).toEqual([4]);
       expect(badge()).toBe('Running');
       expect(area().textContent).toContain('Started 21 November 2026, 10:05 · Europe/Madrid');
-      expect(area().textContent).toContain('Fixed at start: 4 entrants, schedule revision 1. No match has started.');
+      expect(area().textContent).toContain('Fixed at start: the eligible field, schedule revision 1. No match has started.');
       expect(action()).toBeNull();
       expect(texts('.labels herald-status-label')).toContain('Running');
     });

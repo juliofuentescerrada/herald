@@ -200,6 +200,11 @@ public sealed class Field : AggregateRoot<TournamentId>
             return WriteResult.Reject("field", "mismatch");
         }
 
+        if (Terms.FieldLocked)
+        {
+            return Locked;
+        }
+
         if (_entries.Any(entry => entry.GuestId == guest && entry.IsActive))
         {
             return WriteResult.Reject("guest", "already-entered");
@@ -363,6 +368,11 @@ public sealed class Field : AggregateRoot<TournamentId>
             return WriteOutcome.Stale;
         }
 
+        if (Terms.CompetitionStarted)
+        {
+            return Frozen;
+        }
+
         if (entry.State == EntryState.Cancelled)
         {
             return WriteResult.Reject("entry", "cancelled");
@@ -386,11 +396,6 @@ public sealed class Field : AggregateRoot<TournamentId>
         if (entry.Members.Count >= maximum)
         {
             return WriteResult.Reject("roster", "full");
-        }
-
-        if (Terms.CompetitionStarted)
-        {
-            return Frozen;
         }
 
         entry.AddMember(player, actor, at);
@@ -418,6 +423,11 @@ public sealed class Field : AggregateRoot<TournamentId>
             return WriteOutcome.Stale;
         }
 
+        if (Terms.CompetitionStarted)
+        {
+            return Frozen;
+        }
+
         if (entry.State == EntryState.Cancelled)
         {
             return WriteResult.Reject("entry", "cancelled");
@@ -426,11 +436,6 @@ public sealed class Field : AggregateRoot<TournamentId>
         if (Terms.MaximumRosterSize is null)
         {
             return WriteResult.Reject("roster", "awaiting-terms");
-        }
-
-        if (Terms.CompetitionStarted)
-        {
-            return Frozen;
         }
 
         entry.RemoveMember(player, actor, at);

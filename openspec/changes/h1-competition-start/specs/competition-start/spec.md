@@ -31,7 +31,7 @@ An owner SHALL start the competition of a tournament whose start conditions all 
 - **THEN** the start is rejected naming the schedule
 
 ### Requirement: Start fixes the field
-After start, admitting, cancelling and checking in or undoing a check-in SHALL be rejected stating that the competition has started.
+After start, admitting, cancelling and checking in or undoing a check-in SHALL be rejected stating that the competition has started, and so SHALL reopening registration and changing the capacity, entry kind, admission, check-in policy or roster sizes.
 
 #### Scenario: Cancelling after start
 - **WHEN** an owner cancels an admitted entry of a running competition
@@ -49,4 +49,4 @@ The tournament's configuration page SHALL show a Competition panel after the Reg
 
 #### Scenario: The owner starts from the panel
 - **WHEN** an owner confirms "Start competition" on a ready tournament
-- **THEN** the page shows "Running" beside the title and the panel shows who started it and when
+- **THEN** the page shows "Running" beside the title and the panel shows when it started and the schedule revision it fixed

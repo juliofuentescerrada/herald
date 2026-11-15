@@ -99,3 +99,16 @@ Captured by the `seeded-start` test script at the default desktop width and at 3
 - The badge's blocker sentence wrapped past the panel at 390 px; it now wraps inside it (`white-space: normal` for this badge only).
 - The tournament has no Configuration/Entries/Schedule tabs (as in `h1-round-robin-pairings`): the panel's "Open entries" and "Open schedule" links and the page's "View entries"/"View schedule" serve instead.
 - Not verified: 200 % zoom and a keyboard-only pass.
+
+## Review notes
+
+herald-reviewer reviewed the slice's diff on 14 November 2026. Findings and how each was resolved:
+
+1. **A running tournament's configuration could change what decides its entries** (blocking): `Change` now rejects capacity, entry kind, admission, check-in and roster sizes with `competition-started` once running; the title and other facts stay editable. Domain tests.
+2. **Registration could reopen on a running tournament** (blocking): `OpenRegistration` rejects with `registration/competition-started` before the schedule check, and `Field.Enter` honours the field lock. Domain test.
+3. **The spec said the panel shows who started**: the scenario now says when and the schedule revision, matching W-1; the requirement lists the configuration and reopening rejections.
+4. **No backend test for a crossed roster edit**: a Registration domain test removes a member, then applies the start, and checks the frozen revision and `RostersOutsideBounds`; it carries the scenario's marker.
+5. **Roster rejections after start named the wrong reason**: the frozen check comes right after the repeat and stale checks; admitting and confirming a check-in after start are tested.
+6. **A waiting team's roster dialog offered edits after start**: the dialog is read-only for every team once the field reports the start. Vitest.
+7. **"Fixed at start: N entrants" used today's count**: the panel says "the eligible field" instead.
+8. **The API readiness test did not exercise pending entries**: its marker was removed; the domain and Vitest tests carry the scenario.

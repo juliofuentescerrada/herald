@@ -324,6 +324,7 @@
     [teamName]="entry.guestName"
     [tournamentTitle]="tournament.data()!.configuration.title"
     [zone]="zone()"
+    [started]="running()"
     [organisationName]="workingOrganisation.data()?.name ?? 'this organisation'"
     (leave)="close()"
   />
