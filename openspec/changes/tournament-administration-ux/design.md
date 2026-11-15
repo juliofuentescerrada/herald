@@ -1,8 +1,8 @@
 # Tournament administration UX assessment
 
-Status: proposed design, 15 November 2026; not approved for implementation and pending visual input. The maintainer requested the complete administration assessment followed by this OpenSpec proposal.
+Status: proposed design, 15 November 2026; not approved for implementation and pending visual approval. The maintainer requested the complete administration assessment followed by this OpenSpec proposal.
 
-See [the assessment](reviews/assessment.md) for route/state coverage, evidence, findings and candidate scope, and [the completed browser review](reviews/browser-review.md) for the signed-in inspection, reflow measurements and explicit test limits. The read-only assessment is complete for scope discussion; mutation/error/concurrency verification belongs to the subsequent synthetic test round. No production files, product decisions or existing change approvals are modified. Visual input and implementation tasks remain for the subsequent proposal stage.
+See [the assessment](reviews/assessment.md) for route/state coverage, evidence, findings and candidate scope, and [the completed browser review](reviews/browser-review.md) for the signed-in inspection, responsive layout measurements and explicit test limits. The read-only assessment is complete for scope discussion; mutation/error/concurrency verification belongs to the subsequent synthetic test round. No production files, product decisions or existing change approvals are modified. Visual input and implementation tasks remain for the subsequent proposal stage.
 
 The maintainer subsequently confirmed the local seeded data is disposable and authorised mutations. [The operational follow-up](reviews/operational-review.md) records the executed cancellation/promotion, team lineup/start/result and schedule generation/publication/withdrawal checks, including the resulting local data changes. Fault injection and concurrency remain unverified.
 
@@ -20,7 +20,7 @@ Result choices remain native radios inside a fieldset. Larger labelled square su
 
 ### Recovery and state presentation
 
-Use existing query refetch paths for unchanged search retry and both match/tournament load dependencies. Keep failure messages local and distinguish retry from no results. Start-fixed fields use read-only values or disabled controls with an associated explanation; match the backend's existing lock set rather than deriving authority from dates. Correct false progress copy without a new progress endpoint. Use secondary repeated search-result actions, omit empty history, collapse nonempty history with a count and remove redundant empty-entry prose. Preserve cancelled-roster inspection and no-toast updates.
+Use existing query refetch paths for unchanged search retry and both match/tournament load dependencies. Keep failure messages local and distinguish retry from no results. Start-fixed fields use read-only values or disabled controls with an associated explanation; match the backend's existing lock set rather than deriving authority from dates. Correct false progress copy without a new progress endpoint. Use secondary repeated search-result actions, omit empty history, collapse populated history with a count and remove redundant empty-entry prose. Preserve cancelled-roster inspection and no-toast updates.
 
 ### Responsive and shared-control boundaries
 
@@ -28,8 +28,16 @@ Allow text children to shrink and wrap, and row actions to wrap or stack within 
 
 ## Visual review gate and state matrix
 
-The Screens section of proposal.md plus the assessment inventory is the affected state matrix. For each modified state, obtain a reviewed wide/narrow reference and compare actual implementation using G-01–12/RU-01–10; treat loading/error/conflict/access and long-content variants explicitly rather than accepting only populated screenshots. No replacement mockups have been supplied or approved. Under herald-screens, the maintainer is asked to supply mockups for those screens/states; this proposal remains pending visual input. The reviewed input can narrow which preparation screens actually change.
+The Screens section of proposal.md plus the assessment inventory is the affected state matrix. For each modified state, obtain a reviewed wide/narrow reference and compare actual implementation using G-01–12/RU-01–10; treat loading/error/conflict/access and long-content variants explicitly rather than accepting only populated screenshots. The maintainer explicitly requested agent-generated references. See [navigable prototype](../../../prototypes/frontend/tournament-admin-ux.html) and [state inventory](../../../prototypes/frontend/tournament-admin-ux.md). References have been generated but are not approved; the implementation gate remains closed. The reviewed input can narrow which preparation screens actually change.
 
 ## Validation and implementation dependencies
 
 This PR adds proposal artifacts and dated evidence only. Delta scenarios are future acceptance requirements; their tests and covers markers are tasks, not executed implementation evidence. Preserve current domain contracts, expected revisions, retry identities, access boundaries and notification policy. Coordinate active competition changes before choosing the implementation baseline; if their scope changes the screen inventory, update this design and review references first. No handler, event, API or database change is intended.
+
+## Reference validation — 15 November 2026
+
+The maintainer authorised generating the references after reviewing the assessment. The prototype has 94 deterministic fixtures across eight page families, including shared loading/failure/conflict/busy/access states. Chrome rendered all 94 at 390 px with a main region present and no page horizontal overflow. Additional List (long title), Entries (waiting), Schedule (running) and team Match (in play) samples had scrollWidth equal to clientWidth at 320/699/700/1440 px. Schedule and team-result screenshots were visually inspected at wide/narrow sizes. Temporary viewport overrides were reset. These are prototype rendering/layout checks, not production E2E, screen-reader, full keyboard or API acceptance.
+
+The previous PR rules failure was reproduced from its CI log: the spelling check rejected several documentation words. Those words were replaced with ordinary alternatives; no dictionary exception or rule suppression was added. The full tracked-file rules command is used for validation of this update.
+
+The reference review found five simulation inconsistencies (phase labels, unchanged search retry, staying with dirty lineups, the submitted outcome and conflict blocking). All were corrected. Chrome then confirmed that Draw resolves as Draw, Stay retains the ten selected lineup boxes, search retry retains Alex and a match conflict keeps both radios and submission disabled. These are fixture interactions only.

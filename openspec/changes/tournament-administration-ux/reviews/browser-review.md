@@ -24,7 +24,7 @@ Method: visible accessibility trees, page screenshots inspected in the session, 
 | Individual entries | Full capacity with two waiting entrants, disabled admission with reason, confirmed/pending check-in and expanded cancelled history (Autumn League). Mandatory pending check-in/absent-at-start action (Lantern League). No entries/not-open state (Spring Open). |
 | Team entries | Four admitted teams with complete/incomplete/empty rosters; check-in is separate from readiness (Harbour Team League). Running entries hide mutation controls and retain roster inspection (Saltmarsh Team League). |
 | Add entry drawer | Existing/new modes for a team, alias field and explicit create/enter action. Inspected only; no submission. |
-| Roster drawer | Incomplete editable roster, player-search substep, existing player already on another active team, frozen roster and history. At 390 px the drawer fills the screen; Escape closes and restores focus to the roster trigger in the sample. |
+| Roster drawer | Incomplete editable roster, player-search step, existing player already on another active team, frozen roster and history. At 390 px the drawer fills the screen; Escape closes and restores focus to the roster trigger in the sample. |
 | Individual schedule | Published/running with resolved wins, draw, in-play and scheduled matches. Desktop result displacement and ambiguous entrant links reproduced. Responsive samples below. |
 | Team schedule | Scheduled match in running competition; published/preparing odd field with separate rests. Before start, pairings are plain text; after start they become match destinations. This difference follows current capability, not an absent route defect. |
 | Blocked schedule | Mandatory pending check-in blocks generation; affected entrant and Open entries link are visible. No generation was executed. |
@@ -59,7 +59,7 @@ Widths are DOM measurements, not inferred from screenshot dimensions. `clientWid
 | Scheduled team match | 700 | 685 | 685 | No page overflow in sample |
 | Scheduled team match | 1440 | 1425 | 1425 | No page overflow in sample |
 
-No overflow does not establish good hierarchy, target size, all-content reflow or accessibility. In the 390 px schedule screenshot, the first round only begins near the bottom of an 844 px viewport: shell, account, record lifecycle, summary and notice consume most of the initial view. Creation has similar shell/context overhead. The computed font stack requests Inter first; this does not prove which font rendered.
+No overflow does not establish good hierarchy, target size, all-content responsive layout or accessibility. In the 390 px schedule screenshot, the first round only begins near the bottom of an 844 px viewport: shell, account, record lifecycle, summary and notice consume most of the initial view. Creation has similar shell/context overhead. The computed font stack requests Inter first; this does not prove which font rendered.
 
 ## Findings updated by browser evidence
 
@@ -72,7 +72,7 @@ No overflow does not establish good hierarchy, target size, all-content reflow o
 | TA-05 schedule rows | Confirmed desktop displacement; one pairing link visually resembles entrant links. Keep pairing, effective result, match state and destination in one understandable row/group. |
 | TA-06 result task | Single-choice semantics and keyboard selection pass in the sampled in-play individual state. Visual choice hierarchy still needs improvement. Team result priority after start remains source-inspected only: the available team example was scheduled and no start was executed. |
 | TA-09 history | Cancelled entries start collapsed and expand correctly; roster history starts collapsed. Empty roster history and initially open schedule history remain source findings, not browser-reproduced samples. |
-| TA-10 reflow | Upgrade from risk to **should fix / P1** for List and Entries at 700 px. The current wide layout and rail leave too little width for fixed row actions. Preserve the breakpoint; allow safe row/group reflow within it. Other sampled pages do not reproduce overflow. |
+| TA-10 responsive layout | Upgrade from risk to **should fix / P1** for List and Entries at 700 px. The current wide layout and rail leave too little width for fixed row actions. Preserve the breakpoint; allow safe row/group responsive layout within it. Other sampled pages do not reproduce overflow. |
 | TA-12 unsaved work | Upgrade lineup navigation to **should fix / P1**: a one-player local selection is abandoned by Back to schedule without warning, unlike creation. Outcome choice also leaves without warning; whether that needs the same treatment is a product/interaction choice. Conflict reload rules remain source-inspected. |
 | TA-13 content | Confirmed product-facing “Corrections come later” wording. The two-team schedule also says “1 rounds · 1 matches”; include singular/plural polish in affected summaries. Numeric font behaviour still needs dedicated verification. |
 
@@ -90,7 +90,7 @@ Prioritise three coherent areas for the subsequent visual proposal:
 
 1. **Tournament context and movement:** consistent lifecycle emphasis, direct schedule access, peer-section navigation and phase-aware hierarchy. Review the current hub and header density; use existing destinations first.
 2. **Operational records and decisions:** readable schedule rows, clear match destination/outcome, more recognisable result choices, lineup/result priority and protection of unsaved lineup work. Keep preparation, started and resolved variants explicit.
-3. **Preparation quality and resilience:** state-appropriate editor locks/help, entry/roster drawer action hierarchy, search retry and load recovery, empty/history copy, and the reproduced 700 px reflow failures.
+3. **Preparation quality and resilience:** state-appropriate editor locks/help, entry/roster drawer action hierarchy, search retry and load recovery, empty/history copy, and the reproduced 700 px responsive layout failures.
 
 Creation/publication need targeted consistency and recovery review, not a new wizard. Do not add standings, exceptional results, corrections, finalisation or departure operations through this UX change; coordinate their active changes separately. Existing screen content and domain rules remain authoritative until reviewed replacement visuals and specification deltas are approved.
 

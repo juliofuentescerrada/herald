@@ -42,7 +42,7 @@ Guest searches SHALL offer retry with the unchanged query after failure. Load re
 - **WHEN** the search request fails and the owner retries without editing the name
 - **THEN** the same query is executed again from the open surface and its result replaces the failed state without creating a guest
 
-### Requirement: Operational content reflows within the shared foundations
+### Requirement: Operational content wraps within the shared foundations
 Affected screens SHALL preserve full-width stacked admin composition and the existing below-700-px breakpoint while allowing content and action groups to wrap safely. Read-only history SHALL follow current work, remain collapsed by default and be omitted when empty, with visible counts where available.
 
 #### Scenario: Owner uses the desktop breakpoint with the workspace rail

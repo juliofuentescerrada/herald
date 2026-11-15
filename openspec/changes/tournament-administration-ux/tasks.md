@@ -13,7 +13,7 @@
 - [ ] 3.1 Recompose schedule pairing/outcome/state/destination records and result selection surfaces with native semantics.
 - [ ] 3.2 Put result work before read-only started lineups and protect unsaved lineup changes; retain explicit save/discard and conflict handling.
 - [ ] 3.3 Improve entry/roster search action hierarchy and retry, failed-load recovery, empty/history presentation and numeric/copy consistency.
-- [ ] 3.4 Fix List/Entries intermediate-width reflow and inspect affected shared control/catalogue examples; update live component/icon guidance only for changed APIs or meanings.
+- [ ] 3.4 Fix List/Entries intermediate-width responsive layout and inspect affected shared control/catalogue examples; update live component/icon guidance only for changed APIs or meanings.
 
 ## 4. Evidence and acceptance
 

@@ -1,6 +1,6 @@
 ## Status
 
-Proposed, 15 November 2026, following the maintainer's complete administration assessment. **Not approved for implementation; pending visual input and scope review.** This is a standalone proposal, not an approved batch slice. Merging this documentation pull request does not imply visual approval or authorise production edits. Existing competition changes retain their own approval status.
+Proposed, 15 November 2026, following the maintainer's complete administration assessment. **Not approved for implementation; pending visual approval and scope review.** This is a standalone proposal, not an approved batch slice. Merging this documentation pull request does not imply visual approval or authorise production edits. Existing competition changes retain their own approval status.
 
 ## Why
 
@@ -12,7 +12,7 @@ The owner must detour through configuration to reach competition work. Running h
 - Apply one explicit lifecycle presentation mapping across list and headers: publication and registration remain neutral facts; Running uses information emphasis and Preparing remains neutral. Preserve labels and reviewed icons; colour is reinforcement.
 - Recompose schedule records around pairing, effective outcome, state and an explicit View match destination; names do not masquerade as person-profile links.
 - Give result choices a larger labelled selectable surface using native single-choice semantics, with explicit submission and no initial selection. In started team matches put result work before compact read-only lineups; preserve preparation order before start.
-- Protect unsaved lineup selections when navigating away; keep outcome selection local without adding a leave confirmation solely for an unsubmitted outcome choice. Keep explicit per-side save/discard and revision checks.
+- Protect unsaved lineup selections when navigating away; keep outcome selection local without adding a leave confirmation solely for an unsaved outcome choice. Keep explicit per-side save/discard and revision checks.
 - Reflect start-fixed configuration as read-only with accurate reasons; preserve editable descriptive fields and all server-side enforcement.
 - Add same-query search retry and complete failed-dependency reload paths. Reduce repeated primary search actions, empty-state duplication and competing history; correct phase-dependent copy and singular/plural summaries.
 - Fix row wrapping at intermediate desktop widths without changing the 700 px breakpoint or full-width stacked composition. Verify keyboard, focus, mobile, long content and zoom in the affected flow.
@@ -30,7 +30,7 @@ Out of scope: new dashboards or landing routes, filters/bulk actions, wizards, s
 
 Affected: list; new/draft/published/running configuration; publication review; registration/competition areas; entries and add/confirmation overlays; editable/frozen/cancelled roster drawer; blocked/draft/published/withdrawn/running schedule and withdrawal dialog; individual/team match preparation, in-play, result selection and resolved states. Include loading, empty, busy, field/request failure, stale/conflict, permission replacement, unsaved exit, long content and narrow states where applicable. The existing assessment inventories these states.
 
-Current screenshots and older prototypes are evidence, not approved replacement mockups. Under herald-screens, request maintainer mockups for the affected screens/states; until supplied and reviewed, this proposal remains pending visual input. New references must preserve full-width one-column admin, square geometry, the shared spacing scale, one breakpoint below 700 px, full-width panels with independently limited prose, lifecycle labels beside titles, summary actions on the right and history after actionable work.
+The maintainer explicitly requested agent-generated references. The navigable prototype and state inventory in `prototypes/frontend/tournament-admin-ux.html` and `tournament-admin-ux.md` are the replacement visual input for review; they are not approved. Current screenshots and older prototypes remain audit evidence. New references must preserve full-width one-column admin, square geometry, the shared spacing scale, one breakpoint below 700 px, full-width panels with independently limited prose, lifecycle labels beside titles, summary actions on the right and history after actionable work.
 
 ## Capabilities
 
