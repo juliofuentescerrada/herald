@@ -99,7 +99,7 @@ Goal: rounds are played and the standings explain themselves.
 | `h1-standings` | Standings from effective results, explained points and tiebreakers, rest rounds without points, shared positions (F-09) | Standings | `h1-operator-results` |
 | `h1-round-operations` | The operations queue, round completion, withdrawals and sanctions during competition (F-08, D-05) | Competition | `h1-exceptional-outcomes` |
 
-Decision rows: D-05 (withdrawal and disqualification), D-23 (lineups and eligibility changes), the exceptional outcomes of §8.1.
+Decision rows: D-05 (withdrawal and disqualification), D-23 (lineups and eligibility changes), the exceptional outcomes of §8.1 (D-25). The decision session of 15 November 2026 closed them ([§15](herald-functional-discovery.md#15-decision-register-and-development-gates)): the §8.1 table as written; withdrawal and disqualification with a private reason, resolving the entrant's unplayed encounters as single absences; lineups locked at match start; player withdrawal and sanction until lifted; individual results start and resolve in one operation; no score in H1.
 Acceptance journey: AT-01 in full (six matches and explainable final standings), AT-04 (a seven-player roster fields five starters; a team of four cannot play), AT-05 (eligibility changes after the freeze), AT-06 (no-show and withdrawal in play).
 
 ### Batch 3: correct, close and open
