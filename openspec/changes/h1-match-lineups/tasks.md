@@ -31,7 +31,7 @@
 
 ## 7. Validation and completion
 
-- [ ] 7.1 `covers` markers for every scenario this change adds; `node scripts/spec-coverage.mjs` passes
-- [ ] 7.2 Full run (`scripts/check all` and the e2e suite); record in design.md
-- [ ] 7.3 Capture the Visual input states at 1440 and 390 px, compare with the prototypes and record the differences in design.md
+- [x] 7.1 `covers` markers for every scenario this change adds; `node scripts/spec-coverage.mjs` passes
+- [x] 7.2 Full run (`scripts/check all` and the e2e suite); record in design.md
+- [x] 7.3 Capture the Visual input states at 1440 and 390 px, compare with the prototypes and record the differences in design.md
 - [ ] 7.4 Docs: visual direction §9.3 inventory, herald-reviewer review of the diff; sync the specs and archive the change in the slice's pull request
