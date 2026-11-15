@@ -151,18 +151,70 @@
       @if (resultSummary(); as summary) {
         <p><strong>{{ summary }}</strong></p>
         <p class="help">Recorded <span class="when">{{ zoned(m.result!.recordedAt) }}</span>. Corrections come later.</p>
-      } @else if (team() && !started()) {
-        <herald-notice heading="Start the match first">A played team result needs both lineups locked, and they lock at match start.</herald-notice>
       } @else {
-        @if (!started()) {
-          <p class="help">This match has not started: recording a played result also starts it.</p>
-        }
-        <fieldset class="choice outcomes" [disabled]="state() === 'busy'">
-          <legend>Outcome</legend>
-          <label><input type="radio" name="outcome" [checked]="outcome() === 'first'" (change)="outcome.set('first')" /> {{ names().first }} wins</label>
-          <label><input type="radio" name="outcome" [checked]="outcome() === 'draw'" (change)="outcome.set('draw')" /> Draw</label>
-          <label><input type="radio" name="outcome" [checked]="outcome() === 'second'" (change)="outcome.set('second')" /> {{ names().second }} wins</label>
+        <!-- What happened first, nothing selected; then only that cause's fields (h1-exceptional-outcomes D-3). -->
+        <fieldset class="choice options" [disabled]="state() === 'busy'">
+          <legend>What happened?</legend>
+          <label><input type="radio" name="cause" [checked]="cause() === 'played'" (change)="choose('played')" /> Played</label>
+          <label><input type="radio" name="cause" [checked]="cause() === 'concession'" (change)="choose('concession')" /> Concession</label>
+          <!-- An absence is recorded before the start; a match in play takes a concession or a no contest (A-1). -->
+          @if (!started()) {
+            <label><input type="radio" name="cause" [checked]="cause() === 'absence'" (change)="choose('absence')" /> Absence</label>
+          }
+          <label><input type="radio" name="cause" [checked]="cause() === 'noContest'" (change)="choose('noContest')" /> No contest</label>
         </fieldset>
+        @switch (cause()) {
+          @case ('played') {
+            @if (team() && !started()) {
+              <herald-notice heading="Start the match first">A played team result needs both lineups locked, and they lock at match start.</herald-notice>
+            } @else {
+              @if (!started()) {
+                <p class="help">This match has not started: recording a played result also starts it.</p>
+              }
+              <fieldset class="choice outcomes" [disabled]="state() === 'busy'">
+                <legend>Winner</legend>
+                <label><input type="radio" name="outcome" [checked]="outcome() === 'first'" (change)="outcome.set('first')" /> {{ names().first }} wins</label>
+                <label><input type="radio" name="outcome" [checked]="outcome() === 'draw'" (change)="outcome.set('draw')" /> Draw</label>
+                <label><input type="radio" name="outcome" [checked]="outcome() === 'second'" (change)="outcome.set('second')" /> {{ names().second }} wins</label>
+              </fieldset>
+            }
+          }
+          @case ('concession') {
+            <fieldset class="choice options" [disabled]="state() === 'busy'">
+              <legend>Who conceded?</legend>
+              <label><input type="radio" name="conceding" [checked]="conceding() === 'first'" (change)="conceding.set('first')" /> {{ names().first }}</label>
+              <label><input type="radio" name="conceding" [checked]="conceding() === 'second'" (change)="conceding.set('second')" /> {{ names().second }}</label>
+            </fieldset>
+          }
+          @case ('absence') {
+            <fieldset class="choice options" [disabled]="state() === 'busy'">
+              <legend>Who was absent?</legend>
+              <label><input type="radio" name="absent" [checked]="absent() === 'first'" (change)="absent.set('first')" /> {{ names().first }}</label>
+              <label><input type="radio" name="absent" [checked]="absent() === 'second'" (change)="absent.set('second')" /> {{ names().second }}</label>
+              <label><input type="radio" name="absent" [checked]="absent() === 'both'" (change)="absent.set('both')" /> Both were absent</label>
+            </fieldset>
+            <p class="help">An absence records no play and withdraws no one.</p>
+          }
+          @case ('noContest') {
+            <div class="field reason">
+              <label for="reason">Reason (required)</label>
+              <textarea id="reason" #reasonInput rows="3" maxlength="500" [value]="reason()" [readOnly]="state() === 'busy'"
+                (input)="reason.set(reasonInput.value)" aria-describedby="reason-help"></textarea>
+              <p class="help" id="reason-help">Private to the organisation. At most 500 characters.</p>
+            </div>
+          }
+        }
+        @if (cause() === 'concession' || cause() === 'noContest') {
+          <fieldset class="choice options" [disabled]="state() === 'busy'">
+            <legend>Did play take place?</legend>
+            <label><input type="radio" name="play" [checked]="playTookPlace() === true" (change)="playTookPlace.set(true)" /> Yes</label>
+            <label><input type="radio" name="play" [checked]="playTookPlace() === false" (change)="playTookPlace.set(false)" /> No</label>
+          </fieldset>
+          @if (playWithoutStart()) {
+            <herald-notice tone="danger" heading="Start the match first">An administrative outcome cannot record play on a team match that has not started. Choose “No”, or start the match.</herald-notice>
+          }
+        }
+        @if (cause() !== 'played' || !team() || started()) {
         <div class="actions">
           <button herald-button variant="primary" type="button" [loading]="state() === 'busy'" [disabled]="!!recordBlocked() && state() !== 'busy'"
             [attr.aria-describedby]="recordBlocked() ? 'record-why' : null" (click)="record()">Record result</button>
@@ -170,6 +222,7 @@
             <p class="help" id="record-why">{{ why }}</p>
           }
         </div>
+        }
       }
     </section>
   </div>
