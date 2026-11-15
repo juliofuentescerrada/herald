@@ -1053,13 +1053,15 @@ describe('Check-in on the entries page', () => {
         expect(await violations(page())).toEqual([]);
       });
 
-    it('keeps a running competition’s entries read only with the reason', async () => {
+    it('hides a running competition’s entry actions and says why once', async () => {
       const started = closed([entry('Robin Vale', { checkIn: 'confirmed', checkInRevision: 1 })], {}, { fieldLocked: true, competitionStarted: true });
       const { button, text } = await open({ getField: () => of(started) }, tournament({ registration: 'closed', schedulePublished: true, competition: 'running' }));
       await vi.waitFor(() => expect(text('herald-notice')).toContain('Running · entries are read-only'));
       expect(text('herald-notice')).toContain('Leaving now is a competitive withdrawal');
-      expect(button('Undo check-in')?.disabled).toBe(true);
-      expect(button('Cancel entry')?.disabled).toBe(true);
+      // Final, unlike the published schedule's lock: the actions are gone, not disabled.
+      expect(button('Undo check-in')).toBeUndefined();
+      expect(button('Cancel entry')).toBeUndefined();
+      expect(button('Add player')).toBeUndefined();
     });
   });
 });

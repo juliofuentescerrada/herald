@@ -112,3 +112,7 @@ herald-reviewer reviewed the slice's diff on 14 November 2026. Findings and how 
 6. **A waiting team's roster dialog offered edits after start**: the dialog is read-only for every team once the field reports the start. Vitest.
 7. **"Fixed at start: N entrants" used today's count**: the panel says "the eligible field" instead.
 8. **The API readiness test did not exercise pending entries**: its marker was removed; the domain and Vitest tests carry the scenario.
+
+## Test round
+
+The maintainer's local test round of 15 November 2026 (#61) validated the test script. At their request, a running competition's entry actions (check-in, cancel, admit, add) are hidden instead of disabled: the state is final, and the "Running · entries are read-only" notice says why once. The rule is in `docs/ui/style-guide.md` (disable with a reason while the person can lift the lock; hide when the state is final). The roster drawer's stacked actions and the tournament header's density are left to a separate UI change.
