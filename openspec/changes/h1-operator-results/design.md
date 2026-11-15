@@ -60,7 +60,9 @@ Deviations from the plan above, each kept small:
 - **The result's text in `shared`.** `resultText` ("Robin Vale won", "Draw") is used by the schedule and matches features, so it lives in the admin app's `shared`, typed structurally because `shared` may not import the API client.
 - **One primary action on an individual match.** While an individual match is scheduled, its Start panel's "Start match" is secondary: recording the result also starts it, and "Record result" is the page's primary action. A team match keeps "Start match" primary.
 - **State labels.** The match and schedule show "Resolved" in the success tone, text only, as for "In play" and "Locked" (`docs/ui/icons.md` has no reviewed icon for these states).
-- **No recorder's name.** The resolved summary says when the result was recorded, not by whom (as for lineups, W-1).
+- **No recorder's name.** The resolved summary says when the result was recorded, not by whom (as for lineups, W-1). The `match-results` requirement still says "who and when"; the maintainer decides in this slice's pull request whether to amend it, together with the same point in `match-lineups`.
+- **Checks before the revision.** A second result is rejected as resolved even from a stale revision, so the owner reads the specific reason; an undefined outcome (the API binds integers to the enum) is rejected as `outcome`: `unknown`.
+- **One-step start event.** A played result on a scheduled individual match raises `MatchStarted` as well as `MatchResolved`.
 - **Host tests file.** `MatchLineupTests` became `MatchTests`, which covers lineups and results through the Admin API.
 - **Notifiable facts.** `NotifiableFactsTests` named `Resolution`; it is exempted with the proposal's reason (a first result is not in F-10; revised final results join with the change log, D-26).
 
@@ -80,3 +82,9 @@ Captured from `e2e/scripts/seeded-results.spec.ts` (synthetic persona, seeded La
 | Result empty and chosen | Radio group "Outcome" with nothing selected; "Record result" disabled until a choice, described by "Choose the outcome first."; the help line says recording also starts the match | The Start panel stays above the Result panel with a secondary "Start match"; kept, so one primary action remains |
 | Win and draw recorded | Read-only summary "Bram Holloway won · played" or "Draw · played", "Recorded … Corrections come later.", "Resolved" beside the heading | No author's name (above) |
 | Schedule with results | Each resolved row shows "Resolved" and the outcome in words under the pairing, at 1440 and 390 px | None |
+
+`result-saving`, `result-team-not-started`, `result-team` and `result-conflict` were checked with Vitest and `axe-core` (`match-page.spec.ts`), not captured in a browser. Accepted differences from the prototype for these states:
+
+- `result-team`: the prototype adds "appearances recorded for both locked lineups" to the summary; the build shows "River Falcons won · played" with the locked lineups above it, and the appearances in the API.
+- `result-team-not-started`: the prototype's notice has "Go to lineups"; the lineups are on the same page, just above, so the build has no link.
+- `result-conflict`: the prototype keeps the notice in the Result panel; the build uses the page's one conflict notice ("This match changed elsewhere", with Reload), as for lineups, and keeps the chosen outcome.

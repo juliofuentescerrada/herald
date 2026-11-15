@@ -214,14 +214,21 @@ public sealed class Match : AggregateRoot<MatchId>
             return WriteOutcome.Repeated;
         }
 
+        // Before the revision, so a second result from a stale tab hears that the match is already resolved.
+        if (Resolution is not null)
+        {
+            return WriteResult.Reject("match", "resolved");
+        }
+
         if (expectedRevision != Revision)
         {
             return WriteOutcome.Stale;
         }
 
-        if (Resolution is not null)
+        // The API also binds integers to the enum: only a defined outcome becomes the one effective result.
+        if (!Enum.IsDefined(outcome))
         {
-            return WriteResult.Reject("match", "resolved");
+            return WriteResult.Reject("outcome", "unknown");
         }
 
         if (IsTeamMatch && Start is null)
@@ -229,7 +236,12 @@ public sealed class Match : AggregateRoot<MatchId>
             return WriteResult.Reject("match", "not-started");
         }
 
-        Start ??= new(actor, at, null, null);
+        if (Start is null)
+        {
+            Start = new(actor, at, null, null);
+            Raise(new MatchStarted(Id, actor, at));
+        }
+
         Resolution = new(outcome, Cause.Played, true, Appearances(), actor, at, operationId);
         Raise(new MatchResolved(Id, outcome, Cause.Played, actor, at));
         Revision++;

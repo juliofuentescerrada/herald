@@ -7,7 +7,7 @@ import { HeraldHostAdminService, LineupDetails, MatchView, PlayerDetails, Tourna
 import { Toasts } from '@herald/ui';
 import { provideTanStackQuery, QueryClient } from '@tanstack/angular-query-experimental';
 import axe from 'axe-core';
-import { of, throwError } from 'rxjs';
+import { of, Subject, throwError } from 'rxjs';
 import { AccessState, AppContext, QUERY_CLIENT, Session } from '../../platform';
 import { MatchPage } from './match-page';
 
@@ -245,7 +245,7 @@ describe('The match page', () => {
     const resolved = individual({ revision: 2, state: 'resolved', start: { startedAt: '2026-11-22T09:40:00Z', firstLineup: null, secondLineup: null }, result: { outcome: 'first', cause: 'played', played: true, recordedAt: '2026-11-22T09:40:00Z' } });
     let calls = 0;
     const recordResult = vi.fn(() => (++calls === 1 ? throwError(() => problem(0)) : of(resolved)));
-    const { page, button, text, toasts, settle } = await open({ getMatch: () => of(individual()), recordResult });
+    const { page, button, text, texts, toasts, settle } = await open({ getMatch: () => of(individual()), recordResult });
     await vi.waitFor(() => expect(button('Record result')).toBeTruthy());
     page().querySelector<HTMLInputElement>('input[name=outcome]')!.click();
     await settle();
@@ -259,7 +259,7 @@ describe('The match page', () => {
     const bodies = recordResult.mock.calls.map((call) => (call as unknown[])[3] as { operationId: string; outcome: string });
     expect(bodies[0].operationId).toBe(bodies[1].operationId);
     expect(bodies[1].outcome).toBe('first');
-    await vi.waitFor(() => expect(text('#result-heading + herald-status-label, .operation .summary-title herald-status-label')).toBeTruthy());
+    await vi.waitFor(() => expect(texts('.operation .summary-title herald-status-label')).toContain('Resolved'));
     expect(page().textContent).toContain('Sam Reed won · played');
     expect(page().textContent).toContain('Corrections come later.');
     expect(button('Start match')).toBeUndefined();
@@ -300,5 +300,56 @@ describe('The match page', () => {
     button('Record result')!.click();
     await settle();
     await vi.waitFor(() => expect(text('herald-notice')).toContain('This match already has a result. Corrections come later. Nothing changed.'));
+  });
+
+  it('shows the result as saving and blocks a repeat while it is recorded', async () => {
+    const recordResult = vi.fn(() => new Subject<MatchView>());
+    const { page, button, text, settle } = await open({ getMatch: () => of(individual()), recordResult });
+    await vi.waitFor(() => expect(button('Record result')).toBeTruthy());
+    page().querySelector<HTMLInputElement>('input[name=outcome]')!.click();
+    await settle();
+
+    button('Record result')!.click();
+    await settle();
+    button('Record result')!.click();
+    await settle();
+
+    expect(recordResult).toHaveBeenCalledOnce();
+    expect(page().querySelector<HTMLFieldSetElement>('fieldset.outcomes')!.disabled).toBe(true);
+    expect(text('#record-why')).toBe('Request in progress. Please wait; do not submit again.');
+    expect(page().querySelector('[aria-labelledby=result-heading]')!.getAttribute('aria-busy')).toBe('true');
+    expect(await violations(page())).toEqual([]);
+  });
+
+  it('offers the outcome of a team match in play', async () => {
+    const inPlay = teamMatch({
+      revision: 4,
+      state: 'inPlay',
+      first: { ...teamMatch().first, lineups: [lineup(1, falcons.slice(0, 5))] },
+      second: { ...teamMatch().second, lineups: [lineup(1, stars.slice(0, 5))] },
+      blockers: [],
+      start: { startedAt: '2026-11-22T09:20:00Z', firstLineup: 1, secondLineup: 1 },
+    });
+    const { page, texts, button } = await open({ getMatch: () => of(inPlay) });
+    await vi.waitFor(() => expect(texts('fieldset.outcomes label')).toEqual(['River Falcons wins', 'Draw', 'North Stars wins']));
+    expect(page().textContent).not.toContain('recording a played result also starts it');
+    expect(button('Start match')).toBeUndefined();
+    expect(await violations(page())).toEqual([]);
+  });
+
+  it('offers to reload when another tab changed the match before the result', async () => {
+    const recordResult = vi.fn(() => throwError(() => problem(409, { type: 'match-revision-conflict' })));
+    const { page, button, text, settle } = await open({ getMatch: () => of(individual()), recordResult });
+    await vi.waitFor(() => expect(button('Record result')).toBeTruthy());
+    page().querySelector<HTMLInputElement>('input[name=outcome]')!.click();
+    await settle();
+
+    button('Record result')!.click();
+    await settle();
+
+    await vi.waitFor(() => expect(text('herald-notice')).toContain('This match changed elsewhere'));
+    expect(button('Record result')!.disabled).toBe(true);
+    expect(page().querySelector<HTMLInputElement>('input[name=outcome]')!.checked).toBe(true);
+    expect(await violations(page())).toEqual([]);
   });
 });

@@ -115,6 +115,36 @@ public class MatchResultTests
     }
 
     [Fact]
+    public void An_undefined_outcome_is_rejected_and_nothing_is_stored()
+    {
+        var match = Individual();
+
+        Record(match, (Outcome)7).Broken.ShouldBe([new BrokenRule("outcome", "unknown")]);
+        match.Resolution.ShouldBeNull();
+        match.Start.ShouldBeNull();
+    }
+
+    [Fact]
+    public void A_one_step_result_records_the_start_as_an_event_too()
+    {
+        var match = Individual();
+
+        Record(match, Outcome.First);
+
+        match.DomainEvents.OfType<MatchStarted>().ShouldHaveSingleItem();
+        match.DomainEvents.OfType<MatchResolved>().ShouldHaveSingleItem();
+    }
+
+    [Fact]
+    public void A_second_result_from_a_stale_revision_hears_that_the_match_is_resolved()
+    {
+        var match = Individual();
+        Record(match, Outcome.First);
+
+        match.RecordPlayed(Guid.NewGuid(), Outcome.Second, 1, _owner, _at).Broken.ShouldBe([new BrokenRule("match", "resolved")]);
+    }
+
+    [Fact]
     public void A_result_on_an_older_revision_is_stale()
     {
         var match = Individual();

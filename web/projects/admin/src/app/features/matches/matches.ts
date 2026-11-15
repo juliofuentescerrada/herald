@@ -16,6 +16,7 @@ export const splitBlocker = (code: string): [string, string] => {
 
 /** The API's rule codes in words, naming the side's team; the API applies the rules, the page only reports them. */
 export const ruleText = (field: string, rule: string, required: number | null, first: string, second: string): string => {
+  if (field === 'outcome') return 'Choose one of the outcomes offered.';
   const side = field === 'first-lineup' ? first : field === 'second-lineup' ? second : null;
   switch (rule) {
     case 'missing': return `${side} has no lineup.`;
