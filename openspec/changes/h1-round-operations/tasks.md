@@ -18,7 +18,7 @@
 
 - [x] 4.1 `schedule` feature: operations summary, Entrants panel, departure confirmations, frozen roster dialog with player actions
 - [x] 4.2 `matches` feature: unavailable-player blockers; `standings` feature: flags
-- [ ] 4.3 Vitest for each Visual input state and `axe-core`; lint and boundary checks pass
+- [x] 4.3 Vitest for each Visual input state and `axe-core`; lint and boundary checks pass
 
 ## 5. End-to-end journey and seeds
 

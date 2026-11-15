@@ -193,4 +193,12 @@ describe('The standings page', () => {
     await vi.waitFor(() => expect(page().querySelector('table')).not.toBeNull());
     await settle();
   });
+
+  it('flags a withdrawn leader, who keeps its points and position', async () => {
+    const view: StandingsView = { ...provisional, rows: [{ ...provisional.rows[0], entrant: { ...robin, status: 'withdrawn' } }, ...provisional.rows.slice(1)] };
+    const { page, text } = await open(() => of(view));
+    await vi.waitFor(() => expect(text('tbody tr:first-child herald-status-label')).toBe('Withdrawn'));
+    expect(text('tbody tr:first-child td:last-child')).toBe('6');
+    expect(await violations(page())).toEqual([]);
+  });
 });

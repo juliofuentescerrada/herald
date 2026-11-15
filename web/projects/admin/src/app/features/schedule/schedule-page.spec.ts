@@ -3,7 +3,18 @@ import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
-import { EntrantDetails, HeraldHostAdminService, PairingsDetails, PublicationDetails, ScheduleDetails, TournamentDetails } from '@herald/api-client/admin';
+import {
+  CompetitorDetails,
+  EntrantDetails,
+  HeraldHostAdminService,
+  MatchSummary,
+  PairingsDetails,
+  PublicationDetails,
+  RosterPlayerDetails,
+  RoundStateDetails,
+  ScheduleDetails,
+  TournamentDetails,
+} from '@herald/api-client/admin';
 import { Toasts } from '@herald/ui';
 import { provideTanStackQuery, QueryClient } from '@tanstack/angular-query-experimental';
 import axe from 'axe-core';
@@ -310,4 +321,196 @@ describe('The schedule page', () => {
       const { text } = await open({ getSchedule: () => throwError(() => problem(404)) });
       await vi.waitFor(() => expect(text('herald-notice')).toContain('No eligible field reported yet'));
     });
+});
+
+describe('The schedule page of a running competition', () => {
+  afterEach(() => {
+    TestBed.resetTestingModule();
+    document.querySelectorAll('herald-dialog').forEach((element) => element.remove());
+  });
+
+  const startedAt = '2026-11-21T09:05:00Z';
+  const won = { outcome: 'first' as const, cause: 'played' as const, played: true, reason: null, recordedAt: '2026-11-21T10:00:00Z' };
+  const absence = (outcome: 'first' | 'second') => ({ outcome, cause: 'singleAbsence' as const, played: false, reason: null, recordedAt: '2026-11-21T11:30:00Z' });
+  const pairs = four.rounds.flatMap((round) => round.matches.map((match) => ({ round: round.number, ...match })));
+  const summaries = (state: (index: number) => Pick<MatchSummary, 'state' | 'result'>): MatchSummary[] =>
+    pairs.map((pair, index) => ({ matchId: `m-${index + 1}`, round: pair.round, first: pair.first, second: pair.second, ...state(index) }));
+  const competitor = (who: EntrantDetails, over: Partial<CompetitorDetails> = {}): CompetitorDetails => ({ ...who, status: 'active', reason: null, departedAt: null, roster: null, ...over });
+  const running = (matches: MatchSummary[], rounds: RoundStateDetails['state'][], over: Partial<ScheduleDetails> = {}) =>
+    schedule({
+      revision: 7,
+      current: publication(1),
+      history: [publication(1)],
+      startedOnRevision: 1,
+      startedAt,
+      matches,
+      operations: {
+        scheduled: matches.filter((match) => match.state === 'scheduled').length,
+        inPlay: matches.filter((match) => match.state === 'inPlay').length,
+        resolved: matches.filter((match) => match.state === 'resolved').length,
+        rounds: rounds.map((state, index) => ({ number: index + 1, state })),
+        attention: [],
+      },
+      entrants: [robin, sam, jamie, taylor].map((who) => competitor(who)),
+      ...over,
+    });
+  // Round 1 resolved and round 2 in play: 2 resolved, 1 in play, 3 scheduled.
+  const midway = summaries((index) => (index < 2 ? { state: 'resolved', result: won } : index === 2 ? { state: 'inPlay', result: null } : { state: 'scheduled', result: null }));
+
+  it('opens with the operations summary: match counts and each round’s state', async () => {
+    const { page, text, texts } = await open({ getSchedule: () => of(running(midway, ['completed', 'running', 'notStarted'])) });
+    await vi.waitFor(() => expect(text('#operations-heading')).toBe('Operations'));
+
+    expect(page().querySelector('.column > *')?.tagName.toLowerCase()).toBe('app-operations-summary');
+    expect(texts('.stats herald-status-label')).toEqual(['3 scheduled', '1 in play', '2 of 6 resolved']);
+    expect(texts('.rounds li > span')).toEqual(['Round 1', 'Round 2', 'Round 3']);
+    expect(texts('.rounds herald-status-label')).toEqual(['Completed', 'Running', 'Not started']);
+    expect(texts('.round-title herald-status-label')).toEqual(['Completed', 'Running', 'Not started']);
+    expect(texts('.entrants li strong')).toEqual(['Robin Vale', 'Sam Reed', 'Jamie Brook', 'Taylor Finch']);
+    expect(await violations(page())).toEqual([]);
+  });
+
+  it('completes a round resolved by absences',
+    { meta: { type: 'covers', description: 'round-operations: A round resolved administratively' } }, async () => {
+      const matches = summaries((index) => (index < 2 ? { state: 'resolved', result: absence('first') } : { state: 'scheduled', result: null }));
+      const { text, texts } = await open({ getSchedule: () => of(running(matches, ['completed', 'notStarted', 'notStarted'])) });
+      await vi.waitFor(() => expect(texts('.rounds herald-status-label')[0]).toBe('Completed'));
+      expect(text('.stats')).toContain('2 of 6 resolved');
+    });
+
+  it('lists a match whose lineup includes a sanctioned player under Needs attention, linked to the match',
+    { meta: { type: 'covers', description: 'round-operations: A sanctioned starter' } }, async () => {
+      const ready = running(summaries(() => ({ state: 'scheduled', result: null })), ['notStarted', 'notStarted', 'notStarted']);
+      const attention = [{ matchId: 'm-3', round: 2, entrant: robin, player: { playerId: 'p-casey', name: 'Casey Moss' } }];
+      const { page, text } = await open({ getSchedule: () => of({ ...ready, operations: { ...ready.operations!, attention } }) });
+      await vi.waitFor(() => expect(text('#attention-heading')).toBe('Needs attention'));
+
+      expect(text('.attention strong')).toBe('Round 2 · Robin Vale vs Jamie Brook');
+      expect(text('.attention .help')).toBe('Robin Vale’s lineup includes Casey Moss, who is unavailable. Revise the lineup before starting.');
+      expect(text('.attention herald-status-label')).toBe('Blocked');
+      expect(page().querySelector('.attention a')?.getAttribute('href')).toContain('/matches/m-3');
+      expect(await violations(page())).toEqual([]);
+    });
+
+  it('confirms a withdrawal with a required reason, naming the matches it resolves',
+    { meta: { type: 'covers', description: 'round-operations: Confirming a withdrawal' } }, async () => {
+      // Sam Reed played round 1; rounds 2 and 3 are scheduled.
+      const matches = summaries((index) => (index === 1 ? { state: 'resolved', result: won } : { state: 'scheduled', result: null }));
+      const after = running(summaries((index) => (index === 1 ? { state: 'resolved', result: won } : pairs[index].first === sam || pairs[index].second === sam ? { state: 'resolved', result: absence('first') } : { state: 'scheduled', result: null })),
+        ['running', 'running', 'running'], { revision: 8, entrants: [competitor(robin), competitor(sam, { status: 'withdrawn', reason: 'Moved away', departedAt: '2026-11-21T10:30:00Z' }), competitor(jamie), competitor(taylor)] });
+      const withdrawEntrant = vi.fn(() => of(after));
+      const { page, text, texts, toasts, type, settle } = await open({ getSchedule: () => of(running(matches, ['running', 'notStarted', 'notStarted'])), withdrawEntrant });
+      await vi.waitFor(() => expect(texts('.entrants li strong')).toHaveLength(4));
+
+      page().querySelector<HTMLButtonElement>('button[aria-label="Withdraw Sam Reed"]')!.click();
+      await settle();
+      expect(text('[role=dialog] h2')).toBe('Withdraw Sam Reed?');
+      expect(text('[role=dialog] p')).toBe('Sam Reed’s played results stay. 2 unplayed matches will be resolved as Sam Reed’s absence, each opponent winning. This cannot be undone.');
+      expect(await violations(document.querySelector<HTMLElement>('[role=dialog]')!)).toEqual([]);
+
+      const confirm = () => [...document.querySelectorAll<HTMLButtonElement>('[role=dialog] button')].find((each) => each.textContent?.trim() === 'Withdraw')!;
+      confirm().click();
+      await settle();
+      expect(text('#departure-reason-error')).toBe('Error: Enter a reason.');
+      expect(withdrawEntrant).not.toHaveBeenCalled();
+
+      type('#departure-reason', 'Moved away');
+      confirm().click();
+      await vi.waitFor(() => expect(toasts()).toContain('Sam Reed withdrawn. 2 matches resolved.'));
+      expect(withdrawEntrant).toHaveBeenCalledWith(organisation, tournamentId, sam.entryId, expect.objectContaining({ expectedRevision: 7, reason: 'Moved away' }));
+      expect(text('.entrants li:nth-child(2)')).toContain('Withdrawn');
+      expect(text('.entrants li:nth-child(2) .help')).toContain('Reason: Moved away');
+      expect(page().querySelector('button[aria-label="Withdraw Sam Reed"]')).toBeNull();
+    });
+
+  it('confirms a disqualification, naming its match in play as a concession after play', async () => {
+    const harbour = competitor(jamie);
+    const { page, text, settle } = await open({ getSchedule: () => of(running(midway, ['completed', 'running', 'notStarted'], { entrants: [competitor(robin), competitor(sam), harbour, competitor(taylor)] })) });
+    await vi.waitFor(() => expect(page().querySelector('button[aria-label="Disqualify Jamie Brook"]')).not.toBeNull());
+
+    page().querySelector<HTMLButtonElement>('button[aria-label="Disqualify Jamie Brook"]')!.click();
+    await settle();
+    // Jamie Brook: round 1 resolved, round 2 in play (m-3), round 3 scheduled.
+    expect(text('[role=dialog] h2')).toBe('Disqualify Jamie Brook?');
+    expect(text('[role=dialog] p')).toBe('Jamie Brook’s played results stay. 1 unplayed match will be resolved as Jamie Brook’s absence, each opponent winning. Its match in play becomes its concession after play. This cannot be undone.');
+  });
+
+  it('shows a disqualified entrant with its status and private reason, and no actions', async () => {
+    const entrants = [competitor(robin), competitor(sam), competitor(jamie, { status: 'disqualified', reason: 'Fielded an ineligible player', departedAt: '2026-11-21T10:30:00Z' }), competitor(taylor)];
+    const { page, text } = await open({ getSchedule: () => of(running(midway, ['completed', 'running', 'notStarted'], { entrants })) });
+    await vi.waitFor(() => expect(text('.entrants li:nth-child(3)')).toContain('Disqualified'));
+    expect(text('.entrants li:nth-child(3) .help')).toContain('Reason: Fielded an ineligible player');
+    expect(page().querySelector('button[aria-label="Disqualify Jamie Brook"]')).toBeNull();
+    expect(await violations(page())).toEqual([]);
+  });
+
+  it('says when no active entrant is left',
+    { meta: { type: 'covers', description: 'round-operations: All four withdraw' } }, async () => {
+      const entrants = [robin, sam, jamie, taylor].map((who) => competitor(who, { status: 'withdrawn', reason: 'Left', departedAt: startedAt }));
+      const all = running(summaries(() => ({ state: 'resolved', result: { ...absence('first'), outcome: 'none', cause: 'doubleAbsence' } })), ['completed', 'completed', 'completed'], { entrants });
+      const { text } = await open({ getSchedule: () => of(all) });
+      await vi.waitFor(() => expect(text('app-operations-summary herald-notice')).toContain('No active entrant'));
+      expect(text('app-operations-summary herald-notice')).toContain('The competition stays running until it is finalised');
+    });
+
+  describe('frozen roster dialog', () => {
+    const casey = { playerId: 'p-casey', name: 'Casey Moss' };
+    const drew = { playerId: 'p-drew', name: 'Drew Lane' };
+    const roster = (first: RosterPlayerDetails['status'], second: RosterPlayerDetails['status'] = 'available'): RosterPlayerDetails[] => [
+      { ...casey, status: first, reason: first === 'sanctioned' ? 'Abusive conduct' : null },
+      { ...drew, status: second, reason: second === 'withdrawn' ? 'Injured' : null },
+    ];
+    const falcons = { entryId: 'e-falcons', name: 'River Falcons' };
+    const teamSchedule = (players: RosterPlayerDetails[], revision = 7) =>
+      running(summaries(() => ({ state: 'scheduled', result: null })), ['notStarted', 'notStarted', 'notStarted'], { revision, entrants: [competitor(falcons, { roster: players })] });
+
+    async function openRoster(api: Record<string, unknown>, players: RosterPlayerDetails[]) {
+      const opened = await open({ getSchedule: () => of(teamSchedule(players)), ...api }, tournament({ configuration: { title: 'Saturday Team League', entryKind: 'team', capacity: 8, timeZone: 'Europe/Madrid' } }));
+      await vi.waitFor(() => expect(opened.page().querySelector('button[aria-label="Frozen roster: River Falcons"]')).not.toBeNull());
+      opened.page().querySelector<HTMLButtonElement>('button[aria-label="Frozen roster: River Falcons"]')!.click();
+      await opened.settle();
+      return opened;
+    }
+
+    it('lists each player with their availability and actions', async () => {
+      const { text, texts } = await openRoster({}, roster('available'));
+      expect(text('[role=dialog] h2')).toBe('River Falcons · frozen roster');
+      expect(texts('.players herald-status-label')).toEqual(['Available', 'Available']);
+      expect(document.querySelector('button[aria-label="Sanction Casey Moss"]')).not.toBeNull();
+      expect(await violations(document.querySelector<HTMLElement>('[role=dialog]')!)).toEqual([]);
+    });
+
+    it('sanctions a player with a required reason and lifts the sanction, keeping the dialog open',
+      { meta: { type: 'covers', description: 'round-operations: A sanction lifted' } }, async () => {
+        const sanctionPlayer = vi.fn(() => of(teamSchedule(roster('sanctioned'), 8)));
+        const liftSanction = vi.fn(() => of(teamSchedule(roster('available'), 9)));
+        const { button, text, texts, toasts, type, settle } = await openRoster({ sanctionPlayer, liftSanction }, roster('available'));
+
+        document.querySelector<HTMLButtonElement>('button[aria-label="Sanction Casey Moss"]')!.click();
+        await settle();
+        expect(text('#player-form-heading')).toBe('Sanction Casey Moss');
+        button('Sanction')!.click();
+        await settle();
+        expect(text('#player-reason-error')).toBe('Error: Enter a reason.');
+
+        type('#player-reason', 'Abusive conduct');
+        button('Sanction')!.click();
+        await vi.waitFor(() => expect(toasts()).toContain('Casey Moss sanctioned.'));
+        expect(sanctionPlayer).toHaveBeenCalledWith(organisation, tournamentId, 'e-falcons', 'p-casey', { expectedRevision: 7, reason: 'Abusive conduct' });
+        expect(texts('.players herald-status-label')).toEqual(['Sanctioned', 'Available']);
+        expect(text('.players li')).toContain('Reason: Abusive conduct');
+
+        button('Lift sanction')!.click();
+        await vi.waitFor(() => expect(toasts()).toContain('Casey Moss’ sanction lifted.'));
+        expect(liftSanction).toHaveBeenCalledWith(organisation, tournamentId, 'e-falcons', 'p-casey', { expectedRevision: 8 });
+        expect(texts('.players herald-status-label')).toEqual(['Available', 'Available']);
+        expect(document.querySelector('[role=dialog]')).not.toBeNull();
+      });
+
+    it('shows a withdrawn player as final with no actions', async () => {
+      const { text } = await openRoster({}, roster('available', 'withdrawn'));
+      expect(text('.players li:nth-child(2)')).toContain('Withdrawn from the tournament · final · Reason: Injured');
+      expect(document.querySelector('button[aria-label="Withdraw Drew Lane"]')).toBeNull();
+    });
+  });
 });
