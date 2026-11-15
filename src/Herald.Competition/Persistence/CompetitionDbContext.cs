@@ -33,6 +33,8 @@ public sealed class CompetitionDbContext(DbContextOptions<CompetitionDbContext> 
             schedule.Property(s => s.Id).HasConversion(id => id.Value, value => new TournamentId(value));
             // Two writes based on the same schedule cannot both succeed.
             schedule.Property(s => s.Revision).IsConcurrencyToken();
+            // Two resolutions cannot publish the same results revision.
+            schedule.Property(s => s.ResultsRevision).IsConcurrencyToken();
             // The field, the draft and the publications are read and written whole with their schedule:
             // documents, not rows (design D-1).
             Json(schedule.Property(s => s.Field));
@@ -60,12 +62,17 @@ public sealed class CompetitionDbContext(DbContextOptions<CompetitionDbContext> 
     }
 
     // Once per tournament: the started revision's pairings become matches, unless they already did (h1-match-lineups D-1).
-    public async Task ScheduleMatchesAsync(Schedule schedule, CancellationToken cancellationToken)
+    // Returns the matches it scheduled, none if it scheduled nothing.
+    public async Task<IReadOnlyList<Match>> ScheduleMatchesAsync(Schedule schedule, CancellationToken cancellationToken)
     {
-        if (schedule.StartedPairings is not null && !await Matches.AnyAsync(match => match.TournamentId == schedule.Id, cancellationToken))
+        if (schedule.StartedPairings is null || await Matches.AnyAsync(match => match.TournamentId == schedule.Id, cancellationToken))
         {
-            Matches.AddRange(schedule.ScheduleMatches());
+            return [];
         }
+
+        var matches = schedule.ScheduleMatches();
+        Matches.AddRange(matches);
+        return matches;
     }
 
     private static readonly JsonSerializerOptions _json = new(JsonSerializerDefaults.Web);

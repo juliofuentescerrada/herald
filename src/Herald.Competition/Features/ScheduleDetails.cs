@@ -138,7 +138,7 @@ internal static class ScheduleResults
                         extensions: new Dictionary<string, object?> { ["currentRevision"] = schedule.Revision, ["schedule"] = await ScheduleDetails.OfAsync(db, schedule, cancellationToken) });
                 case WriteOutcome.Applied:
                     // A revision published after a crossed withdrawal is the one the matches come from.
-                    await db.ScheduleMatchesAsync(schedule, cancellationToken);
+                    var matches = await db.ScheduleMatchesAsync(schedule, cancellationToken);
                     try
                     {
                         await db.SaveChangesAsync(cancellationToken);
@@ -151,6 +151,10 @@ internal static class ScheduleResults
 
                     // Stored with the change by the transaction around the endpoint, sent after its commit.
                     await bus.PublishAsync(ScheduleDetails.Changed(organisationId, schedule));
+                    if (matches.Count > 0)
+                    {
+                        await bus.PublishAsync(ResultsSnapshot.Of(organisationId, schedule, matches));
+                    }
                     break;
             }
 

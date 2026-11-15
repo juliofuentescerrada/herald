@@ -1,3 +1,4 @@
+using System.Collections.Concurrent;
 using System.Net.Http.Headers;
 using System.Net.Http.Json;
 using Microsoft.Extensions.DependencyInjection;
@@ -13,6 +14,7 @@ public sealed class OrganisationApi : IAsyncLifetime
 {
     private readonly PostgreSqlContainer _container = new PostgreSqlBuilder("postgres:18.3").Build();
     private HostFactory? _host;
+    private readonly ConcurrentQueue<object> _sent = new();
 
     public async ValueTask InitializeAsync()
     {
@@ -48,10 +50,18 @@ public sealed class OrganisationApi : IAsyncLifetime
     public async Task<T> SettledAsync<T>(Func<Task<T>> request)
     {
         T result = default!;
-        await _host!.Services.GetRequiredService<IHost>().TrackActivity()
+        var session = await _host!.Services.GetRequiredService<IHost>().TrackActivity()
             .ExecuteAndWaitAsync((Func<Wolverine.IMessageContext, Task>)(async _ => result = await request()));
+        foreach (var message in session.Sent.MessagesOf<object>())
+        {
+            _sent.Enqueue(message);
+        }
+
         return result;
     }
+
+    // The messages of a type sent during settled requests so far, in order.
+    public IReadOnlyList<TMessage> Sent<TMessage>() => [.. _sent.OfType<TMessage>()];
 
     public async Task ExecuteAsync(string sql, Guid parameter)
     {

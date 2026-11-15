@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
+using Herald.Contracts.Competition.V1;
 using Shouldly;
 
 namespace Herald.Host.Tests;
@@ -282,6 +283,31 @@ public class MatchTests(OrganisationApi api)
         appearances.Count.ShouldBe(10);
         appearances.ShouldNotContain(falcons[5]);
         appearances.ShouldNotContain(stars[6]);
+    }
+
+    [Fact]
+    public async Task The_start_and_each_resolution_publish_the_next_results_revision()
+    {
+        var league = await OpenAsync("individual");
+        foreach (var name in new[] { "Robin Vale", "Sam Reed", "Jamie Brook" })
+        {
+            await EnterAsync(league, name);
+        }
+
+        var matches = (await StartAsync(league)).GetProperty("matches");
+        await SettledAsync(() => ResultAsync(league, MatchPath(league, matches[0]), "first", 1));
+        await SettledAsync(() => ResultAsync(league, MatchPath(league, matches[1]), "draw", 1));
+
+        var tournament = Guid.Parse(league.Path.Split('/')[^1]);
+        var sent = api.Sent<TournamentResultsChanged>().Where(message => message.TournamentId == tournament).ToList();
+        sent.Select(message => message.Revision).ShouldBe([1, 2, 3]);
+        sent[0].Entrants.Count.ShouldBe(3);
+        sent[0].Rests.Count.ShouldBe(3);
+        sent[0].Matches.ShouldAllBe(match => match.State == ResultsMatchState.Scheduled && match.Outcome == null);
+        var last = sent[^1].Matches.ToDictionary(match => match.MatchId);
+        var won = last[matches[0].GetProperty("matchId").GetGuid()];
+        (won.State, won.Outcome, won.Cause, won.Played).ShouldBe((ResultsMatchState.Resolved, ResultOutcome.First, "played", true));
+        last[matches[1].GetProperty("matchId").GetGuid()].Outcome.ShouldBe(ResultOutcome.Draw);
     }
 
     [Fact]

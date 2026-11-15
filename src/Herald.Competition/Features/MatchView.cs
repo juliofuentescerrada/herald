@@ -2,6 +2,7 @@ using Herald.Competition.Domain;
 using Herald.Competition.Persistence;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Wolverine;
 
 namespace Herald.Competition.Features;
 
@@ -74,20 +75,23 @@ internal static class MatchResults
     private const int Attempts = 3;
 
     // Loads the match and its schedule, applies the write and saves it; the same 404 for another organisation's match.
+    // A resolution also publishes the next results revision with it (h1-standings D-1).
     public static async Task<IResult> WriteAsync(
-        this CompetitionDbContext db, Guid tournamentId, Guid matchId, Func<Match, Schedule, WriteResult> write, CancellationToken cancellationToken)
+        this CompetitionDbContext db, IMessageBus bus, Guid organisationId, Guid tournamentId, Guid matchId, Func<Match, Schedule, WriteResult> write, CancellationToken cancellationToken)
     {
         var tournament = new TournamentId(tournamentId);
         var id = new MatchId(matchId);
         for (var attempt = 1; ; attempt++)
         {
             if (await db.Matches.SingleOrDefaultAsync(match => match.Id == id && match.TournamentId == tournament, cancellationToken) is not { } match
-                || await db.Schedules.AsNoTracking().SingleOrDefaultAsync(schedule => schedule.Id == tournament, cancellationToken) is not { } schedule)
+                || await db.Schedules.SingleOrDefaultAsync(schedule => schedule.Id == tournament, cancellationToken) is not { } schedule)
             {
                 return ScheduleResults.NotFound();
             }
 
+            var wasResolved = match.Resolution is not null;
             var result = write(match, schedule);
+            var resolved = result.Outcome == WriteOutcome.Applied && !wasResolved && match.Resolution is not null;
             switch (result.Outcome)
             {
                 case WriteOutcome.Rejected:
@@ -101,6 +105,11 @@ internal static class MatchResults
                         type: RevisionConflict,
                         extensions: new Dictionary<string, object?> { ["currentRevision"] = match.Revision, ["match"] = MatchView.Of(match, schedule) });
                 case WriteOutcome.Applied:
+                    if (resolved)
+                    {
+                        schedule.ResultRecorded();
+                    }
+
                     try
                     {
                         await db.SaveChangesAsync(cancellationToken);
@@ -109,6 +118,13 @@ internal static class MatchResults
                     {
                         db.ChangeTracker.Clear();
                         continue;
+                    }
+
+                    if (resolved)
+                    {
+                        // Stored with the change by the transaction around the endpoint, sent after its commit.
+                        var matches = await db.Matches.Where(other => other.TournamentId == tournament).ToListAsync(cancellationToken);
+                        await bus.PublishAsync(ResultsSnapshot.Of(organisationId, schedule, matches));
                     }
 
                     break;
