@@ -17,18 +17,24 @@ public enum MatchState
     Resolved,
 }
 
-// Who won, or a draw; the loser's result is derived (h1-operator-results A-2).
+// Who won, a draw, or no winner (a double absence or a no contest, 0 each); the loser's result is derived (h1-operator-results A-2).
+// Stored by number in the resolution document: append only.
 public enum Outcome
 {
     First,
     Second,
     Draw,
+    None,
 }
 
-// Why a match is resolved; h1-exceptional-outcomes adds the administrative causes.
+// Why a match is resolved (h1-exceptional-outcomes D-1). Stored by number in the resolution document: append only.
 public enum Cause
 {
     Played,
+    Concession,
+    SingleAbsence,
+    DoubleAbsence,
+    NoContest,
 }
 
 // One recorded lineup of a side: the players chosen from the frozen roster, kept for good once recorded (design D-2).
@@ -45,7 +51,8 @@ public sealed record Resolution(
     IReadOnlyList<Guid> Appearances,
     Guid RecordedBy,
     DateTimeOffset RecordedAt,
-    Guid OperationId);
+    Guid OperationId,
+    string? Reason = null);
 
 public sealed record MatchResolved(MatchId MatchId, Outcome Outcome, Cause Cause, Guid RecordedBy, DateTimeOffset RecordedAt) : IDomainEvent;
 
@@ -225,8 +232,8 @@ public sealed class Match : AggregateRoot<MatchId>
             return WriteOutcome.Stale;
         }
 
-        // The API also binds integers to the enum: only a defined outcome becomes the one effective result.
-        if (!Enum.IsDefined(outcome))
+        // The API also binds integers to the enum: only a winner or a draw becomes the one played result.
+        if (!Enum.IsDefined(outcome) || outcome == Outcome.None)
         {
             return WriteResult.Reject("outcome", "unknown");
         }
@@ -244,6 +251,79 @@ public sealed class Match : AggregateRoot<MatchId>
 
         Resolution = new(outcome, Cause.Played, true, Appearances(), actor, at, operationId);
         Raise(new MatchResolved(Id, outcome, Cause.Played, actor, at));
+        Revision++;
+        return WriteOutcome.Applied;
+    }
+
+    public const int ReasonLength = 500;
+
+    // A concession, an absence or a no contest (h1-exceptional-outcomes D-1, D-2). The entrant is the conceding or absent side;
+    // played states whether play took place, which an absence never records. None of them starts the match.
+    public WriteResult RecordAdministrative(
+        Guid operationId, Cause cause, Side? entrant, bool? played, string? reason, int expectedRevision, Guid actor, DateTimeOffset at)
+    {
+        if (Resolution?.OperationId == operationId)
+        {
+            return WriteOutcome.Repeated;
+        }
+
+        if (Resolution is not null)
+        {
+            return WriteResult.Reject("match", "resolved");
+        }
+
+        if (expectedRevision != Revision)
+        {
+            return WriteOutcome.Stale;
+        }
+
+        reason = string.IsNullOrWhiteSpace(reason) ? null : reason.Trim();
+        List<BrokenRule> broken = [];
+        switch (cause)
+        {
+            case Cause.Concession or Cause.SingleAbsence when entrant is not { } side || !Enum.IsDefined(side):
+                broken.Add(new("entrant", "required"));
+                break;
+            case Cause.NoContest when reason is null:
+                broken.Add(new("reason", "required"));
+                break;
+            case Cause.NoContest when reason?.Length > ReasonLength:
+                broken.Add(new("reason", "too-long"));
+                break;
+            case Cause.Concession or Cause.SingleAbsence or Cause.DoubleAbsence or Cause.NoContest:
+                break;
+            default:
+                return WriteResult.Reject("cause", "unknown");
+        }
+
+        var absence = cause is Cause.SingleAbsence or Cause.DoubleAbsence;
+        if (!absence && played is null)
+        {
+            broken.Add(new("played", "required"));
+        }
+
+        if (absence && Start is not null)
+        {
+            broken.Add(new("match", "started"));
+        }
+
+        var tookPlace = !absence && played == true;
+        if (tookPlace && IsTeamMatch && Start is null)
+        {
+            broken.Add(new("match", "not-started"));
+        }
+
+        if (broken.Count > 0)
+        {
+            return new(WriteOutcome.Rejected, broken);
+        }
+
+        // The other side of the conceding or absent entrant wins; a double absence and a no contest have no winner.
+        var outcome = cause is Cause.Concession or Cause.SingleAbsence
+            ? entrant == Side.First ? Outcome.Second : Outcome.First
+            : Outcome.None;
+        Resolution = new(outcome, cause, tookPlace, tookPlace ? Appearances() : [], actor, at, operationId, cause == Cause.NoContest ? reason : null);
+        Raise(new MatchResolved(Id, outcome, cause, actor, at));
         Revision++;
         return WriteOutcome.Applied;
     }
