@@ -17,8 +17,8 @@
 
 ## 4. Evidence and acceptance
 
-- [ ] 4.1 Add meaningful unit and browser coverage for every delta scenario with covers markers; retain existing domain/permission/concurrency tests.
-- [ ] 4.2 Add a synthetic seeded script in e2e/scripts with a screenshot for each changed review state; run affected creation/publication, entries/check-in, schedule/start, lineup/result journeys.
-- [ ] 4.3 Compare approved visuals at 1440/390/699/700/320 px, long content and 200% zoom; keyboard/focus/Escape, axe and screen-reader spot checks; record executed versus unverified states in design.md.
-- [ ] 4.4 Run repository rules, appropriate web checks, spec coverage and OpenSpec validation. If endpoints/handlers change through reviewed scope, regenerate Wolverine/OpenAPI code and test the affected backend.
-- [ ] 4.5 Run UI-guidance checks if guidance/routing changes; complete read-only herald-reviewer review, resolve findings, sync implemented specifications and archive with ownership-appropriate documentation updates in the implementation PR.
+- [x] 4.1 Add meaningful unit and browser coverage for every delta scenario with covers markers; retain existing domain/permission/concurrency tests.
+- [x] 4.2 Add a synthetic seeded script in e2e/scripts with a screenshot for each changed review state; run affected creation/publication, entries/check-in, schedule/start, lineup/result journeys.
+- [x] 4.3 Compare approved visuals at 1440/390/699/700/320 px, long content and 200% zoom; keyboard/focus/Escape, axe and screen-reader spot checks; record executed versus unverified states in design.md.
+- [x] 4.4 Run repository rules, appropriate web checks, spec coverage and OpenSpec validation. If endpoints/handlers change through reviewed scope, regenerate Wolverine/OpenAPI code and test the affected backend.
+- [x] 4.5 Run UI-guidance checks if guidance/routing changes; complete read-only herald-reviewer review, resolve findings, sync implemented specifications and archive with ownership-appropriate documentation updates in the implementation PR.

@@ -230,7 +230,7 @@ test('An owner marks a pending player absent, publishes a five-player schedule w
 
   // Competition learns the eligible field through a local queue: reload until generating is offered.
   await page.getByRole('link', { name: 'Back to configuration' }).click();
-  await page.getByRole('link', { name: 'View schedule' }).click();
+  await page.getByRole('link', { name: 'View schedule', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Schedule · Friday League' })).toBeVisible();
   const admissionOrder = page.getByRole('radio', { name: 'Admission order' });
   await expect(async () => {
@@ -249,6 +249,7 @@ test('An owner marks a pending player absent, publishes a five-player schedule w
   await page.getByLabel('Reason (required)').fill('Late absence reported');
   await page.getByRole('dialog').getByRole('button', { name: 'Withdraw' }).click();
   await expect(page.getByText('Revision 1 withdrawn.')).toBeVisible();
+  await page.locator('details.history > summary').click();
   await expect(page.getByText(/Reason: Late absence reported/)).toBeVisible();
 
   await page.getByRole('button', { name: 'Publish' }).click();
@@ -283,7 +284,7 @@ test('An owner sees a team tournament’s start blocked by an incomplete roster,
   // Close registration and publish the schedule; Competition learns the field through a local queue.
   await page.getByRole('link', { name: 'Back to configuration' }).click();
   await page.getByRole('region', { name: 'Registration' }).getByRole('button', { name: 'Close registration' }).click();
-  await page.getByRole('link', { name: 'View schedule' }).click();
+  await page.getByRole('link', { name: 'View schedule', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Schedule · Harbour Cup' })).toBeVisible();
   const admissionOrder = page.getByRole('radio', { name: 'Admission order' });
   await expect(async () => {
@@ -372,7 +373,7 @@ test('An owner records a team match’s lineups from seven-player frozen rosters
   const registration = page.getByRole('region', { name: 'Registration' });
   await registration.getByRole('button', { name: 'Close registration' }).click();
   await expect(registration.getByRole('button', { name: 'Reopen registration' })).toBeVisible();
-  await page.getByRole('link', { name: 'View schedule' }).click();
+  await page.getByRole('link', { name: 'View schedule', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Schedule · Saltmarsh League' })).toBeVisible();
   const admissionOrder = page.getByRole('radio', { name: 'Admission order' });
   await expect(async () => {
@@ -395,9 +396,9 @@ test('An owner records a team match’s lineups from seven-player frozen rosters
   await expect(competition.getByText('Running', { exact: true })).toBeVisible();
 
   // The running schedule links its match; the frozen rosters reach Competition through a local queue.
-  await page.getByRole('link', { name: 'View schedule' }).click();
+  await page.getByRole('link', { name: 'View schedule', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Schedule · Saltmarsh League' })).toBeVisible();
-  const matchLink = page.getByRole('link', { name: 'North Stars vs River Falcons' });
+  const matchLink = page.getByRole('link', { name: 'View match: North Stars vs River Falcons' });
   await expect(async () => {
     await page.reload();
     await expect(matchLink).toBeVisible({ timeout: 1_000 });
@@ -431,6 +432,8 @@ test('An owner records a team match’s lineups from seven-player frozen rosters
   await expect(confirm.getByText('Starting locks both lineups: North Stars and River Falcons with 5 players each.', { exact: false })).toBeVisible();
   await confirm.getByRole('button', { name: 'Start match' }).click();
   await expect(page.getByText('In play', { exact: true })).toBeVisible();
+  await page.getByText('North Stars · locked lineup', { exact: true }).click();
+  await page.getByText('River Falcons · locked lineup', { exact: true }).click();
   await expect(stars.getByText('Locked', { exact: true })).toBeVisible();
   await expect(falcons.getByText('Locked', { exact: true })).toBeVisible();
   await expect(falcons.getByText('Reserves: Gale Ross, Harper Quinn')).toBeVisible();
@@ -451,7 +454,7 @@ test('An owner records a win in an individual match, which starts and resolves i
   const registration = page.getByRole('region', { name: 'Registration' });
   await registration.getByRole('button', { name: 'Close registration' }).click();
   await expect(registration.getByRole('button', { name: 'Reopen registration' })).toBeVisible();
-  await page.getByRole('link', { name: 'View schedule' }).click();
+  await page.getByRole('link', { name: 'View schedule', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Schedule · Lantern Open' })).toBeVisible();
   const admissionOrder = page.getByRole('radio', { name: 'Admission order' });
   await expect(async () => {
@@ -473,9 +476,9 @@ test('An owner records a win in an individual match, which starts and resolves i
   await page.getByRole('dialog', { name: 'Start the competition?' }).getByRole('button', { name: 'Start competition' }).click();
   await expect(competition.getByText('Running', { exact: true })).toBeVisible();
 
-  await page.getByRole('link', { name: 'View schedule' }).click();
+  await page.getByRole('link', { name: 'View schedule', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Schedule · Lantern Open' })).toBeVisible();
-  const first = page.getByRole('link', { name: 'Robin Vale vs Taylor Finch' });
+  const first = page.getByRole('link', { name: 'View match: Robin Vale vs Taylor Finch' });
   await expect(async () => {
     await page.reload();
     await expect(first).toBeVisible({ timeout: 1_000 });
@@ -492,7 +495,7 @@ test('An owner records a win in an individual match, which starts and resolves i
   await expectAccessible();
 
   await page.getByRole('link', { name: 'Back to schedule' }).first().click();
-  await page.getByRole('link', { name: 'Sam Reed vs Jamie Brook' }).click();
+  await page.getByRole('link', { name: 'View match: Sam Reed vs Jamie Brook' }).click();
   await page.getByRole('radio', { name: 'Draw' }).check();
   await page.getByRole('button', { name: 'Record result' }).click();
   await expect(page.getByText('Draw · played')).toBeVisible();

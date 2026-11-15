@@ -1,6 +1,6 @@
 ## Status
 
-**Approved for implementation, 15 November 2026.** The maintainer accepted the scope and generated visual references and explicitly instructed committing and applying this change. References: `prototypes/frontend/tournament-admin-ux.html` and its state inventory. This approval supersedes the earlier pending gates; it does not change approvals of the separate competition changes. The implementation baseline is main revision cfc6fa6 plus this proposal; no domain/API dependencies are introduced. All work fits the existing tasks and preserves separate feature ownership.
+**Approved and implemented, 15 November 2026; pending PR merge.** The maintainer accepted the scope and generated visual references and explicitly instructed committing and applying this change. References: `prototypes/frontend/tournament-admin-ux.html` and its state inventory. This approval supersedes the earlier pending gates; it does not change approvals of the separate competition changes. The implementation baseline is main revision cfc6fa6 plus this proposal; no domain/API dependencies are introduced. All work fits the existing tasks and preserves separate feature ownership.
 
 
 ## Why

@@ -2,7 +2,7 @@
 
 Status: approved design, 15 November 2026. The maintainer accepted the scope and generated references and authorised implementation. The maintainer requested the complete administration assessment followed by this OpenSpec proposal.
 
-See [the assessment](reviews/assessment.md) for route/state coverage, evidence, findings and candidate scope, and [the completed browser review](reviews/browser-review.md) for the signed-in inspection, responsive layout measurements and explicit test limits. The read-only assessment is complete for scope discussion; mutation/error/concurrency verification belongs to the subsequent synthetic test round. No production files, product decisions or existing change approvals are modified. Visual input and implementation tasks remain for the subsequent proposal stage.
+See [the assessment](reviews/assessment.md) for route/state coverage, evidence, findings and candidate scope, and [the completed browser review](reviews/browser-review.md) for the signed-in inspection, responsive layout measurements and explicit test limits. The read-only assessment is complete for scope discussion; mutation/error/concurrency verification belongs to the subsequent synthetic test round. At assessment time no production files, product decisions or existing change approvals were modified. The subsequent approval and implementation are recorded below.
 
 The maintainer subsequently confirmed the local seeded data is disposable and authorised mutations. [The operational follow-up](reviews/operational-review.md) records the executed cancellation/promotion, team lineup/start/result and schedule generation/publication/withdrawal checks, including the resulting local data changes. Fault injection and concurrency remain unverified.
 
@@ -28,11 +28,11 @@ Allow text children to shrink and wrap, and row actions to wrap or stack within 
 
 ## Visual review gate and state matrix
 
-The Screens section of proposal.md plus the assessment inventory is the affected state matrix. For each modified state, obtain a reviewed wide/narrow reference and compare actual implementation using G-01–12/RU-01–10; treat loading/error/conflict/access and long-content variants explicitly rather than accepting only populated screenshots. The maintainer explicitly requested agent-generated references. See [navigable prototype](../../../prototypes/frontend/tournament-admin-ux.html) and [state inventory](../../../prototypes/frontend/tournament-admin-ux.md). References have been generated but are not approved; the implementation gate remains closed. The reviewed input can narrow which preparation screens actually change.
+The Screens section of proposal.md plus the assessment inventory is the affected state matrix. For each modified state, obtain a reviewed wide/narrow reference and compare actual implementation using G-01–12/RU-01–10; treat loading/error/conflict/access and long-content variants explicitly rather than accepting only populated screenshots. The maintainer explicitly requested agent-generated references. See [navigable prototype](../../../../prototypes/frontend/tournament-admin-ux.html) and [state inventory](../../../../prototypes/frontend/tournament-admin-ux.md). The maintainer subsequently approved these references and opened the implementation gate; see Implementation approval below. The reviewed input can narrow which preparation screens actually change.
 
 ## Validation and implementation dependencies
 
-This PR adds proposal artifacts and dated evidence only. Delta scenarios are future acceptance requirements; their tests and covers markers are tasks, not executed implementation evidence. Preserve current domain contracts, expected revisions, retry identities, access boundaries and notification policy. Coordinate active competition changes before choosing the implementation baseline; if their scope changes the screen inventory, update this design and review references first. No handler, event, API or database change is intended.
+The proposal initially contained artifacts and dated evidence only. The approved implementation now includes scenario tests and covers markers; execution evidence and limitations are recorded in the implementation review. Preserve current domain contracts, expected revisions, retry identities, access boundaries and notification policy. Coordinate active competition changes before choosing the implementation baseline; if their scope changes the screen inventory, update this design and review references first. No handler, event, API or database change is intended.
 
 ## Reference validation — 15 November 2026
 
@@ -45,3 +45,7 @@ The reference review found five simulation inconsistencies (phase labels, unchan
 ## Implementation approval
 
 The maintainer approved the generated references and application of this change on 15 November 2026. Earlier pending statuses above describe proposal history; the approval gates are now satisfied. No acceptance of future domain capabilities is implied.
+
+## Implemented composition and validation
+
+See [implementation conformance](reviews/implementation-review.md) for the G-/RU- review, reference comparison, synthetic evidence, reviewer findings and explicit unverified states. The UI is implemented with existing controls and app-local presentation; endpoint and handler generation is not applicable because neither changed. The baseline remains main cfc6fa6.
