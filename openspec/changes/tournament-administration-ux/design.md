@@ -1,6 +1,6 @@
 # Tournament administration UX assessment
 
-Status: proposed design, 15 November 2026; not approved for implementation and pending visual approval. The maintainer requested the complete administration assessment followed by this OpenSpec proposal.
+Status: approved design, 15 November 2026. The maintainer accepted the scope and generated references and authorised implementation. The maintainer requested the complete administration assessment followed by this OpenSpec proposal.
 
 See [the assessment](reviews/assessment.md) for route/state coverage, evidence, findings and candidate scope, and [the completed browser review](reviews/browser-review.md) for the signed-in inspection, responsive layout measurements and explicit test limits. The read-only assessment is complete for scope discussion; mutation/error/concurrency verification belongs to the subsequent synthetic test round. No production files, product decisions or existing change approvals are modified. Visual input and implementation tasks remain for the subsequent proposal stage.
 
@@ -41,3 +41,7 @@ The maintainer authorised generating the references after reviewing the assessme
 The previous PR rules failure was reproduced from its CI log: the spelling check rejected several documentation words. Those words were replaced with ordinary alternatives; no dictionary exception or rule suppression was added. The full tracked-file rules command is used for validation of this update.
 
 The reference review found five simulation inconsistencies (phase labels, unchanged search retry, staying with dirty lineups, the submitted outcome and conflict blocking). All were corrected. Chrome then confirmed that Draw resolves as Draw, Stay retains the ten selected lineup boxes, search retry retains Alex and a match conflict keeps both radios and submission disabled. These are fixture interactions only.
+
+## Implementation approval
+
+The maintainer approved the generated references and application of this change on 15 November 2026. Earlier pending statuses above describe proposal history; the approval gates are now satisfied. No acceptance of future domain capabilities is implied.

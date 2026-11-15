@@ -1,7 +1,7 @@
 ## 1. Review gates
 
-- [ ] 1.1 Obtain scope and visual input for the screen/state inventory; record approved references and unresolved exceptions in design.md. Do not mark implementation ready before visual approval.
-- [ ] 1.2 Record explicit implementation approval, confirm overlap/dependency baseline and split into approved slices if required by ADR 0018. Validate the change.
+- [x] 1.1 Obtain scope and visual input for the screen/state inventory; record approved references and unresolved exceptions in design.md. Do not mark implementation ready before visual approval.
+- [x] 1.2 Record explicit implementation approval, confirm overlap/dependency baseline and split into approved slices if required by ADR 0018. Validate the change.
 
 ## 2. Navigation and phase context
 
