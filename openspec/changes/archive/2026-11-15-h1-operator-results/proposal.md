@@ -2,6 +2,8 @@
 
 **Proposed in H1 batch 2's proposals pull request, 15 November 2026.** The rules come from the batch's decision session of the same day, recorded in the functional discovery (§8 "Confirmed for operator results", §8.1, F-07, §15 row D-25). It depends on `h1-match-lineups`. Merging the proposals pull request approves this change (ADR 0018); task 1.1 records that approval.
 
+**Approved for implementation on 15 November 2026**, when the maintainer merged the batch 2 proposals pull request (#63), with the review answers below (ADR 0018).
+
 **Review answers, 15 November 2026 (#63):** the maintainer accepted Q1 and Q2 (appearances from the locked lineups, §5.1's "Resolve a pairing" row) as proposed, and the prototypes as they are.
 
 ## Why

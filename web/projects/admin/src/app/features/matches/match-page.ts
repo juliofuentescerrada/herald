@@ -1,12 +1,12 @@
 import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, computed, inject, signal, TemplateRef, viewChild, ViewContainerRef } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { HeraldHostAdminService, HttpValidationProblemDetails, MatchView, problemOf, SideDetails, TournamentDetails } from '@herald/api-client/admin';
+import { HeraldHostAdminService, HttpValidationProblemDetails, MatchView, Outcome, problemOf, SideDetails, TournamentDetails } from '@herald/api-client/admin';
 import { Button, Dialog, DialogContext, DialogRef, Dialogs, Icon, Notice, StatusLabel, Toasts } from '@herald/ui';
 import { injectQuery } from '@tanstack/angular-query-experimental';
 import { firstValueFrom } from 'rxjs';
 import { AccessState, AppContext, QUERY_CLIENT } from '../../platform';
-import { instantText, lifecycleLabels } from '../../shared';
+import { instantText, lifecycleLabels, resultText } from '../../shared';
 import { matchKey, possessive, ruleText, scheduleKey, splitBlocker, tournamentKey } from './matches';
 
 type SideName = 'first' | 'second';
@@ -57,7 +57,25 @@ export class MatchPage {
   protected readonly labels = computed(() => (this.tournament.data() ? lifecycleLabels(this.tournament.data()!) : []));
   protected readonly zone = computed(() => this.tournament.data()?.configuration.timeZone ?? 'UTC');
   protected readonly team = computed(() => this.match.data()?.activePlayers != null);
-  protected readonly inPlay = computed(() => this.match.data()?.state === 'inPlay');
+  /** Started, in play or resolved: its lineups are locked (h1-match-lineups D-3). */
+  protected readonly started = computed(() => !!this.match.data()?.start);
+  protected readonly scheduled = computed(() => this.match.data()?.state === 'scheduled');
+  protected readonly stateText = { scheduled: 'Scheduled', inPlay: 'In play', resolved: 'Resolved' } as const;
+  protected readonly stateTone = { scheduled: 'neutral', inPlay: 'info', resolved: 'success' } as const;
+  /** Nothing is preselected: the owner chooses the outcome (§8.1). */
+  protected readonly outcome = signal<Outcome | null>(null);
+  /** Reused when the same result is sent again after a lost answer (match-results: A double submission). */
+  private resultOperation: { readonly id: string; readonly revision: number; readonly outcome: Outcome } | null = null;
+  protected readonly resultSummary = computed(() => {
+    const result = this.match.data()?.result;
+    return result ? `${resultText(result, this.names().first, this.names().second)} · played` : null;
+  });
+  /** Why a result cannot be recorded now, or null. */
+  protected readonly recordBlocked = computed(() => {
+    if (this.state() === 'busy') return 'Request in progress. Please wait; do not submit again.';
+    if (this.state() === 'conflict') return 'Reload the latest version first.';
+    return this.outcome() ? null : 'Choose the outcome first.';
+  });
   protected readonly names = computed(() => ({ first: this.match.data()?.first.entrant.name ?? '', second: this.match.data()?.second.entrant.name ?? '' }));
   protected readonly rostersUnknown = computed(() => this.team() && (!this.match.data()?.first.roster || !this.match.data()?.second.roster));
   /** Why the match cannot start now, in words; the first one describes the disabled button. */
@@ -131,6 +149,25 @@ export class MatchPage {
     );
   }
 
+  protected record(): void {
+    const match = this.match.data()!;
+    const outcome = this.outcome();
+    if (!outcome || this.recordBlocked()) return;
+    if (this.resultOperation?.revision !== match.revision || this.resultOperation.outcome !== outcome) {
+      this.resultOperation = { id: crypto.randomUUID(), revision: match.revision, outcome };
+    }
+    const body = { operationId: this.resultOperation.id, expectedRevision: match.revision, outcome };
+    void this.run(
+      'The result was not recorded',
+      () => firstValueFrom(this.api.recordResult<MatchView>(this.organisation, this.tournamentId, this.matchId, body)),
+      () => 'Result recorded.',
+      () => {
+        this.outcome.set(null);
+        this.resultOperation = null;
+      },
+    );
+  }
+
   protected close(): void {
     this.open?.close();
   }
@@ -153,7 +190,7 @@ export class MatchPage {
     const selected = this.selection(name);
     const lineup = side.lineups.at(-1) ?? null;
     const required = this.match.data()!.activePlayers ?? 0;
-    const locked = this.inPlay() ? side.lineups.find((each) => each.number === this.match.data()!.start?.[name === 'first' ? 'firstLineup' : 'secondLineup']) ?? null : null;
+    const locked = this.started() ? side.lineups.find((each) => each.number === this.match.data()!.start?.[name === 'first' ? 'firstLineup' : 'secondLineup']) ?? null : null;
     const lockedIds = new Set(locked?.players.map((player) => player.playerId));
     return {
       name,

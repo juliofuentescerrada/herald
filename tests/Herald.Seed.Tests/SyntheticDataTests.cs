@@ -57,6 +57,20 @@ public class SyntheticDataTests(SeededDatabases databases)
     }
 
     [Fact]
+    public async Task The_seeded_individual_league_is_running_with_its_first_match_won()
+    {
+        var database = await databases.NewDatabaseAsync();
+        await SeededDatabases.SeedAsync(database);
+
+        await using var reader = new Reader(database);
+        var matches = (await reader.GetAsync(Main, $"{Tournament("tournaments-by-state", "running-players")}/schedule")).GetProperty("matches").EnumerateArray().ToList();
+
+        matches.Count.ShouldBe(6);
+        matches[0].GetProperty("result").GetProperty("outcome").GetString().ShouldBe("first");
+        matches.Skip(1).ShouldAllBe(match => match.GetProperty("state").GetString() == "scheduled");
+    }
+
+    [Fact]
     public async Task The_seeded_cup_has_its_schedule_published_and_its_start_blocked_by_one_roster()
     {
         var database = await databases.NewDatabaseAsync();

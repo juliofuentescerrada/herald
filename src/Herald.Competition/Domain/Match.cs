@@ -14,6 +14,21 @@ public enum MatchState
 {
     Scheduled,
     InPlay,
+    Resolved,
+}
+
+// Who won, or a draw; the loser's result is derived (h1-operator-results A-2).
+public enum Outcome
+{
+    First,
+    Second,
+    Draw,
+}
+
+// Why a match is resolved; h1-exceptional-outcomes adds the administrative causes.
+public enum Cause
+{
+    Played,
 }
 
 // One recorded lineup of a side: the players chosen from the frozen roster, kept for good once recorded (design D-2).
@@ -21,6 +36,18 @@ public sealed record Lineup(int Number, IReadOnlyList<Guid> Players, Guid Record
 
 // Who started the match and when, with the lineup numbers it locked; a lock records intended starters, not appearances.
 public sealed record MatchStart(Guid StartedBy, DateTimeOffset StartedAt, int? FirstLineup, int? SecondLineup);
+
+// The one effective result of a match (h1-operator-results D-1), with the players credited with an appearance (D-2).
+public sealed record Resolution(
+    Outcome Outcome,
+    Cause Cause,
+    bool Played,
+    IReadOnlyList<Guid> Appearances,
+    Guid RecordedBy,
+    DateTimeOffset RecordedAt,
+    Guid OperationId);
+
+public sealed record MatchResolved(MatchId MatchId, Outcome Outcome, Cause Cause, Guid RecordedBy, DateTimeOffset RecordedAt) : IDomainEvent;
 
 public sealed record LineupRecorded(MatchId MatchId, Side Side, int Number, Guid RecordedBy, DateTimeOffset RecordedAt) : IDomainEvent;
 
@@ -75,7 +102,9 @@ public sealed class Match : AggregateRoot<MatchId>
 
     public MatchStart? Start { get; private set; }
 
-    public MatchState State => Start is null ? MatchState.Scheduled : MatchState.InPlay;
+    public Resolution? Resolution { get; private set; }
+
+    public MatchState State => Resolution is not null ? MatchState.Resolved : Start is null ? MatchState.Scheduled : MatchState.InPlay;
 
     // shortcut: a team start reported without its lineup size (a message from before h1-match-lineups) schedules
     // individual matches; no such message exists outside local databases, so revisit only if one is found.
@@ -176,6 +205,55 @@ public sealed class Match : AggregateRoot<MatchId>
         Revision++;
         return WriteOutcome.Applied;
     }
+
+    // A played result; an individual match not yet started starts with it, a team match must be in play (h1-operator-results D-1).
+    public WriteResult RecordPlayed(Guid operationId, Outcome outcome, int expectedRevision, Guid actor, DateTimeOffset at)
+    {
+        if (Resolution?.OperationId == operationId)
+        {
+            return WriteOutcome.Repeated;
+        }
+
+        // Before the revision, so a second result from a stale tab hears that the match is already resolved.
+        if (Resolution is not null)
+        {
+            return WriteResult.Reject("match", "resolved");
+        }
+
+        if (expectedRevision != Revision)
+        {
+            return WriteOutcome.Stale;
+        }
+
+        // The API also binds integers to the enum: only a defined outcome becomes the one effective result.
+        if (!Enum.IsDefined(outcome))
+        {
+            return WriteResult.Reject("outcome", "unknown");
+        }
+
+        if (IsTeamMatch && Start is null)
+        {
+            return WriteResult.Reject("match", "not-started");
+        }
+
+        if (Start is null)
+        {
+            Start = new(actor, at, null, null);
+            Raise(new MatchStarted(Id, actor, at));
+        }
+
+        Resolution = new(outcome, Cause.Played, true, Appearances(), actor, at, operationId);
+        Raise(new MatchResolved(Id, outcome, Cause.Played, actor, at));
+        Revision++;
+        return WriteOutcome.Applied;
+    }
+
+    // The players of the two locked lineups; none for an individual match, whose entrant is the player (D-2).
+    private List<Guid> Appearances() => IsTeamMatch && Start is { } start
+        ? [.. LockedPlayers(Side.First, start.FirstLineup), .. LockedPlayers(Side.Second, start.SecondLineup)]
+        : [];
+
+    private IEnumerable<Guid> LockedPlayers(Side side, int? number) => Lineups(side).Find(lineup => lineup.Number == number)?.Players ?? [];
 
     private List<Lineup> Lineups(Side side) => side == Side.First ? _firstLineups : _secondLineups;
 

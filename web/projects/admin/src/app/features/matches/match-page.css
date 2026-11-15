@@ -18,6 +18,7 @@ h2 { font-size: 20px; margin: 0; }
 .players { list-style: none; margin: var(--herald-space-3) 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr)); gap: var(--herald-space-2) var(--herald-space-4); }
 .choice { border: 0; padding: 0; margin: var(--herald-space-3) 0 0; }
 .choice legend { font-weight: 700; padding: 0; }
+.outcomes { display: grid; gap: var(--herald-space-1); }
 .choice label { display: inline-flex; align-items: center; gap: var(--herald-space-2); min-height: var(--herald-target-min); }
 .history { margin-top: var(--herald-space-4); }
 .history summary { display: inline-flex; align-items: center; min-height: var(--herald-target-min); font-weight: 700; cursor: pointer; }

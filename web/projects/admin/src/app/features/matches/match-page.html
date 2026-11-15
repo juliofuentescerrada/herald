@@ -30,7 +30,7 @@
     <section class="summary" aria-labelledby="summary-heading" [attr.aria-busy]="state() === 'busy' || null">
       <div class="summary-title">
         <h2 id="summary-heading">Round {{ m.round }} · {{ names().first }} vs {{ names().second }}</h2>
-        <herald-status-label [tone]="inPlay() ? 'info' : 'neutral'">{{ inPlay() ? 'In play' : 'Scheduled' }}</herald-status-label>
+        <herald-status-label [tone]="stateTone[m.state]">{{ stateText[m.state] }}</herald-status-label>
       </div>
       <p class="help">{{ team() ? 'Direct team match · ' + m.activePlayers + ' active players per side' : 'Individual match' }} · single round-robin</p>
       @if (m.start; as start) {
@@ -119,7 +119,7 @@
       }
     }
 
-    @if (!inPlay()) {
+    @if (!started()) {
       <section class="operation" aria-labelledby="start-heading">
         <h2 id="start-heading">Start</h2>
         <p class="help">
@@ -130,7 +130,8 @@
           }
         </p>
         <div class="actions">
-          <button herald-button variant="primary" type="button" [loading]="state() === 'busy'"
+          <!-- One primary action: an individual match's result also starts it, so Start is secondary there. -->
+          <button herald-button [variant]="team() ? 'primary' : 'secondary'" type="button" [loading]="state() === 'busy'"
             [disabled]="!!startBlocked() && state() !== 'busy'" [attr.aria-describedby]="startBlocked() ? 'start-why' : null" (click)="askStart($any($event.currentTarget))">Start match</button>
           @if (startBlocked(); as why) {
             <p class="help" id="start-why">{{ why }}</p>
@@ -138,6 +139,39 @@
         </div>
       </section>
     }
+
+    <!-- The result: a choice with nothing preselected, then a read-only summary once resolved (h1-operator-results D-3). -->
+    <section class="operation" aria-labelledby="result-heading" [attr.aria-busy]="state() === 'busy' || null">
+      <div class="summary-title">
+        <h2 id="result-heading">Result</h2>
+        @if (m.result) {
+          <herald-status-label tone="success">Resolved</herald-status-label>
+        }
+      </div>
+      @if (resultSummary(); as summary) {
+        <p><strong>{{ summary }}</strong></p>
+        <p class="help">Recorded <span class="when">{{ zoned(m.result!.recordedAt) }}</span>. Corrections come later.</p>
+      } @else if (team() && !started()) {
+        <herald-notice heading="Start the match first">A played team result needs both lineups locked, and they lock at match start.</herald-notice>
+      } @else {
+        @if (!started()) {
+          <p class="help">This match has not started: recording a played result also starts it.</p>
+        }
+        <fieldset class="choice outcomes" [disabled]="state() === 'busy'">
+          <legend>Outcome</legend>
+          <label><input type="radio" name="outcome" [checked]="outcome() === 'first'" (change)="outcome.set('first')" /> {{ names().first }} wins</label>
+          <label><input type="radio" name="outcome" [checked]="outcome() === 'draw'" (change)="outcome.set('draw')" /> Draw</label>
+          <label><input type="radio" name="outcome" [checked]="outcome() === 'second'" (change)="outcome.set('second')" /> {{ names().second }} wins</label>
+        </fieldset>
+        <div class="actions">
+          <button herald-button variant="primary" type="button" [loading]="state() === 'busy'" [disabled]="!!recordBlocked() && state() !== 'busy'"
+            [attr.aria-describedby]="recordBlocked() ? 'record-why' : null" (click)="record()">Record result</button>
+          @if (recordBlocked(); as why) {
+            <p class="help" id="record-why">{{ why }}</p>
+          }
+        </div>
+      }
+    </section>
   </div>
 }
 

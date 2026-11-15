@@ -126,6 +126,22 @@ public static class Scenarios
         await admin.CloseRegistrationAsync(organisation, running);
         await admin.PublishScheduleAsync(organisation, running);
         await admin.StartCompetitionAsync(organisation, running);
+
+        // Running individual league of four: its first match won by the first player, the other five to play
+        // (h1-operator-results).
+        var playing = Ids.For("tournament", "running-players");
+        await admin.CreateTournamentAsync(organisation, playing, Configuration(clock, "Lantern Open", opens: -6, closes: -1, starts: 1, capacity: 4));
+        await admin.PublishAsync(organisation, playing);
+        await admin.OpenRegistrationAsync(organisation, playing);
+        foreach (var name in Names.Players[..4])
+        {
+            await admin.EnterAsync(organisation, playing, await admin.CreateGuestAsync(organisation, "player", name));
+        }
+
+        await admin.CloseRegistrationAsync(organisation, playing);
+        await admin.PublishScheduleAsync(organisation, playing);
+        await admin.StartCompetitionAsync(organisation, playing);
+        await admin.RecordFirstResultAsync(organisation, playing, "first");
     }
 
     private static async Task SecondOrganisationAsync(Admin admin, Guid organisation, Clock clock)

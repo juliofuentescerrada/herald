@@ -66,6 +66,13 @@ export const CancellationCause = {
   absentAtStart: 'absentAtStart',
 } as const;
 
+export type Cause = typeof Cause[keyof typeof Cause];
+
+
+export const Cause = {
+  played: 'played',
+} as const;
+
 export type CheckIn = typeof CheckIn[keyof typeof CheckIn] | null;
 
 
@@ -430,7 +437,24 @@ export type MatchState = typeof MatchState[keyof typeof MatchState];
 export const MatchState = {
   scheduled: 'scheduled',
   inPlay: 'inPlay',
+  resolved: 'resolved',
 } as const;
+
+export type Outcome = typeof Outcome[keyof typeof Outcome];
+
+
+export const Outcome = {
+  first: 'first',
+  second: 'second',
+  draw: 'draw',
+} as const;
+
+export interface ResultDetails {
+  outcome: Outcome;
+  cause: Cause;
+  played: boolean;
+  recordedAt: string;
+}
 
 export interface MatchSummary {
   matchId: string;
@@ -438,6 +462,7 @@ export interface MatchSummary {
   first: EntrantDetails;
   second: EntrantDetails;
   state: MatchState;
+  result: null | ResultDetails;
 }
 
 export interface SideDetails {
@@ -458,6 +483,8 @@ export interface MatchView {
   second: SideDetails;
   start: null | MatchStartDetails;
   blockers: string[];
+  result: null | ResultDetails;
+  appearances: PlayerDetails[];
 }
 
 export interface OpenRegistration {
@@ -516,6 +543,12 @@ export interface PublishTournament {
 export interface RecordLineup {
   expectedRevision: number;
   players: string[];
+}
+
+export interface RecordResult {
+  operationId: string;
+  expectedRevision: number;
+  outcome: Outcome;
 }
 
 export type RegistrationWindow = typeof RegistrationWindow[keyof typeof RegistrationWindow];
@@ -1911,6 +1944,56 @@ export class HeraldHostAdminService {
   }
 
 /**
+ * POST_api_organisations_organisationId_tournaments_tournamentId_matches_matchId_result
+ * @summary POST_api_organisations_organisationId_tournaments_tournamentId_matches_matchId_result
+ */
+ recordResult<TData = MatchView>(organisationId: string,
+    tournamentId: string,
+    matchId: string,
+    recordResultBody: RecordResult, options?: HttpClientBodyOptions): Observable<TData>;
+ recordResult<TData = MatchView>(organisationId: string,
+    tournamentId: string,
+    matchId: string,
+    recordResultBody: RecordResult, options?: HttpClientEventOptions): Observable<HttpEvent<TData>>;
+ recordResult<TData = MatchView>(organisationId: string,
+    tournamentId: string,
+    matchId: string,
+    recordResultBody: RecordResult, options?: HttpClientResponseOptions): Observable<AngularHttpResponse<TData>>;
+  recordResult<TData = MatchView>(
+    organisationId: string,
+    tournamentId: string,
+    matchId: string,
+    recordResultBody: RecordResult, options?: HttpClientObserveOptions): Observable<TData | HttpEvent<TData> | AngularHttpResponse<TData>> {
+    if (options?.observe === 'events') {
+      return this.http.post<TData>(
+      `/api/organisations/${organisationId}/tournaments/${tournamentId}/matches/${matchId}/result`,
+      recordResultBody,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'events',
+      }
+    );
+    }
+
+    if (options?.observe === 'response') {
+      return this.http.post<TData>(
+      `/api/organisations/${organisationId}/tournaments/${tournamentId}/matches/${matchId}/result`,
+      recordResultBody,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'response',
+      }
+    );
+    }
+
+    return this.http.post<TData>(
+      `/api/organisations/${organisationId}/tournaments/${tournamentId}/matches/${matchId}/result`,
+      recordResultBody,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'body',
+      }
+    );
+  }
+
+/**
  * PUT_api_organisations_organisationId_tournaments_tournamentId_matches_matchId_lineups_side
  * @summary PUT_api_organisations_organisationId_tournaments_tournamentId_matches_matchId_lineups_side
  */
@@ -2165,6 +2248,7 @@ export type CancelEntryClientResult = NonNullable<FieldDetails>
 export type AdmitEntryClientResult = NonNullable<FieldDetails>
 export type WithdrawScheduleClientResult = NonNullable<ScheduleDetails>
 export type StartMatchClientResult = NonNullable<MatchView>
+export type RecordResultClientResult = NonNullable<MatchView>
 export type RecordLineupClientResult = NonNullable<MatchView>
 export type PublishScheduleClientResult = NonNullable<ScheduleDetails>
 export type GetScheduleClientResult = NonNullable<ScheduleDetails>
