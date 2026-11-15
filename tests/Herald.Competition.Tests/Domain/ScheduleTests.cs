@@ -34,7 +34,7 @@ public class ScheduleTests
         pairings.Matches.Count.ShouldBe(6);
         pairings.Matches.Select(match => match.Round).Distinct().Count().ShouldBe(3);
         pairings.Rests.ShouldBeEmpty();
-        pairings.Matches.Take(2).ShouldBe([new Match(1, _four[0].EntryId, _four[3].EntryId), new Match(1, _four[1].EntryId, _four[2].EntryId)]);
+        pairings.Matches.Take(2).ShouldBe([new Pairing(1, _four[0].EntryId, _four[3].EntryId), new Pairing(1, _four[1].EntryId, _four[2].EntryId)]);
     }
 
     [Fact]
