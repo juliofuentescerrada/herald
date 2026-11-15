@@ -72,7 +72,10 @@ internal static class MatchResults
 {
     public const string RevisionConflict = "match-revision-conflict";
 
-    private const int Attempts = 3;
+    // Every resolution of a tournament also writes its schedule's results revision, so simultaneous results of different
+    // matches queue on that row and each conflict is tried again.
+    // shortcut: more than ten results saved at the same instant in one tournament fail the last ones; lock the schedule row if that ever happens.
+    private const int Attempts = 10;
 
     // Loads the match and its schedule, applies the write and saves it; the same 404 for another organisation's match.
     // A resolution also publishes the next results revision with it (h1-standings D-1).

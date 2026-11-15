@@ -63,6 +63,8 @@ Deviations from the plan above, each kept small:
 - **Tournament tabs.** Earlier slices left tabs out (`h1-round-robin-pairings`, `h1-competition-start`); this change's task 4.1 asks for them, so Configuration, Entries, Schedule and Standings are route links (with `aria-current="page"`, not ARIA tabs) below the title of each published tournament's pages. The pages keep their back links. The match page has none: it is a child of the schedule.
 - **Journey 21.** Renumbered from 22: `h1-exceptional-outcomes`, which had 21, has not merged; it renumbers its journey to 22.
 - **Seed.** The seeded Lantern Open also records Dario Venn's win over Bram Holloway, so its standings share positions both as seeded and after `seeded-results` adds two results.
+- **Tournaments started before this change.** They have no results snapshot until their next resolution, and their Standings page reads "Updating" until then. No deployed data exists before M4 (ADR 0012), so there is no backfill.
+- **Simultaneous results.** Every resolution writes the schedule's results revision, so simultaneous results of one tournament queue on that row; a match write tries up to ten times (a `shortcut:` comment names the limit).
 - **Host tests file.** The standings API tests extend `MatchTests` (partial class `StandingsTests.cs`) for its league helpers.
 
 ## Verification
@@ -89,3 +91,16 @@ Captured at 1440 and 390 px from the composed application (synthetic persona, se
 | Narrow (390 px) | Position, entrant and points only; the explanation wraps | None |
 
 `standings-flags` belongs to `h1-round-operations`.
+
+## Review
+
+The herald-reviewer reviewed the diff on 15 November 2026 (no blocking findings):
+
+| Finding | Resolution |
+|---|---|
+| Simultaneous results in one tournament could exhaust three tries and fail | Ten tries, a `shortcut:` comment, and an API test recording four results at once (all succeed, revisions 2–5) |
+| `aria-label` on a plain span may not reach screen readers | Visible "2=" hidden from them, visually hidden "Position 2, shared" beside it |
+| A tournament started before this change polls until its next result | Recorded above: no deployed data before M4 |
+| Two scenario markers on tests that do not check the scenario's text | Markers moved to Vitest tests that assert "Provisional · 4 of 6 matches resolved" and "Round 2 · Rest · no points" |
+| At 390 px the hidden counts appear nowhere | The explanation adds "Resolved · won · drawn · lost" |
+| `seeded-results` comment out of date | Updated |

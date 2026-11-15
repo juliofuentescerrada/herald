@@ -21,7 +21,7 @@ test('The seeded owner reads a league’s provisional standings, a shared positi
   await expect(page.getByRole('heading', { name: 'Standings · Lantern Open' })).toBeVisible();
   await expect(page.getByText(/^Provisional · \d of 6 matches resolved$/)).toBeVisible();
   const table = page.getByRole('table', { name: 'Standings' });
-  await expect(table.getByLabel(/, shared$/).first()).toBeVisible();
+  await expect(table.getByText(/, shared$/).first()).toBeAttached();
   await screen(page, info, 'provisional-shared-position');
 
   await table.getByRole('button', { name: 'Dario Venn' }).click();

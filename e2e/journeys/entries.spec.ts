@@ -541,7 +541,7 @@ test('An owner records the results of a four-player league and reads its standin
   // Standings follow the results through a local queue: the page reads again until all six have arrived.
   await expect(page.getByText('Provisional · 6 of 6 matches resolved')).toBeVisible();
   const table = page.getByRole('table', { name: 'Standings' });
-  await expect(table.getByLabel('Position 2, shared')).toHaveCount(2);
+  await expect(table.getByText('Position 2, shared')).toHaveCount(2);
   const rows = table.getByRole('row');
   await expect(rows.nth(1)).toContainText('Robin Vale');
   await expect(rows.nth(1)).toContainText('9');

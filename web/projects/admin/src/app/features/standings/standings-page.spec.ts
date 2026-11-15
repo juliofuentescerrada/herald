@@ -108,7 +108,7 @@ describe('The standings page', () => {
   it('ranks every entrant at 1= with no points before any result', async () => {
     const { page, text, texts } = await open(() => of(empty), tournament(), resolvedMatches(0));
 
-    expect(texts('tbody tr td:first-child')).toEqual(['1=', '1=', '1=', '1=']);
+    expect(texts('tbody tr td:first-child [aria-hidden="true"]')).toEqual(['1=', '1=', '1=', '1=']);
     expect(text('.summary')).toContain('Provisional · 0 of 6 matches resolved');
     expect(text('.summary')).toContain('No match resolved yet');
     expect(await violations(page())).toEqual([]);
@@ -122,13 +122,19 @@ describe('The standings page', () => {
       expect(text('.summary')).toContain('Provisional · 4 of 6 matches resolved');
       expect(text('.summary')).toContain('Results revision 5');
       expect(texts('thead th')).toEqual(['Position', 'Player', 'Resolved', 'Won', 'Drawn', 'Lost', 'Points']);
-      const shared = [...page().querySelectorAll('tbody td:first-child span')].map((span) => span.getAttribute('aria-label'));
-      expect(shared).toEqual(['Position 1', 'Position 2, shared', 'Position 2, shared', 'Position 4']);
-      expect(texts('tbody td:first-child')).toEqual(['1', '2=', '2=', '4']);
+      expect(texts('tbody td:first-child .visually-hidden')).toEqual(['Position 1', 'Position 2, shared', 'Position 2, shared', 'Position 4']);
+      expect(texts('tbody td:first-child [aria-hidden="true"]')).toEqual(['1', '2=', '2=', '4']);
       expect(texts('nav[aria-label="Tournament"] a')).toEqual(['Configuration', 'Entries', 'Schedule', 'Standings']);
       expect(page().querySelector('nav a[aria-current="page"]')?.textContent?.trim()).toBe('Standings');
       expect(await violations(page())).toEqual([]);
     });
+
+  it('reads four of six matches resolved with the results revision', { meta: { type: 'covers', description: 'standings: Partway through' } }, async () => {
+    const { text } = await open(() => of(provisional));
+
+    expect(text('.summary p')).toBe('Provisional · 4 of 6 matches resolved');
+    expect(text('.summary .help')).toContain('Results revision 5');
+  });
 
   it('opens an entrant’s explanation, whose points add up to its total', async () => {
     const { page, settle, button, texts, text } = await open(() => of(provisional));
@@ -142,11 +148,11 @@ describe('The standings page', () => {
       'Round 2 · vs Taylor Finch · won · played · 3 points',
       'Round 3 · vs Jamie Brook · draw · played · 1 point',
     ]);
-    expect(text('.explain .help')).toBe('Total: 4 points');
+    expect(texts('.explain .help')).toEqual(['Resolved 3 · won 1 · drawn 1 · lost 1', 'Total: 4 points']);
     expect(await violations(page())).toEqual([]);
   });
 
-  it('names a rest round with no points and a double absence as no winner', async () => {
+  it('names a rest round with no points and a double absence as no winner', { meta: { type: 'covers', description: 'standings: Five players' } }, async () => {
     const view: StandingsView = {
       ...provisional,
       rows: [row(1, false, robin, [1, 0, 0, 0, 0], [

@@ -58,7 +58,8 @@
           @for (row of view()!.rows; track row.entrant.entryId) {
             <tr>
               <td>
-                <span [attr.aria-label]="'Position ' + row.position + (row.shared ? ', shared' : '')">{{ row.position }}{{ row.shared ? '=' : '' }}</span>
+                <span aria-hidden="true">{{ row.position }}{{ row.shared ? '=' : '' }}</span>
+                <span class="visually-hidden">Position {{ row.position }}{{ row.shared ? ', shared' : '' }}</span>
               </td>
               <td>
                 <button
@@ -89,6 +90,7 @@
                   } @else {
                     <p class="help">No match resolved yet.</p>
                   }
+                  <p class="help">Resolved {{ row.resolved }} · won {{ row.won }} · drawn {{ row.drawn }} · lost {{ row.lost }}</p>
                   <p class="help">Total: {{ pointsText(row.points) }}</p>
                 </td>
               </tr>

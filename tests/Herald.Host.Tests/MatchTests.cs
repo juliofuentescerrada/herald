@@ -311,6 +311,25 @@ public partial class MatchTests(OrganisationApi api)
     }
 
     [Fact]
+    public async Task Results_recorded_at_once_in_one_tournament_all_succeed_with_consecutive_results_revisions()
+    {
+        var league = await OpenAsync("individual");
+        foreach (var name in new[] { "Robin Vale", "Sam Reed", "Jamie Brook", "Taylor Finch" })
+        {
+            await EnterAsync(league, name);
+        }
+
+        var matches = (await StartAsync(league)).GetProperty("matches").EnumerateArray().Take(4).ToList();
+        var answers = await api.SettledAsync(() => Task.WhenAll(matches.Select(match => ResultAsync(league, MatchPath(league, match), "first", 1))));
+
+        answers.ShouldAllBe(answer => answer.StatusCode == HttpStatusCode.OK);
+        var tournament = Guid.Parse(league.Path.Split('/')[^1]);
+        api.Sent<TournamentResultsChanged>().Where(message => message.TournamentId == tournament).Select(message => message.Revision).Order().ShouldBe([1, 2, 3, 4, 5]);
+        var standings = await JsonAsync(await league.Client.GetAsync($"{league.Path}/standings", Cancellation));
+        (Revision(standings), standings.GetProperty("resolvedMatches").GetInt32()).ShouldBe((5, 4));
+    }
+
+    [Fact]
     public async Task A_result_from_an_older_revision_is_a_conflict_and_another_organisation_cannot_record_one()
     {
         var league = await OpenAsync("individual");

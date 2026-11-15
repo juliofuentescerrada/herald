@@ -27,3 +27,5 @@ button.link { background: none; border: 0; padding: 0; min-height: var(--herald-
   .wide { display: none; }
   th, td { padding: var(--herald-space-2) var(--herald-space-3); }
 }
+/* The shared position in words for screen readers; the visible "2=" is hidden from them. */
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }

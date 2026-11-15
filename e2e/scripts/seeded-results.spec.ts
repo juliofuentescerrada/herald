@@ -2,7 +2,8 @@ import { expect, test } from '../fixtures.ts';
 import { scriptPersona } from '../environment.ts';
 import { screen } from './screens.ts';
 
-// h1-operator-results 4.3: on the seeded Lantern Open (running, four players, Ada Fenwick already beat Dario Venn),
+// h1-operator-results 4.3: on the seeded Lantern Open (running, four players, Ada Fenwick already beat Dario Venn and
+// Dario Venn beat Bram Holloway),
 // the owner records a win that starts and resolves its match in one step and a draw, and reads both on the schedule.
 test('The seeded owner records a win and a draw and reads them on the schedule', async ({ page, signIn }, info) => {
   await signIn({ as: scriptPersona });
