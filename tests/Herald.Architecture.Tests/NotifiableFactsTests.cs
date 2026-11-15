@@ -20,6 +20,7 @@ public partial class NotifiableFactsTests
         ["FieldChange"] = "Computed when read from the field and the pairings, never stored (h1-round-robin-pairings D-5).",
         ["Lineup"] = "Recording a match lineup is not a notifiable fact in F-10 (h1-match-lineups proposal).",
         ["MatchStart"] = "Starting a match is not a notifiable fact in F-10 (h1-match-lineups proposal).",
+        ["Resolution"] = "A first result is not a notifiable fact in F-10; revised final results join with the change log (h1-operator-results proposal, D-26).",
         ["Tournament"] = "Publication and registration opening or closing join the inventory when their owning change confirms what is recorded (ADR 0017).",
     };
 

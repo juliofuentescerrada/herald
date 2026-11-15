@@ -207,8 +207,8 @@ describe('The schedule page', () => {
 
   it('links each match of a running competition to its page with its state', async () => {
     const matches = [
-      { matchId: 'm-1', round: 1, first: robin, second: taylor, state: 'inPlay' as const },
-      { matchId: 'm-2', round: 1, first: sam, second: jamie, state: 'scheduled' as const },
+      { matchId: 'm-1', round: 1, first: robin, second: taylor, state: 'inPlay' as const, result: null },
+      { matchId: 'm-2', round: 1, first: sam, second: jamie, state: 'scheduled' as const, result: null },
     ];
     const { texts, page } = await open({ getSchedule: () => of(schedule({ revision: 7, current: publication(1), startedOnRevision: 1, startedAt: '2026-11-21T09:05:00Z', matches })) });
     await vi.waitFor(() => expect(texts('.running herald-status-label')).toEqual(['In play', 'Scheduled']));

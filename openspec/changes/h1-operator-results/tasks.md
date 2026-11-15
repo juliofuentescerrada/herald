@@ -5,8 +5,8 @@
 ## 2. Competition
 
 - [x] 2.1 `Match` resolution, cause `Played` and appearances (design D-1, D-2); domain tests for every `match-results` scenario
-- [ ] 2.2 Migration; feature `RecordResult`; match and schedule details carry the resolution; API tests against PostgreSQL, including repeats, conflicts, a second result and another organisation's 404s
-- [ ] 2.3 Regenerate Wolverine code (`codegen write`) and the OpenAPI documents and client (`pnpm api:generate`); CI drift checks pass
+- [x] 2.2 Migration; feature `RecordResult`; match and schedule details carry the resolution; API tests against PostgreSQL, including repeats, conflicts, a second result and another organisation's 404s
+- [x] 2.3 Regenerate Wolverine code (`codegen write`) and the OpenAPI documents and client (`pnpm api:generate`); CI drift checks pass
 
 ## 3. Admin application
 

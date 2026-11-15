@@ -12,6 +12,9 @@ public sealed record LineupDetails(int Number, IReadOnlyList<PlayerDetails> Play
 // A side of a match: its entrant and, for a team match, its frozen roster (null while unknown) and lineups.
 public sealed record SideDetails(EntrantDetails Entrant, IReadOnlyList<PlayerDetails>? Roster, IReadOnlyList<LineupDetails> Lineups);
 
+// A match's effective result; appearances are named on the match view only (h1-operator-results D-2).
+public sealed record ResultDetails(Outcome Outcome, Cause Cause, bool Played, DateTimeOffset RecordedAt);
+
 public sealed record MatchStartDetails(DateTimeOffset StartedAt, int? FirstLineup, int? SecondLineup);
 
 // What every match write and the match read answer with. Blockers say why the match cannot start now.
@@ -24,7 +27,9 @@ public sealed record MatchView(
     SideDetails First,
     SideDetails Second,
     MatchStartDetails? Start,
-    IReadOnlyList<string> Blockers)
+    IReadOnlyList<string> Blockers,
+    ResultDetails? Result,
+    IReadOnlyList<PlayerDetails> Appearances)
 {
     public static MatchView Of(Match match, Schedule schedule)
     {
@@ -53,8 +58,13 @@ public sealed record MatchView(
             match.Start is { } start ? new(start.StartedAt, start.FirstLineup, start.SecondLineup) : null,
             match.State == MatchState.Scheduled
                 ? [.. match.StartBlockers(schedule.RosterOf(match.First), schedule.RosterOf(match.Second)).Select(rule => $"{rule.Field}-{rule.Rule}")]
-                : []);
+                : [],
+            ResultOf(match),
+            [.. (match.Resolution?.Appearances ?? []).Select(Player)]);
     }
+
+    public static ResultDetails? ResultOf(Match match) =>
+        match.Resolution is { } resolution ? new(resolution.Outcome, resolution.Cause, resolution.Played, resolution.RecordedAt) : null;
 }
 
 internal static class MatchResults

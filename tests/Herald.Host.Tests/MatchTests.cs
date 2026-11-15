@@ -5,10 +5,10 @@ using Shouldly;
 
 namespace Herald.Host.Tests;
 
-// The match-lineups spec through the Admin API: matches appear when the competition starts, frozen rosters arrive
+// The match-lineups and match-results specs through the Admin API: matches appear when the competition starts, frozen rosters arrive
 // from Registration and the lineup size from Tournaments (h1-match-lineups D-1, D-4).
 [Collection(OrganisationApiTests.Name)]
-public class MatchLineupTests(OrganisationApi api)
+public class MatchTests(OrganisationApi api)
 {
     private sealed record League(HttpClient Client, string Organisation, string Path);
 
@@ -220,5 +220,82 @@ public class MatchLineupTests(OrganisationApi api)
         (await other.GetAsync(path, Cancellation)).StatusCode.ShouldBe(HttpStatusCode.NotFound);
         (await other.PutAsJsonAsync($"{path}/lineups/first", new { expectedRevision = 1, players = Array.Empty<Guid>() }, Cancellation)).StatusCode.ShouldBe(HttpStatusCode.NotFound);
         (await other.PostAsJsonAsync($"{path}/start", new { expectedRevision = 1 }, Cancellation)).StatusCode.ShouldBe(HttpStatusCode.NotFound);
+    }
+
+    private static async Task<HttpResponseMessage> ResultAsync(League league, string match, string outcome, int revision, Guid? operation = null) =>
+        await league.Client.PostAsJsonAsync($"{match}/result", new { operationId = operation ?? Guid.NewGuid(), expectedRevision = revision, outcome }, Cancellation);
+
+    [Fact]
+    [Trait("covers", "match-results: A scheduled individual match")]
+    [Trait("covers", "match-results: A double submission")]
+    [Trait("covers", "match-results: A second result")]
+    public async Task An_owner_records_a_win_in_one_step_a_retry_returns_it_and_a_second_result_is_rejected()
+    {
+        var league = await OpenAsync("individual");
+        foreach (var name in new[] { "Robin Vale", "Sam Reed", "Jamie Brook", "Taylor Finch" })
+        {
+            await EnterAsync(league, name);
+        }
+
+        var matches = (await StartAsync(league)).GetProperty("matches");
+        var path = MatchPath(league, matches[0]);
+        var operation = Guid.NewGuid();
+
+        var won = await ResultAsync(league, path, "first", 1, operation);
+        var retried = await ResultAsync(league, path, "first", 1, operation);
+        var second = await ResultAsync(league, path, "second", 2);
+        var drawn = await JsonAsync(await ResultAsync(league, MatchPath(league, matches[1]), "draw", 1));
+        var schedule = await JsonAsync(await league.Client.GetAsync($"{league.Path}/schedule", Cancellation));
+
+        won.StatusCode.ShouldBe(HttpStatusCode.OK);
+        var details = await JsonAsync(won);
+        details.GetProperty("state").GetString().ShouldBe("resolved");
+        details.GetProperty("start").ValueKind.ShouldBe(JsonValueKind.Object);
+        details.GetProperty("result").GetProperty("outcome").GetString().ShouldBe("first");
+        details.GetProperty("result").GetProperty("cause").GetString().ShouldBe("played");
+        retried.StatusCode.ShouldBe(HttpStatusCode.OK);
+        Revision(await JsonAsync(retried)).ShouldBe(Revision(details));
+        Errors(await JsonAsync(second), "match").ShouldBe(["resolved"]);
+        drawn.GetProperty("result").GetProperty("outcome").GetString().ShouldBe("draw");
+        schedule.GetProperty("matches")[0].GetProperty("result").GetProperty("outcome").GetString().ShouldBe("first");
+        schedule.GetProperty("matches")[1].GetProperty("result").GetProperty("outcome").GetString().ShouldBe("draw");
+    }
+
+    [Fact]
+    [Trait("covers", "match-results: A team match not started")]
+    [Trait("covers", "match-results: Reserves")]
+    public async Task A_team_result_needs_the_start_and_credits_only_the_locked_starters()
+    {
+        var league = await OpenAsync("team");
+        var falcons = await TeamAsync(league, "River Falcons");
+        var stars = await TeamAsync(league, "North Stars");
+        var path = MatchPath(league, (await StartAsync(league)).GetProperty("matches")[0]);
+        await LineupAsync(league, path, "first", falcons[..5], 1);
+        await LineupAsync(league, path, "second", stars[..5], 2);
+
+        var early = await JsonAsync(await ResultAsync(league, path, "first", 3));
+        await league.Client.PostAsJsonAsync($"{path}/start", new { expectedRevision = 3 }, Cancellation);
+        var played = await JsonAsync(await ResultAsync(league, path, "first", 4));
+
+        Errors(early, "match").ShouldBe(["not-started"]);
+        var appearances = played.GetProperty("appearances").EnumerateArray().Select(player => player.GetProperty("playerId").GetGuid()).ToList();
+        appearances.Count.ShouldBe(10);
+        appearances.ShouldNotContain(falcons[5]);
+        appearances.ShouldNotContain(stars[6]);
+    }
+
+    [Fact]
+    public async Task A_result_from_an_older_revision_is_a_conflict_and_another_organisation_cannot_record_one()
+    {
+        var league = await OpenAsync("individual");
+        await EnterAsync(league, "Robin Vale");
+        await EnterAsync(league, "Sam Reed");
+        var path = MatchPath(league, (await StartAsync(league)).GetProperty("matches")[0]);
+
+        var stale = await ResultAsync(league, path, "first", 7);
+        var other = await api.As(Guid.NewGuid()).PostAsJsonAsync($"{path}/result", new { operationId = Guid.NewGuid(), expectedRevision = 1, outcome = "first" }, Cancellation);
+
+        stale.StatusCode.ShouldBe(HttpStatusCode.Conflict);
+        other.StatusCode.ShouldBe(HttpStatusCode.NotFound);
     }
 }

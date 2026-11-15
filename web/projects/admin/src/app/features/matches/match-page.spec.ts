@@ -48,6 +48,8 @@ const teamMatch = (over: Partial<MatchView> = {}): MatchView => ({
   second: { entrant: { entryId: 'e-stars', name: 'North Stars' }, roster: stars, lineups: [] },
   start: null,
   blockers: ['first-lineup-missing', 'second-lineup-missing'],
+  result: null,
+  appearances: [],
   ...over,
 });
 
@@ -61,6 +63,8 @@ const individual = (over: Partial<MatchView> = {}): MatchView => ({
   second: { entrant: { entryId: 'e-jamie', name: 'Jamie Brook' }, roster: null, lineups: [] },
   start: null,
   blockers: [],
+  result: null,
+  appearances: [],
   ...over,
 });
 

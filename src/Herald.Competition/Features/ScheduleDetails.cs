@@ -12,7 +12,7 @@ public sealed record EntrantDetails(Guid EntryId, string Name);
 public sealed record MatchDetails(EntrantDetails First, EntrantDetails Second);
 
 // A match of the running competition, for the Schedule page (h1-match-lineups D-5).
-public sealed record MatchSummary(Guid MatchId, int Round, EntrantDetails First, EntrantDetails Second, MatchState State);
+public sealed record MatchSummary(Guid MatchId, int Round, EntrantDetails First, EntrantDetails Second, MatchState State, ResultDetails? Result);
 
 public sealed record RoundDetails(int Number, IReadOnlyList<MatchDetails> Matches, EntrantDetails? Rest);
 
@@ -67,7 +67,7 @@ public sealed record ScheduleDetails(
         EntrantDetails Entrant(Guid id) => new(id, names.GetValueOrDefault(id, ""));
         // In the schedule's own order, as the pairings list them.
         var order = schedule.StartedPairings?.Matches.Select((pairing, index) => (pairing, index)).ToDictionary(item => (item.pairing.First, item.pairing.Second), item => item.index) ?? [];
-        return [.. matches.OrderBy(match => match.Round).ThenBy(match => order.GetValueOrDefault((match.First, match.Second))).Select(match => new MatchSummary(match.Id.Value, match.Round, Entrant(match.First), Entrant(match.Second), match.State))];
+        return [.. matches.OrderBy(match => match.Round).ThenBy(match => order.GetValueOrDefault((match.First, match.Second))).Select(match => new MatchSummary(match.Id.Value, match.Round, Entrant(match.First), Entrant(match.Second), match.State, MatchView.ResultOf(match)))];
     }
 
     public static async Task<ScheduleDetails> OfAsync(CompetitionDbContext db, Schedule schedule, CancellationToken cancellationToken) =>
