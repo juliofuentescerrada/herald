@@ -31,6 +31,9 @@ test('The seeded owner navigates and protects lineup work', { annotation: [{ typ
   await expectAccessible();
   await page.getByRole('link', { name: 'View match: Granite Herons vs Saltmarsh Wolves', exact: true }).click();
   const first = page.getByRole('region', { name: 'Granite Herons · lineup', exact: true });
+  // The match page renders its heading once loaded; checking before that reports a missing h1.
+  await expect(page.getByRole('heading', { level: 1, name: 'Match · Saltmarsh Team League' })).toBeVisible();
+  await expect(first).toBeVisible();
   await expectAccessible();
   await first.getByRole('checkbox', { name: 'Ada Fenwick', exact: true }).check();
   await page.getByRole('link', { name: 'Back to schedule', exact: true }).click();
