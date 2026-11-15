@@ -52,3 +52,31 @@ Visual choices (G-/RU-): radio buttons for a single choice among three visible o
 ## Risks / Trade-offs
 
 - [A wrong result has no correction until batch 3] → shown plainly in the resolved panel ("Corrections come later"); seeds and test rounds use fresh tournaments.
+
+## Implementation notes
+
+Deviations from the plan above, each kept small:
+
+- **The result's text in `shared`.** `resultText` ("Robin Vale won", "Draw") is used by the schedule and matches features, so it lives in the admin app's `shared`, typed structurally because `shared` may not import the API client.
+- **One primary action on an individual match.** While an individual match is scheduled, its Start panel's "Start match" is secondary: recording the result also starts it, and "Record result" is the page's primary action. A team match keeps "Start match" primary.
+- **State labels.** The match and schedule show "Resolved" in the success tone, text only, as for "In play" and "Locked" (`docs/ui/icons.md` has no reviewed icon for these states).
+- **No recorder's name.** The resolved summary says when the result was recorded, not by whom (as for lineups, W-1).
+- **Host tests file.** `MatchLineupTests` became `MatchTests`, which covers lineups and results through the Admin API.
+- **Notifiable facts.** `NotifiableFactsTests` named `Resolution`; it is exempted with the proposal's reason (a first result is not in F-10; revised final results join with the change log, D-26).
+
+## Verification
+
+15 November 2026, cloud session:
+
+- `scripts/check all` passed.
+- End-to-end suite: 20 journeys passed, journey 20 included. Test scripts: 7 passed, `seeded-results` included.
+
+## Visual comparison
+
+Captured from `e2e/scripts/seeded-results.spec.ts` (synthetic persona, seeded Lantern Open) at 1440 and 390 px and compared with `prototypes/frontend/play-and-score-states.html` (`result-empty`, `result-chosen`, `result-win`, `result-draw`, `schedule-results`). Browser verification of the composed application.
+
+| State | Match | Difference and resolution |
+|---|---|---|
+| Result empty and chosen | Radio group "Outcome" with nothing selected; "Record result" disabled until a choice, described by "Choose the outcome first."; the help line says recording also starts the match | The Start panel stays above the Result panel with a secondary "Start match"; kept, so one primary action remains |
+| Win and draw recorded | Read-only summary "Bram Holloway won · played" or "Draw · played", "Recorded … Corrections come later.", "Resolved" beside the heading | No author's name (above) |
+| Schedule with results | Each resolved row shows "Resolved" and the outcome in words under the pairing, at 1440 and 390 px | None |
