@@ -157,6 +157,10 @@ Next: M0's three changes are implemented and archived, and H1's slices up to tea
 
 H0 remains the product decision gate described in the functional baseline. It does not require solving H2–H7 or every M0 implementation detail. No H1 screen proposal is ready solely because a concept image or wireframe now exists: confirm the rule/interaction decisions and relevant states for that slice.
 
+## Ideas outside the plan
+
+Feature ideas not yet planned are kept as GitHub issues labelled `idea` (template `.github/ISSUE_TEMPLATE/idea.yml`). They are not commitments: review them when the target delivery above is complete, or earlier if one fits a horizon being refined, and turn one into an OpenSpec change or close it with its reason.
+
 ## Proposed roadmap refinements
 
 [Extensible match result profiles](result-profiles-proposal.md) proposes preserving score-free H1 outcomes, adding direct numeric scores as an optional bounded H1 follow-on (or H3 if deferred), refining H3's existing Bo3 commitment and leaving sets profiles for a later explicit decision. It separates match evidence from standings points and defines compatibility and acceptance expectations. This is a review proposal; the target delivery rows and functional baseline remain unchanged until incorporation through the existing decision register.
