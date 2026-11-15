@@ -19,6 +19,8 @@
 
 - [x] 4.1 Add meaningful unit and browser coverage for every delta scenario with covers markers; retain existing domain/permission/concurrency tests.
 - [x] 4.2 Add a synthetic seeded script in e2e/scripts with a screenshot for each changed review state; run affected creation/publication, entries/check-in, schedule/start, lineup/result journeys.
-- [x] 4.3 Compare approved visuals at 1440/390/699/700/320 px, long content and 200% zoom; keyboard/focus/Escape, axe and screen-reader spot checks; record executed versus unverified states in design.md.
+- [ ] 4.3 Compare approved visuals at 1440/390/699/700/320 px, long content and 200% zoom; keyboard/focus/Escape, axe and screen-reader spot checks; record executed versus unverified states in design.md.
 - [x] 4.4 Run repository rules, appropriate web checks, spec coverage and OpenSpec validation. If endpoints/handlers change through reviewed scope, regenerate Wolverine/OpenAPI code and test the affected backend.
 - [x] 4.5 Run UI-guidance checks if guidance/routing changes; complete read-only herald-reviewer review, resolve findings, sync implemented specifications and archive with ownership-appropriate documentation updates in the implementation PR.
+
+Task 4.3 remains open for real 200% browser zoom and screen-reader checks. Implemented viewport, long-content, selected keyboard/focus/Escape and axe evidence is recorded in the implementation review; no maintainer exception has been assumed.

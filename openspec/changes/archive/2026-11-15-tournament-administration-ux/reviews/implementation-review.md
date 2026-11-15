@@ -25,7 +25,7 @@ Not verified: a real 200% browser zoom session, a screen-reader spot check, ever
 
 ## Read-only review
 
-The required herald-reviewer found no production correctness or architecture findings. It identified two tests whose scenario markers overstated their assertions. The team-result script now checks initial unselected radios, operational order, explicit result recording and schedule propagation. The schedule-results script now checks unresolved destinations and row-scoped resolved outcome/state. Both findings are resolved by executable assertions.
+The required herald-reviewer found no production correctness or architecture findings. It identified two tests whose scenario markers overstated their assertions. The team-result script now checks initial unselected radios, operational order, explicit result recording and schedule propagation. The schedule-results script now checks unresolved destinations and row-scoped resolved outcome/state. Both findings are resolved by executable assertions. The final archive review also identified that task 4.3 was checked despite its remaining zoom and screen-reader checks; the task is now explicitly open. No exception or completed accessibility acceptance is inferred.
 
 ## Validation results
 
