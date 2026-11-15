@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
+using Herald.Contracts.Competition.V1;
 using Shouldly;
 
 namespace Herald.Host.Tests;
@@ -8,7 +9,7 @@ namespace Herald.Host.Tests;
 // The match-lineups and match-results specs through the Admin API: matches appear when the competition starts, frozen rosters arrive
 // from Registration and the lineup size from Tournaments (h1-match-lineups D-1, D-4).
 [Collection(OrganisationApiTests.Name)]
-public class MatchTests(OrganisationApi api)
+public partial class MatchTests(OrganisationApi api)
 {
     private sealed record League(HttpClient Client, string Organisation, string Path);
 
@@ -282,6 +283,50 @@ public class MatchTests(OrganisationApi api)
         appearances.Count.ShouldBe(10);
         appearances.ShouldNotContain(falcons[5]);
         appearances.ShouldNotContain(stars[6]);
+    }
+
+    [Fact]
+    public async Task The_start_and_each_resolution_publish_the_next_results_revision()
+    {
+        var league = await OpenAsync("individual");
+        foreach (var name in new[] { "Robin Vale", "Sam Reed", "Jamie Brook" })
+        {
+            await EnterAsync(league, name);
+        }
+
+        var matches = (await StartAsync(league)).GetProperty("matches");
+        await SettledAsync(() => ResultAsync(league, MatchPath(league, matches[0]), "first", 1));
+        await SettledAsync(() => ResultAsync(league, MatchPath(league, matches[1]), "draw", 1));
+
+        var tournament = Guid.Parse(league.Path.Split('/')[^1]);
+        var sent = api.Sent<TournamentResultsChanged>().Where(message => message.TournamentId == tournament).ToList();
+        sent.Select(message => message.Revision).ShouldBe([1, 2, 3]);
+        sent[0].Entrants.Count.ShouldBe(3);
+        sent[0].Rests.Count.ShouldBe(3);
+        sent[0].Matches.ShouldAllBe(match => match.State == ResultsMatchState.Scheduled && match.Outcome == null);
+        var last = sent[^1].Matches.ToDictionary(match => match.MatchId);
+        var won = last[matches[0].GetProperty("matchId").GetGuid()];
+        (won.State, won.Outcome, won.Cause, won.Played).ShouldBe((ResultsMatchState.Resolved, ResultOutcome.First, "played", true));
+        last[matches[1].GetProperty("matchId").GetGuid()].Outcome.ShouldBe(ResultOutcome.Draw);
+    }
+
+    [Fact]
+    public async Task Results_recorded_at_once_in_one_tournament_all_succeed_with_consecutive_results_revisions()
+    {
+        var league = await OpenAsync("individual");
+        foreach (var name in new[] { "Robin Vale", "Sam Reed", "Jamie Brook", "Taylor Finch" })
+        {
+            await EnterAsync(league, name);
+        }
+
+        var matches = (await StartAsync(league)).GetProperty("matches").EnumerateArray().Take(4).ToList();
+        var answers = await api.SettledAsync(() => Task.WhenAll(matches.Select(match => ResultAsync(league, MatchPath(league, match), "first", 1))));
+
+        answers.ShouldAllBe(answer => answer.StatusCode == HttpStatusCode.OK);
+        var tournament = Guid.Parse(league.Path.Split('/')[^1]);
+        api.Sent<TournamentResultsChanged>().Where(message => message.TournamentId == tournament).Select(message => message.Revision).Order().ShouldBe([1, 2, 3, 4, 5]);
+        var standings = await JsonAsync(await league.Client.GetAsync($"{league.Path}/standings", Cancellation));
+        (Revision(standings), standings.GetProperty("resolvedMatches").GetInt32()).ShouldBe((5, 4));
     }
 
     [Fact]

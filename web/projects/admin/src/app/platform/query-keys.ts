@@ -4,4 +4,5 @@ import { organisationKey } from './app-context';
 export const tournamentsKey = (organisation: string) => organisationKey(organisation, 'tournaments');
 export const tournamentKey = (organisation: string, id: string) => organisationKey(organisation, 'tournament', id);
 export const fieldKey = (organisation: string, id: string) => organisationKey(organisation, 'field', id);
+export const standingsKey = (organisation: string, id: string) => organisationKey(organisation, 'standings', id);
 export const scheduleKey = (organisation: string, id: string) => organisationKey(organisation, 'schedule', id);

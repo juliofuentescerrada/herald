@@ -109,6 +109,24 @@ public sealed class Admin(Seeding seeding, Persona persona)
         }));
     }
 
+    // The match between two named entrants, won by the first named.
+    public async Task RecordWinAsync(Guid organisation, Guid tournament, string winner, string loser)
+    {
+        var schedule = await ReadAsync(await _client.GetAsync($"{Path(organisation, tournament)}/schedule"), "read a schedule");
+        var match = schedule.GetProperty("matches").EnumerateArray().Single(candidate =>
+            new[] { Name(candidate, "first"), Name(candidate, "second") }.Order().SequenceEqual(new[] { winner, loser }.Order()));
+        var id = match.GetProperty("matchId").GetGuid();
+        var path = $"{Path(organisation, tournament)}/matches/{id}";
+        await WriteAsync($"record the result of {id}", async () => await _client.PostAsJsonAsync($"{path}/result", new
+        {
+            operationId = Ids.For(id.ToString(), "result"),
+            expectedRevision = (await ReadAsync(await _client.GetAsync(path), "read a match")).GetProperty("revision").GetInt32(),
+            outcome = Name(match, "first") == winner ? "first" : "second",
+        }));
+    }
+
+    private static string Name(JsonElement match, string side) => match.GetProperty(side).GetProperty("name").GetString()!;
+
     private static string Path(Guid organisation, Guid tournament) => $"/api/organisations/{organisation}/tournaments/{tournament}";
 
     private async Task<int> RevisionAsync(Guid organisation, Guid tournament) =>

@@ -1,3 +1,4 @@
+using Herald.Contracts.Competition.V1;
 using Herald.Contracts.Registration.V1;
 using Herald.Contracts.Tournaments.V1;
 using Microsoft.Extensions.DependencyInjection;
@@ -14,6 +15,7 @@ public class IntegrationEventRoutingTests(PostgresFixture postgres)
     [Theory]
     [InlineData(typeof(TournamentEntryTermsChanged), "local://registration/")]
     [InlineData(typeof(TournamentFieldChanged), "local://tournaments/")]
+    [InlineData(typeof(TournamentResultsChanged), "local://standings/")]
     public async Task An_integration_event_goes_to_its_consumers_durable_local_queue(Type integrationEvent, string queue)
     {
         await using var host = new HostFactory(postgres.ConnectionString);

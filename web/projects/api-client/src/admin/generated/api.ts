@@ -412,6 +412,16 @@ export interface HttpValidationProblemDetails {
 
 export interface IResult { [key: string]: unknown }
 
+export type LineResult = typeof LineResult[keyof typeof LineResult] | null;
+
+
+export const LineResult = {
+  won: 'won',
+  drawn: 'drawn',
+  lost: 'lost',
+  noWinner: 'noWinner',
+} as const;
+
 export interface PlayerDetails {
   playerId: string;
   name: string;
@@ -651,6 +661,40 @@ export interface ScheduleDetails {
 export interface SignedInPerson {
   displayName: string;
   organisations: OwnedOrganisation[];
+}
+
+export interface StandingsEntrant {
+  entryId: string;
+  name: string;
+}
+
+export interface StandingsLine {
+  round: number;
+  opponent: null | StandingsEntrant;
+  result: null | LineResult;
+  /** @nullable */
+  cause: string | null;
+  points: number;
+}
+
+export interface StandingsRow {
+  position: number;
+  shared: boolean;
+  entrant: StandingsEntrant;
+  resolved: number;
+  won: number;
+  drawn: number;
+  lost: number;
+  points: number;
+  lines: StandingsLine[];
+}
+
+export interface StandingsView {
+  tournamentId: string;
+  revision: number;
+  resolvedMatches: number;
+  matches: number;
+  rows: StandingsRow[];
 }
 
 export interface StartCompetition {
@@ -2242,6 +2286,45 @@ export class HeraldHostAdminService {
     );
   }
 
+/**
+ * GET_api_organisations_organisationId_tournaments_tournamentId_standings
+ * @summary GET_api_organisations_organisationId_tournaments_tournamentId_standings
+ */
+ getStandings<TData = StandingsView>(organisationId: string,
+    tournamentId: string, options?: HttpClientBodyOptions): Observable<TData>;
+ getStandings<TData = StandingsView>(organisationId: string,
+    tournamentId: string, options?: HttpClientEventOptions): Observable<HttpEvent<TData>>;
+ getStandings<TData = StandingsView>(organisationId: string,
+    tournamentId: string, options?: HttpClientResponseOptions): Observable<AngularHttpResponse<TData>>;
+  getStandings<TData = StandingsView>(
+    organisationId: string,
+    tournamentId: string, options?: HttpClientObserveOptions): Observable<TData | HttpEvent<TData> | AngularHttpResponse<TData>> {
+    if (options?.observe === 'events') {
+      return this.http.get<TData>(
+      `/api/organisations/${organisationId}/tournaments/${tournamentId}/standings`,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'events',
+      }
+    );
+    }
+
+    if (options?.observe === 'response') {
+      return this.http.get<TData>(
+      `/api/organisations/${organisationId}/tournaments/${tournamentId}/standings`,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'response',
+      }
+    );
+    }
+
+    return this.http.get<TData>(
+      `/api/organisations/${organisationId}/tournaments/${tournamentId}/standings`,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'body',
+      }
+    );
+  }
+
 };
 
 export type GetOrganisationClientResult = NonNullable<OrganisationSummary>
@@ -2275,3 +2358,4 @@ export type PublishScheduleClientResult = NonNullable<ScheduleDetails>
 export type GetScheduleClientResult = NonNullable<ScheduleDetails>
 export type GetMatchClientResult = NonNullable<MatchView>
 export type GenerateDraftClientResult = NonNullable<ScheduleDetails>
+export type GetStandingsClientResult = NonNullable<StandingsView>

@@ -127,8 +127,8 @@ public static class Scenarios
         await admin.PublishScheduleAsync(organisation, running);
         await admin.StartCompetitionAsync(organisation, running);
 
-        // Running individual league of four: its first match won by the first player, the other five to play
-        // (h1-operator-results).
+        // Running individual league of four: its first match won by the first player and Dario Venn's win over Bram Holloway,
+        // the other four to play (h1-operator-results); its standings share a position (h1-standings).
         var playing = Ids.For("tournament", "running-players");
         await admin.CreateTournamentAsync(organisation, playing, Configuration(clock, "Lantern Open", opens: -6, closes: -1, starts: 1, capacity: 4));
         await admin.PublishAsync(organisation, playing);
@@ -142,6 +142,7 @@ public static class Scenarios
         await admin.PublishScheduleAsync(organisation, playing);
         await admin.StartCompetitionAsync(organisation, playing);
         await admin.RecordResultAsync(organisation, playing, 0, outcome: "first");
+        await admin.RecordWinAsync(organisation, playing, Names.Players[3], Names.Players[1]);
 
         // Running individual league of six with one match of each exceptional cause, the other eleven to play (h1-exceptional-outcomes).
         // A tournament of its own, so the results script keeps Lantern Open's matches; the exceptional outcomes script records here.

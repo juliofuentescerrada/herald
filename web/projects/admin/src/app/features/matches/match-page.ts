@@ -9,7 +9,7 @@ import { injectQuery } from '@tanstack/angular-query-experimental';
 import { firstValueFrom } from 'rxjs';
 import { AccessState, AppContext, QUERY_CLIENT } from '../../platform';
 import { instantText, lifecycleLabels, resultText } from '../../shared';
-import { matchKey, possessive, ruleText, scheduleKey, splitBlocker, tournamentKey } from './matches';
+import { matchKey, possessive, ruleText, scheduleKey, splitBlocker, standingsKey, tournamentKey } from './matches';
 
 type SideName = 'first' | 'second';
 
@@ -292,6 +292,7 @@ export class MatchPage {
       this.state.set('ready');
       this.queries.setQueryData(matchKey(this.organisation, this.tournamentId, this.matchId), answer);
       void this.queries.invalidateQueries({ queryKey: scheduleKey(this.organisation, this.tournamentId) });
+      void this.queries.invalidateQueries({ queryKey: standingsKey(this.organisation, this.tournamentId) });
       after?.();
       this.toasts.show(done());
       this.close();

@@ -90,6 +90,10 @@ public sealed class Schedule : AggregateRoot<TournamentId>
     // The profile's players per side, fixed at start; null for an individual tournament (h1-match-lineups D-4).
     public int? ActivePlayersPerSide { get; private set; }
 
+    // The revision of the results Standings keeps: 1 once the matches are scheduled, one more for each resolution
+    // (h1-standings D-1); 0 before.
+    public int ResultsRevision { get; private set; }
+
     // Null until Registration reports the frozen rosters of a team tournament.
     public FrozenRosters? Rosters { get; private set; }
 
@@ -125,8 +129,19 @@ public sealed class Schedule : AggregateRoot<TournamentId>
     }
 
     // One scheduled match per pairing of the started revision; rests never become matches (h1-match-lineups D-1).
-    public IReadOnlyList<Match> ScheduleMatches() =>
-        StartedPairings is { } pairings ? [.. pairings.Matches.Select(pairing => Match.Schedule(Id, pairing, ActivePlayersPerSide))] : [];
+    public IReadOnlyList<Match> ScheduleMatches()
+    {
+        if (StartedPairings is not { } pairings)
+        {
+            return [];
+        }
+
+        ResultsRevision++;
+        return [.. pairings.Matches.Select(pairing => Match.Schedule(Id, pairing, ActivePlayersPerSide))];
+    }
+
+    // One of the schedule's matches was resolved: the results change.
+    public void ResultRecorded() => ResultsRevision++;
 
     // Newer reports replace the rosters; older ones change nothing.
     public bool ApplyRosters(FrozenRosters rosters)

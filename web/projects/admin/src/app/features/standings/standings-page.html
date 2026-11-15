@@ -1,0 +1,103 @@
+<a class="back" routerLink="../schedule"><herald-icon name="arrow-left" size="metadata" />Back to schedule</a>
+
+@if (tournament.isPending()) {
+  <p class="panel" role="status">Loading standings…</p>
+} @else if (tournament.isError()) {
+  <section class="panel">
+    <herald-notice tone="danger" heading="Standings not available">
+      This tournament does not exist in this organisation, or could not be read.
+    </herald-notice>
+    <div class="actions">
+      <button herald-button variant="primary" type="button" [loading]="tournament.isFetching()" (click)="tournament.refetch()">Try again</button>
+      <a herald-button routerLink="../.."><herald-icon name="arrow-left" />Back to tournaments</a>
+    </div>
+  </section>
+} @else {
+  <header class="page-header">
+    <div class="title">
+      <h1>Standings · {{ tournament.data()!.configuration.title }}</h1>
+      @if (updating()) {
+        <herald-status-label tone="info" icon="hourglass">Updating</herald-status-label>
+      } @else if (running() && view()) {
+        <herald-status-label>Provisional</herald-status-label>
+      }
+    </div>
+  </header>
+  <app-tournament-nav current="Standings" />
+
+  <div class="column">
+    @if (!running()) {
+      <herald-notice heading="Standings begin when the competition starts">Nothing is ranked before start.</herald-notice>
+    } @else if (failed()) {
+      <herald-notice tone="danger" heading="The standings could not be loaded">
+        The request failed. Nothing changed.
+        <span class="notice-action"><button herald-button type="button" [loading]="standings.isFetching()" (click)="standings.refetch()">Try again</button></span>
+      </herald-notice>
+    } @else if (!view()) {
+      <p role="status">Loading standings…</p>
+    } @else {
+      <section class="summary">
+        <p><strong>Provisional · {{ view()!.resolvedMatches }} of {{ view()!.matches }} {{ view()!.matches === 1 ? 'match' : 'matches' }} resolved</strong></p>
+        <p class="help">
+          Results revision {{ view()!.revision }} · 3 points a win, 1 a draw · equal points share a position, listed by name{{ view()!.resolvedMatches === 0 ? ' · No match resolved yet' : '' }}
+        </p>
+      </section>
+      <table aria-label="Standings">
+        <thead>
+          <tr>
+            <th scope="col">Position</th>
+            <th scope="col">{{ teams() ? 'Team' : 'Player' }}</th>
+            <th scope="col" class="num wide">Resolved</th>
+            <th scope="col" class="num wide">Won</th>
+            <th scope="col" class="num wide">Drawn</th>
+            <th scope="col" class="num wide">Lost</th>
+            <th scope="col" class="pts">Points</th>
+          </tr>
+        </thead>
+        <tbody>
+          @for (row of view()!.rows; track row.entrant.entryId) {
+            <tr>
+              <td>
+                <span aria-hidden="true">{{ row.position }}{{ row.shared ? '=' : '' }}</span>
+                <span class="visually-hidden">Position {{ row.position }}{{ row.shared ? ', shared' : '' }}</span>
+              </td>
+              <td>
+                <button
+                  type="button"
+                  class="link"
+                  [attr.aria-expanded]="open().has(row.entrant.entryId)"
+                  [attr.aria-controls]="'explain-' + row.entrant.entryId"
+                  (click)="toggle(row.entrant.entryId)"
+                >
+                  {{ row.entrant.name }}
+                </button>
+              </td>
+              <td class="num wide">{{ row.resolved }}</td>
+              <td class="num wide">{{ row.won }}</td>
+              <td class="num wide">{{ row.drawn }}</td>
+              <td class="num wide">{{ row.lost }}</td>
+              <td class="pts">{{ row.points }}</td>
+            </tr>
+            @if (open().has(row.entrant.entryId)) {
+              <tr class="explain" [id]="'explain-' + row.entrant.entryId">
+                <td colspan="7">
+                  @if (row.lines.length) {
+                    <ul>
+                      @for (line of row.lines; track line.round) {
+                        <li>{{ lineText(line) }}</li>
+                      }
+                    </ul>
+                  } @else {
+                    <p class="help">No match resolved yet.</p>
+                  }
+                  <p class="help">Resolved {{ row.resolved }} · won {{ row.won }} · drawn {{ row.drawn }} · lost {{ row.lost }}</p>
+                  <p class="help">Total: {{ pointsText(row.points) }}</p>
+                </td>
+              </tr>
+            }
+          }
+        </tbody>
+      </table>
+    }
+  </div>
+}

@@ -34,6 +34,7 @@ namespace Internal.Generated.WolverineHandlers
             await using var competitionDbContext = new Herald.Competition.Persistence.CompetitionDbContext(_dbContextOptionsOfCompetitionDbContext, organisationContext);
             var messageContext = new Wolverine.Runtime.MessageContext(_wolverineRuntime);
             Wolverine.Http.HttpHandler.RequestActivity(httpContext)?.SetTag("handler.type", "Herald.Competition.Features.StartMatch.StartMatchEndpoint").SetTag("http.route", "/api/organisations/{organisationId}/tournaments/{tournamentId}/matches/{matchId}/start").SetTag("http.request.method", "POST");
+            Wolverine.Http.Runtime.RequestIdMiddleware.Apply(httpContext, messageContext);
             
             // Enroll the DbContext & IMessagingContext in the outgoing Wolverine outbox transaction
             var efCoreEnvelopeTransaction = new Wolverine.EntityFrameworkCore.Internals.EfCoreEnvelopeTransaction(competitionDbContext, messageContext, _domainEventScraperIEnumerable);
@@ -87,7 +88,7 @@ namespace Internal.Generated.WolverineHandlers
                 if (jsonContinue == Wolverine.HandlerContinuation.Stop) return;
                 
                 // The actual HTTP request handler execution
-                var result = await Herald.Competition.Features.StartMatch.StartMatchEndpoint.Post(organisationId, tournamentId, matchId, command, organisationContext, competitionDbContext, httpContext.RequestAborted).ConfigureAwait(false);
+                var result = await Herald.Competition.Features.StartMatch.StartMatchEndpoint.Post(organisationId, tournamentId, matchId, command, organisationContext, competitionDbContext, messageContext, httpContext.RequestAborted).ConfigureAwait(false);
 
                 
                 // Added by EF Core Transaction Middleware

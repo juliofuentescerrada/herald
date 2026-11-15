@@ -1,7 +1,7 @@
 import { organisationKey } from '../../platform';
 
 /** Shared with the schedule feature, so starting a match refreshes the schedule's states. */
-export { scheduleKey, tournamentKey } from '../../platform';
+export { scheduleKey, standingsKey, tournamentKey } from '../../platform';
 
 export const matchKey = (organisation: string, tournamentId: string, matchId: string) => organisationKey(organisation, 'match', tournamentId, matchId);
 

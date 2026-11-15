@@ -6,5 +6,6 @@ namespace Herald.Standings.Persistence;
 // Used only by the EF Core tools to build migrations.
 public sealed class StandingsDesignTimeFactory : IDesignTimeDbContextFactory<StandingsDbContext>
 {
-    public StandingsDbContext CreateDbContext(string[] args) => new(ModuleDatabase.DesignTimeOptions<StandingsDbContext>(StandingsDbContext.Schema));
+    public StandingsDbContext CreateDbContext(string[] args) =>
+        new(ModuleDatabase.DesignTimeOptions<StandingsDbContext>(StandingsDbContext.Schema), new OrganisationContext());
 }
