@@ -14,6 +14,7 @@ test('The seeded owner records a win and a draw and reads them on the schedule',
 
   await page.getByRole('link', { name: 'Bram Holloway vs Cleo Marsh' }).click();
   await expect(page.getByRole('button', { name: 'Record result' })).toBeDisabled();
+  await page.getByRole('radio', { name: 'Played' }).check();
   await expect(page.getByText('This match has not started: recording a played result also starts it.')).toBeVisible();
   await screen(page, info, 'result-empty');
 
@@ -27,6 +28,7 @@ test('The seeded owner records a win and a draw and reads them on the schedule',
 
   await page.getByRole('link', { name: 'Back to schedule' }).first().click();
   await page.getByRole('link', { name: 'Ada Fenwick vs Cleo Marsh' }).click();
+  await page.getByRole('radio', { name: 'Played' }).check();
   await page.getByRole('radio', { name: 'Draw' }).check();
   await page.getByRole('button', { name: 'Record result' }).click();
   await expect(page.getByText('Draw · played')).toBeVisible();

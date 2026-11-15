@@ -16,7 +16,7 @@
 ## 4. End-to-end journey and seeds
 
 - [x] 4.1 `tools/Herald.Seed`: one match of each cause in the running four-player tournament
-- [ ] 4.2 Journey 21; the suite passes
+- [x] 4.2 Journey 21; the suite passes
 - [ ] 4.3 Test script in `e2e/scripts/` (seeded data, `scriptPersona`) with a screenshot per step: concession chosen, conceded before play, double absence, no contest missing its reason, no contest recorded, schedule with the causes
 
 ## 5. Validation and completion
