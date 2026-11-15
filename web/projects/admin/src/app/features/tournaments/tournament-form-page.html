@@ -16,7 +16,7 @@
       <h1>{{ published() ? stored()!.configuration.title : stored() ? 'Configure ' + stored()!.configuration.title : 'Create tournament' }}</h1>
       <p class="labels">
         @for (label of labels(); track label.text) {
-          <herald-status-label [icon]="label.icon">{{ label.text }}</herald-status-label>
+          <herald-status-label [icon]="label.icon" [tone]="label.tone ?? 'neutral'">{{ label.text }}</herald-status-label>
         }
       </p>
     </div>
@@ -27,6 +27,7 @@
       <p class="lead">Draft configuration · {{ organisationName() }}not yet published</p>
     }
   </header>
+  @if (published()) { <app-tournament-nav current="Configuration" /> }
 
   <!-- A published tournament shows its state, registration and entries before the form, stacked at every width. -->
   <div class="column">
@@ -129,7 +130,7 @@
                     autocomplete="off"
                     [value]="value(field.name)"
                     (input)="set(field.name, input.value)"
-                    [readOnly]="field.kind === 'readonly' || state() === 'saving'"
+                    [readOnly]="field.kind === 'readonly' || !!field.locked || state() === 'saving'"
                     [attr.aria-invalid]="errorOf(field.name) ? 'true' : null"
                     [attr.aria-describedby]="describedBy(field)"
                   />

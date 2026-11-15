@@ -5,15 +5,15 @@
 
 ## 2. Navigation and phase context
 
-- [ ] 2.1 Implement route-based tournament section navigation and published-list schedule access, preserving dirty-form and access boundaries.
-- [ ] 2.2 Apply shared lifecycle emphasis, phase-correct copy and immutable configuration cues; preserve current domain rules.
+- [x] 2.1 Implement route-based tournament section navigation and published-list schedule access, preserving dirty-form and access boundaries.
+- [x] 2.2 Apply shared lifecycle emphasis, phase-correct copy and immutable configuration cues; preserve current domain rules.
 
 ## 3. Operational task composition
 
-- [ ] 3.1 Recompose schedule pairing/outcome/state/destination records and result selection surfaces with native semantics.
-- [ ] 3.2 Put result work before read-only started lineups and protect unsaved lineup changes; retain explicit save/discard and conflict handling.
-- [ ] 3.3 Improve entry/roster search action hierarchy and retry, failed-load recovery, empty/history presentation and numeric/copy consistency.
-- [ ] 3.4 Fix List/Entries intermediate-width responsive layout and inspect affected shared control/catalogue examples; update live component/icon guidance only for changed APIs or meanings.
+- [x] 3.1 Recompose schedule pairing/outcome/state/destination records and result selection surfaces with native semantics.
+- [x] 3.2 Put result work before read-only started lineups and protect unsaved lineup changes; retain explicit save/discard and conflict handling.
+- [x] 3.3 Improve entry/roster search action hierarchy and retry, failed-load recovery, empty/history presentation and numeric/copy consistency.
+- [x] 3.4 Fix List/Entries intermediate-width responsive layout and inspect affected shared control/catalogue examples; update live component/icon guidance only for changed APIs or meanings.
 
 ## 4. Evidence and acceptance
 

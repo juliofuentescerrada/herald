@@ -103,6 +103,7 @@ describe('The tournament list', () => {
     expect(first.querySelector('.capacity')?.textContent).toBe('3 of 16 individual entries admitted · 1 waiting');
     expect([...first.querySelectorAll('a')].map((a) => [a.textContent?.trim(), a.getAttribute('href'), a.getAttribute('aria-label')])).toEqual([
       ['Edit configuration', `${base}/t2`, 'Edit configuration: Autumn Open'],
+      ['View schedule', `${base}/t2/schedule`, 'View schedule: Autumn Open'],
       ['Entries', `${base}/t2/entries`, 'Entries: Autumn Open'],
     ]);
     expect(second.querySelector('.capacity')?.textContent).toBe('0 of 4 teams admitted');

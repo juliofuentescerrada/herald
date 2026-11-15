@@ -6,7 +6,7 @@ export { fieldKey, scheduleKey, tournamentKey } from '../../platform';
 /** "4 players · 3 rounds · 6 matches": the size of a set of pairings in words. */
 export const sizeText = (pairings: PairingsDetails, teams: boolean): string => {
   const entrants = `${pairings.entrants} ${teams ? (pairings.entrants === 1 ? 'team' : 'teams') : pairings.entrants === 1 ? 'player' : 'players'}`;
-  return `${entrants} · ${pairings.rounds.length} rounds · ${pairings.matches} matches`;
+  return `${entrants} · ${pairings.rounds.length} ${pairings.rounds.length === 1 ? 'round' : 'rounds'} · ${pairings.matches} ${pairings.matches === 1 ? 'match' : 'matches'}`;
 };
 
 export const seedingText = (pairings: PairingsDetails): string =>

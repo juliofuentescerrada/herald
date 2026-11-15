@@ -80,7 +80,7 @@ async function open(api: Record<string, unknown>) {
       { provide: QUERY_CLIENT, useValue: client },
       { provide: AppContext, useValue: { organisation: signal(organisation), home: signal(`/organisations/${organisation}`) } },
       { provide: Session, useValue: { account: signal({ username: 'ana' }) } },
-      { provide: AccessState, useValue: { problem: signal(null) } },
+      { provide: AccessState, useValue: { problem: signal(null), keepDraft: vi.fn() } },
       { provide: HeraldHostAdminService, useValue: { getTournament: () => of(tournament), ...api } },
     ],
   });
@@ -179,7 +179,7 @@ describe('The match page', () => {
       expect(startMatch).toHaveBeenCalledOnce();
       await vi.waitFor(() => expect(text('.summary-title herald-status-label')).toBe('In play'));
       expect(texts('.operation .summary-title herald-status-label')).toEqual(['Locked', 'Locked']);
-      expect(text('.operation .help')).toBe('Locked at match start · lineup revision 1');
+      expect(text('.operation details > .help')).toBe('Locked at match start · lineup revision 1');
       expect(texts('.operation ul.players')[0]).toContain('Falcon 5');
       expect(page().textContent).toContain('Reserves: Falcon 6, Falcon 7');
       expect(button('Start match')).toBeUndefined();
@@ -261,7 +261,7 @@ describe('The match page', () => {
     expect(bodies[1].outcome).toBe('first');
     await vi.waitFor(() => expect(texts('.operation .summary-title herald-status-label')).toContain('Resolved'));
     expect(page().textContent).toContain('Sam Reed won · played');
-    expect(page().textContent).toContain('Corrections come later.');
+    expect(page().textContent).toContain('This result is read-only.');
     expect(button('Start match')).toBeUndefined();
     expect(toasts()).toEqual(['Result recorded.']);
   });
@@ -287,7 +287,7 @@ describe('The match page', () => {
     const { page, texts } = await open({ getMatch: () => of(ready) });
     await vi.waitFor(() => expect(page().textContent).toContain('Draw · played'));
     expect(texts('.summary-title herald-status-label')[0]).toBe('Resolved');
-    expect(texts('.operation .summary-title herald-status-label').slice(0, 2)).toEqual(['Locked', 'Locked']);
+    expect(texts('.operation .summary-title herald-status-label').slice(1, 3)).toEqual(['Locked', 'Locked']);
     expect(await violations(page())).toEqual([]);
   });
 
@@ -299,7 +299,7 @@ describe('The match page', () => {
     await settle();
     button('Record result')!.click();
     await settle();
-    await vi.waitFor(() => expect(text('herald-notice')).toContain('This match already has a result. Corrections come later. Nothing changed.'));
+    await vi.waitFor(() => expect(text('herald-notice')).toContain('This match already has a result. This result is read-only. Nothing changed.'));
   });
 
   it('shows the result as saving and blocks a repeat while it is recorded', async () => {
@@ -352,4 +352,29 @@ describe('The match page', () => {
     expect(page().querySelector<HTMLInputElement>('input[name=outcome]')!.checked).toBe(true);
     expect(await violations(page())).toEqual([]);
   });
+  it('registers only unsaved lineup changes for deliberate exit and clears them when restored', async () => {
+    const view = await open({ getMatch: () => of(teamMatch()) });
+    await vi.waitFor(() => expect(view.page().querySelector('input[type=checkbox]')).not.toBeNull());
+    const readDraft = vi.mocked(TestBed.inject(AccessState).keepDraft).mock.calls[0][0];
+    expect(readDraft()).toBe('');
+    view.check(0);
+    await view.settle();
+    expect(readDraft()).toContain('Falcon 1');
+    const exit = new Event('beforeunload', { cancelable: true });
+    window.dispatchEvent(exit);
+    expect(exit.defaultPrevented).toBe(true);
+    view.check(0);
+    await view.settle();
+    expect(readDraft()).toBe('');
+  });
+
+  it('reloads the tournament as well as the match after a failed required dependency', async () => {
+    let reads = 0;
+    const view = await open({ getTournament: () => ++reads === 1 ? throwError(() => problem(503)) : of(tournament), getMatch: () => of(individual()) });
+    await vi.waitFor(() => expect(view.button('Try again')).toBeDefined());
+    view.button('Try again')!.click();
+    await vi.waitFor(() => expect(view.page().textContent).toContain('Sam Reed vs Jamie Brook'));
+    expect(reads).toBe(2);
+  });
+
 });
