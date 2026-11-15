@@ -1,6 +1,6 @@
 ## 1. Review gates
 
-- [ ] 1.1 Record in proposal.md that merging the batch 2 proposals pull request approved this change, with the review's answer to Q1 and any change it asked for (ADR 0018); verify with `openspec validate h1-exceptional-outcomes`
+- [x] 1.1 Record in proposal.md that merging the batch 2 proposals pull request approved this change, with the review's answer to Q1 and any change it asked for (ADR 0018); verify with `openspec validate h1-exceptional-outcomes`
 
 ## 2. Competition
 
