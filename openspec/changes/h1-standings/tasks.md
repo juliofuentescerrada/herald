@@ -11,7 +11,7 @@
 
 - [x] 3.1 Domain: the table from a snapshot (D-2); domain tests for every `standings` scenario
 - [x] 3.2 Projection, migration and feature `GetStandings`; API tests against PostgreSQL, including an older snapshot and another organisation's 404s
-- [ ] 3.3 Regenerate Wolverine code (`codegen write`) and the OpenAPI documents and client (`pnpm api:generate`); CI drift checks pass
+- [x] 3.3 Regenerate Wolverine code (`codegen write`) and the OpenAPI documents and client (`pnpm api:generate`); CI drift checks pass
 
 ## 4. Admin application
 
