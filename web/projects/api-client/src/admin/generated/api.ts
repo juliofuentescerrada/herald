@@ -71,6 +71,10 @@ export type Cause = typeof Cause[keyof typeof Cause];
 
 export const Cause = {
   played: 'played',
+  concession: 'concession',
+  singleAbsence: 'singleAbsence',
+  doubleAbsence: 'doubleAbsence',
+  noContest: 'noContest',
 } as const;
 
 export type CheckIn = typeof CheckIn[keyof typeof CheckIn] | null;
@@ -457,12 +461,15 @@ export const Outcome = {
   first: 'first',
   second: 'second',
   draw: 'draw',
+  none: 'none',
 } as const;
 
 export interface ResultDetails {
   outcome: Outcome;
   cause: Cause;
   played: boolean;
+  /** @nullable */
+  reason: string | null;
   recordedAt: string;
 }
 
@@ -555,10 +562,24 @@ export interface RecordLineup {
   players: string[];
 }
 
+export type Side = typeof Side[keyof typeof Side] | null;
+
+
+export const Side = {
+  first: 'first',
+  second: 'second',
+} as const;
+
 export interface RecordResult {
   operationId: string;
   expectedRevision: number;
-  outcome: Outcome;
+  outcome?: null | Outcome;
+  cause?: Cause;
+  entrant?: null | Side;
+  /** @nullable */
+  played?: boolean | null;
+  /** @nullable */
+  reason?: string | null;
 }
 
 export type RegistrationWindow = typeof RegistrationWindow[keyof typeof RegistrationWindow];

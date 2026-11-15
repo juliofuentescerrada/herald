@@ -58,6 +58,7 @@ test('The seeded owner records both lineups of a five-a-side match and starts it
   await expect(second.getByText('Locked', { exact: true })).toBeVisible();
   await screen(page, info, 'in-play-locked');
   const result = page.getByRole('region', { name: 'Result', exact: true });
+  await result.getByRole('radio', { name: 'Played', exact: true }).check();
   await result.getByRole('radio', { name: 'Draw', exact: true }).check();
   await result.getByRole('button', { name: 'Record result', exact: true }).click();
   await expect(result.getByText('Draw · played', { exact: true })).toBeVisible();

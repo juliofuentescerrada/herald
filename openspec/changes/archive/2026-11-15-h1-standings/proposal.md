@@ -18,7 +18,7 @@ Results exist but nobody can read who is first. F-09 asks for standings from eff
 - **Provisional and revision:** the table says "Provisional" while the competition runs and states how many matches are resolved and the results revision it reflects; while a newer revision is being applied it shows "Updating".
 - **Admin application:** a Standings page for each tournament, beside Configuration, Entries and Schedule, readable once the competition has started.
 - **Notifiable facts (ADR 0017):** none; standings are a projection.
-- One end-to-end journey (21, renumbered from 22 because it merges before `h1-exceptional-outcomes`): an owner records the results of a four-player league and reads its standings, with two players sharing a position and one player's points traced to its results.
+- One end-to-end journey (22): an owner records the results of a four-player league and reads its standings, with two players sharing a position and one player's points traced to its results.
 
 Out of scope: withdrawn and disqualified flags (`h1-round-operations` adds them), finalisation and the review barrier (`h1-finalisation`, D-24), the public page (`h1-public-read`), tiebreakers beyond points (H4 and profiles), team player statistics.
 
@@ -51,7 +51,7 @@ Prototypes in `prototypes/frontend/play-and-score-states.html` (design.md, Visua
 
 ### Modified Capabilities
 
-- `end-to-end-journeys`: journey 21.
+- `end-to-end-journeys`: journey 22.
 
 ## Impact
 
@@ -59,4 +59,4 @@ Prototypes in `prototypes/frontend/play-and-score-states.html` (design.md, Visua
 - `Herald.Competition`: publishes the snapshot through the outbox on start and on every resolution; no change to its EF Core model.
 - `Herald.Standings`: first domain, projection, feature `GetStandings` and migration.
 - Admin OpenAPI document and client; Wolverine's generated code; new admin `standings` feature and the tournament tabs.
-- `e2e/`: journey 21 and its test script; `tools/Herald.Seed`: the running four-player tournament with enough results for a shared position. Docs: visual direction §9.3, `src/Herald.Standings` module README.
+- `e2e/`: journey 22 and its test script; `tools/Herald.Seed`: the running four-player tournament with enough results for a shared position. Docs: visual direction §9.3, `src/Herald.Standings` module README.

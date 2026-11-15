@@ -76,6 +76,19 @@ public class SyntheticDataTests(SeededDatabases databases)
     }
 
     [Fact]
+    public async Task The_seeded_exceptional_league_has_one_match_of_each_cause()
+    {
+        var database = await databases.NewDatabaseAsync();
+        await SeededDatabases.SeedAsync(database);
+
+        await using var reader = new Reader(database);
+        var matches = (await reader.GetAsync(Main, $"{Tournament("tournaments-by-state", "running-exceptional")}/schedule")).GetProperty("matches").EnumerateArray().ToList();
+
+        matches.Take(4).Select(match => match.GetProperty("result").GetProperty("cause").GetString()).ShouldBe(["concession", "singleAbsence", "doubleAbsence", "noContest"]);
+        matches.Skip(4).ShouldAllBe(match => match.GetProperty("state").GetString() == "scheduled");
+    }
+
+    [Fact]
     public async Task The_seeded_cup_has_its_schedule_published_and_its_start_blocked_by_one_roster()
     {
         var database = await databases.NewDatabaseAsync();

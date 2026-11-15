@@ -61,7 +61,7 @@ Deviations from the plan above, each kept small:
 - **Each line's result.** `GetStandings` gives each explanation line its result for the entrant (won, drawn, lost, no winner), so the explanation reads "Round 1 · vs Jamie Brook · draw · played · 1 point".
 - **Explanation of resolved matches only.** The prototype also lists matches in play or scheduled ("counts nothing yet"); the requirement lists resolved matches and the rest, so the build does not.
 - **Tournament navigation.** Task 4.1 asked for a Standings tab on every tournament page. The tournament section navigation merged in #69 (`TournamentNav`) gains a Standings section, and the Standings page uses it; this slice's own tabs were dropped when merging `main`.
-- **Journey 21.** Renumbered from 22: `h1-exceptional-outcomes`, which had 21, has not merged; it renumbers its journey to 22.
+- **Journey 22.** Kept as proposed: `h1-exceptional-outcomes` merged first (#70) with journey 21.
 - **Seed.** The seeded Lantern Open also records Dario Venn's win over Bram Holloway, so its standings share positions both as seeded and after `seeded-results` adds two results.
 - **Tournaments started before this change.** They have no results snapshot until their next resolution, and their Standings page reads "Updating" until then. No deployed data exists before M4 (ADR 0012), so there is no backfill.
 - **Simultaneous results.** Every resolution writes the schedule's results revision, so simultaneous results of one tournament queue on that row; a match write tries up to ten times (a `shortcut:` comment names the limit).
@@ -72,7 +72,7 @@ Deviations from the plan above, each kept small:
 15 November 2026, cloud session:
 
 - `scripts/check all` passed.
-- End-to-end suite: 21 journeys passed, journey 21 included. Test scripts: 8 passed, `seeded-standings` included.
+- End-to-end suite: all journeys passed, this change's included. Test scripts: 8 passed, `seeded-standings` included.
 - The admin initial bundle is over its 900 kB budget by about 56 kB, a warning that predates this change's frontend work (the generated client grows with each endpoint).
 
 ## Visual comparison

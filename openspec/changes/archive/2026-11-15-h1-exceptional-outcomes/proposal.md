@@ -2,6 +2,8 @@
 
 **Proposed in H1 batch 2's proposals pull request, 15 November 2026.** The rules come from the batch's decision session of the same day, recorded in the functional discovery (§8.1, confirmed as D-25; F-07, F-08; §15 rows D-05 and D-25). It depends on `h1-operator-results`. Merging the proposals pull request approves this change (ADR 0018); task 1.1 records that approval.
 
+**Approved for implementation on 15 November 2026**, when the maintainer merged the batch 2 proposals pull request (#63), with the review answers below (ADR 0018).
+
 **Review answers, 15 November 2026 (#63):** the maintainer accepted Q1 (only the no contest requires a reason among the outcomes) as proposed, and the prototypes as they are.
 
 ## Why
