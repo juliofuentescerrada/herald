@@ -201,6 +201,23 @@ public class MatchResultTests
 
         (match.Resolution!.Outcome, match.Resolution.Cause, match.Resolution.Played).ShouldBe((Outcome.First, Cause.SingleAbsence, false));
         match.Resolution.Appearances.ShouldBeEmpty();
+
+        // Not withdrawn: the absent entrant's next match still takes a played result.
+        var later = Match.Schedule(match.TournamentId, new Pairing(2, match.Second, Guid.NewGuid()), null);
+        Record(later, Outcome.First).Outcome.ShouldBe(WriteOutcome.Applied);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void A_match_resolved_without_a_start_cannot_be_started(bool team)
+    {
+        var match = team ? TeamMatch(started: false) : Individual();
+        Administrative(match, Cause.Concession, Side.First, played: false);
+
+        match.StartMatch(_falcons, _stars, match.Revision, _owner, _at).Broken.ShouldBe([new BrokenRule("match", "resolved")]);
+        match.Start.ShouldBeNull();
+        match.DomainEvents.OfType<MatchStarted>().ShouldBeEmpty();
     }
 
     [Fact]

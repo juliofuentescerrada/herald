@@ -525,6 +525,7 @@ test('An owner records a concession before play, a double absence and a no conte
   await page.getByRole('group', { name: 'Did play take place?' }).getByRole('radio', { name: 'No' }).check();
   await page.getByRole('button', { name: 'Record result' }).click();
   await expect(page.getByText('Robin Vale conceded before play · Taylor Finch wins · no play recorded')).toBeVisible();
+  await expect(page.getByText(/appearance/i)).toHaveCount(0);
   await expectAccessible();
 
   await page.getByRole('link', { name: 'Back to schedule' }).first().click();
@@ -550,5 +551,6 @@ test('An owner records a concession before play, a double absence and a no conte
   await expect(page.getByRole('list', { name: 'Round 1' }).getByText('Both were absent · 0 each · no play recorded')).toBeVisible();
   await expect(page.getByRole('list', { name: 'Round 2' }).getByText('No contest: Venue closed · 0 each · no play recorded')).toBeVisible();
   await expect(page.getByText('· played')).toHaveCount(0);
+  await expect(page.getByText(/\d+\s*[-–]\s*\d+/)).toHaveCount(0);
   await expectAccessible();
 });

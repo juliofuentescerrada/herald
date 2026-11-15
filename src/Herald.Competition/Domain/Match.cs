@@ -197,6 +197,12 @@ public sealed class Match : AggregateRoot<MatchId>
             return WriteOutcome.Repeated;
         }
 
+        // An administrative outcome resolves a match without starting it; a start afterwards would invent start evidence (D-2).
+        if (Resolution is not null)
+        {
+            return WriteResult.Reject("match", "resolved");
+        }
+
         if (expectedRevision != Revision)
         {
             return WriteOutcome.Stale;

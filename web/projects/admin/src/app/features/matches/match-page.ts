@@ -89,6 +89,7 @@ export class MatchPage {
       case 'played': return this.outcome() ? { cause: 'played', outcome: this.outcome() } : null;
       case 'concession': return this.conceding() && played !== null ? { cause: 'concession', entrant: this.conceding(), played } : null;
       case 'absence': {
+        if (this.started()) return null;
         const absent = this.absent();
         return absent === 'both' ? { cause: 'doubleAbsence' } : absent ? { cause: 'singleAbsence', entrant: absent } : null;
       }
@@ -101,6 +102,8 @@ export class MatchPage {
     if (this.state() === 'busy') return 'Request in progress. Please wait; do not submit again.';
     if (this.state() === 'conflict') return 'Reload the latest version first.';
     if (this.playWithoutStart()) return 'Start the match first, or choose “No”.';
+    // The match started in another tab after the owner chose an absence (A-1).
+    if (this.cause() === 'absence' && this.started()) return 'A started match takes a concession or a no contest.';
     if (this.resultBody()) return null;
     switch (this.cause()) {
       case 'played': return 'Choose the outcome first.';

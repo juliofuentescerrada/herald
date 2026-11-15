@@ -333,6 +333,8 @@ public class MatchTests(OrganisationApi api)
         (result.GetProperty("cause").GetString(), result.GetProperty("outcome").GetString(), result.GetProperty("played").GetBoolean()).ShouldBe(("concession", "second", false));
         conceded.GetProperty("appearances").GetArrayLength().ShouldBe(0);
         Revision(repeated).ShouldBe(Revision(conceded));
+        var started = await JsonAsync(await league.Client.PostAsJsonAsync($"{MatchPath(league, matches[0])}/start", new { expectedRevision = 2 }, Cancellation));
+        Errors(started, "match").ShouldBe(["resolved"]);
         Errors(afterwards, "match").ShouldBe(["resolved"]);
         absent.GetProperty("result").GetProperty("outcome").GetString().ShouldBe("none");
         Errors(noReason, "reason").ShouldBe(["required"]);
