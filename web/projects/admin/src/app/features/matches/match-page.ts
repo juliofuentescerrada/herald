@@ -3,7 +3,7 @@ import { TournamentNav } from '../../shared';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, computed, inject, signal, TemplateRef, viewChild, ViewContainerRef } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { HeraldHostAdminService, HttpValidationProblemDetails, MatchView, Outcome, problemOf, SideDetails, TournamentDetails } from '@herald/api-client/admin';
+import { HeraldHostAdminService, HttpValidationProblemDetails, MatchView, Outcome, problemOf, RecordResult, SideDetails, TournamentDetails } from '@herald/api-client/admin';
 import { Button, Dialog, DialogContext, DialogRef, Dialogs, Icon, Notice, StatusLabel, Toasts } from '@herald/ui';
 import { injectQuery } from '@tanstack/angular-query-experimental';
 import { firstValueFrom } from 'rxjs';
@@ -12,6 +12,9 @@ import { instantText, lifecycleLabels, resultText } from '../../shared';
 import { matchKey, possessive, ruleText, scheduleKey, splitBlocker, tournamentKey } from './matches';
 
 type SideName = 'first' | 'second';
+
+/** The causes the Result panel offers; an absence of one side or both is one choice (h1-exceptional-outcomes D-3). */
+type CauseChoice = 'played' | 'concession' | 'absence' | 'noContest';
 
 interface Failure {
   readonly heading: string;
@@ -65,19 +68,53 @@ export class MatchPage {
   protected readonly scheduled = computed(() => this.match.data()?.state === 'scheduled');
   protected readonly stateText = { scheduled: 'Scheduled', inPlay: 'In play', resolved: 'Resolved' } as const;
   protected readonly stateTone = { scheduled: 'neutral', inPlay: 'info', resolved: 'success' } as const;
-  /** Nothing is preselected: the owner chooses the outcome (§8.1). */
+  /** Nothing is preselected: the owner chooses what happened, then that cause's fields (§8.1, D-3). */
+  protected readonly cause = signal<CauseChoice | null>(null);
   protected readonly outcome = signal<Outcome | null>(null);
+  protected readonly conceding = signal<SideName | null>(null);
+  protected readonly absent = signal<SideName | 'both' | null>(null);
+  protected readonly playTookPlace = signal<boolean | null>(null);
+  protected readonly reason = signal('');
+  /** A team match not yet in play cannot record play (D-2). */
+  protected readonly playWithoutStart = computed(() => this.team() && !this.started() && this.cause() !== 'played' && this.cause() !== 'absence' && this.playTookPlace() === true);
   /** Reused when the same result is sent again after a lost answer (match-results: A double submission). */
-  private resultOperation: { readonly id: string; readonly revision: number; readonly outcome: Outcome } | null = null;
+  private resultOperation: { readonly id: string; readonly revision: number; readonly body: string } | null = null;
   protected readonly resultSummary = computed(() => {
     const result = this.match.data()?.result;
-    return result ? `${resultText(result, this.names().first, this.names().second)} · played` : null;
+    if (!result) return null;
+    const text = resultText(result, this.names().first, this.names().second);
+    return result.cause === 'played' ? `${text} · played` : text;
+  });
+  /** The chosen cause as the API's command fields, or null while incomplete. */
+  private readonly resultBody = computed((): Omit<RecordResult, 'operationId' | 'expectedRevision'> | null => {
+    const played = this.playTookPlace();
+    switch (this.cause()) {
+      case 'played': return this.outcome() ? { cause: 'played', outcome: this.outcome() } : null;
+      case 'concession': return this.conceding() && played !== null ? { cause: 'concession', entrant: this.conceding(), played } : null;
+      case 'absence': {
+        if (this.started()) return null;
+        const absent = this.absent();
+        return absent === 'both' ? { cause: 'doubleAbsence' } : absent ? { cause: 'singleAbsence', entrant: absent } : null;
+      }
+      case 'noContest': return this.reason().trim() && played !== null ? { cause: 'noContest', played, reason: this.reason().trim() } : null;
+      default: return null;
+    }
   });
   /** Why a result cannot be recorded now, or null. */
   protected readonly recordBlocked = computed(() => {
     if (this.state() === 'busy') return 'Request in progress. Please wait; do not submit again.';
     if (this.state() === 'conflict') return 'Reload the latest version first.';
-    return this.outcome() ? null : 'Choose the outcome first.';
+    if (this.playWithoutStart()) return 'Start the match first, or choose “No”.';
+    // The match started in another tab after the owner chose an absence (A-1).
+    if (this.cause() === 'absence' && this.started()) return 'A started match takes a concession or a no contest.';
+    if (this.resultBody()) return null;
+    switch (this.cause()) {
+      case 'played': return 'Choose the outcome first.';
+      case 'concession': return this.conceding() ? 'Choose whether play took place.' : 'Choose who conceded.';
+      case 'absence': return 'Choose who was absent.';
+      case 'noContest': return this.reason().trim() ? 'Choose whether play took place.' : 'A no contest needs a reason.';
+      default: return 'Choose what happened first.';
+    }
   });
   protected readonly names = computed(() => ({ first: this.match.data()?.first.entrant.name ?? '', second: this.match.data()?.second.entrant.name ?? '' }));
   protected readonly rostersUnknown = computed(() => this.team() && (!this.match.data()?.first.roster || !this.match.data()?.second.roster));
@@ -175,21 +212,33 @@ export class MatchPage {
 
   protected record(): void {
     const match = this.match.data()!;
-    const outcome = this.outcome();
-    if (!outcome || this.recordBlocked()) return;
-    if (this.resultOperation?.revision !== match.revision || this.resultOperation.outcome !== outcome) {
-      this.resultOperation = { id: crypto.randomUUID(), revision: match.revision, outcome };
+    const fields = this.resultBody();
+    if (!fields || this.recordBlocked()) return;
+    const key = JSON.stringify(fields);
+    if (this.resultOperation?.revision !== match.revision || this.resultOperation.body !== key) {
+      this.resultOperation = { id: crypto.randomUUID(), revision: match.revision, body: key };
     }
-    const body = { operationId: this.resultOperation.id, expectedRevision: match.revision, outcome };
+    const body: RecordResult = { operationId: this.resultOperation.id, expectedRevision: match.revision, ...fields };
     void this.run(
       'The result was not recorded',
       () => firstValueFrom(this.api.recordResult<MatchView>(this.organisation, this.tournamentId, this.matchId, body)),
       () => 'Result recorded.',
       () => {
-        this.outcome.set(null);
+        this.choose(null);
         this.resultOperation = null;
       },
     );
+  }
+
+  /** A new cause clears the previous cause's fields, so only the chosen cause's answers are sent. */
+  protected choose(cause: CauseChoice | null): void {
+    this.cause.set(cause);
+    this.outcome.set(null);
+    this.conceding.set(null);
+    this.absent.set(null);
+    this.playTookPlace.set(null);
+    this.reason.set('');
+    this.failure.set(null);
   }
 
   protected close(): void {

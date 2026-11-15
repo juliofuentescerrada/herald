@@ -298,4 +298,74 @@ public class MatchTests(OrganisationApi api)
         stale.StatusCode.ShouldBe(HttpStatusCode.Conflict);
         other.StatusCode.ShouldBe(HttpStatusCode.NotFound);
     }
+
+    private static async Task<JsonElement> CauseAsync(League league, string match, object body) =>
+        await JsonAsync(await league.Client.PostAsJsonAsync($"{match}/result", body, Cancellation));
+
+    [Fact]
+    [Trait("covers", "match-results: Before play")]
+    [Trait("covers", "match-results: A double absence")]
+    [Trait("covers", "match-results: No reason")]
+    public async Task An_owner_records_a_concession_a_double_absence_and_a_no_contest_and_the_schedule_shows_each_cause()
+    {
+        var league = await OpenAsync("individual");
+        foreach (var name in new[] { "Robin Vale", "Sam Reed", "Jamie Brook", "Taylor Finch" })
+        {
+            await EnterAsync(league, name);
+        }
+
+        var matches = (await StartAsync(league)).GetProperty("matches");
+        var operation = Guid.NewGuid();
+        var concession = new { operationId = operation, expectedRevision = 1, cause = "concession", entrant = "first", played = false };
+
+        var conceded = await CauseAsync(league, MatchPath(league, matches[0]), concession);
+        var repeated = await CauseAsync(league, MatchPath(league, matches[0]), concession);
+        var afterwards = await CauseAsync(league, MatchPath(league, matches[0]), new { operationId = Guid.NewGuid(), expectedRevision = 2, cause = "noContest", played = false, reason = "Late" });
+        var absent = await CauseAsync(league, MatchPath(league, matches[1]), new { operationId = Guid.NewGuid(), expectedRevision = 1, cause = "doubleAbsence" });
+        var noReason = await CauseAsync(league, MatchPath(league, matches[2]), new { operationId = Guid.NewGuid(), expectedRevision = 1, cause = "noContest", played = false });
+        var noOutcome = await CauseAsync(league, MatchPath(league, matches[2]), new { operationId = Guid.NewGuid(), expectedRevision = 1, cause = "played" });
+        var noContest = await CauseAsync(league, MatchPath(league, matches[2]), new { operationId = Guid.NewGuid(), expectedRevision = 1, cause = "noContest", played = false, reason = "Venue closed" });
+        var schedule = (await JsonAsync(await league.Client.GetAsync($"{league.Path}/schedule", Cancellation))).GetProperty("matches");
+
+        conceded.GetProperty("state").GetString().ShouldBe("resolved");
+        conceded.GetProperty("start").ValueKind.ShouldBe(JsonValueKind.Null);
+        var result = conceded.GetProperty("result");
+        (result.GetProperty("cause").GetString(), result.GetProperty("outcome").GetString(), result.GetProperty("played").GetBoolean()).ShouldBe(("concession", "second", false));
+        conceded.GetProperty("appearances").GetArrayLength().ShouldBe(0);
+        Revision(repeated).ShouldBe(Revision(conceded));
+        var started = await JsonAsync(await league.Client.PostAsJsonAsync($"{MatchPath(league, matches[0])}/start", new { expectedRevision = 2 }, Cancellation));
+        Errors(started, "match").ShouldBe(["resolved"]);
+        Errors(afterwards, "match").ShouldBe(["resolved"]);
+        absent.GetProperty("result").GetProperty("outcome").GetString().ShouldBe("none");
+        Errors(noReason, "reason").ShouldBe(["required"]);
+        Errors(noOutcome, "outcome").ShouldBe(["required"]);
+        noContest.GetProperty("result").GetProperty("reason").GetString().ShouldBe("Venue closed");
+        schedule.EnumerateArray().Take(3).Select(match => match.GetProperty("result").GetProperty("cause").GetString()).ShouldBe(["concession", "doubleAbsence", "noContest"]);
+        schedule[2].GetProperty("result").GetProperty("reason").GetString().ShouldBe("Venue closed");
+    }
+
+    [Fact]
+    [Trait("covers", "match-results: Play claimed on an unstarted team match")]
+    [Trait("covers", "match-results: An absence after start")]
+    [Trait("covers", "match-results: A no contest after play")]
+    public async Task A_team_match_takes_play_only_once_started_and_no_absence_after_it()
+    {
+        var league = await OpenAsync("team");
+        var falcons = await TeamAsync(league, "River Falcons");
+        var stars = await TeamAsync(league, "North Stars");
+        var path = MatchPath(league, (await StartAsync(league)).GetProperty("matches")[0]);
+        await LineupAsync(league, path, "first", falcons[..5], 1);
+        await LineupAsync(league, path, "second", stars[..5], 2);
+
+        var early = await CauseAsync(league, path, new { operationId = Guid.NewGuid(), expectedRevision = 3, cause = "concession", entrant = "first", played = true });
+        await league.Client.PostAsJsonAsync($"{path}/start", new { expectedRevision = 3 }, Cancellation);
+        var absence = await CauseAsync(league, path, new { operationId = Guid.NewGuid(), expectedRevision = 4, cause = "singleAbsence", entrant = "second" });
+        var noContest = await CauseAsync(league, path, new { operationId = Guid.NewGuid(), expectedRevision = 4, cause = "noContest", played = true, reason = "Venue closed" });
+
+        Errors(early, "match").ShouldBe(["not-started"]);
+        early.GetProperty("match").GetProperty("state").GetString().ShouldBe("scheduled");
+        Errors(absence, "match").ShouldBe(["started"]);
+        noContest.GetProperty("result").GetProperty("outcome").GetString().ShouldBe("none");
+        noContest.GetProperty("appearances").GetArrayLength().ShouldBe(10);
+    }
 }

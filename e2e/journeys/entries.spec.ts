@@ -440,8 +440,8 @@ test('An owner records a team match’s lineups from seven-player frozen rosters
   await expectAccessible();
 });
 
-test('An owner records a win in an individual match, which starts and resolves it in one step, records a draw in another, and sees both results on the schedule', async ({ page, signIn, expectAccessible }) => {
-  await signIn();
+// A running four-player league in a new organisation, with the schedule page open on its matches (journeys 20 and 21).
+async function runningLanternOpen(page: Page): Promise<void> {
   await createOrganisation(page);
   await openForEntries(page, 'Lantern Open', { team: false, capacity: 4, admission: 'Automatic' });
   for (const player of ['Robin Vale', 'Sam Reed', 'Jamie Brook', 'Taylor Finch']) {
@@ -484,10 +484,18 @@ test('An owner records a win in an individual match, which starts and resolves i
     await expect(first).toBeVisible({ timeout: 1_000 });
   }).toPass();
 
+}
+
+test('An owner records a win in an individual match, which starts and resolves it in one step, records a draw in another, and sees both results on the schedule', async ({ page, signIn, expectAccessible }) => {
+  await signIn();
+  await runningLanternOpen(page);
+  const first = page.getByRole('link', { name: 'View match: Robin Vale vs Taylor Finch' });
+
   // A win on a scheduled match starts and resolves it at once; nothing is preselected.
   await first.click();
-  await expect(page.getByText('This match has not started: recording a played result also starts it.')).toBeVisible();
   await expect(page.getByRole('button', { name: 'Record result' })).toBeDisabled();
+  await page.getByRole('radio', { name: 'Played' }).check();
+  await expect(page.getByText('This match has not started: recording a played result also starts it.')).toBeVisible();
   await page.getByRole('radio', { name: 'Robin Vale wins' }).check();
   await page.getByRole('button', { name: 'Record result' }).click();
   await expect(page.getByText('Robin Vale won · played')).toBeVisible();
@@ -496,6 +504,7 @@ test('An owner records a win in an individual match, which starts and resolves i
 
   await page.getByRole('link', { name: 'Back to schedule' }).first().click();
   await page.getByRole('link', { name: 'View match: Sam Reed vs Jamie Brook' }).click();
+  await page.getByRole('radio', { name: 'Played' }).check();
   await page.getByRole('radio', { name: 'Draw' }).check();
   await page.getByRole('button', { name: 'Record result' }).click();
   await expect(page.getByText('Draw · played')).toBeVisible();
@@ -505,5 +514,46 @@ test('An owner records a win in an individual match, which starts and resolves i
   await expect(round.getByText('Robin Vale won')).toBeVisible();
   await expect(round.getByText('Draw', { exact: true })).toBeVisible();
   await expect(round.getByText('Resolved')).toHaveCount(2);
+  await expectAccessible();
+});
+
+test('An owner records a concession before play, a double absence and a no contest with its reason, and sees each cause on the schedule with no score', async ({ page, signIn, expectAccessible }) => {
+  await signIn();
+  await runningLanternOpen(page);
+
+  // A concession before play: the opponent wins, no play is recorded and the match does not start.
+  await page.getByRole('link', { name: 'View match: Robin Vale vs Taylor Finch' }).click();
+  await page.getByRole('radio', { name: 'Concession' }).check();
+  await page.getByRole('group', { name: 'Who conceded?' }).getByRole('radio', { name: 'Robin Vale' }).check();
+  await page.getByRole('group', { name: 'Did play take place?' }).getByRole('radio', { name: 'No' }).check();
+  await page.getByRole('button', { name: 'Record result' }).click();
+  await expect(page.getByText('Robin Vale conceded before play · Taylor Finch wins · no play recorded')).toBeVisible();
+  await expect(page.getByText(/appearance/i)).toHaveCount(0);
+  await expectAccessible();
+
+  await page.getByRole('link', { name: 'Back to schedule' }).first().click();
+  await page.getByRole('link', { name: 'View match: Sam Reed vs Jamie Brook' }).click();
+  await page.getByRole('radio', { name: 'Absence' }).check();
+  await page.getByRole('radio', { name: 'Both were absent' }).check();
+  await page.getByRole('button', { name: 'Record result' }).click();
+  await expect(page.getByText('Both were absent · 0 each · no play recorded')).toBeVisible();
+
+  // A no contest needs its reason, kept privately.
+  await page.getByRole('link', { name: 'Back to schedule' }).first().click();
+  await page.getByRole('list', { name: 'Round 2' }).getByRole('link').first().click();
+  await page.getByRole('radio', { name: 'No contest' }).check();
+  await page.getByRole('group', { name: 'Did play take place?' }).getByRole('radio', { name: 'No' }).check();
+  await expect(page.getByText('A no contest needs a reason.')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Record result' })).toBeDisabled();
+  await page.getByRole('textbox', { name: 'Reason (required)' }).fill('Venue closed');
+  await page.getByRole('button', { name: 'Record result' }).click();
+  await expect(page.getByText('No contest: Venue closed · 0 each · no play recorded')).toBeVisible();
+
+  await page.getByRole('link', { name: 'Back to schedule' }).first().click();
+  await expect(page.getByRole('list', { name: 'Round 1' }).getByText('Robin Vale conceded before play · Taylor Finch wins · no play recorded')).toBeVisible();
+  await expect(page.getByRole('list', { name: 'Round 1' }).getByText('Both were absent · 0 each · no play recorded')).toBeVisible();
+  await expect(page.getByRole('list', { name: 'Round 2' }).getByText('No contest: Venue closed · 0 each · no play recorded')).toBeVisible();
+  await expect(page.getByText('· played')).toHaveCount(0);
+  await expect(page.getByText(/\d+\s*[-–]\s*\d+/)).toHaveCount(0);
   await expectAccessible();
 });

@@ -160,4 +160,166 @@ public class MatchResultTests
 
         match.RecordLineup(Side.First, _falcons[2..], _falcons, match.Revision, _owner, _at).Broken.ShouldBe([new BrokenRule("match", "started")]);
     }
+
+    private WriteResult Administrative(Match match, Cause cause, Side? entrant = null, bool? played = null, string? reason = null, Guid? operation = null) =>
+        match.RecordAdministrative(operation ?? Guid.NewGuid(), cause, entrant, played, reason, match.Revision, _owner, _at);
+
+    [Fact]
+    [Trait("covers", "match-results: Before play")]
+    public void A_concession_before_play_makes_the_opponent_win_with_no_play_and_no_appearance()
+    {
+        var match = TeamMatch(started: false);
+
+        Administrative(match, Cause.Concession, Side.First, played: false).Outcome.ShouldBe(WriteOutcome.Applied);
+
+        match.State.ShouldBe(MatchState.Resolved);
+        (match.Resolution!.Outcome, match.Resolution.Cause, match.Resolution.Played).ShouldBe((Outcome.Second, Cause.Concession, false));
+        match.Resolution.Appearances.ShouldBeEmpty();
+        match.Start.ShouldBeNull();
+    }
+
+    [Fact]
+    [Trait("covers", "match-results: After play in a team match")]
+    public void A_concession_after_play_keeps_the_locked_lineups_appearances()
+    {
+        var match = TeamMatch(started: true);
+
+        Administrative(match, Cause.Concession, Side.Second, played: true);
+
+        match.Resolution!.Outcome.ShouldBe(Outcome.First);
+        match.Resolution.Played.ShouldBeTrue();
+        match.Resolution.Appearances.ShouldBe([.. _falcons[..5], .. _stars[..5]]);
+    }
+
+    [Fact]
+    [Trait("covers", "match-results: A single absence")]
+    public void A_single_absence_makes_the_opponent_win_and_records_no_play()
+    {
+        var match = Individual();
+
+        Administrative(match, Cause.SingleAbsence, Side.Second, played: true).Outcome.ShouldBe(WriteOutcome.Applied);
+
+        (match.Resolution!.Outcome, match.Resolution.Cause, match.Resolution.Played).ShouldBe((Outcome.First, Cause.SingleAbsence, false));
+        match.Resolution.Appearances.ShouldBeEmpty();
+
+        // Not withdrawn: the absent entrant's next match still takes a played result.
+        var later = Match.Schedule(match.TournamentId, new Pairing(2, match.Second, Guid.NewGuid()), null);
+        Record(later, Outcome.First).Outcome.ShouldBe(WriteOutcome.Applied);
+    }
+
+    [Theory]
+    [InlineData(false)]
+    [InlineData(true)]
+    public void A_match_resolved_without_a_start_cannot_be_started(bool team)
+    {
+        var match = team ? TeamMatch(started: false) : Individual();
+        Administrative(match, Cause.Concession, Side.First, played: false);
+
+        match.StartMatch(_falcons, _stars, match.Revision, _owner, _at).Broken.ShouldBe([new BrokenRule("match", "resolved")]);
+        match.Start.ShouldBeNull();
+        match.DomainEvents.OfType<MatchStarted>().ShouldBeEmpty();
+    }
+
+    [Fact]
+    [Trait("covers", "match-results: A double absence")]
+    public void A_double_absence_resolves_the_match_with_no_winner_and_no_appearances()
+    {
+        var match = TeamMatch(started: false);
+
+        Administrative(match, Cause.DoubleAbsence);
+
+        (match.Resolution!.Outcome, match.Resolution.Cause, match.Resolution.Played).ShouldBe((Outcome.None, Cause.DoubleAbsence, false));
+        match.Resolution.Appearances.ShouldBeEmpty();
+    }
+
+    [Theory]
+    [Trait("covers", "match-results: An absence after start")]
+    [InlineData(Cause.SingleAbsence)]
+    [InlineData(Cause.DoubleAbsence)]
+    public void An_absence_on_a_match_in_play_is_rejected(Cause cause)
+    {
+        var match = TeamMatch(started: true);
+
+        Administrative(match, cause, Side.First).Broken.ShouldBe([new BrokenRule("match", "started")]);
+        match.State.ShouldBe(MatchState.InPlay);
+    }
+
+    [Fact]
+    [Trait("covers", "match-results: A no contest after play")]
+    public void A_no_contest_after_play_keeps_the_reason_and_the_appearances_with_no_winner()
+    {
+        var match = TeamMatch(started: true);
+
+        Administrative(match, Cause.NoContest, played: true, reason: " Venue closed ");
+
+        (match.Resolution!.Outcome, match.Resolution.Cause, match.Resolution.Played, match.Resolution.Reason)
+            .ShouldBe((Outcome.None, Cause.NoContest, true, "Venue closed"));
+        match.Resolution.Appearances.Count.ShouldBe(10);
+    }
+
+    [Theory]
+    [Trait("covers", "match-results: No reason")]
+    [InlineData(null)]
+    [InlineData("   ")]
+    public void A_no_contest_without_a_reason_is_rejected(string? reason)
+    {
+        var match = Individual();
+
+        Administrative(match, Cause.NoContest, played: false, reason: reason).Broken.ShouldBe([new BrokenRule("reason", "required")]);
+        match.Resolution.ShouldBeNull();
+    }
+
+    [Fact]
+    public void A_no_contest_reason_longer_than_500_characters_is_rejected()
+    {
+        var match = Individual();
+
+        Administrative(match, Cause.NoContest, played: false, reason: new string('x', 501)).Broken.ShouldBe([new BrokenRule("reason", "too-long")]);
+    }
+
+    [Theory]
+    [Trait("covers", "match-results: Play claimed on an unstarted team match")]
+    [InlineData(Cause.Concession)]
+    [InlineData(Cause.NoContest)]
+    public void Play_claimed_on_an_unstarted_team_match_is_rejected(Cause cause)
+    {
+        var match = TeamMatch(started: false);
+
+        Administrative(match, cause, Side.First, played: true, reason: "Venue closed").Broken.ShouldBe([new BrokenRule("match", "not-started")]);
+        match.State.ShouldBe(MatchState.Scheduled);
+    }
+
+    [Fact]
+    public void A_concession_without_its_entrant_or_whether_play_took_place_names_both()
+    {
+        var match = Individual();
+
+        Administrative(match, Cause.Concession).Broken.ShouldBe([new BrokenRule("entrant", "required"), new BrokenRule("played", "required")]);
+    }
+
+    [Theory]
+    [InlineData(Cause.Played)]
+    [InlineData((Cause)9)]
+    public void An_administrative_write_with_a_played_or_unknown_cause_is_rejected(Cause cause)
+    {
+        Administrative(Individual(), cause, Side.First, played: false).Broken.ShouldBe([new BrokenRule("cause", "unknown")]);
+    }
+
+    [Fact]
+    public void A_played_result_cannot_have_no_winner()
+    {
+        Record(Individual(), Outcome.None).Broken.ShouldBe([new BrokenRule("outcome", "unknown")]);
+    }
+
+    [Fact]
+    public void A_concession_on_a_resolved_match_is_rejected_and_its_repeat_is_answered_with_the_first()
+    {
+        var match = Individual();
+        var operation = Guid.NewGuid();
+        Administrative(match, Cause.Concession, Side.First, played: false, operation: operation);
+
+        Administrative(match, Cause.Concession, Side.First, played: false, operation: operation).Outcome.ShouldBe(WriteOutcome.Repeated);
+        Administrative(match, Cause.NoContest, played: false, reason: "Late").Broken.ShouldBe([new BrokenRule("match", "resolved")]);
+        match.Resolution!.Cause.ShouldBe(Cause.Concession);
+    }
 }
