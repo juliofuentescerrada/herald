@@ -81,7 +81,7 @@ Captured at 1440 and 390 px from the composed application (synthetic persona, se
 
 | State | Match | Difference and resolution |
 |---|---|---|
-| `standings-before-start` | Notice "Standings begin when the competition starts" below the tabs | None |
+| `standings-before-start` | Notice "Standings begin when the competition starts" below the tournament navigation | None |
 | `standings-empty` | Every entrant 1= with 0 points; "No match resolved yet" in the summary | None |
 | `standings-provisional` | "Provisional" beside the title; summary "Provisional · 4 of 6 matches resolved" with the revision and the rules; points strongest, other numbers muted and right-aligned; "2=" with the accessible name "Position 2, shared" | None |
 | `standings-explained` | The entrant's row expands below it with each resolved match and "Total" | Only resolved matches are listed (above) |
