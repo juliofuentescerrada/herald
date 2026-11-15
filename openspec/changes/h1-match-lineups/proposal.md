@@ -2,6 +2,8 @@
 
 **Proposed in H1 batch 2's proposals pull request, 15 November 2026.** The rules come from the batch's decision session of the same day, recorded in the functional discovery (§8, §10.2 "Confirmed for match lineups", §10.2.1, §15 rows D-18 and D-23). It depends on batch 1 (`h1-competition-start`). Merging the proposals pull request approves this change (ADR 0018); task 1.1 records that approval.
 
+**Approved for implementation on 15 November 2026**, when the maintainer merged the batch 2 proposals pull request (#63), with the review answers below (ADR 0018).
+
 **Review answers, 15 November 2026 (#63):** the maintainer accepted Q1 and Q2 (§5.1's "Start a match" row, lineups at any time after start, confirmation on a team start) as proposed, and the prototypes as they are.
 
 ## Why
