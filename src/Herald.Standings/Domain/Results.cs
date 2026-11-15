@@ -14,7 +14,16 @@ public enum Outcome
     None,
 }
 
-public sealed record Entrant(Guid EntryId, string Name);
+// Stored by number in the results document: append only. Snapshots kept before departures read as active.
+public enum EntrantStatus
+{
+    Active,
+    Withdrawn,
+    Disqualified,
+}
+
+// A withdrawn or disqualified entrant keeps its points and position and is flagged (h1-round-operations).
+public sealed record Entrant(Guid EntryId, string Name, EntrantStatus Status = EntrantStatus.Active);
 
 // A match as Competition reported it; Outcome and Cause are set once it is resolved, the only state that counts.
 public sealed record MatchResult(Guid MatchId, int Round, Guid First, Guid Second, Outcome? Outcome, string? Cause)

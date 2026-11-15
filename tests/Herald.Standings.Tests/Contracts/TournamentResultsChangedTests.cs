@@ -33,4 +33,17 @@ public class TournamentResultsChangedTests
         again.Matches.ShouldBe(message.Matches);
         again.Rests.ShouldBe(message.Rests);
     }
+
+    [Fact]
+    public void An_entrant_status_reads_back_and_a_message_without_it_reads_as_active()
+    {
+        var (withdrawn, active) = (Guid.NewGuid(), Guid.NewGuid());
+        var json = $$"""
+            {"OrganisationId":"{{Guid.NewGuid()}}","TournamentId":"{{Guid.NewGuid()}}","Revision":4,
+             "Entrants":[{"EntryId":"{{withdrawn}}","Name":"Sam Reed","Status":1},{"EntryId":"{{active}}","Name":"Robin Vale"}],"Matches":[],"Rests":[]}
+            """;
+
+        JsonSerializer.Deserialize<TournamentResultsChanged>(json)!.Entrants
+            .ShouldBe([new(withdrawn, "Sam Reed", ResultsEntrantStatus.Withdrawn), new(active, "Robin Vale", ResultsEntrantStatus.Active)]);
+    }
 }

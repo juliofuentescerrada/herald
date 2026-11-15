@@ -139,4 +139,19 @@ public partial class MatchTests
         roster.EnumerateArray().Count(player => player.GetProperty("status").GetString() == "withdrawn").ShouldBe(1);
         Errors(lineup, $"player-{falcons[6]}").ShouldBe(["unavailable"]);
     }
+
+    [Fact]
+    public async Task A_withdrawn_entrant_keeps_its_points_in_the_standings_and_is_flagged()
+    {
+        var league = await PlayedLeagueAsync();
+        var schedule = await JsonAsync(await league.Client.GetAsync($"{league.Path}/schedule", Cancellation));
+
+        (await SettledAsync(() => DepartAsync(league, EntryOf(schedule, "Robin Vale"), "withdrawal", Revision(schedule), "Moved away"))).StatusCode.ShouldBe(HttpStatusCode.OK);
+        var standings = await JsonAsync(await league.Client.GetAsync($"{league.Path}/standings", Cancellation));
+
+        Revision(standings).ShouldBe(8);
+        var first = standings.GetProperty("rows")[0];
+        (Name(first.GetProperty("entrant")), first.GetProperty("points").GetInt32(), first.GetProperty("entrant").GetProperty("status").GetString())
+            .ShouldBe(("Robin Vale", 9, "withdrawn"));
+    }
 }
