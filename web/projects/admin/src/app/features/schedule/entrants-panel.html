@@ -1,0 +1,140 @@
+@let s = schedule();
+<section class="entrants" aria-labelledby="entrants-heading">
+  <h2 id="entrants-heading">Entrants</h2>
+  <ul class="rows" aria-labelledby="entrants-heading">
+    @for (entrant of s.entrants; track entrant.entryId) {
+      @let label = entrantStatusLabel[entrant.status];
+      <li>
+        <div class="identity">
+          <div class="name">
+            <strong>{{ entrant.name }}</strong>
+            <herald-status-label [tone]="label.tone" [icon]="label.icon">{{ label.text }}</herald-status-label>
+          </div>
+          @if (entrant.status !== 'active') {
+            <p class="help">{{ label.text }} {{ zoned()(entrant.departedAt) }} · Reason: {{ entrant.reason }}</p>
+          }
+        </div>
+        <div class="actions">
+          @if (entrant.roster) {
+            <button herald-button type="button" [attr.aria-label]="'Frozen roster: ' + entrant.name" (click)="showRoster(entrant, $any($event.currentTarget))">Frozen roster</button>
+          }
+          @if (entrant.status === 'active') {
+            <button herald-button type="button" [attr.aria-label]="'Withdraw ' + entrant.name" (click)="askDeparture(entrant, 'withdraw', $any($event.currentTarget))">Withdraw</button>
+            <button herald-button type="button" [attr.aria-label]="'Disqualify ' + entrant.name" (click)="askDeparture(entrant, 'disqualify', $any($event.currentTarget))">Disqualify</button>
+          }
+        </div>
+      </li>
+    }
+  </ul>
+</section>
+
+<ng-template #departureDialog>
+  @let kind = departure()?.kind;
+  <herald-dialog [heading]="(kind === 'withdraw' ? 'Withdraw ' : 'Disqualify ') + departing()?.name + '?'" [busy]="busy()">
+    <p>{{ consequence() }}</p>
+    <form novalidate (submit)="$event.preventDefault(); confirmDeparture()">
+      <div class="field">
+        <label for="departure-reason">Reason (required)</label>
+        <textarea
+          id="departure-reason"
+          #departureReason
+          rows="3"
+          maxlength="500"
+          [value]="reason()"
+          (input)="reason.set(departureReason.value); reasonError.set(null)"
+          [readOnly]="busy()"
+          [attr.aria-invalid]="reasonError() ? 'true' : null"
+          [attr.aria-describedby]="reasonError() ? 'departure-reason-help departure-reason-error' : 'departure-reason-help'"
+        ></textarea>
+        <p class="help" id="departure-reason-help">Private to the organisation. At most 500 characters.</p>
+        @if (reasonError(); as message) {
+          <p class="field-error" id="departure-reason-error"><herald-icon name="alert-circle" size="metadata" />Error: {{ message }}</p>
+        }
+      </div>
+      @if (failure(); as failed) {
+        <herald-notice tone="danger" [heading]="kind === 'withdraw' ? 'Entrant was not withdrawn' : 'Entrant was not disqualified'">{{ failed }}</herald-notice>
+      }
+      <div class="actions">
+        <button herald-button variant="destructive" type="submit" [loading]="busy()">
+          {{ busy() ? (kind === 'withdraw' ? 'Withdrawing…' : 'Disqualifying…') : failure() ? 'Try again' : kind === 'withdraw' ? 'Withdraw' : 'Disqualify' }}
+        </button>
+        <button herald-button type="button" data-herald-initial-focus [disabled]="busy()" (click)="close()">Keep as it is</button>
+      </div>
+    </form>
+  </herald-dialog>
+</ng-template>
+
+<ng-template #rosterDialog>
+  <herald-dialog [heading]="team()?.name + ' · frozen roster'" [busy]="busy()">
+    <p class="help">Frozen at start. No player can be added; a withdrawn or sanctioned player stays with their appearances and cannot be chosen for a lineup.</p>
+    @if (acting(); as player) {
+      @let kind = playerAction()!.kind;
+      <form class="player-form" novalidate aria-labelledby="player-form-heading" (submit)="$event.preventDefault(); confirmPlayer()">
+        <h3 id="player-form-heading">{{ kind === 'sanction' ? 'Sanction ' : 'Withdraw ' }}{{ player.name }}</h3>
+        <p>
+          @if (kind === 'sanction') {
+            {{ player.name }} stays on the frozen roster and cannot be chosen for a lineup until the sanction is lifted. Played appearances stay.
+          } @else {
+            {{ player.name }} withdraws from the tournament for good, stays on the frozen roster and cannot be chosen for a lineup. Played appearances stay.
+          }
+        </p>
+        <div class="field">
+          <label for="player-reason">{{ kind === 'sanction' ? 'Reason (required)' : 'Reason (optional)' }}</label>
+          <textarea
+            id="player-reason"
+            #playerReason
+            rows="3"
+            maxlength="500"
+            [value]="reason()"
+            (input)="reason.set(playerReason.value); reasonError.set(null)"
+            [readOnly]="busy()"
+            [attr.aria-invalid]="reasonError() ? 'true' : null"
+            [attr.aria-describedby]="reasonError() ? 'player-reason-help player-reason-error' : 'player-reason-help'"
+          ></textarea>
+          <p class="help" id="player-reason-help">Private to the organisation. At most 500 characters.</p>
+          @if (reasonError(); as message) {
+            <p class="field-error" id="player-reason-error"><herald-icon name="alert-circle" size="metadata" />Error: {{ message }}</p>
+          }
+        </div>
+        <div class="actions">
+          <button herald-button variant="destructive" type="submit" [loading]="busy()">{{ kind === 'sanction' ? 'Sanction' : 'Withdraw player' }}</button>
+          <button herald-button type="button" [disabled]="busy()" (click)="cancelPlayer()">Keep as it is</button>
+        </div>
+      </form>
+    }
+    @if (failure(); as failed) {
+      <herald-notice tone="danger" heading="Nothing changed">{{ failed }}</herald-notice>
+    }
+    <ul class="rows players" aria-label="Frozen roster">
+      @for (player of team()?.roster ?? []; track player.playerId) {
+        @let label = playerStatusLabel[player.status];
+        <li>
+          <div class="identity">
+            <div class="name">
+              <strong>{{ player.name }}</strong>
+              <herald-status-label [tone]="label.tone" [icon]="label.icon">{{ label.text }}</herald-status-label>
+            </div>
+            @if (player.status === 'sanctioned') {
+              <p class="help">Reason: {{ player.reason }}</p>
+            } @else if (player.status === 'withdrawn') {
+              <p class="help">Withdrawn from the tournament · final@if (player.reason) { · Reason: {{ player.reason }}}</p>
+            }
+          </div>
+          <div class="actions">
+            @if (player.status !== 'withdrawn') {
+              <button herald-button type="button" [disabled]="busy()" [attr.aria-label]="'Withdraw ' + player.name" (click)="askPlayer(player, 'withdraw')">Withdraw player</button>
+            }
+            @if (player.status === 'sanctioned') {
+              <button herald-button type="button" [disabled]="busy()" [attr.aria-label]="'Lift ' + possessive(player.name) + ' sanction'" (click)="lift(player)">Lift sanction</button>
+            } @else if (player.status === 'available') {
+              <button herald-button type="button" [disabled]="busy()" [attr.aria-label]="'Sanction ' + player.name" (click)="askPlayer(player, 'sanction')">Sanction</button>
+            }
+          </div>
+        </li>
+      }
+    </ul>
+    <div class="actions close">
+      <button herald-button type="button" data-herald-initial-focus [disabled]="busy()" (click)="close()">Close</button>
+    </div>
+  </herald-dialog>
+</ng-template>

@@ -123,4 +123,18 @@ public class TableTests
         results.Apply(Results(6, [])).ShouldBeTrue();
         results.Table().Matches.ShouldBe(0);
     }
+
+    [Fact]
+    [Trait("covers", "standings: A withdrawn leader")]
+    public void A_withdrawn_leader_stays_first_with_its_points_and_is_flagged()
+    {
+        var robin = _robin with { Status = EntrantStatus.Withdrawn };
+        var table = Table.Of(Results(5, [
+            Match(1, robin, _sam, Outcome.First),
+            Match(1, _jamie, _taylor, Outcome.Draw),
+            Match(2, robin, _jamie, Outcome.First)], entrants: [robin, _sam, _jamie, _taylor]));
+
+        var first = table.Rows[0];
+        (first.Position, first.Entrant.Name, first.Points, first.Entrant.Status).ShouldBe((1, "Robin Vale", 6, EntrantStatus.Withdrawn));
+    }
 }

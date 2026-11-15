@@ -71,6 +71,10 @@
                 >
                   {{ row.entrant.name }}
                 </button>
+                <!-- A departed entrant keeps its points and position and is flagged (h1-round-operations). -->
+                @if (row.entrant.status !== 'active') {
+                  <herald-status-label tone="danger" icon="alert-triangle">{{ row.entrant.status === 'withdrawn' ? 'Withdrawn' : 'Disqualified' }}</herald-status-label>
+                }
               </td>
               <td class="num wide">{{ row.resolved }}</td>
               <td class="num wide">{{ row.won }}</td>

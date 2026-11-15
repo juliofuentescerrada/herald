@@ -25,7 +25,7 @@ public static class StartMatchEndpoint
     {
         var actor = context.ActorId ?? throw new InvalidOperationException($"No acting person in organisation {organisationId}.");
         return await db.WriteAsync(bus, organisationId, tournamentId, matchId,
-            (match, schedule) => match.StartMatch(schedule.RosterOf(match.First), schedule.RosterOf(match.Second), command.ExpectedRevision, actor, DateTimeOffset.UtcNow),
+            (match, schedule) => match.StartMatch(schedule.RosterOf(match.First), schedule.RosterOf(match.Second), command.ExpectedRevision, actor, DateTimeOffset.UtcNow, schedule.UnavailablePlayers),
             cancellationToken);
     }
 }

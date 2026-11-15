@@ -33,7 +33,7 @@ public static class RecordLineupEndpoint
 
         var actor = context.ActorId ?? throw new InvalidOperationException($"No acting person in organisation {organisationId}.");
         return await db.WriteAsync(bus, organisationId, tournamentId, matchId,
-            (match, schedule) => match.RecordLineup(which, command.Players, schedule.RosterOf(match.EntryOf(which)), command.ExpectedRevision, actor, DateTimeOffset.UtcNow),
+            (match, schedule) => match.RecordLineup(which, command.Players, schedule.RosterOf(match.EntryOf(which)), command.ExpectedRevision, actor, DateTimeOffset.UtcNow, schedule.UnavailablePlayers),
             cancellationToken);
     }
 }

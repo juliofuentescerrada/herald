@@ -125,6 +125,49 @@ public sealed class Admin(Seeding seeding, Persona persona)
         }));
     }
 
+    // Records a side's lineup of the schedule's match at that position from its frozen roster's first players (h1-match-lineups).
+    public async Task RecordLineupAsync(Guid organisation, Guid tournament, int index, string side, int players)
+    {
+        var schedule = await ReadAsync(await _client.GetAsync($"{Path(organisation, tournament)}/schedule"), "read a schedule");
+        var match = schedule.GetProperty("matches")[index].GetProperty("matchId").GetGuid();
+        var path = $"{Path(organisation, tournament)}/matches/{match}";
+        await WriteAsync($"record the {side} lineup of {match}", async () =>
+        {
+            var details = await ReadAsync(await _client.GetAsync(path), "read a match");
+            var roster = details.GetProperty(side).GetProperty("roster").EnumerateArray().Select(player => player.GetProperty("playerId").GetGuid()).Take(players);
+            return await _client.PutAsJsonAsync($"{path}/lineups/{side}", new { expectedRevision = details.GetProperty("revision").GetInt32(), players = roster });
+        });
+    }
+
+    // Withdraws a named entrant of the running competition; the operation identifier is stable, so a rerun repeats (h1-round-operations).
+    public async Task WithdrawEntrantAsync(Guid organisation, Guid tournament, string name, string reason)
+    {
+        var schedule = $"{Path(organisation, tournament)}/schedule";
+        var entry = EntrantOf(await ReadAsync(await _client.GetAsync(schedule), "read a schedule"), name).GetProperty("entryId").GetGuid();
+        await WriteAsync($"withdraw {entry}", async () => await _client.PostAsJsonAsync($"{Path(organisation, tournament)}/entrants/{entry}/withdrawal", new
+        {
+            operationId = Ids.For(entry.ToString(), "withdrawal"),
+            expectedRevision = (await ReadAsync(await _client.GetAsync(schedule), "read a schedule")).GetProperty("revision").GetInt32(),
+            reason,
+        }));
+    }
+
+    // Sanctions a named player of a named team's frozen roster (h1-round-operations); a rerun repeats.
+    public async Task SanctionPlayerAsync(Guid organisation, Guid tournament, string team, string player, string reason)
+    {
+        var schedule = $"{Path(organisation, tournament)}/schedule";
+        var entrant = EntrantOf(await ReadAsync(await _client.GetAsync(schedule), "read a schedule"), team);
+        var id = entrant.GetProperty("roster").EnumerateArray().Single(candidate => candidate.GetProperty("name").GetString() == player).GetProperty("playerId").GetGuid();
+        await WriteAsync($"sanction {id}", async () => await _client.PostAsJsonAsync($"{Path(organisation, tournament)}/entrants/{entrant.GetProperty("entryId").GetGuid()}/players/{id}/sanction", new
+        {
+            expectedRevision = (await ReadAsync(await _client.GetAsync(schedule), "read a schedule")).GetProperty("revision").GetInt32(),
+            reason,
+        }));
+    }
+
+    private static JsonElement EntrantOf(JsonElement schedule, string name) =>
+        schedule.GetProperty("entrants").EnumerateArray().Single(entrant => entrant.GetProperty("name").GetString() == name);
+
     private static string Name(JsonElement match, string side) => match.GetProperty(side).GetProperty("name").GetString()!;
 
     private static string Path(Guid organisation, Guid tournament) => $"/api/organisations/{organisation}/tournaments/{tournament}";

@@ -50,6 +50,7 @@ const teamMatch = (over: Partial<MatchView> = {}): MatchView => ({
   blockers: ['first-lineup-missing', 'second-lineup-missing'],
   result: null,
   appearances: [],
+  unavailable: [],
   ...over,
 });
 
@@ -65,6 +66,7 @@ const individual = (over: Partial<MatchView> = {}): MatchView => ({
   blockers: [],
   result: null,
   appearances: [],
+  unavailable: [],
   ...over,
 });
 
@@ -230,6 +232,33 @@ describe('The match page', () => {
     await settle();
 
     expect(text('herald-notice')).toContain('Star 1 is not on that team’s frozen roster. Nothing changed.');
+  });
+
+  it('names a sanctioned starter that blocks the start and offers the player out of the lineup only',
+    { meta: { type: 'covers', description: 'match-lineups: A sanctioned starter' } }, async () => {
+      const blocked = teamMatch({
+        first: { ...teamMatch().first, lineups: [lineup(1, falcons.slice(0, 5))] },
+        second: { ...teamMatch().second, lineups: [lineup(1, stars.slice(0, 5))] },
+        blockers: ['first-lineup-unavailable'],
+        unavailable: [falcons[0], falcons[6]],
+      });
+      const { page, button, text, texts } = await open({ getMatch: () => of(blocked) });
+      await vi.waitFor(() => expect(text('#start-why')).toBe('River Falcons’ lineup includes Falcon 1, who is unavailable. Revise the lineup from the other eligible players.'));
+
+      expect(button('Start match')?.disabled).toBe(true);
+      const boxes = page().querySelectorAll<HTMLInputElement>('input[type=checkbox]');
+      // Falcon 1 is chosen and can be taken out; Falcon 7 is not chosen and cannot be put in.
+      expect([boxes[0].disabled, boxes[6].disabled]).toEqual([false, true]);
+      expect(texts('.choice herald-status-label').slice(0, 2)).toEqual(['Unavailable', 'Unavailable']);
+      expect(await violations(page())).toEqual([]);
+    });
+
+  it('says a team with too few eligible players waits for the owner’s outcome', async () => {
+    const short = teamMatch({ blockers: ['first-roster-too-few-eligible', 'first-lineup-missing', 'second-lineup-missing'], unavailable: falcons.slice(4, 7) });
+    const { page, text } = await open({ getMatch: () => of(short) });
+    await vi.waitFor(() => expect(text('#start-why')).toBe('River Falcons has fewer than 5 eligible players. Record an outcome when you decide; the team is not withdrawn automatically.'));
+    expect(text('.operation herald-notice')).toContain('Too few eligible players');
+    expect(await violations(page())).toEqual([]);
   });
 
   it('says when the match cannot be loaded', async () => {

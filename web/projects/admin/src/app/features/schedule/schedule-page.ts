@@ -15,7 +15,9 @@ import { injectQuery } from '@tanstack/angular-query-experimental';
 import { firstValueFrom } from 'rxjs';
 import { AccessState, AppContext, QUERY_CLIENT } from '../../platform';
 import { instantText, lifecycleLabels, resultText } from '../../shared';
-import { blockerText, fieldKey, ruleText, scheduleKey, seedingText, sizeText, tournamentKey } from './schedule';
+import { EntrantsPanel } from './entrants-panel';
+import { OperationsSummary } from './operations-summary';
+import { blockerText, fieldKey, roundStateLabel, ruleText, scheduleKey, seedingText, sizeText, tournamentKey } from './schedule';
 
 interface Failure {
   readonly heading: string;
@@ -25,7 +27,7 @@ interface Failure {
 /** A tournament's round-robin: the draft from the eligible field, its publication and withdrawal (F-06, round-robin-pairings). */
 @Component({
   selector: 'app-schedule-page',
-  imports: [TournamentNav, Button, Dialog, Icon, Notice, RouterLink, StatusLabel],
+  imports: [TournamentNav, Button, Dialog, EntrantsPanel, Icon, Notice, OperationsSummary, RouterLink, StatusLabel],
   templateUrl: './schedule-page.html',
   styleUrl: './schedule-page.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -104,6 +106,13 @@ export class SchedulePage {
   protected readonly withdrawn = computed(() => (this.schedule.data()?.history ?? []).filter((publication) => publication.withdrawnAt));
 
   protected readonly resultText = resultText;
+  protected readonly organisationId = this.organisation;
+  protected readonly id = this.tournamentId;
+  /** A running round's state, or undefined before start (h1-round-operations D-1). */
+  protected readonly roundState = (round: number) => {
+    const state = this.schedule.data()?.operations?.rounds.find((other) => other.number === round)?.state;
+    return state ? roundStateLabel[state] : undefined;
+  };
   protected readonly stateText = { scheduled: 'Scheduled', inPlay: 'In play', resolved: 'Resolved' } as const;
   protected readonly stateTone = { scheduled: 'neutral', inPlay: 'info', resolved: 'success' } as const;
   /** The running competition's match for a pairing, or undefined before start. */

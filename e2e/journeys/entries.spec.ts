@@ -604,3 +604,35 @@ test('An owner records the results of a four-player league and reads its standin
   await expect(page.getByText('Total: 4 points')).toBeVisible();
   await expectAccessible();
 });
+
+test('An owner withdraws a player during the competition with a reason, sees the player’s unplayed matches resolved as absences and the player flagged in the standings, and sees round 1 completed', async ({ page, signIn, expectAccessible }) => {
+  await signIn();
+  await runningLanternOpen(page);
+  await recordResult(page, 'Robin Vale', 'Taylor Finch', 'Robin Vale wins');
+
+  const operations = page.getByRole('region', { name: 'Operations' });
+  await expect(operations.getByRole('list', { name: 'Rounds' }).getByRole('listitem').first()).toContainText('Running');
+
+  // The confirmation states what it resolves and needs a reason, private to the organisation.
+  await page.getByRole('region', { name: 'Entrants' }).getByRole('button', { name: 'Withdraw Sam Reed' }).click();
+  const confirm = page.getByRole('dialog', { name: 'Withdraw Sam Reed?' });
+  await expect(confirm.getByText('3 unplayed matches will be resolved as Sam Reed’s absence, each opponent winning.', { exact: false })).toBeVisible();
+  await confirm.getByRole('button', { name: 'Withdraw', exact: true }).click();
+  await expect(confirm.getByText('Error: Enter a reason.')).toBeVisible();
+  await expectAccessible();
+  await confirm.getByRole('textbox', { name: 'Reason (required)' }).fill('Moved away');
+  await confirm.getByRole('button', { name: 'Withdraw', exact: true }).click();
+  await expect(page.getByText('Sam Reed withdrawn. 3 matches resolved.')).toBeVisible();
+
+  await expect(page.getByRole('list', { name: 'Round 1' }).getByText('Sam Reed was absent · Jamie Brook wins · no play recorded')).toBeVisible();
+  await expect(page.getByRole('list', { name: 'Round 2' }).getByText('Sam Reed was absent · Taylor Finch wins · no play recorded')).toBeVisible();
+  await expect(page.getByRole('list', { name: 'Round 3' }).getByText('Sam Reed was absent · Robin Vale wins · no play recorded')).toBeVisible();
+  await expect(operations.getByRole('list', { name: 'Rounds' }).getByRole('listitem').first()).toContainText('Completed');
+  await expect(page.getByRole('region', { name: 'Entrants' }).getByText('Reason: Moved away')).toBeVisible();
+  await expectAccessible();
+
+  await page.getByRole('navigation', { name: 'Tournament sections' }).getByRole('link', { name: 'Standings' }).click();
+  await expect(page.getByText('Provisional · 4 of 6 matches resolved')).toBeVisible();
+  await expect(page.getByRole('table', { name: 'Standings' }).getByRole('row').filter({ hasText: 'Sam Reed' })).toContainText('Withdrawn');
+  await expectAccessible();
+});

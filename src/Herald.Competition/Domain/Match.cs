@@ -44,6 +44,7 @@ public sealed record Lineup(int Number, IReadOnlyList<Guid> Players, Guid Record
 public sealed record MatchStart(Guid StartedBy, DateTimeOffset StartedAt, int? FirstLineup, int? SecondLineup);
 
 // The one effective result of a match (h1-operator-results D-1), with the players credited with an appearance (D-2).
+// A departure's single absence revised to a double absence keeps it as its predecessor (h1-round-operations D-2).
 public sealed record Resolution(
     Outcome Outcome,
     Cause Cause,
@@ -52,7 +53,8 @@ public sealed record Resolution(
     Guid RecordedBy,
     DateTimeOffset RecordedAt,
     Guid OperationId,
-    string? Reason = null);
+    string? Reason = null,
+    Resolution? Predecessor = null);
 
 public sealed record MatchResolved(MatchId MatchId, Outcome Outcome, Cause Cause, Guid RecordedBy, DateTimeOffset RecordedAt) : IDomainEvent;
 
@@ -124,8 +126,10 @@ public sealed class Match : AggregateRoot<MatchId>
 
     public Guid EntryOf(Side side) => side == Side.First ? First : Second;
 
-    // The roster is the side's frozen roster, or null while Competition has not learned it (D-4).
-    public WriteResult RecordLineup(Side side, IReadOnlyList<Guid> players, IReadOnlyCollection<Guid>? roster, int expectedRevision, Guid actor, DateTimeOffset at)
+    // The roster is the side's frozen roster, or null while Competition has not learned it (D-4); unavailable players are the
+    // withdrawn and sanctioned ones (h1-round-operations D-3).
+    public WriteResult RecordLineup(
+        Side side, IReadOnlyList<Guid> players, IReadOnlyCollection<Guid>? roster, int expectedRevision, Guid actor, DateTimeOffset at, IReadOnlyCollection<Guid>? unavailable = null)
     {
         if (!IsTeamMatch)
         {
@@ -147,7 +151,7 @@ public sealed class Match : AggregateRoot<MatchId>
             return WriteResult.Reject("match", "started");
         }
 
-        if (Check(players, roster) is { Count: > 0 } broken)
+        if (Check(players, roster, unavailable) is { Count: > 0 } broken)
         {
             return new(WriteOutcome.Rejected, broken);
         }
@@ -161,7 +165,7 @@ public sealed class Match : AggregateRoot<MatchId>
     }
 
     // The reasons this match cannot start now, side by side; the rosters are null while unknown.
-    public IReadOnlyList<BrokenRule> StartBlockers(IReadOnlyCollection<Guid>? firstRoster, IReadOnlyCollection<Guid>? secondRoster)
+    public IReadOnlyList<BrokenRule> StartBlockers(IReadOnlyCollection<Guid>? firstRoster, IReadOnlyCollection<Guid>? secondRoster, IReadOnlyCollection<Guid>? unavailable = null)
     {
         if (!IsTeamMatch)
         {
@@ -172,13 +176,19 @@ public sealed class Match : AggregateRoot<MatchId>
         foreach ((var side, var roster) in new[] { (Side.First, firstRoster), (Side.Second, secondRoster) })
         {
             var field = side == Side.First ? "first-lineup" : "second-lineup";
+            // Too few eligible players: the match waits for the owner's explicit outcome (h1-round-operations D-3).
+            if (roster is not null && roster.Count(player => unavailable?.Contains(player) != true) < ActivePlayers)
+            {
+                broken.Add(new(side == Side.First ? "first-roster" : "second-roster", "too-few-eligible"));
+            }
+
             if (CurrentLineup(side) is not { } lineup)
             {
                 broken.Add(new(field, "missing"));
             }
             else
             {
-                broken.AddRange(Check(lineup.Players, roster).Select(rule => rule with { Field = field }));
+                broken.AddRange(Check(lineup.Players, roster, unavailable).Select(rule => rule with { Field = field }));
             }
         }
 
@@ -187,10 +197,12 @@ public sealed class Match : AggregateRoot<MatchId>
             broken.Add(new("players", "both-sides"));
         }
 
-        return broken;
+        // Each side's rule once, however many of its players break it.
+        return [.. broken.Distinct()];
     }
 
-    public WriteResult StartMatch(IReadOnlyCollection<Guid>? firstRoster, IReadOnlyCollection<Guid>? secondRoster, int expectedRevision, Guid actor, DateTimeOffset at)
+    public WriteResult StartMatch(
+        IReadOnlyCollection<Guid>? firstRoster, IReadOnlyCollection<Guid>? secondRoster, int expectedRevision, Guid actor, DateTimeOffset at, IReadOnlyCollection<Guid>? unavailable = null)
     {
         if (Start is not null)
         {
@@ -208,9 +220,12 @@ public sealed class Match : AggregateRoot<MatchId>
             return WriteOutcome.Stale;
         }
 
-        if (StartBlockers(firstRoster, secondRoster) is { Count: > 0 } broken)
+        if (StartBlockers(firstRoster, secondRoster, unavailable) is { Count: > 0 } broken)
         {
-            return new(WriteOutcome.Rejected, broken);
+            // The rejection also names each unavailable starter (h1-round-operations D-3).
+            var named = new[] { Side.First, Side.Second }.SelectMany(side => CurrentLineup(side)?.Players ?? [])
+                .Where(player => unavailable?.Contains(player) == true).Distinct().Select(player => new BrokenRule($"player-{player}", "unavailable"));
+            return new(WriteOutcome.Rejected, [.. broken, .. named]);
         }
 
         Start = new(actor, at, CurrentLineup(Side.First)?.Number, CurrentLineup(Side.Second)?.Number);
@@ -334,6 +349,37 @@ public sealed class Match : AggregateRoot<MatchId>
         return WriteOutcome.Applied;
     }
 
+    // Resolves this match for the departing side's entrant (h1-round-operations D-2); false when nothing changes. The opponent's
+    // departure, when it departed first, is its operation: its own single absence is revised once to a double absence. Any other
+    // resolution stays, a played one above all.
+    public bool ResolveForDeparture(Guid operationId, Side side, Guid? opponentDeparture, Guid actor, DateTimeOffset at)
+    {
+        if (Resolution is { } resolution)
+        {
+            if (resolution.Cause != Cause.SingleAbsence || resolution.OperationId != opponentDeparture)
+            {
+                return false;
+            }
+
+            Resolution = new(Outcome.None, Cause.DoubleAbsence, false, [], actor, at, operationId, Predecessor: resolution);
+        }
+        else if (Start is not null)
+        {
+            // In play: a concession after play, crediting the locked lineups.
+            Resolution = new(side == Side.First ? Outcome.Second : Outcome.First, Cause.Concession, true, Appearances(), actor, at, operationId);
+        }
+        else
+        {
+            Resolution = opponentDeparture is null
+                ? new(side == Side.First ? Outcome.Second : Outcome.First, Cause.SingleAbsence, false, [], actor, at, operationId)
+                : new(Outcome.None, Cause.DoubleAbsence, false, [], actor, at, operationId);
+        }
+
+        Raise(new MatchResolved(Id, Resolution.Outcome, Resolution.Cause, actor, at));
+        Revision++;
+        return true;
+    }
+
     // The players of the two locked lineups; none for an individual match, whose entrant is the player (D-2).
     private List<Guid> Appearances() => IsTeamMatch && Start is { } start
         ? [.. LockedPlayers(Side.First, start.FirstLineup), .. LockedPlayers(Side.Second, start.SecondLineup)]
@@ -343,7 +389,7 @@ public sealed class Match : AggregateRoot<MatchId>
 
     private List<Lineup> Lineups(Side side) => side == Side.First ? _firstLineups : _secondLineups;
 
-    private List<BrokenRule> Check(IReadOnlyList<Guid> players, IReadOnlyCollection<Guid>? roster)
+    private List<BrokenRule> Check(IReadOnlyList<Guid> players, IReadOnlyCollection<Guid>? roster, IReadOnlyCollection<Guid>? unavailable)
     {
         if (roster is null)
         {
@@ -363,6 +409,7 @@ public sealed class Match : AggregateRoot<MatchId>
 
         // One rule per player, so the rejection names each of them.
         broken.AddRange(players.Where(player => !roster.Contains(player)).Distinct().Select(player => new BrokenRule($"player-{player}", "not-on-roster")));
+        broken.AddRange(players.Where(player => unavailable?.Contains(player) == true).Distinct().Select(player => new BrokenRule($"player-{player}", "unavailable")));
 
         return broken;
     }

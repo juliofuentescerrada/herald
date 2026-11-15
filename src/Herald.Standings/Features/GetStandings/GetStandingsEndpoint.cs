@@ -9,7 +9,8 @@ using Wolverine.Http;
 
 namespace Herald.Standings.Features.GetStandings;
 
-public sealed record StandingsEntrant(Guid EntryId, string Name);
+// Status flags a withdrawn or disqualified entrant (h1-round-operations).
+public sealed record StandingsEntrant(Guid EntryId, string Name, EntrantStatus Status);
 
 // A resolved match's result for the entrant; NoWinner gives no points and is neither a win, a draw nor a loss.
 public enum LineResult
@@ -72,5 +73,5 @@ public static class GetStandingsEndpoint
         _ => null,
     };
 
-    private static StandingsEntrant EntrantOf(Entrant entrant) => new(entrant.EntryId, entrant.Name);
+    private static StandingsEntrant EntrantOf(Entrant entrant) => new(entrant.EntryId, entrant.Name, entrant.Status);
 }

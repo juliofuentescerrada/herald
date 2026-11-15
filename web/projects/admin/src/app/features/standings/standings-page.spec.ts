@@ -3,7 +3,7 @@ import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
-import { HeraldHostAdminService, MatchSummary, ScheduleDetails, StandingsRow, StandingsView, TournamentDetails } from '@herald/api-client/admin';
+import { HeraldHostAdminService, MatchSummary, ScheduleDetails, StandingsEntrant, StandingsRow, StandingsView, TournamentDetails } from '@herald/api-client/admin';
 import { provideTanStackQuery, QueryClient } from '@tanstack/angular-query-experimental';
 import axe from 'axe-core';
 import { Observable, of, throwError } from 'rxjs';
@@ -32,10 +32,10 @@ const tournament = (over: Partial<TournamentDetails> = {}): TournamentDetails =>
   ...over,
 });
 
-const entrant = (name: string) => ({ entryId: `e-${name.replaceAll(' ', '-')}`, name });
+const entrant = (name: string): StandingsEntrant => ({ entryId: `e-${name.replaceAll(' ', '-')}`, name, status: 'active' });
 const [robin, sam, jamie, taylor] = ['Robin Vale', 'Sam Reed', 'Jamie Brook', 'Taylor Finch'].map(entrant);
 
-const row = (position: number, shared: boolean, who: { entryId: string; name: string }, numbers: [number, number, number, number, number], lines: StandingsRow['lines'] = []): StandingsRow => {
+const row = (position: number, shared: boolean, who: StandingsEntrant, numbers: [number, number, number, number, number], lines: StandingsRow['lines'] = []): StandingsRow => {
   const [resolved, won, drawn, lost, points] = numbers;
   return { position, shared, entrant: who, resolved, won, drawn, lost, points, lines };
 };
@@ -192,5 +192,13 @@ describe('The standings page', () => {
     button('Try again').click();
     await vi.waitFor(() => expect(page().querySelector('table')).not.toBeNull());
     await settle();
+  });
+
+  it('flags a withdrawn leader, who keeps its points and position', async () => {
+    const view: StandingsView = { ...provisional, rows: [{ ...provisional.rows[0], entrant: { ...robin, status: 'withdrawn' } }, ...provisional.rows.slice(1)] };
+    const { page, text } = await open(() => of(view));
+    await vi.waitFor(() => expect(text('tbody tr:first-child herald-status-label')).toBe('Withdrawn'));
+    expect(text('tbody tr:first-child td:last-child')).toBe('6');
+    expect(await violations(page())).toEqual([]);
   });
 });

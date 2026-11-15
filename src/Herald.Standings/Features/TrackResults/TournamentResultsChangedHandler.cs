@@ -35,7 +35,7 @@ public static class TournamentResultsChangedHandler
     // Only resolved matches carry an outcome; the contract's states beyond that are Competition's.
     private static ResultsSnapshot SnapshotOf(TournamentResultsChanged message) => new(
         message.Revision,
-        [.. message.Entrants.Select(entrant => new Entrant(entrant.EntryId, entrant.Name))],
+        [.. message.Entrants.Select(entrant => new Entrant(entrant.EntryId, entrant.Name, Enum.Parse<EntrantStatus>(entrant.Status.ToString())))],
         [.. message.Matches.Select(match => new MatchResult(
             match.MatchId,
             match.Round,

@@ -16,7 +16,15 @@ public enum ResultOutcome
     None,
 }
 
-public sealed record ResultsEntrant(Guid EntryId, string Name);
+/// <summary>An entrant's competitive status (h1-round-operations D-4); absent in older messages, which read as active.</summary>
+public enum ResultsEntrantStatus
+{
+    Active,
+    Withdrawn,
+    Disqualified,
+}
+
+public sealed record ResultsEntrant(Guid EntryId, string Name, ResultsEntrantStatus Status = ResultsEntrantStatus.Active);
 
 /// <summary>
 /// A match of the running competition. Outcome, Cause and Played are set once it is resolved; Cause is Competition's

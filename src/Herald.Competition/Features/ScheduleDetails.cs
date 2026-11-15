@@ -14,6 +14,29 @@ public sealed record MatchDetails(EntrantDetails First, EntrantDetails Second);
 // A match of the running competition, for the Schedule page (h1-match-lineups D-5).
 public sealed record MatchSummary(Guid MatchId, int Round, EntrantDetails First, EntrantDetails Second, MatchState State, ResultDetails? Result);
 
+public sealed record RoundStateDetails(int Number, RoundState State);
+
+// A scheduled team match whose current lineup includes an unavailable player, naming the side's entrant and the player.
+public sealed record AttentionDetails(Guid MatchId, int Round, EntrantDetails Entrant, PlayerDetails Player);
+
+// Where a running competition stands, for the top of the Schedule page (h1-round-operations D-5).
+public sealed record OperationsDetails(int Scheduled, int InPlay, int Resolved, IReadOnlyList<RoundStateDetails> Rounds, IReadOnlyList<AttentionDetails> Attention);
+
+public enum PlayerStatus
+{
+    Available,
+    Withdrawn,
+    Sanctioned,
+}
+
+// A frozen-roster player with their availability; the reason is the latest withdrawal's or active sanction's, private to the organisation.
+public sealed record RosterPlayerDetails(Guid PlayerId, string Name, PlayerStatus Status, string? Reason);
+
+// An entrant of the running competition, for the Entrants panel; the departure reason is the organisation's own. A team's frozen
+// roster is null while unknown, and for an individual entrant.
+public sealed record CompetitorDetails(
+    Guid EntryId, string Name, EntrantStatus Status, string? Reason, DateTimeOffset? DepartedAt, IReadOnlyList<RosterPlayerDetails>? Roster);
+
 public sealed record RoundDetails(int Number, IReadOnlyList<MatchDetails> Matches, EntrantDetails? Rest);
 
 public sealed record PairingsDetails(Seeding Seeding, int? Seed, int Entrants, int Matches, IReadOnlyList<RoundDetails> Rounds);
@@ -42,7 +65,9 @@ public sealed record ScheduleDetails(
     int? StartedOnRevision,
     DateTimeOffset? StartedAt,
     bool StartCrossedWithdrawal,
-    IReadOnlyList<MatchSummary> Matches)
+    IReadOnlyList<MatchSummary> Matches,
+    OperationsDetails? Operations,
+    IReadOnlyList<CompetitorDetails> Entrants)
 {
     public static ScheduleDetails Of(Schedule schedule, IReadOnlyList<Match> matches) => new(
         schedule.Id.Value,
@@ -59,7 +84,60 @@ public sealed record ScheduleDetails(
         schedule.StartedOnRevision,
         schedule.StartedAt,
         schedule.StartCrossedWithdrawal,
-        MatchesOf(schedule, matches));
+        MatchesOf(schedule, matches),
+        OperationsOf(schedule, matches),
+        CompetitorsOf(schedule));
+
+    // Null until the competition's matches exist.
+    private static OperationsDetails? OperationsOf(Schedule schedule, IReadOnlyList<Match> matches)
+    {
+        if (matches.Count == 0)
+        {
+            return null;
+        }
+
+        var unavailable = schedule.UnavailablePlayers;
+        var names = schedule.StartedPairings?.Entrants.ToDictionary(entrant => entrant.EntryId, entrant => entrant.Name) ?? [];
+        var players = schedule.Rosters?.Teams.SelectMany(team => team.Players).DistinctBy(player => player.PlayerId).ToDictionary(player => player.PlayerId, player => player.Name) ?? [];
+        var attention = matches
+            .Where(match => match.State == MatchState.Scheduled)
+            .OrderBy(match => match.Round)
+            .SelectMany(match => new[] { Side.First, Side.Second }.SelectMany(side =>
+                (match.CurrentLineup(side)?.Players ?? []).Where(unavailable.Contains).Select(player => new AttentionDetails(
+                    match.Id.Value, match.Round, new(match.EntryOf(side), names.GetValueOrDefault(match.EntryOf(side), "")), new(player, players.GetValueOrDefault(player, ""))))));
+        return new(
+            matches.Count(match => match.State == MatchState.Scheduled),
+            matches.Count(match => match.State == MatchState.InPlay),
+            matches.Count(match => match.State == MatchState.Resolved),
+            [.. Rounds.Of(matches).Select(round => new RoundStateDetails(round.Round, round.State))],
+            [.. attention]);
+    }
+
+    // Empty before start; then the started field in admission order.
+    private static List<CompetitorDetails> CompetitorsOf(Schedule schedule) =>
+        [.. (schedule.StartedPairings?.Entrants ?? []).OrderBy(entrant => entrant.AdmissionOrder).Select(entrant =>
+        {
+            var departure = schedule.DepartureOf(entrant.EntryId);
+            var roster = schedule.Rosters?.Teams.SingleOrDefault(team => team.EntryId == entrant.EntryId);
+            return new CompetitorDetails(
+                entrant.EntryId,
+                entrant.Name,
+                schedule.StatusOf(entrant.EntryId),
+                departure?.Reason,
+                departure?.DepartedAt,
+                roster is null ? null : [.. roster.Players.OrderBy(player => player.Name, StringComparer.InvariantCulture).Select(player => PlayerOf(schedule, entrant.EntryId, player))]);
+        })];
+
+    private static RosterPlayerDetails PlayerOf(Schedule schedule, Guid entryId, RosterPlayer player)
+    {
+        var availability = schedule.Players.SingleOrDefault(other => other.EntryId == entryId && other.PlayerId == player.PlayerId);
+        return availability switch
+        {
+            { Withdrawal: { } withdrawal } => new(player.PlayerId, player.Name, PlayerStatus.Withdrawn, withdrawal.Reason),
+            { Sanctions: [.., { IsActive: true } sanction] } => new(player.PlayerId, player.Name, PlayerStatus.Sanctioned, sanction.Reason),
+            _ => new(player.PlayerId, player.Name, PlayerStatus.Available, null),
+        };
+    }
 
     private static List<MatchSummary> MatchesOf(Schedule schedule, IReadOnlyList<Match> matches)
     {
@@ -110,8 +188,14 @@ internal static class ScheduleResults
     public static IResult NotFound() => Results.Problem(statusCode: StatusCodes.Status404NotFound, title: "Not found");
 
     // Loads the schedule, applies the write and saves it with its snapshot event in the same transaction.
+    public static Task<IResult> WriteAsync(
+        this CompetitionDbContext db, IMessageBus bus, Guid organisationId, Guid tournamentId, Func<Schedule, WriteResult> write, CancellationToken cancellationToken) =>
+        db.WriteAsync(bus, organisationId, tournamentId, (schedule, _) => write(schedule), cancellationToken);
+
+    // The same with the tournament's matches, tracked, for a write that resolves them too (h1-round-operations D-2). A change of the
+    // results revision publishes the results with it.
     public static async Task<IResult> WriteAsync(
-        this CompetitionDbContext db, IMessageBus bus, Guid organisationId, Guid tournamentId, Func<Schedule, WriteResult> write, CancellationToken cancellationToken)
+        this CompetitionDbContext db, IMessageBus bus, Guid organisationId, Guid tournamentId, Func<Schedule, IReadOnlyList<Match>, WriteResult> write, CancellationToken cancellationToken)
     {
         var id = new TournamentId(tournamentId);
         for (var attempt = 1; ; attempt++)
@@ -121,7 +205,9 @@ internal static class ScheduleResults
                 return NotFound();
             }
 
-            var result = write(schedule);
+            var tracked = await db.Matches.Where(match => match.TournamentId == id).ToListAsync(cancellationToken);
+            var resultsRevision = schedule.ResultsRevision;
+            var result = write(schedule, tracked);
             switch (result.Outcome)
             {
                 // Both carry the current schedule, so a rejection names its blockers (pending entries included) and a
@@ -138,7 +224,7 @@ internal static class ScheduleResults
                         extensions: new Dictionary<string, object?> { ["currentRevision"] = schedule.Revision, ["schedule"] = await ScheduleDetails.OfAsync(db, schedule, cancellationToken) });
                 case WriteOutcome.Applied:
                     // A revision published after a crossed withdrawal is the one the matches come from.
-                    var matches = await db.ScheduleMatchesAsync(schedule, cancellationToken);
+                    await db.ScheduleMatchesAsync(schedule, cancellationToken);
                     try
                     {
                         await db.SaveChangesAsync(cancellationToken);
@@ -151,8 +237,9 @@ internal static class ScheduleResults
 
                     // Stored with the change by the transaction around the endpoint, sent after its commit.
                     await bus.PublishAsync(ScheduleDetails.Changed(organisationId, schedule));
-                    if (matches.Count > 0)
+                    if (schedule.ResultsRevision != resultsRevision)
                     {
+                        var matches = await db.Matches.Where(match => match.TournamentId == id).ToListAsync(cancellationToken);
                         await bus.PublishAsync(ResultsSnapshot.Of(organisationId, schedule, matches));
                     }
                     break;

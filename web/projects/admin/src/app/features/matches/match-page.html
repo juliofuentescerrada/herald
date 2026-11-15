@@ -89,11 +89,16 @@
               <legend>Players</legend>
               <ul class="players">
                 @for (player of side.roster; track player.playerId) {
+                  @let out = unavailableIds().has(player.playerId);
                   <li>
                     <label>
-                      <input type="checkbox" [checked]="side.selected.has(player.playerId)" [attr.aria-describedby]="side.name + '-count'"
-                        (change)="toggle(side.name, player.playerId, $any($event.target).checked)" />
+                      <!-- An unavailable player can be taken out of the lineup, never put in (h1-round-operations D-3). -->
+                      <input type="checkbox" [checked]="side.selected.has(player.playerId)" [disabled]="out && !side.selected.has(player.playerId)"
+                        [attr.aria-describedby]="side.name + '-count'" (change)="toggle(side.name, player.playerId, $any($event.target).checked)" />
                       {{ player.name }}
+                      @if (out) {
+                        <herald-status-label tone="danger" icon="alert-triangle">Unavailable</herald-status-label>
+                      }
                     </label>
                   </li>
                 }
@@ -138,6 +143,11 @@
             Starting shows the match as in play. Recording a result later also starts it.
           }
         </p>
+        @if (tooFewEligible()) {
+          <herald-notice heading="Too few eligible players">
+            A team cannot field enough players: withdrawn and sanctioned players cannot be chosen. Record an absence or a concession below when you decide; the team is not withdrawn automatically.
+          </herald-notice>
+        }
         <div class="actions">
           <!-- One primary action: an individual match's result also starts it, so Start is secondary there. -->
           <button herald-button [variant]="team() ? 'primary' : 'secondary'" type="button" [loading]="state() === 'busy'"

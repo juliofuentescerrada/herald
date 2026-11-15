@@ -44,8 +44,38 @@ public sealed record RosterPlayer(Guid PlayerId, string Name);
 
 public sealed record FrozenRosters(int Revision, IReadOnlyList<FrozenRoster> Teams);
 
+// Revision is the schedule's revision after the change: the fact's subject revision (ADR 0007, ADR 0017).
+public sealed record PlayerWithdrawal(string? Reason, Guid WithdrawnBy, DateTimeOffset WithdrawnAt, int Revision);
+
+public sealed record PlayerSanction(
+    string Reason, Guid SanctionedBy, DateTimeOffset SanctionedAt, int Revision, Guid? LiftedBy = null, DateTimeOffset? LiftedAt = null, int? LiftRevision = null)
+{
+    public bool IsActive => LiftedAt is null;
+}
+
+// A frozen-roster player's withdrawal and sanctions, kept for good (h1-round-operations D-3). Kept apart from the rosters, which
+// Registration's reports replace.
+public sealed record PlayerAvailability(Guid EntryId, Guid PlayerId, PlayerWithdrawal? Withdrawal, IReadOnlyList<PlayerSanction> Sanctions)
+{
+    public bool IsUnavailable => Withdrawal is not null || Sanctions.Any(sanction => sanction.IsActive);
+}
+
 // What changed between the field a set of pairings came from and the current one (D-5).
 public sealed record FieldChange(IReadOnlyList<Entrant> Added, IReadOnlyList<Entrant> Removed);
+
+// An entrant's competitive status (h1-round-operations D-2). Stored by number in the departures document: append only.
+public enum EntrantStatus
+{
+    Active,
+    Withdrawn,
+    Disqualified,
+}
+
+// A withdrawal or disqualification of an entrant after start, final in H1; the reason is the organisation's own (A-1).
+// Revision is the schedule's revision after the departure (ADR 0007, ADR 0017).
+public sealed record Departure(Guid EntryId, EntrantStatus Status, string Reason, Guid DepartedBy, DateTimeOffset DepartedAt, Guid OperationId, int Revision);
+
+public sealed record EntrantDeparted(TournamentId TournamentId, Guid EntryId, EntrantStatus Status, Guid DepartedBy, DateTimeOffset DepartedAt) : IDomainEvent;
 
 public sealed record DraftGenerated(TournamentId TournamentId, Seeding Seeding, int? Seed, int EligibleRevision, Guid GeneratedBy, DateTimeOffset GeneratedAt) : IDomainEvent;
 
@@ -59,6 +89,8 @@ public sealed class Schedule : AggregateRoot<TournamentId>
     public const int ReasonMaxLength = 500;
 
     private List<Publication> _publications = [];
+    private List<Departure> _departures = [];
+    private List<PlayerAvailability> _players = [];
 
     // For EF Core, which sets the field after constructing.
     private Schedule(TournamentId id)
@@ -79,6 +111,21 @@ public sealed class Schedule : AggregateRoot<TournamentId>
         get => _publications;
         private set => _publications = [.. value];
     }
+
+    public IReadOnlyList<Departure> Departures
+    {
+        get => _departures;
+        private set => _departures = [.. value];
+    }
+
+    public IReadOnlyList<PlayerAvailability> Players
+    {
+        get => _players;
+        private set => _players = [.. value];
+    }
+
+    // The frozen-roster players who cannot be in a lineup now, across the tournament's teams.
+    public IReadOnlyCollection<Guid> UnavailablePlayers => _players.Where(player => player.IsUnavailable).Select(player => player.PlayerId).ToHashSet();
 
     public Publication? Current => _publications.LastOrDefault(publication => !publication.IsWithdrawn);
 
@@ -142,6 +189,138 @@ public sealed class Schedule : AggregateRoot<TournamentId>
 
     // One of the schedule's matches was resolved: the results change.
     public void ResultRecorded() => ResultsRevision++;
+
+    public Departure? DepartureOf(Guid entryId) => _departures.Find(departure => departure.EntryId == entryId);
+
+    public EntrantStatus StatusOf(Guid entryId) => DepartureOf(entryId)?.Status ?? EntrantStatus.Active;
+
+    // Withdraws or disqualifies an entrant of the running competition and, in the same write, resolves its unresolved matches
+    // (h1-round-operations D-2). The matches are the tournament's; the results revision grows once.
+    public WriteResult Depart(
+        Guid operationId, Guid entryId, EntrantStatus status, string? reason, int expectedRevision, IReadOnlyList<Match> matches, Guid actor, DateTimeOffset at)
+    {
+        if (DepartureOf(entryId) is { } departed)
+        {
+            return departed.OperationId == operationId ? WriteOutcome.Repeated : WriteResult.Reject("entrant", "departed");
+        }
+
+        if (expectedRevision != Revision)
+        {
+            return WriteOutcome.Stale;
+        }
+
+        if (StartedPairings is not { } pairings)
+        {
+            return WriteResult.Reject("schedule", "not-started");
+        }
+
+        // The API also binds integers to the enum.
+        if (status is not (EntrantStatus.Withdrawn or EntrantStatus.Disqualified))
+        {
+            return WriteResult.Reject("status", "unknown");
+        }
+
+        if (pairings.Entrants.All(entrant => entrant.EntryId != entryId))
+        {
+            return WriteResult.Reject("entrant", "unknown");
+        }
+
+        reason = reason?.Trim();
+        if (string.IsNullOrEmpty(reason))
+        {
+            return WriteResult.Reject("reason", "required");
+        }
+
+        if (reason.Length > ReasonMaxLength)
+        {
+            return WriteResult.Reject("reason", "too-long");
+        }
+
+        _departures.Add(new(entryId, status, reason, actor, at, operationId, Revision + 1));
+        foreach (var match in matches.Where(match => match.First == entryId || match.Second == entryId))
+        {
+            var side = match.First == entryId ? Side.First : Side.Second;
+            var opponent = match.EntryOf(side == Side.First ? Side.Second : Side.First);
+            match.ResolveForDeparture(operationId, side, DepartureOf(opponent)?.OperationId, actor, at);
+        }
+
+        Raise(new EntrantDeparted(Id, entryId, status, actor, at));
+        Revision++;
+        ResultsRevision++;
+        return WriteOutcome.Applied;
+    }
+
+    // A player's withdrawal from the tournament, final; the reason is optional (A-2).
+    public WriteResult WithdrawPlayer(Guid entryId, Guid playerId, string? reason, int expectedRevision, Guid actor, DateTimeOffset at) =>
+        ChangePlayer(entryId, playerId, expectedRevision, (player, revision) =>
+        {
+            if (player.Withdrawal is not null)
+            {
+                return (WriteOutcome.Repeated, player);
+            }
+
+            reason = string.IsNullOrWhiteSpace(reason) ? null : reason.Trim();
+            return reason?.Length > ReasonMaxLength
+                ? (WriteResult.Reject("reason", "too-long"), player)
+                : (WriteOutcome.Applied, player with { Withdrawal = new(reason, actor, at, revision) });
+        });
+
+    // A sanction lasts until the owner lifts it; its reason is required (A-2).
+    public WriteResult SanctionPlayer(Guid entryId, Guid playerId, string? reason, int expectedRevision, Guid actor, DateTimeOffset at) =>
+        ChangePlayer(entryId, playerId, expectedRevision, (player, revision) =>
+        {
+            if (player.Sanctions.Any(sanction => sanction.IsActive))
+            {
+                return (WriteOutcome.Repeated, player);
+            }
+
+            if (player.Withdrawal is not null)
+            {
+                return (WriteResult.Reject("player", "withdrawn"), player);
+            }
+
+            reason = reason?.Trim();
+            return string.IsNullOrEmpty(reason) ? (WriteResult.Reject("reason", "required"), player)
+                : reason.Length > ReasonMaxLength ? (WriteResult.Reject("reason", "too-long"), player)
+                : (WriteOutcome.Applied, player with { Sanctions = [.. player.Sanctions, new(reason, actor, at, revision)] });
+        });
+
+    public WriteResult LiftSanction(Guid entryId, Guid playerId, int expectedRevision, Guid actor, DateTimeOffset at) =>
+        ChangePlayer(entryId, playerId, expectedRevision, (player, revision) =>
+            player.Sanctions.Count > 0 && player.Sanctions[^1] is { IsActive: true } active
+                ? (WriteOutcome.Applied, player with { Sanctions = [.. player.Sanctions.SkipLast(1), active with { LiftedBy = actor, LiftedAt = at, LiftRevision = revision }] })
+                : (player.Sanctions.Count > 0 ? WriteOutcome.Repeated : WriteResult.Reject("player", "not-sanctioned"), player));
+
+    // Applies a change to a frozen-roster player of a running competition, answering a repeat before the revision.
+    private WriteResult ChangePlayer(Guid entryId, Guid playerId, int expectedRevision, Func<PlayerAvailability, int, (WriteResult Result, PlayerAvailability Player)> change)
+    {
+        if (StartedAt is null)
+        {
+            return WriteResult.Reject("schedule", "not-started");
+        }
+
+        if (RosterOf(entryId) is not { } roster || !roster.Contains(playerId))
+        {
+            return WriteResult.Reject("player", "not-on-roster");
+        }
+
+        var current = _players.Find(player => player.EntryId == entryId && player.PlayerId == playerId) ?? new(entryId, playerId, null, []);
+        (var result, var changed) = change(current, Revision + 1);
+        if (result.Outcome != WriteOutcome.Applied)
+        {
+            return result;
+        }
+
+        if (expectedRevision != Revision)
+        {
+            return WriteOutcome.Stale;
+        }
+
+        _players.Remove(current);
+        _players.Add(changed);
+        Revision++;
+        return WriteOutcome.Applied;
+    }
 
     // Newer reports replace the rosters; older ones change nothing.
     public bool ApplyRosters(FrozenRosters rosters)

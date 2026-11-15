@@ -2,6 +2,8 @@
 
 **Proposed in H1 batch 2's proposals pull request, 15 November 2026.** The rules come from the batch's decision session of the same day, recorded in the functional discovery (§8.1, §9.2, §10.2.1, F-08; §15 rows D-05, D-23 and D-25). It depends on `h1-exceptional-outcomes` and, for its standings flags, `h1-standings`. Merging the proposals pull request approves this change (ADR 0018); task 1.1 records that approval.
 
+**Approved for implementation on 15 November 2026**, when the maintainer merged the batch 2 proposals pull request (#63), with the review answers below (ADR 0018).
+
 **Review answers, 15 November 2026 (#63):** the maintainer accepted Q1 to Q3 (Competition records departures after start, §5.1's round completion, a disqualification resolves its match in play as a concession after play) and the reasons of A-2 as proposed, and the prototypes as they are.
 
 ## Why

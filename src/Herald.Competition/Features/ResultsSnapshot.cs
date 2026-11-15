@@ -14,7 +14,7 @@ internal static class ResultsSnapshot
             organisationId,
             schedule.Id.Value,
             schedule.ResultsRevision,
-            [.. pairings.Entrants.Select(entrant => new ResultsEntrant(entrant.EntryId, entrant.Name))],
+            [.. pairings.Entrants.Select(entrant => new ResultsEntrant(entrant.EntryId, entrant.Name, Enum.Parse<ResultsEntrantStatus>(schedule.StatusOf(entrant.EntryId).ToString())))],
             [.. matches.OrderBy(match => match.Round).Select(Of)],
             [.. pairings.Rests.Select(rest => new ResultsRest(rest.Round, rest.EntryId))]);
     }

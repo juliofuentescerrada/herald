@@ -1,7 +1,33 @@
-import { PairingsDetails } from '@herald/api-client/admin';
+import { EntrantStatus, PairingsDetails, PlayerStatus, RoundState } from '@herald/api-client/admin';
+import { IconName, StatusTone } from '@herald/ui';
+
+interface Label {
+  readonly text: string;
+  readonly tone: StatusTone;
+  readonly icon?: IconName;
+}
+
+/** States in words, never colour alone; only departures and sanctions take an icon, alert-triangle (attention required, docs/ui/icons.md). */
+export const roundStateLabel: Record<RoundState, Label> = {
+  notStarted: { text: 'Not started', tone: 'neutral' },
+  running: { text: 'Running', tone: 'info' },
+  completed: { text: 'Completed', tone: 'success' },
+};
+
+export const entrantStatusLabel: Record<EntrantStatus, Label> = {
+  active: { text: 'Active', tone: 'success' },
+  withdrawn: { text: 'Withdrawn', tone: 'danger', icon: 'alert-triangle' },
+  disqualified: { text: 'Disqualified', tone: 'danger', icon: 'alert-triangle' },
+};
+
+export const playerStatusLabel: Record<PlayerStatus, Label> = {
+  available: { text: 'Available', tone: 'success' },
+  withdrawn: { text: 'Withdrawn', tone: 'danger', icon: 'alert-triangle' },
+  sanctioned: { text: 'Sanctioned', tone: 'danger', icon: 'alert-triangle' },
+};
 
 /** Shared with the tournaments and entries features, so a write here refreshes their reads. */
-export { fieldKey, scheduleKey, tournamentKey } from '../../platform';
+export { fieldKey, scheduleKey, standingsKey, tournamentKey } from '../../platform';
 
 /** "4 players · 3 rounds · 6 matches": the size of a set of pairings in words. */
 export const sizeText = (pairings: PairingsDetails, teams: boolean): string => {
@@ -30,6 +56,12 @@ export const ruleText = (field: string, rule: string): string => {
     case 'schedule/competition-started': return 'The competition has started.';
     case 'draft/none': return 'There is no draft to publish.';
     case 'draft/stale': return 'The field changed after this draft. Regenerate it first.';
+    case 'entrant/departed': return 'This entrant has already left the competition.';
+    case 'entrant/unknown': return 'This entrant is not in the running competition.';
+    case 'schedule/not-started': return 'The competition has not started.';
+    case 'player/not-on-roster': return 'This player is not on the team’s frozen roster.';
+    case 'player/withdrawn': return 'This player has withdrawn from the tournament.';
+    case 'player/not-sanctioned': return 'This player has no sanction to lift.';
     case 'reason/required': return 'Enter a reason.';
     case 'reason/too-long': return 'Use at most 500 characters.';
     default: return 'Check the request and try again.';

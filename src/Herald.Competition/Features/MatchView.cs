@@ -19,7 +19,8 @@ public sealed record ResultDetails(Outcome Outcome, Cause Cause, bool Played, st
 
 public sealed record MatchStartDetails(DateTimeOffset StartedAt, int? FirstLineup, int? SecondLineup);
 
-// What every match write and the match read answer with. Blockers say why the match cannot start now.
+// What every match write and the match read answer with. Blockers say why the match cannot start now; unavailable players are
+// the withdrawn and sanctioned ones of either frozen roster (h1-round-operations D-3).
 public sealed record MatchView(
     Guid MatchId,
     int Revision,
@@ -31,7 +32,8 @@ public sealed record MatchView(
     MatchStartDetails? Start,
     IReadOnlyList<string> Blockers,
     ResultDetails? Result,
-    IReadOnlyList<PlayerDetails> Appearances)
+    IReadOnlyList<PlayerDetails> Appearances,
+    IReadOnlyList<PlayerDetails> Unavailable)
 {
     public static MatchView Of(Match match, Schedule schedule)
     {
@@ -59,10 +61,13 @@ public sealed record MatchView(
             SideOf(Side.Second, match.SecondLineups),
             match.Start is { } start ? new(start.StartedAt, start.FirstLineup, start.SecondLineup) : null,
             match.State == MatchState.Scheduled
-                ? [.. match.StartBlockers(schedule.RosterOf(match.First), schedule.RosterOf(match.Second)).Select(rule => $"{rule.Field}-{rule.Rule}")]
+                ? [.. match.StartBlockers(schedule.RosterOf(match.First), schedule.RosterOf(match.Second), schedule.UnavailablePlayers).Select(rule => $"{rule.Field}-{rule.Rule}")]
                 : [],
             ResultOf(match),
-            [.. (match.Resolution?.Appearances ?? []).Select(Player)]);
+            [.. (match.Resolution?.Appearances ?? []).Select(Player)],
+            match.IsTeamMatch
+                ? [.. schedule.Players.Where(player => player.IsUnavailable && (player.EntryId == match.First || player.EntryId == match.Second)).Select(player => Player(player.PlayerId))]
+                : []);
     }
 
     public static ResultDetails? ResultOf(Match match) =>

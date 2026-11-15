@@ -82,6 +82,10 @@ namespace Herald.Competition.Persistence.Migrations
                     b.Property<int?>("ActivePlayersPerSide")
                         .HasColumnType("integer");
 
+                    b.Property<string>("Departures")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
                     b.Property<string>("Draft")
                         .HasColumnType("jsonb");
 
@@ -91,6 +95,10 @@ namespace Herald.Competition.Persistence.Migrations
 
                     b.Property<Guid>("OrganisationId")
                         .HasColumnType("uuid");
+
+                    b.Property<string>("Players")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
 
                     b.Property<string>("Publications")
                         .IsRequired()
