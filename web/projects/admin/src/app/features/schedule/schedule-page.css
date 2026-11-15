@@ -34,6 +34,8 @@ h2 { font-size: 20px; margin: 0 0 var(--herald-space-2); }
 .seeding label { display: inline-flex; align-items: center; gap: var(--herald-space-2); min-height: var(--herald-target-min); }
 
 .group h2 { margin-bottom: var(--herald-space-3); }
+.round-title { display: flex; flex-wrap: wrap; align-items: center; gap: var(--herald-space-2) var(--herald-space-4); margin-bottom: var(--herald-space-3); }
+.round-title h2 { margin: 0; }
 .rows { list-style: none; margin: 0; padding: 0; background: var(--herald-color-surface-default); border: 1px solid var(--herald-color-border-default); }
 .rows li + li { border-top: 1px solid var(--herald-color-border-default); }
 /* Symmetric about "vs": the first entrant aligned right, the second left, names next to it (#55). */

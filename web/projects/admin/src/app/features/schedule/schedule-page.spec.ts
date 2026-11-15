@@ -81,6 +81,8 @@ const schedule = (over: Partial<ScheduleDetails> = {}): ScheduleDetails => ({
   startedAt: null,
   startCrossedWithdrawal: false,
   matches: [],
+  operations: null,
+  entrants: [],
   ...over,
 });
 

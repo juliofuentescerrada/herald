@@ -44,8 +44,12 @@
     </herald-notice>
   } @else {
     @let s = schedule.data()!;
-    <!-- Stacked at every width: the summary and its operation, notices, the rounds, then the publication history. -->
+    <!-- Stacked at every width: a running competition's operations, the summary and its operation, notices, the rounds, the
+         entrants, then the publication history (h1-round-operations D-5). -->
     <div class="column">
+      @if (started() && s.operations) {
+        <app-operations-summary [schedule]="s" />
+      }
       <section class="summary" aria-labelledby="summary-heading" [attr.aria-busy]="state() === 'busy' || null">
         <div class="summary-text">
           <div class="summary-title">
@@ -174,7 +178,12 @@
       @if (pairings(); as p) {
         @for (round of p.rounds; track round.number) {
           <section class="group" [attr.aria-labelledby]="'round-' + round.number">
-            <h2 [id]="'round-' + round.number">Round {{ round.number }}</h2>
+            <div class="round-title">
+              <h2 [id]="'round-' + round.number">Round {{ round.number }}</h2>
+              @if (roundState(round.number); as label) {
+                <herald-status-label [tone]="label.tone">{{ label.text }}</herald-status-label>
+              }
+            </div>
             <ul class="rows matches" [attr.aria-labelledby]="'round-' + round.number">
               @for (match of round.matches; track match.first.entryId) {
                 @if (matchFor(round.number, match.first.entryId); as played) {
@@ -201,6 +210,10 @@
             }
           </section>
         }
+      }
+
+      @if (started() && s.entrants.length) {
+        <app-entrants-panel [schedule]="s" [organisation]="organisationId" [tournamentId]="id" [zoned]="zoned" />
       }
 
       @if (withdrawn().length) {

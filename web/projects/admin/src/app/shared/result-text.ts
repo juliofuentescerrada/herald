@@ -23,3 +23,6 @@ export const resultText = (result: Result, first: string, second: string): strin
     default: return result.outcome === 'draw' ? 'Draw' : `${winner} won`;
   }
 };
+
+/** "River Falcons’ lineup", "North Stars’ lineup", "Robin’s lineup": the British possessive. */
+export const possessive = (name: string) => (name.endsWith('s') ? `${name}’` : `${name}’s`);

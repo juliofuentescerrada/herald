@@ -1,12 +1,12 @@
 import { organisationKey } from '../../platform';
+import { possessive } from '../../shared';
 
 /** Shared with the schedule feature, so starting a match refreshes the schedule's states. */
 export { scheduleKey, standingsKey, tournamentKey } from '../../platform';
 
 export const matchKey = (organisation: string, tournamentId: string, matchId: string) => organisationKey(organisation, 'match', tournamentId, matchId);
 
-/** "River Falcons’ lineup", "North Stars’ lineup", "Robin’s lineup": the British possessive. */
-export const possessive = (name: string) => (name.endsWith('s') ? `${name}’` : `${name}’s`);
+export { possessive };
 
 /** A blocker code from the API ("second-lineup-missing") as its field and rule. */
 export const splitBlocker = (code: string): [string, string] => {

@@ -50,6 +50,7 @@ const teamMatch = (over: Partial<MatchView> = {}): MatchView => ({
   blockers: ['first-lineup-missing', 'second-lineup-missing'],
   result: null,
   appearances: [],
+  unavailable: [],
   ...over,
 });
 
@@ -65,6 +66,7 @@ const individual = (over: Partial<MatchView> = {}): MatchView => ({
   blockers: [],
   result: null,
   appearances: [],
+  unavailable: [],
   ...over,
 });
 
