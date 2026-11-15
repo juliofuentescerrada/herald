@@ -20,4 +20,6 @@ herald-notice { display: flex; margin-top: var(--herald-space-4); }
 form .actions { margin-top: var(--herald-space-4); }
 @media (max-width: 699px) {
   .rows li { padding: var(--herald-space-3) var(--herald-space-4); }
+  /* The actions take their own line and stack full width, as the app's narrow .actions do. */
+  .rows li .actions { flex-basis: 100%; align-items: stretch; }
 }

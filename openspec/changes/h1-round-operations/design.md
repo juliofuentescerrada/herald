@@ -63,3 +63,33 @@ Visual choices (G-/RU-): departures are destructive and final, so their confirma
 ## Risks / Trade-offs
 
 - [One departure touches many matches] → one transaction, one operation identity, one results revision; tests cover either withdrawal order.
+
+## Implementation record
+
+### Full run (task 6.2), 15 November 2026
+
+`scripts/check all` passed: rules, spec coverage, rules tests, .NET restore, format, build, Wolverine codegen drift, all .NET tests (560, PostgreSQL through Testcontainers), web install, OpenAPI client drift, lint, boundaries, Vitest (281 admin tests), SSR isolation and build. The e2e suite passed with journey 23 (23 journeys), and `pnpm test:scripts` passed all 12 scripts, `seeded-round-operations` included.
+
+Implementation notes:
+
+- Departures and player availability live on the `Schedule` aggregate as two documents (`Departures`, `Players`), kept apart from the frozen rosters that Registration's reports replace; migration `AddDepartures`. Every player write and departure goes through the schedule's revision.
+- Only a single absence that the opponent's departure set (same operation identity) is revised to a double absence; a single absence the owner recorded stays.
+- A blocked start keeps the side's rule (`first-lineup-unavailable`); the match view lists the unavailable players, and the page names the side's unavailable starters from it.
+- A roster below the lineup size once withdrawn and sanctioned players are left out adds the start blocker `first-roster-too-few-eligible` (or `second-`).
+- ADR 0017's inventory gains `Departure`, `PlayerWithdrawal` and `PlayerSanction` as notifiable facts recorded but not published, as the architecture test requires; the proposal's "none in H1" means none published.
+
+### Visual comparison (task 6.3)
+
+Captures: `seeded-round-operations` at 1440 px (steps 1 to 7) and 390 px (steps 8 and 9), against the prototype states at 1440 and 390 px.
+
+| State | Difference from the prototype | Resolution |
+|---|---|---|
+| `operations-running`, `round-completed` | Rounds sit on one wrapping line with their badge instead of one row each; status labels carry no icon except departures, sanctions and "Blocked" | Kept: shorter at both widths. Icons follow `docs/ui/icons.md`, which has no reviewed mapping for round or match states (clock means registration not open) |
+| `operations-attention` | Same content; "Blocked" uses `alert-triangle` (attention required) | Kept |
+| All Schedule states | The operations summary comes first, then the existing summary heading and the "Running" notice, then the rounds, the Entrants panel and the history | Kept: the summary still leads the page (D-5); the existing heading and notice are batch 1's |
+| `withdrawn`, `disqualified` | The entrant row shows the private reason ("Reason: Moved away") instead of "reason kept privately" | Kept: the admin page is the organisation's own, as the publication history shows its withdrawal reason |
+| `withdraw-confirm`, `disqualify-confirm` | Same text and danger action; cancel reads "Keep as it is" | None |
+| `roster-running`, `sanction-confirm`, `player-sanctioned`, `player-withdrawn` | The sanction and withdrawal forms open inside the roster dialog above the list; "Withdraw player" also asks first, with an optional reason, because it is final | Kept: A-2 gives the withdrawal an optional reason |
+| `start-blocked-unavailable`, `too-few-eligible` | Unavailable players carry an "Unavailable" label in the lineup choice and cannot be added | None |
+| `standings-flags` | Same | None |
+| 390 px | The Entrants panel's actions first rendered as a staggered column | Fixed: they stack full width like the app's other narrow actions. The schedule's existing running rows (batch 1) show the same stagger; left to their owner |

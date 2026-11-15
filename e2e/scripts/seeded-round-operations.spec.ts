@@ -6,6 +6,7 @@ import { screen } from './screens.ts';
 // completed) the owner reads the operations summary, withdraws Mara Quill, sees her matches resolved and the standings flagged;
 // on the seeded Saltmarsh Team Cup, Ada Fenwick's sanction blocks the start of Copper Owls' match.
 test('The seeded owner reads the operations summary, withdraws a player, reads the flagged standings and sees a sanctioned starter block a start', async ({ page, signIn }, info) => {
+  await page.setViewportSize({ width: 1440, height: 900 });
   await signIn({ as: scriptPersona });
   await page.getByRole('button', { name: 'Switch to Lantern Hall Players' }).click();
   await page.getByRole('link', { name: 'Tournaments', exact: true }).click();
@@ -58,4 +59,12 @@ test('The seeded owner reads the operations summary, withdraws a player, reads t
   await expect(page.getByText('Copper Owls’ lineup includes Ada Fenwick, who is unavailable. Revise the lineup from the other eligible players.')).toBeVisible();
   await expect(page.getByRole('button', { name: 'Start match' })).toBeDisabled();
   await screen(page, info, 'sanctioned-starter-blocks-start');
+
+  // The narrow layout (one 700 px breakpoint): the blocked match, then the schedule with its operations and entrants.
+  await page.setViewportSize({ width: 390, height: 844 });
+  await expect(page.getByRole('button', { name: 'Start match' })).toBeDisabled();
+  await screen(page, info, 'narrow-sanctioned-starter');
+  await page.getByRole('link', { name: 'Back to schedule' }).first().click();
+  await expect(page.getByRole('list', { name: 'Needs attention' })).toBeVisible();
+  await screen(page, info, 'narrow-operations-and-entrants');
 });
