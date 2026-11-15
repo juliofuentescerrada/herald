@@ -17,7 +17,7 @@
 
 - [x] 4.1 `tools/Herald.Seed`: a running four-player tournament with one match resolved
 - [x] 4.2 Journey 20; the suite passes
-- [ ] 4.3 Test script in `e2e/scripts/` (seeded data, `scriptPersona`) with a screenshot per step: empty Result panel, outcome chosen, win recorded, draw recorded, schedule with both results
+- [x] 4.3 Test script in `e2e/scripts/` (seeded data, `scriptPersona`) with a screenshot per step: empty Result panel, outcome chosen, win recorded, draw recorded, schedule with both results
 
 ## 5. Validation and completion
 

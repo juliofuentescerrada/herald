@@ -130,7 +130,8 @@
           }
         </p>
         <div class="actions">
-          <button herald-button variant="primary" type="button" [loading]="state() === 'busy'"
+          <!-- One primary action: an individual match's result also starts it, so Start is secondary there. -->
+          <button herald-button [variant]="team() ? 'primary' : 'secondary'" type="button" [loading]="state() === 'busy'"
             [disabled]="!!startBlocked() && state() !== 'busy'" [attr.aria-describedby]="startBlocked() ? 'start-why' : null" (click)="askStart($any($event.currentTarget))">Start match</button>
           @if (startBlocked(); as why) {
             <p class="help" id="start-why">{{ why }}</p>
