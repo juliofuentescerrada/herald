@@ -45,6 +45,7 @@ The suite SHALL cover these journeys, each as one test named as a sentence:
 15. An owner builds a team's roster to its minimum, is stopped from adding a player who is on another team's roster, and sees the team's roster complete.
 16. An owner checks in two admitted players, undoes one of the check-ins, and sees the entries page count 1 of 2 checked in.
 17. An owner marks a pending player absent, generates a schedule for five players with one rest each, publishes it, withdraws it with a reason and publishes it again.
+18. An owner sees a team tournament's start blocked by an incomplete roster, completes the roster, starts the competition and is stopped from adding a player to the frozen roster.
 
 #### Scenario: Each journey checks what the person sees
 - **WHEN** a journey runs

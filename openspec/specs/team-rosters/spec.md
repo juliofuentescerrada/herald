@@ -2,9 +2,7 @@
 
 ## Purpose
 An organisation's owner builds the roster of each team entry from the organisation's guest players, within the tournament's minimum and maximum roster sizes; a player is on one team per tournament among active entries, readiness is derived from the bounds, and every addition and removal is kept in the roster's history.
-
 ## Requirements
-
 ### Requirement: An owner builds the roster of a team entry
 The organisation's owner SHALL add guest players of the organisation to the tournament roster of an active (waiting or admitted) team entry, and remove members from it, while the tournament's competition has not started (always, in this slice). Registration's state need not be open. A member SHALL be a guest player of the same organisation; a guest team, a guest of another organisation or an unknown guest SHALL be rejected. A cancelled entry's roster SHALL not change. An individual tournament SHALL have no rosters: its entries SHALL neither offer nor accept roster writes. Adding a player already in this roster, or removing one not in it, SHALL return the current roster as a repeat.
 
@@ -102,3 +100,11 @@ On the entries page of a team tournament, each active team entry SHALL show its 
 #### Scenario: A failed addition keeps the drawer open
 - **WHEN** the request that adds a player to a roster fails
 - **THEN** the drawer stays open, says nothing was added and offers a retry
+
+### Requirement: Rosters freeze at start
+When the competition starts, each admitted team's current roster revision SHALL become its frozen roster. Adding or removing a member afterwards SHALL be rejected stating that the roster is frozen. The roster dialog SHALL show the frozen revision and when it froze.
+
+#### Scenario: Adding after start
+- **WHEN** an owner adds a player to an admitted team's roster after the competition started
+- **THEN** the write is rejected and the frozen roster is unchanged
+
