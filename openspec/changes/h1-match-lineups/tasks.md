@@ -26,7 +26,7 @@
 ## 6. End-to-end journey and seeds
 
 - [x] 6.1 `tools/Herald.Seed`: a running team tournament with seven-player rosters and five active players per side
-- [ ] 6.2 Journey 19; the suite passes
+- [x] 6.2 Journey 19; the suite passes
 - [ ] 6.3 Test script in `e2e/scripts/` (seeded data, `scriptPersona`) with a screenshot per step: match scheduled, one side incomplete, start blocked, both lineups valid, confirmation, in play with locked lineups
 
 ## 7. Validation and completion
