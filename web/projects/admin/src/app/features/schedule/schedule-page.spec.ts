@@ -205,13 +205,15 @@ describe('The schedule page', () => {
     expect(button('Generate draft')).toBeUndefined();
   });
 
-  it('links each match of a running competition to its page with its state', async () => {
+  it('links each match of a running competition to its page with its state and result', async () => {
     const matches = [
       { matchId: 'm-1', round: 1, first: robin, second: taylor, state: 'inPlay' as const, result: null },
       { matchId: 'm-2', round: 1, first: sam, second: jamie, state: 'scheduled' as const, result: null },
+      { matchId: 'm-3', round: 2, first: robin, second: jamie, state: 'resolved' as const, result: { outcome: 'second' as const, cause: 'played' as const, played: true, recordedAt: '2026-11-21T10:00:00Z' } },
     ];
     const { texts, page } = await open({ getSchedule: () => of(schedule({ revision: 7, current: publication(1), startedOnRevision: 1, startedAt: '2026-11-21T09:05:00Z', matches })) });
-    await vi.waitFor(() => expect(texts('.running herald-status-label')).toEqual(['In play', 'Scheduled']));
+    await vi.waitFor(() => expect(texts('.running herald-status-label')).toEqual(['In play', 'Scheduled', 'Resolved']));
+    expect(texts('.running .outcome')).toEqual(['Jamie Brook won']);
     expect(page().querySelector('.running a')?.getAttribute('href')).toContain('/matches/m-1');
     expect(await violations(page())).toEqual([]);
   });

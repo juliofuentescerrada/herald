@@ -13,7 +13,7 @@ import { Button, Dialog, DialogContext, DialogRef, Dialogs, Icon, Notice, Status
 import { injectQuery } from '@tanstack/angular-query-experimental';
 import { firstValueFrom } from 'rxjs';
 import { AccessState, AppContext, QUERY_CLIENT } from '../../platform';
-import { instantText, lifecycleLabels } from '../../shared';
+import { instantText, lifecycleLabels, resultText } from '../../shared';
 import { blockerText, fieldKey, ruleText, scheduleKey, seedingText, sizeText, tournamentKey } from './schedule';
 
 interface Failure {
@@ -102,6 +102,9 @@ export class SchedulePage {
   });
   protected readonly withdrawn = computed(() => (this.schedule.data()?.history ?? []).filter((publication) => publication.withdrawnAt));
 
+  protected readonly resultText = resultText;
+  protected readonly stateText = { scheduled: 'Scheduled', inPlay: 'In play', resolved: 'Resolved' } as const;
+  protected readonly stateTone = { scheduled: 'neutral', inPlay: 'info', resolved: 'success' } as const;
   /** The running competition's match for a pairing, or undefined before start. */
   protected readonly matchFor = (round: number, first: string) =>
     this.schedule.data()?.matches.find((match) => match.round === round && match.first.entryId === first);

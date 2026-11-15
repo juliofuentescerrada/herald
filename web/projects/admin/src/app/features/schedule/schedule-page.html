@@ -180,7 +180,10 @@
                   <!-- Running: each match opens its own page (h1-match-lineups D-5). -->
                   <li class="running">
                     <a class="match-link" [routerLink]="['../matches', played.matchId]"><span class="home">{{ match.first.name }}</span><span class="vs"> vs </span><span>{{ match.second.name }}</span></a>
-                    <herald-status-label [tone]="played.state === 'inPlay' ? 'info' : 'neutral'">{{ played.state === 'inPlay' ? 'In play' : 'Scheduled' }}</herald-status-label>
+                    <herald-status-label [tone]="stateTone[played.state]">{{ stateText[played.state] }}</herald-status-label>
+                    @if (played.result; as result) {
+                      <p class="help outcome">{{ resultText(result, match.first.name, match.second.name) }}</p>
+                    }
                   </li>
                 } @else {
                   <li><span class="home">{{ match.first.name }}</span><span class="vs"> vs </span><span>{{ match.second.name }}</span></li>

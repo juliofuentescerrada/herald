@@ -10,8 +10,8 @@
 
 ## 3. Admin application
 
-- [ ] 3.1 `matches` feature: Result panel with the Visual input states; `schedule` feature: outcomes in match rows
-- [ ] 3.2 Vitest for each Visual input state and `axe-core`; lint and boundary checks pass
+- [x] 3.1 `matches` feature: Result panel with the Visual input states; `schedule` feature: outcomes in match rows
+- [x] 3.2 Vitest for each Visual input state and `axe-core`; lint and boundary checks pass
 
 ## 4. End-to-end journey and seeds
 
