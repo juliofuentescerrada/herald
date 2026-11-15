@@ -5,6 +5,7 @@ import { HeraldHostAdminService, HttpValidationProblemDetails, problemOf, Tourna
 import { Button, Icon, Notice, StatusLabel, Toasts } from '@herald/ui';
 import { firstValueFrom } from 'rxjs';
 import { AccessState, CONFIRM, injectWorkingOrganisation, QUERY_CLIENT } from '../../platform';
+import { TournamentTabs } from '../../shared';
 import {
   admittedText,
   dateTimeText,
@@ -112,7 +113,7 @@ const zones = (): string[] => {
 /** Creates a draft, edits it, and edits a published tournament: one form, three moments. */
 @Component({
   selector: 'app-tournament-form-page',
-  imports: [Button, CompetitionArea, Icon, Notice, RegistrationArea, RouterLink, StatusLabel],
+  imports: [Button, CompetitionArea, Icon, Notice, RegistrationArea, RouterLink, StatusLabel, TournamentTabs],
   templateUrl: './tournament-form-page.html',
   styleUrl: './tournament-form-page.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

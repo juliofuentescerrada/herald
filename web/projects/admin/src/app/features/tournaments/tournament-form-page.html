@@ -26,6 +26,9 @@
     } @else {
       <p class="lead">Draft configuration · {{ organisationName() }}not yet published</p>
     }
+    @if (published()) {
+      <app-tournament-tabs [organisation]="organisation" [tournament]="stored()!.id" />
+    }
   </header>
 
   <!-- A published tournament shows its state, registration and entries before the form, stacked at every width. -->

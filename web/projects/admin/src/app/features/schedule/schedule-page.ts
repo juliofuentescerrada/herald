@@ -13,7 +13,7 @@ import { Button, Dialog, DialogContext, DialogRef, Dialogs, Icon, Notice, Status
 import { injectQuery } from '@tanstack/angular-query-experimental';
 import { firstValueFrom } from 'rxjs';
 import { AccessState, AppContext, QUERY_CLIENT } from '../../platform';
-import { instantText, lifecycleLabels, resultText } from '../../shared';
+import { instantText, lifecycleLabels, resultText, TournamentTabs } from '../../shared';
 import { blockerText, fieldKey, ruleText, scheduleKey, seedingText, sizeText, tournamentKey } from './schedule';
 
 interface Failure {
@@ -24,7 +24,7 @@ interface Failure {
 /** A tournament's round-robin: the draft from the eligible field, its publication and withdrawal (F-06, round-robin-pairings). */
 @Component({
   selector: 'app-schedule-page',
-  imports: [Button, Dialog, Icon, Notice, RouterLink, StatusLabel],
+  imports: [Button, Dialog, Icon, Notice, RouterLink, StatusLabel, TournamentTabs],
   templateUrl: './schedule-page.html',
   styleUrl: './schedule-page.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -33,8 +33,8 @@ export class SchedulePage {
   private readonly api = inject(HeraldHostAdminService);
   private readonly queries = inject(QUERY_CLIENT);
   private readonly access = inject(AccessState);
-  private readonly organisation = inject(AppContext).organisation()!;
-  private readonly tournamentId = inject(ActivatedRoute).snapshot.paramMap.get('tournamentId')!;
+  protected readonly organisation = inject(AppContext).organisation()!;
+  protected readonly tournamentId = inject(ActivatedRoute).snapshot.paramMap.get('tournamentId')!;
   private readonly dialogs = inject(Dialogs);
   private readonly toasts = inject(Toasts);
   private readonly viewContainerRef = inject(ViewContainerRef);

@@ -11,8 +11,17 @@ namespace Herald.Standings.Features.GetStandings;
 
 public sealed record StandingsEntrant(Guid EntryId, string Name);
 
-// A line of an entrant's explanation: a resolved match (opponent and cause) or a rest (both null).
-public sealed record StandingsLine(int Round, StandingsEntrant? Opponent, string? Cause, int Points);
+// A resolved match's result for the entrant; NoWinner gives no points and is neither a win, a draw nor a loss.
+public enum LineResult
+{
+    Won,
+    Drawn,
+    Lost,
+    NoWinner,
+}
+
+// A line of an entrant's explanation: a resolved match (opponent, result and cause) or a rest (all three null).
+public sealed record StandingsLine(int Round, StandingsEntrant? Opponent, LineResult? Result, string? Cause, int Points);
 
 public sealed record StandingsRow(int Position, bool Shared, StandingsEntrant Entrant, int Resolved, int Won, int Drawn, int Lost, int Points, IReadOnlyList<StandingsLine> Lines);
 
@@ -51,8 +60,17 @@ public static class GetStandingsEndpoint
                 row.Drawn,
                 row.Lost,
                 row.Points,
-                [.. row.Lines.Select(line => new StandingsLine(line.Round, line.Opponent is { } opponent ? EntrantOf(opponent) : null, line.Cause, line.Points))]))]));
+                [.. row.Lines.Select(line => new StandingsLine(line.Round, line.Opponent is { } opponent ? EntrantOf(opponent) : null, ResultOf(line.Outcome), line.Cause, line.Points))]))]));
     }
+
+    private static LineResult? ResultOf(Outcome? outcome) => outcome switch
+    {
+        Outcome.First => LineResult.Won,
+        Outcome.Second => LineResult.Lost,
+        Outcome.Draw => LineResult.Drawn,
+        Outcome.None => LineResult.NoWinner,
+        _ => null,
+    };
 
     private static StandingsEntrant EntrantOf(Entrant entrant) => new(entrant.EntryId, entrant.Name);
 }

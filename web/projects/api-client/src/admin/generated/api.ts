@@ -408,6 +408,16 @@ export interface HttpValidationProblemDetails {
 
 export interface IResult { [key: string]: unknown }
 
+export type LineResult = typeof LineResult[keyof typeof LineResult] | null;
+
+
+export const LineResult = {
+  won: 'won',
+  drawn: 'drawn',
+  lost: 'lost',
+  noWinner: 'noWinner',
+} as const;
+
 export interface PlayerDetails {
   playerId: string;
   name: string;
@@ -640,6 +650,7 @@ export interface StandingsEntrant {
 export interface StandingsLine {
   round: number;
   opponent: null | StandingsEntrant;
+  result: null | LineResult;
   /** @nullable */
   cause: string | null;
   points: number;

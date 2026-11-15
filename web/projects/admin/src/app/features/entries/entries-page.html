@@ -26,6 +26,7 @@
     @if (starts()) {
       <p class="lead">{{ starts() }}</p>
     }
+    <app-tournament-tabs [organisation]="organisation" [tournament]="tournamentId" />
   </header>
 
   @if (field.isPending()) {

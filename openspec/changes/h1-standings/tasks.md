@@ -15,8 +15,8 @@
 
 ## 4. Admin application
 
-- [ ] 4.1 New `standings` feature: Standings page with the Visual input states; the Standings tab on every tournament page
-- [ ] 4.2 Vitest for each Visual input state and `axe-core`; lint and boundary checks pass
+- [x] 4.1 New `standings` feature: Standings page with the Visual input states; the Standings tab on every tournament page
+- [x] 4.2 Vitest for each Visual input state and `axe-core`; lint and boundary checks pass
 
 ## 5. End-to-end journey and seeds
 

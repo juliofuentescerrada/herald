@@ -3151,6 +3151,15 @@
       "IResult": {
         "type": "object"
       },
+      "LineResult": {
+        "enum": [
+          "won",
+          "drawn",
+          "lost",
+          "noWinner",
+          null
+        ]
+      },
       "LineupDetails": {
         "required": [
           "number",
@@ -4094,6 +4103,7 @@
         "required": [
           "round",
           "opponent",
+          "result",
           "cause",
           "points"
         ],
@@ -4110,6 +4120,16 @@
               },
               {
                 "$ref": "#/components/schemas/StandingsEntrant"
+              }
+            ]
+          },
+          "result": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/LineResult"
               }
             ]
           },
