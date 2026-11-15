@@ -117,14 +117,21 @@ export class MatchPage {
     }
   });
   protected readonly names = computed(() => ({ first: this.match.data()?.first.entrant.name ?? '', second: this.match.data()?.second.entrant.name ?? '' }));
+  /** Withdrawn or sanctioned players of either frozen roster: they cannot be chosen for a lineup. */
+  protected readonly unavailableIds = computed(() => new Set(this.match.data()?.unavailable.map((player) => player.playerId) ?? []));
+  protected readonly tooFewEligible = computed(() => this.match.data()?.blockers.some((code) => code.endsWith('-too-few-eligible')) ?? false);
   protected readonly rostersUnknown = computed(() => this.team() && (!this.match.data()?.first.roster || !this.match.data()?.second.roster));
   /** Why the match cannot start now, in words; the first one describes the disabled button. */
   protected readonly blockers = computed(() => {
     const match = this.match.data();
     if (!match) return [];
+    const unavailable = new Set(match.unavailable.map((player) => player.playerId));
     return match.blockers.map((code) => {
       const [field, rule] = splitBlocker(code);
-      return ruleText(field, rule, match.activePlayers, this.names().first, this.names().second);
+      // An unavailable starter is named from the side's current lineup (h1-round-operations D-3).
+      const lineup = (field.startsWith('first') ? match.first : match.second).lineups.at(-1)?.players ?? [];
+      const named = lineup.filter((player) => unavailable.has(player.playerId)).map((player) => player.name);
+      return ruleText(field, rule, match.activePlayers, this.names().first, this.names().second, named);
     });
   });
   protected readonly startBlocked = computed(() => {
@@ -318,7 +325,9 @@ export class MatchPage {
       const player = field.startsWith('player-')
         ? [...(match?.first.roster ?? []), ...(match?.second.roster ?? [])].find((each) => `player-${each.playerId}` === field)?.name
         : undefined;
-      const text = player ? `${player} is not on that team’s frozen roster.` : ruleText(field, rules[0], match?.activePlayers ?? null, this.names().first, this.names().second);
+      const text = player
+        ? rules[0] === 'unavailable' ? `${player} is withdrawn or sanctioned and cannot be chosen.` : `${player} is not on that team’s frozen roster.`
+        : ruleText(field, rules[0], match?.activePlayers ?? null, this.names().first, this.names().second);
       this.failure.set({ heading, text: `${text} Nothing changed.` });
       void this.match.refetch();
     } else {
