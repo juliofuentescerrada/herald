@@ -14,6 +14,11 @@ public sealed record MatchDetails(EntrantDetails First, EntrantDetails Second);
 // A match of the running competition, for the Schedule page (h1-match-lineups D-5).
 public sealed record MatchSummary(Guid MatchId, int Round, EntrantDetails First, EntrantDetails Second, MatchState State, ResultDetails? Result);
 
+public sealed record RoundStateDetails(int Number, RoundState State);
+
+// Where a running competition stands, for the top of the Schedule page (h1-round-operations D-5).
+public sealed record OperationsDetails(int Scheduled, int InPlay, int Resolved, IReadOnlyList<RoundStateDetails> Rounds);
+
 public sealed record RoundDetails(int Number, IReadOnlyList<MatchDetails> Matches, EntrantDetails? Rest);
 
 public sealed record PairingsDetails(Seeding Seeding, int? Seed, int Entrants, int Matches, IReadOnlyList<RoundDetails> Rounds);
@@ -42,7 +47,8 @@ public sealed record ScheduleDetails(
     int? StartedOnRevision,
     DateTimeOffset? StartedAt,
     bool StartCrossedWithdrawal,
-    IReadOnlyList<MatchSummary> Matches)
+    IReadOnlyList<MatchSummary> Matches,
+    OperationsDetails? Operations)
 {
     public static ScheduleDetails Of(Schedule schedule, IReadOnlyList<Match> matches) => new(
         schedule.Id.Value,
@@ -59,7 +65,15 @@ public sealed record ScheduleDetails(
         schedule.StartedOnRevision,
         schedule.StartedAt,
         schedule.StartCrossedWithdrawal,
-        MatchesOf(schedule, matches));
+        MatchesOf(schedule, matches),
+        OperationsOf(matches));
+
+    // Null until the competition's matches exist.
+    private static OperationsDetails? OperationsOf(IReadOnlyList<Match> matches) => matches.Count == 0 ? null : new(
+        matches.Count(match => match.State == MatchState.Scheduled),
+        matches.Count(match => match.State == MatchState.InPlay),
+        matches.Count(match => match.State == MatchState.Resolved),
+        [.. Rounds.Of(matches).Select(round => new RoundStateDetails(round.Round, round.State))]);
 
     private static List<MatchSummary> MatchesOf(Schedule schedule, IReadOnlyList<Match> matches)
     {
