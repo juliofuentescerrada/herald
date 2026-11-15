@@ -30,6 +30,7 @@ public sealed class CompetitionDbContext(DbContextOptions<CompetitionDbContext> 
             schedule.Ignore(s => s.DraftChange);
             schedule.Ignore(s => s.CrossedChange);
             schedule.Ignore(s => s.StartedPairings);
+            schedule.Ignore(s => s.UnavailablePlayers);
             schedule.Property(s => s.Id).HasConversion(id => id.Value, value => new TournamentId(value));
             // Two writes based on the same schedule cannot both succeed.
             schedule.Property(s => s.Revision).IsConcurrencyToken();
@@ -42,6 +43,7 @@ public sealed class CompetitionDbContext(DbContextOptions<CompetitionDbContext> 
             Json(schedule.Property(s => s.Publications));
             Json(schedule.Property(s => s.Rosters));
             Json(schedule.Property(s => s.Departures));
+            Json(schedule.Property(s => s.Players));
         });
 
         OrganisationOwned<Match>(modelBuilder);

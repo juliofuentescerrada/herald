@@ -16,8 +16,26 @@ public sealed record MatchSummary(Guid MatchId, int Round, EntrantDetails First,
 
 public sealed record RoundStateDetails(int Number, RoundState State);
 
+// A scheduled team match whose current lineup includes an unavailable player, naming the side's entrant and the player.
+public sealed record AttentionDetails(Guid MatchId, int Round, EntrantDetails Entrant, PlayerDetails Player);
+
 // Where a running competition stands, for the top of the Schedule page (h1-round-operations D-5).
-public sealed record OperationsDetails(int Scheduled, int InPlay, int Resolved, IReadOnlyList<RoundStateDetails> Rounds);
+public sealed record OperationsDetails(int Scheduled, int InPlay, int Resolved, IReadOnlyList<RoundStateDetails> Rounds, IReadOnlyList<AttentionDetails> Attention);
+
+public enum PlayerStatus
+{
+    Available,
+    Withdrawn,
+    Sanctioned,
+}
+
+// A frozen-roster player with their availability; the reason is the latest withdrawal's or active sanction's, private to the organisation.
+public sealed record RosterPlayerDetails(Guid PlayerId, string Name, PlayerStatus Status, string? Reason);
+
+// An entrant of the running competition, for the Entrants panel; the departure reason is the organisation's own. A team's frozen
+// roster is null while unknown, and for an individual entrant.
+public sealed record CompetitorDetails(
+    Guid EntryId, string Name, EntrantStatus Status, string? Reason, DateTimeOffset? DepartedAt, IReadOnlyList<RosterPlayerDetails>? Roster);
 
 public sealed record RoundDetails(int Number, IReadOnlyList<MatchDetails> Matches, EntrantDetails? Rest);
 
@@ -48,7 +66,8 @@ public sealed record ScheduleDetails(
     DateTimeOffset? StartedAt,
     bool StartCrossedWithdrawal,
     IReadOnlyList<MatchSummary> Matches,
-    OperationsDetails? Operations)
+    OperationsDetails? Operations,
+    IReadOnlyList<CompetitorDetails> Entrants)
 {
     public static ScheduleDetails Of(Schedule schedule, IReadOnlyList<Match> matches) => new(
         schedule.Id.Value,
@@ -66,14 +85,59 @@ public sealed record ScheduleDetails(
         schedule.StartedAt,
         schedule.StartCrossedWithdrawal,
         MatchesOf(schedule, matches),
-        OperationsOf(matches));
+        OperationsOf(schedule, matches),
+        CompetitorsOf(schedule));
 
     // Null until the competition's matches exist.
-    private static OperationsDetails? OperationsOf(IReadOnlyList<Match> matches) => matches.Count == 0 ? null : new(
-        matches.Count(match => match.State == MatchState.Scheduled),
-        matches.Count(match => match.State == MatchState.InPlay),
-        matches.Count(match => match.State == MatchState.Resolved),
-        [.. Rounds.Of(matches).Select(round => new RoundStateDetails(round.Round, round.State))]);
+    private static OperationsDetails? OperationsOf(Schedule schedule, IReadOnlyList<Match> matches)
+    {
+        if (matches.Count == 0)
+        {
+            return null;
+        }
+
+        var unavailable = schedule.UnavailablePlayers;
+        var names = schedule.StartedPairings?.Entrants.ToDictionary(entrant => entrant.EntryId, entrant => entrant.Name) ?? [];
+        var players = schedule.Rosters?.Teams.SelectMany(team => team.Players).DistinctBy(player => player.PlayerId).ToDictionary(player => player.PlayerId, player => player.Name) ?? [];
+        var attention = matches
+            .Where(match => match.State == MatchState.Scheduled)
+            .OrderBy(match => match.Round)
+            .SelectMany(match => new[] { Side.First, Side.Second }.SelectMany(side =>
+                (match.CurrentLineup(side)?.Players ?? []).Where(unavailable.Contains).Select(player => new AttentionDetails(
+                    match.Id.Value, match.Round, new(match.EntryOf(side), names.GetValueOrDefault(match.EntryOf(side), "")), new(player, players.GetValueOrDefault(player, ""))))));
+        return new(
+            matches.Count(match => match.State == MatchState.Scheduled),
+            matches.Count(match => match.State == MatchState.InPlay),
+            matches.Count(match => match.State == MatchState.Resolved),
+            [.. Rounds.Of(matches).Select(round => new RoundStateDetails(round.Round, round.State))],
+            [.. attention]);
+    }
+
+    // Empty before start; then the started field in admission order.
+    private static List<CompetitorDetails> CompetitorsOf(Schedule schedule) =>
+        [.. (schedule.StartedPairings?.Entrants ?? []).OrderBy(entrant => entrant.AdmissionOrder).Select(entrant =>
+        {
+            var departure = schedule.DepartureOf(entrant.EntryId);
+            var roster = schedule.Rosters?.Teams.SingleOrDefault(team => team.EntryId == entrant.EntryId);
+            return new CompetitorDetails(
+                entrant.EntryId,
+                entrant.Name,
+                schedule.StatusOf(entrant.EntryId),
+                departure?.Reason,
+                departure?.DepartedAt,
+                roster is null ? null : [.. roster.Players.OrderBy(player => player.Name, StringComparer.InvariantCulture).Select(player => PlayerOf(schedule, entrant.EntryId, player))]);
+        })];
+
+    private static RosterPlayerDetails PlayerOf(Schedule schedule, Guid entryId, RosterPlayer player)
+    {
+        var availability = schedule.Players.SingleOrDefault(other => other.EntryId == entryId && other.PlayerId == player.PlayerId);
+        return availability switch
+        {
+            { Withdrawal: { } withdrawal } => new(player.PlayerId, player.Name, PlayerStatus.Withdrawn, withdrawal.Reason),
+            { Sanctions: [.., { IsActive: true } sanction] } => new(player.PlayerId, player.Name, PlayerStatus.Sanctioned, sanction.Reason),
+            _ => new(player.PlayerId, player.Name, PlayerStatus.Available, null),
+        };
+    }
 
     private static List<MatchSummary> MatchesOf(Schedule schedule, IReadOnlyList<Match> matches)
     {

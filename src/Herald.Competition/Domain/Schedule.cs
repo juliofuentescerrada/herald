@@ -44,6 +44,20 @@ public sealed record RosterPlayer(Guid PlayerId, string Name);
 
 public sealed record FrozenRosters(int Revision, IReadOnlyList<FrozenRoster> Teams);
 
+public sealed record PlayerWithdrawal(string? Reason, Guid WithdrawnBy, DateTimeOffset WithdrawnAt);
+
+public sealed record PlayerSanction(string Reason, Guid SanctionedBy, DateTimeOffset SanctionedAt, Guid? LiftedBy = null, DateTimeOffset? LiftedAt = null)
+{
+    public bool IsActive => LiftedAt is null;
+}
+
+// A frozen-roster player's withdrawal and sanctions, kept for good (h1-round-operations D-3). Kept apart from the rosters, which
+// Registration's reports replace.
+public sealed record PlayerAvailability(Guid EntryId, Guid PlayerId, PlayerWithdrawal? Withdrawal, IReadOnlyList<PlayerSanction> Sanctions)
+{
+    public bool IsUnavailable => Withdrawal is not null || Sanctions.Any(sanction => sanction.IsActive);
+}
+
 // What changed between the field a set of pairings came from and the current one (D-5).
 public sealed record FieldChange(IReadOnlyList<Entrant> Added, IReadOnlyList<Entrant> Removed);
 
@@ -73,6 +87,7 @@ public sealed class Schedule : AggregateRoot<TournamentId>
 
     private List<Publication> _publications = [];
     private List<Departure> _departures = [];
+    private List<PlayerAvailability> _players = [];
 
     // For EF Core, which sets the field after constructing.
     private Schedule(TournamentId id)
@@ -99,6 +114,15 @@ public sealed class Schedule : AggregateRoot<TournamentId>
         get => _departures;
         private set => _departures = [.. value];
     }
+
+    public IReadOnlyList<PlayerAvailability> Players
+    {
+        get => _players;
+        private set => _players = [.. value];
+    }
+
+    // The frozen-roster players who cannot be in a lineup now, across the tournament's teams.
+    public IReadOnlyCollection<Guid> UnavailablePlayers => _players.Where(player => player.IsUnavailable).Select(player => player.PlayerId).ToHashSet();
 
     public Publication? Current => _publications.LastOrDefault(publication => !publication.IsWithdrawn);
 
@@ -220,6 +244,78 @@ public sealed class Schedule : AggregateRoot<TournamentId>
         Raise(new EntrantDeparted(Id, entryId, status, actor, at));
         Revision++;
         ResultsRevision++;
+        return WriteOutcome.Applied;
+    }
+
+    // A player's withdrawal from the tournament, final; the reason is optional (A-2).
+    public WriteResult WithdrawPlayer(Guid entryId, Guid playerId, string? reason, int expectedRevision, Guid actor, DateTimeOffset at) =>
+        ChangePlayer(entryId, playerId, expectedRevision, player =>
+        {
+            if (player.Withdrawal is not null)
+            {
+                return (WriteOutcome.Repeated, player);
+            }
+
+            reason = string.IsNullOrWhiteSpace(reason) ? null : reason.Trim();
+            return reason?.Length > ReasonMaxLength
+                ? (WriteResult.Reject("reason", "too-long"), player)
+                : (WriteOutcome.Applied, player with { Withdrawal = new(reason, actor, at) });
+        });
+
+    // A sanction lasts until the owner lifts it; its reason is required (A-2).
+    public WriteResult SanctionPlayer(Guid entryId, Guid playerId, string? reason, int expectedRevision, Guid actor, DateTimeOffset at) =>
+        ChangePlayer(entryId, playerId, expectedRevision, player =>
+        {
+            if (player.Sanctions.Any(sanction => sanction.IsActive))
+            {
+                return (WriteOutcome.Repeated, player);
+            }
+
+            if (player.Withdrawal is not null)
+            {
+                return (WriteResult.Reject("player", "withdrawn"), player);
+            }
+
+            reason = reason?.Trim();
+            return string.IsNullOrEmpty(reason) ? (WriteResult.Reject("reason", "required"), player)
+                : reason.Length > ReasonMaxLength ? (WriteResult.Reject("reason", "too-long"), player)
+                : (WriteOutcome.Applied, player with { Sanctions = [.. player.Sanctions, new(reason, actor, at)] });
+        });
+
+    public WriteResult LiftSanction(Guid entryId, Guid playerId, int expectedRevision, Guid actor, DateTimeOffset at) =>
+        ChangePlayer(entryId, playerId, expectedRevision, player =>
+            player.Sanctions.Count > 0 && player.Sanctions[^1] is { IsActive: true } active
+                ? (WriteOutcome.Applied, player with { Sanctions = [.. player.Sanctions.SkipLast(1), active with { LiftedBy = actor, LiftedAt = at }] })
+                : (player.Sanctions.Count > 0 ? WriteOutcome.Repeated : WriteResult.Reject("player", "not-sanctioned"), player));
+
+    // Applies a change to a frozen-roster player of a running competition, answering a repeat before the revision.
+    private WriteResult ChangePlayer(Guid entryId, Guid playerId, int expectedRevision, Func<PlayerAvailability, (WriteResult Result, PlayerAvailability Player)> change)
+    {
+        if (StartedAt is null)
+        {
+            return WriteResult.Reject("schedule", "not-started");
+        }
+
+        if (RosterOf(entryId) is not { } roster || !roster.Contains(playerId))
+        {
+            return WriteResult.Reject("player", "not-on-roster");
+        }
+
+        var current = _players.Find(player => player.EntryId == entryId && player.PlayerId == playerId) ?? new(entryId, playerId, null, []);
+        (var result, var changed) = change(current);
+        if (result.Outcome != WriteOutcome.Applied)
+        {
+            return result;
+        }
+
+        if (expectedRevision != Revision)
+        {
+            return WriteOutcome.Stale;
+        }
+
+        _players.Remove(current);
+        _players.Add(changed);
+        Revision++;
         return WriteOutcome.Applied;
     }
 

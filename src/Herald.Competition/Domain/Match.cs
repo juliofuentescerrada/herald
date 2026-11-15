@@ -126,8 +126,10 @@ public sealed class Match : AggregateRoot<MatchId>
 
     public Guid EntryOf(Side side) => side == Side.First ? First : Second;
 
-    // The roster is the side's frozen roster, or null while Competition has not learned it (D-4).
-    public WriteResult RecordLineup(Side side, IReadOnlyList<Guid> players, IReadOnlyCollection<Guid>? roster, int expectedRevision, Guid actor, DateTimeOffset at)
+    // The roster is the side's frozen roster, or null while Competition has not learned it (D-4); unavailable players are the
+    // withdrawn and sanctioned ones (h1-round-operations D-3).
+    public WriteResult RecordLineup(
+        Side side, IReadOnlyList<Guid> players, IReadOnlyCollection<Guid>? roster, int expectedRevision, Guid actor, DateTimeOffset at, IReadOnlyCollection<Guid>? unavailable = null)
     {
         if (!IsTeamMatch)
         {
@@ -149,7 +151,7 @@ public sealed class Match : AggregateRoot<MatchId>
             return WriteResult.Reject("match", "started");
         }
 
-        if (Check(players, roster) is { Count: > 0 } broken)
+        if (Check(players, roster, unavailable) is { Count: > 0 } broken)
         {
             return new(WriteOutcome.Rejected, broken);
         }
@@ -163,7 +165,7 @@ public sealed class Match : AggregateRoot<MatchId>
     }
 
     // The reasons this match cannot start now, side by side; the rosters are null while unknown.
-    public IReadOnlyList<BrokenRule> StartBlockers(IReadOnlyCollection<Guid>? firstRoster, IReadOnlyCollection<Guid>? secondRoster)
+    public IReadOnlyList<BrokenRule> StartBlockers(IReadOnlyCollection<Guid>? firstRoster, IReadOnlyCollection<Guid>? secondRoster, IReadOnlyCollection<Guid>? unavailable = null)
     {
         if (!IsTeamMatch)
         {
@@ -174,13 +176,19 @@ public sealed class Match : AggregateRoot<MatchId>
         foreach ((var side, var roster) in new[] { (Side.First, firstRoster), (Side.Second, secondRoster) })
         {
             var field = side == Side.First ? "first-lineup" : "second-lineup";
+            // Too few eligible players: the match waits for the owner's explicit outcome (h1-round-operations D-3).
+            if (roster is not null && roster.Count(player => unavailable?.Contains(player) != true) < ActivePlayers)
+            {
+                broken.Add(new(side == Side.First ? "first-roster" : "second-roster", "too-few-eligible"));
+            }
+
             if (CurrentLineup(side) is not { } lineup)
             {
                 broken.Add(new(field, "missing"));
             }
             else
             {
-                broken.AddRange(Check(lineup.Players, roster).Select(rule => rule with { Field = field }));
+                broken.AddRange(Check(lineup.Players, roster, unavailable).Select(rule => rule with { Field = field }));
             }
         }
 
@@ -192,7 +200,8 @@ public sealed class Match : AggregateRoot<MatchId>
         return broken;
     }
 
-    public WriteResult StartMatch(IReadOnlyCollection<Guid>? firstRoster, IReadOnlyCollection<Guid>? secondRoster, int expectedRevision, Guid actor, DateTimeOffset at)
+    public WriteResult StartMatch(
+        IReadOnlyCollection<Guid>? firstRoster, IReadOnlyCollection<Guid>? secondRoster, int expectedRevision, Guid actor, DateTimeOffset at, IReadOnlyCollection<Guid>? unavailable = null)
     {
         if (Start is not null)
         {
@@ -210,7 +219,7 @@ public sealed class Match : AggregateRoot<MatchId>
             return WriteOutcome.Stale;
         }
 
-        if (StartBlockers(firstRoster, secondRoster) is { Count: > 0 } broken)
+        if (StartBlockers(firstRoster, secondRoster, unavailable) is { Count: > 0 } broken)
         {
             return new(WriteOutcome.Rejected, broken);
         }
@@ -376,7 +385,7 @@ public sealed class Match : AggregateRoot<MatchId>
 
     private List<Lineup> Lineups(Side side) => side == Side.First ? _firstLineups : _secondLineups;
 
-    private List<BrokenRule> Check(IReadOnlyList<Guid> players, IReadOnlyCollection<Guid>? roster)
+    private List<BrokenRule> Check(IReadOnlyList<Guid> players, IReadOnlyCollection<Guid>? roster, IReadOnlyCollection<Guid>? unavailable)
     {
         if (roster is null)
         {
@@ -396,6 +405,7 @@ public sealed class Match : AggregateRoot<MatchId>
 
         // One rule per player, so the rejection names each of them.
         broken.AddRange(players.Where(player => !roster.Contains(player)).Distinct().Select(player => new BrokenRule($"player-{player}", "not-on-roster")));
+        broken.AddRange(players.Where(player => unavailable?.Contains(player) == true).Distinct().Select(player => new BrokenRule($"player-{player}", "unavailable")));
 
         return broken;
     }
