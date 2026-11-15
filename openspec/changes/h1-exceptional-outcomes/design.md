@@ -62,3 +62,10 @@ Visual choices (G-/RU-): progressive disclosure inside one panel rather than fou
 ## Risks / Trade-offs
 
 - [More fields in one panel] → only the chosen cause's fields show; the prototype states check each at 390 px.
+
+## Verification
+
+15 November 2026, cloud session:
+
+- `scripts/check all` passed.
+- End-to-end suite: 21 journeys passed, journey 21 included. Test scripts: 8 passed, `seeded-exceptional-outcomes` included.
