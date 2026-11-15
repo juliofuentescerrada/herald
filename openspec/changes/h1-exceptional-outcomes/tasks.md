@@ -6,7 +6,7 @@
 
 - [x] 2.1 Causes and their outcomes on the resolution (design D-1); play and start evidence (D-2); domain tests for every added `match-results` scenario
 - [x] 2.2 Migration; `RecordResult` takes the cause and its fields; details carry them; API tests against PostgreSQL, including the rejections and repeats
-- [ ] 2.3 Regenerate Wolverine code (`codegen write`) and the OpenAPI documents and client (`pnpm api:generate`); CI drift checks pass
+- [x] 2.3 Regenerate Wolverine code (`codegen write`) and the OpenAPI documents and client (`pnpm api:generate`); CI drift checks pass
 
 ## 3. Admin application
 

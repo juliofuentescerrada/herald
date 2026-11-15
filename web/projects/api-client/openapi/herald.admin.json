@@ -2425,7 +2425,11 @@
       },
       "Cause": {
         "enum": [
-          "played"
+          "played",
+          "concession",
+          "singleAbsence",
+          "doubleAbsence",
+          "noContest"
         ]
       },
       "CheckIn": {
@@ -3342,7 +3346,8 @@
         "enum": [
           "first",
           "second",
-          "draw"
+          "draw",
+          "none"
         ]
       },
       "OwnedOrganisation": {
@@ -3538,8 +3543,7 @@
       "RecordResult": {
         "required": [
           "operationId",
-          "expectedRevision",
-          "outcome"
+          "expectedRevision"
         ],
         "type": "object",
         "properties": {
@@ -3552,7 +3556,39 @@
             "format": "int32"
           },
           "outcome": {
-            "$ref": "#/components/schemas/Outcome"
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Outcome"
+              }
+            ]
+          },
+          "cause": {
+            "$ref": "#/components/schemas/Cause"
+          },
+          "entrant": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Side"
+              }
+            ]
+          },
+          "played": {
+            "type": [
+              "null",
+              "boolean"
+            ]
+          },
+          "reason": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },
@@ -3575,6 +3611,7 @@
           "outcome",
           "cause",
           "played",
+          "reason",
           "recordedAt"
         ],
         "type": "object",
@@ -3587,6 +3624,12 @@
           },
           "played": {
             "type": "boolean"
+          },
+          "reason": {
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "recordedAt": {
             "type": "string",
@@ -3975,6 +4018,13 @@
             }
           }
         }
+      },
+      "Side": {
+        "enum": [
+          "first",
+          "second",
+          null
+        ]
       },
       "SideDetails": {
         "required": [
