@@ -197,7 +197,8 @@ public sealed class Match : AggregateRoot<MatchId>
             broken.Add(new("players", "both-sides"));
         }
 
-        return broken;
+        // Each side's rule once, however many of its players break it.
+        return [.. broken.Distinct()];
     }
 
     public WriteResult StartMatch(
@@ -221,7 +222,10 @@ public sealed class Match : AggregateRoot<MatchId>
 
         if (StartBlockers(firstRoster, secondRoster, unavailable) is { Count: > 0 } broken)
         {
-            return new(WriteOutcome.Rejected, broken);
+            // The rejection also names each unavailable starter (h1-round-operations D-3).
+            var named = new[] { Side.First, Side.Second }.SelectMany(side => CurrentLineup(side)?.Players ?? [])
+                .Where(player => unavailable?.Contains(player) == true).Distinct().Select(player => new BrokenRule($"player-{player}", "unavailable"));
+            return new(WriteOutcome.Rejected, [.. broken, .. named]);
         }
 
         Start = new(actor, at, CurrentLineup(Side.First)?.Number, CurrentLineup(Side.Second)?.Number);

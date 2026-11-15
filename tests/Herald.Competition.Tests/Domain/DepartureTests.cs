@@ -58,8 +58,7 @@ public class DepartureTests
     }
 
     [Fact]
-    [Trait("covers", "round-operations: A disqualification")]
-    public void A_disqualification_keeps_previous_results_resolves_the_rest_as_absences_and_keeps_the_reason()
+    public void An_individual_disqualification_keeps_previous_results_resolves_the_rest_as_absences_and_keeps_the_reason()
     {
         var played = MatchesOf("Robin Vale").Single(match => match.Round == 1);
         played.RecordPlayed(Guid.NewGuid(), Outcome.Draw, played.Revision, _owner, _at);
@@ -68,24 +67,55 @@ public class DepartureTests
 
         played.Resolution!.Cause.ShouldBe(Cause.Played);
         MatchesOf("Robin Vale").Where(match => match.Round > 1).ShouldAllBe(match => match.Resolution!.Cause == Cause.SingleAbsence);
-        _schedule.DepartureOf(Id("Robin Vale")).ShouldBe(new Departure(Id("Robin Vale"), EntrantStatus.Disqualified, "Fielded an ineligible player", _owner, _at, _schedule.Departures[0].OperationId));
+        _schedule.DepartureOf(Id("Robin Vale")).ShouldBe(new Departure(Id("Robin Vale"), EntrantStatus.Disqualified, "Fielded an ineligible player", _owner, _at, _schedule.Departures[0].OperationId, _schedule.Revision));
+    }
+
+    // Three five-a-side teams of seven, started: three matches over three rounds, one rest each.
+    private (Schedule Schedule, IReadOnlyList<Match> Matches, Dictionary<Guid, List<Guid>> Rosters) Teams()
+    {
+        List<Entrant> teams = [new(Guid.NewGuid(), "River Falcons", 1), new(Guid.NewGuid(), "North Stars", 2), new(Guid.NewGuid(), "Harbour Lights", 3)];
+        var schedule = Schedule.Track(new TournamentId(Guid.NewGuid()), new EligibleField(1, true, [], teams));
+        schedule.Generate(Guid.NewGuid(), Seeding.AdmissionOrder, null, schedule.Revision, _owner, _at);
+        schedule.Publish(schedule.Revision, _owner, _at);
+        schedule.ApplyStart(1, _at, 5);
+        var rosters = teams.ToDictionary(team => team.EntryId, _ => Enumerable.Range(0, 7).Select(_ => Guid.NewGuid()).ToList());
+        schedule.ApplyRosters(new(1, [.. teams.Select(team => new FrozenRoster(team.EntryId, 1, [.. rosters[team.EntryId].Select((id, index) => new RosterPlayer(id, $"{team.Name} {index}"))]))]));
+        return (schedule, schedule.ScheduleMatches(), rosters);
     }
 
     [Fact]
     [Trait("covers", "round-operations: Withdrawal in play")]
     public void A_withdrawal_in_play_resolves_that_match_as_a_concession_after_play_with_the_locked_appearances()
     {
-        List<Guid> falcons = [.. Enumerable.Range(0, 5).Select(_ => Guid.NewGuid())];
-        List<Guid> stars = [.. Enumerable.Range(0, 5).Select(_ => Guid.NewGuid())];
-        var match = Match.Schedule(_schedule.Id, new Pairing(1, Guid.NewGuid(), Guid.NewGuid()), 5);
-        match.RecordLineup(Side.First, falcons, falcons, match.Revision, _owner, _at);
-        match.RecordLineup(Side.Second, stars, stars, match.Revision, _owner, _at);
-        match.StartMatch(falcons, stars, match.Revision, _owner, _at).Outcome.ShouldBe(WriteOutcome.Applied);
+        (var schedule, var matches, var rosters) = Teams();
+        var playing = matches.First(match => match.Round == 1);
+        playing.RecordLineup(Side.First, rosters[playing.First][..5], rosters[playing.First], playing.Revision, _owner, _at);
+        playing.RecordLineup(Side.Second, rosters[playing.Second][..5], rosters[playing.Second], playing.Revision, _owner, _at);
+        playing.StartMatch(rosters[playing.First], rosters[playing.Second], playing.Revision, _owner, _at).Outcome.ShouldBe(WriteOutcome.Applied);
 
-        match.ResolveForDeparture(Guid.NewGuid(), Side.First, null, _owner, _at).ShouldBeTrue();
+        schedule.Depart(Guid.NewGuid(), playing.First, EntrantStatus.Withdrawn, "Team folded", schedule.Revision, matches, _owner, _at).Outcome.ShouldBe(WriteOutcome.Applied);
 
-        (match.Resolution!.Cause, match.Resolution.Outcome, match.Resolution.Played).ShouldBe((Cause.Concession, Outcome.Second, true));
-        match.Resolution.Appearances.ShouldBe([.. falcons, .. stars]);
+        (playing.Resolution!.Cause, playing.Resolution.Outcome, playing.Resolution.Played).ShouldBe((Cause.Concession, Outcome.Second, true));
+        playing.Resolution.Appearances.ShouldBe([.. rosters[playing.First][..5], .. rosters[playing.Second][..5]]);
+        matches.Where(match => match != playing && (match.First == playing.First || match.Second == playing.First))
+            .ShouldAllBe(match => match.Resolution!.Cause == Cause.SingleAbsence);
+    }
+
+    [Fact]
+    [Trait("covers", "round-operations: A disqualification")]
+    public void A_disqualified_team_keeps_its_played_result_and_its_scheduled_matches_become_its_absences()
+    {
+        (var schedule, var matches, _) = Teams();
+        var team = schedule.Field.Entrants[0].EntryId;
+        var own = matches.Where(match => match.First == team || match.Second == team).OrderBy(match => match.Round).ToList();
+        // Resolved without lineups: a no contest before any play.
+        own[0].RecordAdministrative(Guid.NewGuid(), Cause.NoContest, null, false, "Venue closed", own[0].Revision, _owner, _at);
+
+        schedule.Depart(Guid.NewGuid(), team, EntrantStatus.Disqualified, "Fielded an ineligible player", schedule.Revision, matches, _owner, _at).Outcome.ShouldBe(WriteOutcome.Applied);
+
+        own[0].Resolution!.Cause.ShouldBe(Cause.NoContest);
+        own[1].Resolution!.Cause.ShouldBe(Cause.SingleAbsence);
+        (schedule.StatusOf(team), schedule.DepartureOf(team)!.Reason, schedule.DepartureOf(team)!.Revision).ShouldBe((EntrantStatus.Disqualified, "Fielded an ineligible player", schedule.Revision));
     }
 
     [Fact]

@@ -3,7 +3,7 @@ import { ChangeDetectionStrategy, Component, computed, inject, input, signal, Te
 import { CompetitorDetails, HeraldHostAdminService, HttpValidationProblemDetails, problemOf, RosterPlayerDetails, ScheduleDetails } from '@herald/api-client/admin';
 import { Button, Dialog, DialogContext, DialogRef, Dialogs, Icon, Notice, StatusLabel, Toasts } from '@herald/ui';
 import { firstValueFrom, Observable } from 'rxjs';
-import { AccessState, QUERY_CLIENT } from '../../platform';
+import { AccessState, organisationKey, QUERY_CLIENT } from '../../platform';
 import { possessive } from '../../shared';
 import { entrantStatusLabel, playerStatusLabel, ruleText, scheduleKey, standingsKey } from './schedule';
 
@@ -154,8 +154,9 @@ export class EntrantsPanel {
       const answer = await firstValueFrom(write);
       const text = done(answer);
       this.queries.setQueryData(scheduleKey(this.organisation(), this.tournamentId()), answer);
-      // A departure resolves matches and flags the entrant: the standings are asked again.
+      // A departure resolves matches and flags the entrant, a player change moves start blockers: matches and standings are asked again.
       void this.queries.invalidateQueries({ queryKey: standingsKey(this.organisation(), this.tournamentId()) });
+      void this.queries.invalidateQueries({ queryKey: organisationKey(this.organisation(), 'match', this.tournamentId()) });
       this.toasts.show(text);
       this.playerAction.set(null);
       if (closes) this.close();

@@ -45,8 +45,8 @@ public class PlayerAvailabilityTests
     {
         Sanction(_falcons[0]).Outcome.ShouldBe(WriteOutcome.Applied);
 
-        // The side's rule; the match view names the player among its unavailable ones.
-        Start().Broken.ShouldBe([new BrokenRule("first-lineup", "unavailable")]);
+        // The side's rule once, and each unavailable starter by name.
+        Start().Broken.ShouldBe([new BrokenRule("first-lineup", "unavailable"), new BrokenRule($"player-{_falcons[0]}", "unavailable")]);
         _schedule.UnavailablePlayers.ShouldBe([_falcons[0]]);
 
         Lineup(Side.First, _falcons[1..6]).Outcome.ShouldBe(WriteOutcome.Applied);
@@ -84,7 +84,7 @@ public class PlayerAvailabilityTests
         _schedule.LiftSanction(Falcons, _falcons[0], _schedule.Revision, _owner, _at).Outcome.ShouldBe(WriteOutcome.Applied);
 
         _schedule.UnavailablePlayers.ShouldNotContain(_falcons[0]);
-        _schedule.Players.Single().Sanctions.ShouldBe([new PlayerSanction("Abusive conduct", _owner, _at, _owner, _at)]);
+        _schedule.Players.Single().Sanctions.ShouldBe([new PlayerSanction("Abusive conduct", _owner, _at, _schedule.Revision - 1, _owner, _at, _schedule.Revision)]);
         Start().Outcome.ShouldBe(WriteOutcome.Applied);
     }
 
@@ -129,5 +129,15 @@ public class PlayerAvailabilityTests
         operations.Attention.ShouldBe([new AttentionDetails(_match.Id.Value, 1, new(Falcons, "Falcons"), new(_falcons[0], "Falcon 0"))]);
         (operations.Scheduled, operations.InPlay, operations.Resolved).ShouldBe((1, 0, 0));
         operations.Rounds.ShouldBe([new RoundStateDetails(1, RoundState.NotStarted)]);
+    }
+
+    [Fact]
+    public void Two_sanctioned_starters_give_one_side_blocker_and_name_both_on_the_rejection()
+    {
+        Sanction(_falcons[0]);
+        Sanction(_falcons[1]);
+
+        _match.StartBlockers(_schedule.RosterOf(_match.First), _schedule.RosterOf(_match.Second), _schedule.UnavailablePlayers).ShouldBe([new BrokenRule("first-lineup", "unavailable")]);
+        Start().Broken.ShouldBe([new BrokenRule("first-lineup", "unavailable"), new BrokenRule($"player-{_falcons[0]}", "unavailable"), new BrokenRule($"player-{_falcons[1]}", "unavailable")]);
     }
 }

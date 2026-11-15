@@ -121,10 +121,12 @@
             }
           </div>
           <div class="actions">
+            @if (player.status !== 'withdrawn') {
+              <button herald-button type="button" [disabled]="busy()" [attr.aria-label]="'Withdraw ' + player.name" (click)="askPlayer(player, 'withdraw')">Withdraw player</button>
+            }
             @if (player.status === 'sanctioned') {
               <button herald-button type="button" [disabled]="busy()" [attr.aria-label]="'Lift ' + possessive(player.name) + ' sanction'" (click)="lift(player)">Lift sanction</button>
             } @else if (player.status === 'available') {
-              <button herald-button type="button" [disabled]="busy()" [attr.aria-label]="'Withdraw ' + player.name" (click)="askPlayer(player, 'withdraw')">Withdraw player</button>
               <button herald-button type="button" [disabled]="busy()" [attr.aria-label]="'Sanction ' + player.name" (click)="askPlayer(player, 'sanction')">Sanction</button>
             }
           </div>

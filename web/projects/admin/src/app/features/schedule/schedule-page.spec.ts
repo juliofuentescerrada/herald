@@ -499,6 +499,8 @@ describe('The schedule page of a running competition', () => {
         expect(sanctionPlayer).toHaveBeenCalledWith(organisation, tournamentId, 'e-falcons', 'p-casey', { expectedRevision: 7, reason: 'Abusive conduct' });
         expect(texts('.players herald-status-label')).toEqual(['Sanctioned', 'Available']);
         expect(text('.players li')).toContain('Reason: Abusive conduct');
+        // A sanctioned player can still withdraw for good.
+        expect(document.querySelector('button[aria-label="Withdraw Casey Moss"]')).not.toBeNull();
 
         button('Lift sanction')!.click();
         await vi.waitFor(() => expect(toasts()).toContain('Casey Moss’ sanction lifted.'));

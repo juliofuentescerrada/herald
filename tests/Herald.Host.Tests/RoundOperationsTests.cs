@@ -115,6 +115,7 @@ public partial class MatchTests
         sanctioned.GetProperty("entrants").EnumerateArray().Single(entrant => entrant.GetProperty("entryId").GetGuid() == team)
             .GetProperty("roster").EnumerateArray().Single(player => player.GetProperty("playerId").GetGuid() == falcons[0]).GetProperty("status").GetString().ShouldBe("sanctioned");
         Errors(blocked, "first-lineup").ShouldBe(["unavailable"]);
+        Errors(blocked, $"player-{falcons[0]}").ShouldBe(["unavailable"]);
         Name(blocked.GetProperty("match").GetProperty("unavailable")[0]).ShouldBe("River Falcons player 1");
         lifted.GetProperty("operations").GetProperty("attention").GetArrayLength().ShouldBe(0);
         started.StatusCode.ShouldBe(HttpStatusCode.OK);

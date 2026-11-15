@@ -74,7 +74,8 @@ Implementation notes:
 
 - Departures and player availability live on the `Schedule` aggregate as two documents (`Departures`, `Players`), kept apart from the frozen rosters that Registration's reports replace; migration `AddDepartures`. Every player write and departure goes through the schedule's revision.
 - Only a single absence that the opponent's departure set (same operation identity) is revised to a double absence; a single absence the owner recorded stays.
-- A blocked start keeps the side's rule (`first-lineup-unavailable`); the match view lists the unavailable players, and the page names the side's unavailable starters from it.
+- A blocked start keeps the side's rule once (`first-lineup-unavailable`) and the rejection adds one `player-{id}`/`unavailable` rule per unavailable starter, naming them (D-3); the match view lists the unavailable players, and the page names the side's unavailable starters from them.
+- `Departure`, `PlayerWithdrawal` and `PlayerSanction` (and a sanction's lift) store the schedule revision they produced, the subject revision ADR 0017's fact events will carry.
 - A roster below the lineup size once withdrawn and sanctioned players are left out adds the start blocker `first-roster-too-few-eligible` (or `second-`).
 - ADR 0017's inventory gains `Departure`, `PlayerWithdrawal` and `PlayerSanction` as notifiable facts recorded but not published, as the architecture test requires; the proposal's "none in H1" means none published.
 
@@ -93,3 +94,15 @@ Captures: `seeded-round-operations` at 1440 px (steps 1 to 7) and 390 px (steps 
 | `start-blocked-unavailable`, `too-few-eligible` | Unavailable players carry an "Unavailable" label in the lineup choice and cannot be added | None |
 | `standings-flags` | Same | None |
 | 390 px | The Entrants panel's actions first rendered as a staggered column | Fixed: they stack full width like the app's other narrow actions. The schedule's existing running rows (batch 1) show the same stagger; left to their owner |
+
+### herald-reviewer review (task 6.4)
+
+| Finding | Resolution |
+|---|---|
+| Departures and player changes stored no revision (ADR 0007, ADR 0017) | Fixed: each stores the schedule revision after the change; ADR 0017's rows name it |
+| A blocked start did not name the player and repeated the side's rule | Fixed: the side's rule once, plus a rule per unavailable starter |
+| Match queries not refreshed after a departure or player change | Fixed: the Entrants panel invalidates the tournament's match queries |
+| "Withdrawal in play" tested on a match outside the schedule | Fixed: a team match in play withdrawn through `Schedule.Depart` |
+| "A disqualification" tested with individual entrants only | Fixed: a team disqualification test carries the marker |
+| A sanctioned player could not be withdrawn from the roster dialog | Fixed: "Withdraw player" is offered to available and sanctioned players |
+| Player actions remain allowed on a departed team | Open: not settled by the change or §15; asked of the maintainer in the pull request |
