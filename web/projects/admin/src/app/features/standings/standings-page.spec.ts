@@ -137,7 +137,7 @@ describe('The standings page', () => {
   });
 
   it('opens an entrant’s explanation, whose points add up to its total', async () => {
-    const { page, settle, button, texts, text } = await open(() => of(provisional));
+    const { page, settle, button, texts } = await open(() => of(provisional));
 
     button('Sam Reed').click();
     await settle();
