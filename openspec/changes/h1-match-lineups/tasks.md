@@ -9,7 +9,7 @@
 ## 3. Competition
 
 - [x] 3.1 Rename the round-robin record `Match` to `Pairing`; `Match` aggregate with state, lineup revisions and start (design D-1 to D-3); domain tests for every `match-lineups` scenario
-- [ ] 3.2 Matches created on start; frozen-roster and active-count projections (D-4); migration
+- [x] 3.2 Matches created on start; frozen-roster and active-count projections (D-4); migration
 - [ ] 3.3 Features `GetMatch`, `RecordLineup`, `StartMatch`; the schedule details list matches with their state; API tests against PostgreSQL, including conflicts, repeats and another organisation's 404s
 
 ## 4. Registration and Tournaments

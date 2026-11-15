@@ -120,6 +120,8 @@ internal static class ScheduleResults
                         type: RevisionConflict,
                         extensions: new Dictionary<string, object?> { ["currentRevision"] = schedule.Revision, ["schedule"] = ScheduleDetails.Of(schedule) });
                 case WriteOutcome.Applied:
+                    // A revision published after a crossed withdrawal is the one the matches come from.
+                    await db.ScheduleMatchesAsync(schedule, cancellationToken);
                     try
                     {
                         await db.SaveChangesAsync(cancellationToken);

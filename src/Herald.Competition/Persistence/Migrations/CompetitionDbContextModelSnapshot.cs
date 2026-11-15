@@ -24,10 +24,60 @@ namespace Herald.Competition.Persistence.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("Herald.Competition.Domain.Match", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<int?>("ActivePlayers")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("First")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("FirstLineups")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<Guid>("OrganisationId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Revision")
+                        .IsConcurrencyToken()
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Round")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("Second")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("SecondLineups")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("Start")
+                        .HasColumnType("jsonb");
+
+                    b.Property<Guid>("TournamentId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrganisationId");
+
+                    b.HasIndex("TournamentId");
+
+                    b.ToTable("Matches", "competition");
+                });
+
             modelBuilder.Entity("Herald.Competition.Domain.Schedule", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
+
+                    b.Property<int?>("ActivePlayersPerSide")
+                        .HasColumnType("integer");
 
                     b.Property<string>("Draft")
                         .HasColumnType("jsonb");
@@ -46,6 +96,9 @@ namespace Herald.Competition.Persistence.Migrations
                     b.Property<int>("Revision")
                         .IsConcurrencyToken()
                         .HasColumnType("integer");
+
+                    b.Property<string>("Rosters")
+                        .HasColumnType("jsonb");
 
                     b.Property<DateTimeOffset?>("StartedAt")
                         .HasColumnType("timestamp with time zone");

@@ -58,6 +58,15 @@ public sealed class CompetitionDbContext(DbContextOptions<CompetitionDbContext> 
         });
     }
 
+    // Once per tournament: the started revision's pairings become matches, unless they already did (h1-match-lineups D-1).
+    public async Task ScheduleMatchesAsync(Schedule schedule, CancellationToken cancellationToken)
+    {
+        if (schedule.StartedPairings is not null && !await Matches.AnyAsync(match => match.TournamentId == schedule.Id, cancellationToken))
+        {
+            Matches.AddRange(schedule.ScheduleMatches());
+        }
+    }
+
     private static readonly JsonSerializerOptions _json = new(JsonSerializerDefaults.Web);
 
     private static void Json<T>(PropertyBuilder<T> property) => property
