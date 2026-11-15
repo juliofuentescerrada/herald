@@ -68,6 +68,11 @@ export const routes: Routes = [
             title: 'Schedule · Herald',
             loadComponent: () => import('./features/schedule').then((m) => m.SchedulePage),
           },
+          {
+            path: 'tournaments/:tournamentId/matches/:matchId',
+            title: 'Match · Herald',
+            loadComponent: () => import('./features/matches').then((m) => m.MatchPage),
+          },
           notFound,
         ],
       },
