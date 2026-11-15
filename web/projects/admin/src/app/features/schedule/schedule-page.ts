@@ -102,6 +102,9 @@ export class SchedulePage {
   });
   protected readonly withdrawn = computed(() => (this.schedule.data()?.history ?? []).filter((publication) => publication.withdrawnAt));
 
+  /** The running competition's match for a pairing, or undefined before start. */
+  protected readonly matchFor = (round: number, first: string) =>
+    this.schedule.data()?.matches.find((match) => match.round === round && match.first.entryId === first);
   protected readonly zoned = (instant: string | null | undefined) => (instant ? `${instantText(instant, this.zone())} · ${this.zone()}` : '');
   protected readonly names = (entrants: readonly { name: string }[]) => entrants.map((entrant) => entrant.name).join(', ');
 

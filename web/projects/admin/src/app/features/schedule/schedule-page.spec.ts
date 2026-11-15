@@ -80,6 +80,7 @@ const schedule = (over: Partial<ScheduleDetails> = {}): ScheduleDetails => ({
   startedOnRevision: null,
   startedAt: null,
   startCrossedWithdrawal: false,
+  matches: [],
   ...over,
 });
 
@@ -202,6 +203,17 @@ describe('The schedule page', () => {
     await vi.waitFor(() => expect(text('.column herald-notice')).toContain('The competition started on revision 1. The schedule can no longer be withdrawn or regenerated.'));
     expect(button('Withdraw')).toBeUndefined();
     expect(button('Generate draft')).toBeUndefined();
+  });
+
+  it('links each match of a running competition to its page with its state', async () => {
+    const matches = [
+      { matchId: 'm-1', round: 1, first: robin, second: taylor, state: 'inPlay' as const },
+      { matchId: 'm-2', round: 1, first: sam, second: jamie, state: 'scheduled' as const },
+    ];
+    const { texts, page } = await open({ getSchedule: () => of(schedule({ revision: 7, current: publication(1), startedOnRevision: 1, startedAt: '2026-11-21T09:05:00Z', matches })) });
+    await vi.waitFor(() => expect(texts('.running herald-status-label')).toEqual(['In play', 'Scheduled']));
+    expect(page().querySelector('.running a')?.getAttribute('href')).toContain('/matches/m-1');
+    expect(await violations(page())).toEqual([]);
   });
 
   it('reports a start on a withdrawn revision and offers to publish the draft once', async () => {

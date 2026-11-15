@@ -19,7 +19,7 @@
 
 ## 5. Admin application
 
-- [ ] 5.1 `schedule` feature: match state badges and links in a running competition
+- [x] 5.1 `schedule` feature: match state badges and links in a running competition
 - [ ] 5.2 New `matches` feature: Match page with the individual and team states of the Visual input, Lineups panels, start confirmation, conflict and load failure
 - [ ] 5.3 Vitest for each Visual input state and `axe-core`; lint and boundary checks pass
 
