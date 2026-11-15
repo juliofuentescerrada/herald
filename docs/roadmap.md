@@ -118,7 +118,7 @@ Goal: the tournament is corrected safely, finalised, announced, read by link and
 
 Cancelling after the start voids unresolved pairings, which is Competition's state. Competition does so on Tournaments' cancellation event, so `h1-tournament-cancel-and-dates` changes only Tournaments' model; if its proposal needs to change Competition's, it runs after `h1-safe-corrections` instead of beside it.
 
-Decision rows: D-07 (corrections), D-24 (finalisation barrier), D-26 (H1 announcements, a new proposal), D-27 (visibility, cancellation, dates), D-09 (public identity), D-02, D-12 and D-15 (the API's result and identity contract), D-14 (pilot).
+Decision rows: D-07 (corrections), D-24 (finalisation barrier), D-26 (H1 announcements, a new proposal), D-27 (visibility, cancellation, dates), D-09 (public identity), D-02, D-12 and D-15 (the API's result and identity contract), D-14 (pilot). The decision session of 15 November 2026 closed them ([§15](herald-functional-discovery.md#15-decision-register-and-development-gates)): any effective resolution corrected with reason and impact preview; finalisation behind the full §9.3 barrier, with reasoned reopening; §5.1's cancellation and archive rows as written and deletion of a never-published draft; dates changed only before start, per date; visibility changeable in any state; the change log of F-10 as written; the public page from publication, alias-only; delegated user tokens plus pilot server applications under an owner-recorded grant; queryable receipts and API-06's identifiers as the public contract.
 Acceptance journey: AT-07 to AT-11, AT-13 and AT-14; with it, H1's exit criteria below.
 
 ### Review answers
