@@ -1,5 +1,5 @@
 import { HttpErrorResponse } from '@angular/common/http';
-import { ChangeDetectionStrategy, Component, computed, inject, signal } from '@angular/core';
+import { ChangeDetectionStrategy, Component, computed, effect, inject, signal } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
 import { HeraldHostAdminService, ScheduleDetails, StandingsView, TournamentDetails } from '@herald/api-client/admin';
 import { Button, Icon, Notice, StatusLabel } from '@herald/ui';
@@ -35,13 +35,15 @@ export class StandingsPage {
     enabled: this.running(),
     retry: false,
   }));
+  /** Set from updating, which reads the standings query: reading it in the query's own options would be a cycle. */
+  private readonly polling = signal(false);
   protected readonly standings = injectQuery(() => ({
     queryKey: standingsKey(this.organisation, this.tournamentId),
     queryFn: () => firstValueFrom(this.api.getStandings<StandingsView>(this.organisation, this.tournamentId)),
     enabled: this.running(),
     retry: false,
     // Read again until the newer results have arrived.
-    refetchInterval: (): number | false => (this.updating() ? 1000 : false),
+    refetchInterval: this.polling() ? 1000 : false,
   }));
 
   /** Standings exist once the first results arrive, just after start: until then they are updating, not missing. */
@@ -60,6 +62,10 @@ export class StandingsPage {
 
   protected readonly lineText = lineText;
   protected readonly pointsText = pointsText;
+
+  constructor() {
+    effect(() => this.polling.set(this.updating()));
+  }
 
   protected toggle(entry: string): void {
     const next = new Set(this.open());

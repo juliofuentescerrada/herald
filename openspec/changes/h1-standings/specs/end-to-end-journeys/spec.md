@@ -23,7 +23,7 @@ The suite SHALL cover these journeys, each as one test named as a sentence:
 18. An owner sees a team tournament's start blocked by an incomplete roster, completes the roster, starts the competition and is stopped from adding a player to the frozen roster.
 19. An owner records a team match's lineups from seven-player frozen rosters, is stopped from starting with four starters on one side, completes the lineup and starts the match, which locks both lineups.
 20. An owner records a win in an individual match, which starts and resolves it in one step, records a draw in another, and sees both results on the schedule.
-22. An owner records the results of a four-player league and reads its standings, with two players sharing a position and one player's points traced to its results.
+21. An owner records the results of a four-player league and reads its standings, with two players sharing a position and one player's points traced to its results.
 
 #### Scenario: Each journey checks what the person sees
 - **WHEN** a journey runs

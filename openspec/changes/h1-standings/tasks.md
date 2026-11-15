@@ -21,7 +21,7 @@
 ## 5. End-to-end journey and seeds
 
 - [x] 5.1 `tools/Herald.Seed`: the running four-player tournament's results give a shared position
-- [ ] 5.2 Journey 22; the suite passes
+- [x] 5.2 Journey 21 (renumbered from 22: h1-exceptional-outcomes, which had 21, is not merged); the suite passes
 - [ ] 5.3 Test script in `e2e/scripts/` (seeded data, `scriptPersona`) with a screenshot per step: before start, provisional table, shared position, an entrant's explanation, narrow layout
 
 ## 6. Validation and completion

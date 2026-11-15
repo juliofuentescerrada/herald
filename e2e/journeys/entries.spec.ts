@@ -437,11 +437,10 @@ test('An owner records a team match’s lineups from seven-player frozen rosters
   await expectAccessible();
 });
 
-test('An owner records a win in an individual match, which starts and resolves it in one step, records a draw in another, and sees both results on the schedule', async ({ page, signIn, expectAccessible }) => {
-  await signIn();
-  await createOrganisation(page);
-  await openForEntries(page, 'Lantern Open', { team: false, capacity: 4, admission: 'Automatic' });
-  for (const player of ['Robin Vale', 'Sam Reed', 'Jamie Brook', 'Taylor Finch']) {
+// A running individual league of four, entered in this order and started with admission-order pairings; ends on its schedule.
+const startLeague = async (page: Page, title: string, players: readonly [string, string, string, string]) => {
+  await openForEntries(page, title, { team: false, capacity: 4, admission: 'Automatic' });
+  for (const player of players) {
     await addNew(page, 'player', player);
     await expect(page.getByText(player, { exact: true })).toBeVisible();
   }
@@ -452,7 +451,7 @@ test('An owner records a win in an individual match, which starts and resolves i
   await registration.getByRole('button', { name: 'Close registration' }).click();
   await expect(registration.getByRole('button', { name: 'Reopen registration' })).toBeVisible();
   await page.getByRole('link', { name: 'View schedule' }).click();
-  await expect(page.getByRole('heading', { name: 'Schedule · Lantern Open' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: `Schedule · ${title}` })).toBeVisible();
   const admissionOrder = page.getByRole('radio', { name: 'Admission order' });
   await expect(async () => {
     await page.reload();
@@ -474,12 +473,20 @@ test('An owner records a win in an individual match, which starts and resolves i
   await expect(competition.getByText('Running', { exact: true })).toBeVisible();
 
   await page.getByRole('link', { name: 'View schedule' }).click();
-  await expect(page.getByRole('heading', { name: 'Schedule · Lantern Open' })).toBeVisible();
-  const first = page.getByRole('link', { name: 'Robin Vale vs Taylor Finch' });
+  await expect(page.getByRole('heading', { name: `Schedule · ${title}` })).toBeVisible();
+  const first = page.getByRole('link', { name: `${players[0]} vs ${players[3]}` });
   await expect(async () => {
     await page.reload();
     await expect(first).toBeVisible({ timeout: 1_000 });
   }).toPass();
+
+};
+
+test('An owner records a win in an individual match, which starts and resolves it in one step, records a draw in another, and sees both results on the schedule', async ({ page, signIn, expectAccessible }) => {
+  await signIn();
+  await createOrganisation(page);
+  await startLeague(page, 'Lantern Open', ['Robin Vale', 'Sam Reed', 'Jamie Brook', 'Taylor Finch']);
+  const first = page.getByRole('link', { name: 'Robin Vale vs Taylor Finch' });
 
   // A win on a scheduled match starts and resolves it at once; nothing is preselected.
   await first.click();
@@ -502,5 +509,52 @@ test('An owner records a win in an individual match, which starts and resolves i
   await expect(round.getByText('Robin Vale won')).toBeVisible();
   await expect(round.getByText('Draw', { exact: true })).toBeVisible();
   await expect(round.getByText('Resolved')).toHaveCount(2);
+  await expectAccessible();
+});
+
+// The match between two players, whichever of them the pairings list first.
+const matchLink = (page: Page, a: string, b: string) => page.getByRole('link', { name: new RegExp(`^(${a} vs ${b}|${b} vs ${a})$`) });
+
+const recordResult = async (page: Page, a: string, b: string, choice: string) => {
+  await matchLink(page, a, b).click();
+  await page.getByRole('radio', { name: choice }).check();
+  await page.getByRole('button', { name: 'Record result' }).click();
+  await expect(page.getByText(choice === 'Draw' ? 'Draw · played' : `${choice.replace(' wins', '')} won · played`)).toBeVisible();
+  await page.getByRole('link', { name: 'Back to schedule' }).first().click();
+};
+
+test('An owner records the results of a four-player league and reads its standings, with two players sharing a position and one player’s points traced to its results', async ({ page, signIn, expectAccessible }) => {
+  await signIn();
+  await createOrganisation(page);
+  await startLeague(page, 'Harbour League', ['Robin Vale', 'Sam Reed', 'Jamie Brook', 'Taylor Finch']);
+
+  // Robin Vale wins all three; Sam Reed and Jamie Brook draw and each beats Taylor Finch.
+  await recordResult(page, 'Robin Vale', 'Taylor Finch', 'Robin Vale wins');
+  await recordResult(page, 'Sam Reed', 'Jamie Brook', 'Draw');
+  await recordResult(page, 'Robin Vale', 'Jamie Brook', 'Robin Vale wins');
+  await recordResult(page, 'Taylor Finch', 'Sam Reed', 'Sam Reed wins');
+  await recordResult(page, 'Robin Vale', 'Sam Reed', 'Robin Vale wins');
+  await recordResult(page, 'Jamie Brook', 'Taylor Finch', 'Jamie Brook wins');
+
+  await page.getByRole('navigation', { name: 'Tournament' }).getByRole('link', { name: 'Standings' }).click();
+  await expect(page.getByRole('heading', { name: 'Standings · Harbour League' })).toBeVisible();
+  // Standings follow the results through a local queue: the page reads again until all six have arrived.
+  await expect(page.getByText('Provisional · 6 of 6 matches resolved')).toBeVisible();
+  const table = page.getByRole('table', { name: 'Standings' });
+  await expect(table.getByLabel('Position 2, shared')).toHaveCount(2);
+  const rows = table.getByRole('row');
+  await expect(rows.nth(1)).toContainText('Robin Vale');
+  await expect(rows.nth(1)).toContainText('9');
+  await expect(rows.nth(2)).toContainText('Jamie Brook');
+  await expect(rows.nth(3)).toContainText('Sam Reed');
+  await expect(rows.nth(4)).toContainText('Taylor Finch');
+  await expectAccessible();
+
+  await table.getByRole('button', { name: 'Sam Reed' }).click();
+  await expect(table.getByRole('button', { name: 'Sam Reed' })).toHaveAttribute('aria-expanded', 'true');
+  await expect(page.getByText(/vs Jamie Brook · draw · played · 1 point$/)).toBeVisible();
+  await expect(page.getByText(/vs Taylor Finch · won · played · 3 points$/)).toBeVisible();
+  await expect(page.getByText(/vs Robin Vale · lost · played · 0 points$/)).toBeVisible();
+  await expect(page.getByText('Total: 4 points')).toBeVisible();
   await expectAccessible();
 });
