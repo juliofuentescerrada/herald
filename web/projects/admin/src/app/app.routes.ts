@@ -70,6 +70,7 @@ export const routes: Routes = [
           },
           {
             path: 'tournaments/:tournamentId/matches/:matchId',
+            canDeactivate: [confirmLeave],
             title: 'Match · Herald',
             loadComponent: () => import('./features/matches').then((m) => m.MatchPage),
           },

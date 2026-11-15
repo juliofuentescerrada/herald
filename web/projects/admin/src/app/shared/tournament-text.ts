@@ -1,4 +1,4 @@
-import type { IconName } from '@herald/ui';
+import type { IconName, StatusTone } from '@herald/ui';
 
 /** How the admin application writes a tournament's facts, shared by the features that show a tournament. */
 
@@ -41,6 +41,7 @@ export const registrationText = (registration: string): string => registrationWo
 export interface LifecycleLabel {
   readonly text: string;
   readonly icon?: IconName;
+  readonly tone?: StatusTone;
 }
 
 const registrationIcons: Record<string, IconName> = { notOpen: 'clock', open: 'door-enter', closed: 'lock' };
@@ -49,5 +50,5 @@ const registrationIcons: Record<string, IconName> = { notOpen: 'clock', open: 'd
 export const lifecycleLabels = (tournament: { publication: string; registration: string; competition: string }): LifecycleLabel[] => [
   tournament.publication === 'published' ? { text: 'Published', icon: 'world' } : { text: 'Draft', icon: 'pencil' },
   { text: registrationText(tournament.registration), icon: registrationIcons[tournament.registration] },
-  tournament.competition === 'running' ? { text: 'Running', icon: 'trophy' } : { text: 'Preparing', icon: 'hourglass' },
+  tournament.competition === 'running' ? { text: 'Running', icon: 'trophy', tone: 'info' } : { text: 'Preparing', icon: 'hourglass' },
 ];

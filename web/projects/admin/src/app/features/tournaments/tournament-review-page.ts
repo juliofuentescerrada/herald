@@ -39,13 +39,13 @@ const words: Record<string, string> = {
     } @else if (!tournament.data()) {
       <section class="panel">
         <herald-notice tone="danger" heading="Tournament not available">It does not exist in this organisation, or it could not be read.</herald-notice>
-        <div class="actions"><a herald-button [routerLink]="listPath"><herald-icon name="arrow-left" />Back to tournaments</a></div>
+        <div class="actions"><button herald-button type="button" [loading]="tournament.isFetching()" (click)="tournament.refetch()">Try again</button><a herald-button [routerLink]="listPath"><herald-icon name="arrow-left" />Back to tournaments</a></div>
       </section>
     } @else {
       <p class="lead">Read-only configuration summary · {{ tournament.data()!.configuration.title }}</p>
       <p class="labels">
         @for (label of labels(); track label.text) {
-          <herald-status-label [icon]="label.icon">{{ label.text }}</herald-status-label>
+          <herald-status-label [icon]="label.icon" [tone]="label.tone ?? 'neutral'">{{ label.text }}</herald-status-label>
         }
       </p>
       <div class="column">
@@ -99,7 +99,7 @@ const words: Record<string, string> = {
     .panel h2:first-child { border-top: 0; padding-top: 0; margin-top: 0; }
     dl { display: grid; grid-template-columns: 1fr 1fr; gap: var(--herald-space-6); margin: 0 0 var(--herald-space-6); }
     dt { color: var(--herald-color-text-secondary); margin-bottom: var(--herald-space-1); }
-    dd { margin: 0; font-size: var(--herald-text-lg); }
+    dd { font-variant-numeric: tabular-nums; margin: 0; font-size: var(--herald-text-lg); }
     .wide { grid-column: 1 / -1; }
     .statement { margin: 0 0 var(--herald-space-2); }
     @media (max-width: 699px) { h1 { font-size: 28px; } dl { grid-template-columns: 1fr; } }

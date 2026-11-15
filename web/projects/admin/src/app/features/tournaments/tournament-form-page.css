@@ -34,3 +34,5 @@ legend + * { clear: both; }
   h1 { font-size: 28px; }
   .grid { grid-template-columns: 1fr; }
 }
+
+.written { font-variant-numeric: tabular-nums; }
