@@ -141,7 +141,26 @@ public static class Scenarios
         await admin.CloseRegistrationAsync(organisation, playing);
         await admin.PublishScheduleAsync(organisation, playing);
         await admin.StartCompetitionAsync(organisation, playing);
-        await admin.RecordFirstResultAsync(organisation, playing, "first");
+        await admin.RecordResultAsync(organisation, playing, 0, outcome: "first");
+
+        // Running individual league of four with one match of each exceptional cause, the other two to play (h1-exceptional-outcomes).
+        // A tournament of its own, so the test scripts keep Lantern Open's matches to record.
+        var exceptional = Ids.For("tournament", "running-exceptional");
+        await admin.CreateTournamentAsync(organisation, exceptional, Configuration(clock, "Lantern Shield", opens: -6, closes: -1, starts: 1, capacity: 4));
+        await admin.PublishAsync(organisation, exceptional);
+        await admin.OpenRegistrationAsync(organisation, exceptional);
+        foreach (var name in Names.Players[4..8])
+        {
+            await admin.EnterAsync(organisation, exceptional, await admin.CreateGuestAsync(organisation, "player", name));
+        }
+
+        await admin.CloseRegistrationAsync(organisation, exceptional);
+        await admin.PublishScheduleAsync(organisation, exceptional);
+        await admin.StartCompetitionAsync(organisation, exceptional);
+        await admin.RecordResultAsync(organisation, exceptional, 0, "concession", entrant: "first", played: false);
+        await admin.RecordResultAsync(organisation, exceptional, 1, "singleAbsence", entrant: "second");
+        await admin.RecordResultAsync(organisation, exceptional, 2, "doubleAbsence");
+        await admin.RecordResultAsync(organisation, exceptional, 3, "noContest", played: false, reason: "Venue closed");
     }
 
     private static async Task SecondOrganisationAsync(Admin admin, Guid organisation, Clock clock)

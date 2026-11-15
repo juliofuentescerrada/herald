@@ -54,6 +54,11 @@ Visual choices (G-/RU-): progressive disclosure inside one panel rather than fou
 - **A-1** An absence is recorded on a match that has not started; on a match in play the owner records a concession or a no contest instead.
 - **A-2** "Both were absent" is the double absence; it never withdraws either entrant (§8.1).
 
+## Implementation notes
+
+- **Seeds (task 4.1):** the four causes are seeded in a running four-player league of their own, "Lantern Shield" (concession before play, single absence, double absence, no contest "Venue closed"; two matches to play), not in Lantern Open as the task said. Lantern Open has six matches, one already won; the results test script records two and this slice's script three, so four more seeded there would leave too few. The proposal's intent, one match of each cause in a running four-player tournament, holds.
+- **Absence after start (A-1):** the Result panel does not offer "Absence" once the match has started, so the owner never reaches the API's rejection; the API still rejects it (match-results: An absence after start).
+
 ## Risks / Trade-offs
 
 - [More fields in one panel] → only the chosen cause's fields show; the prototype states check each at 390 px.
