@@ -22,7 +22,7 @@
 
 ## 5. End-to-end journey and seeds
 
-- [ ] 5.1 `tools/Herald.Seed`: a running team tournament with a sanctioned player and a running individual one with a withdrawn player
+- [x] 5.1 `tools/Herald.Seed`: a running team tournament with a sanctioned player and a running individual one with a withdrawn player
 - [ ] 5.2 Journey 23; the suite passes
 - [ ] 5.3 Test script in `e2e/scripts/` (seeded data, `scriptPersona`) with a screenshot per step: operations summary, withdrawal confirmation, withdrawn entrant and its absences, flagged standings, round completed, sanctioned player blocking a start
 

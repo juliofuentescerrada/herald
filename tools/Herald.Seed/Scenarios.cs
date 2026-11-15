@@ -162,6 +162,46 @@ public static class Scenarios
         await admin.RecordResultAsync(organisation, exceptional, 1, "singleAbsence", entrant: "second");
         await admin.RecordResultAsync(organisation, exceptional, 2, "doubleAbsence");
         await admin.RecordResultAsync(organisation, exceptional, 3, "noContest", played: false, reason: "Venue closed");
+
+        // Running five-a-side cup of two teams of seven: both lineups recorded and a sanctioned starter blocking the start (h1-round-operations).
+        var cupTeams = Ids.For("tournament", "running-operations-teams");
+        await admin.CreateTournamentAsync(organisation, cupTeams, Configuration(clock, "Saltmarsh Team Cup", opens: -6, closes: -1, starts: 1, capacity: 4, team: true, rosters: (5, 7, 5)));
+        await admin.PublishAsync(organisation, cupTeams);
+        await admin.OpenRegistrationAsync(organisation, cupTeams);
+        player = 0;
+        foreach (var team in Names.Teams[..2])
+        {
+            var entry = await admin.EnterAsync(organisation, cupTeams, await admin.CreateGuestAsync(organisation, "team", team));
+            for (var member = 0; member < 7; member++)
+            {
+                await admin.AddRosterMemberAsync(organisation, cupTeams, entry, await admin.CreateGuestAsync(organisation, "player", Names.Players[player++]));
+            }
+        }
+
+        await admin.CloseRegistrationAsync(organisation, cupTeams);
+        await admin.PublishScheduleAsync(organisation, cupTeams);
+        await admin.StartCompetitionAsync(organisation, cupTeams);
+        await admin.RecordLineupAsync(organisation, cupTeams, 0, "first", 5);
+        await admin.RecordLineupAsync(organisation, cupTeams, 0, "second", 5);
+        // Lineups take the first five by name: Ada Fenwick starts for Copper Owls.
+        await admin.SanctionPlayerAsync(organisation, cupTeams, Names.Teams[0], Names.Players[0], "Abusive conduct");
+
+        // Running individual league of four with Lior Ashby withdrawn after Kira Dunmore beat Nils Brandt, which completes round 1
+        // (h1-round-operations).
+        var trophy = Ids.For("tournament", "running-operations-players");
+        await admin.CreateTournamentAsync(organisation, trophy, Configuration(clock, "Lantern Trophy", opens: -6, closes: -1, starts: 1, capacity: 4));
+        await admin.PublishAsync(organisation, trophy);
+        await admin.OpenRegistrationAsync(organisation, trophy);
+        foreach (var name in Names.Players[10..14])
+        {
+            await admin.EnterAsync(organisation, trophy, await admin.CreateGuestAsync(organisation, "player", name));
+        }
+
+        await admin.CloseRegistrationAsync(organisation, trophy);
+        await admin.PublishScheduleAsync(organisation, trophy);
+        await admin.StartCompetitionAsync(organisation, trophy);
+        await admin.RecordWinAsync(organisation, trophy, Names.Players[10], Names.Players[13]);
+        await admin.WithdrawEntrantAsync(organisation, trophy, Names.Players[11], "Moved away");
     }
 
     private static async Task SecondOrganisationAsync(Admin admin, Guid organisation, Clock clock)

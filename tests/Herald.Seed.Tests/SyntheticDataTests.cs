@@ -35,8 +35,8 @@ public class SyntheticDataTests(SeededDatabases databases)
             join registration."Entries" entry on entry."Id" = change."EntryId"
             where change."ChangedBy" <> entry."EnteredBy"
             """)).ShouldBe(0);
-        // Eight in the team league, eight in the cup and fourteen in the running league.
-        (await SeededDatabases.CountAsync(database, """select count(*) from registration."RosterChanges" """)).ShouldBe(30);
+        // Eight in the team league, eight in the cup, fourteen in the running league and fourteen in the running cup.
+        (await SeededDatabases.CountAsync(database, """select count(*) from registration."RosterChanges" """)).ShouldBe(44);
     }
 
     [Fact]
@@ -73,6 +73,24 @@ public class SyntheticDataTests(SeededDatabases databases)
         standings.GetProperty("rows").EnumerateArray()
             .Select(row => (row.GetProperty("position").GetInt32(), row.GetProperty("entrant").GetProperty("name").GetString(), row.GetProperty("points").GetInt32()))
             .ShouldBe([(1, "Ada Fenwick", 3), (1, "Dario Venn", 3), (3, "Bram Holloway", 0), (3, "Cleo Marsh", 0)]);
+    }
+
+    [Fact]
+    public async Task The_seeded_running_cup_has_a_sanctioned_starter_and_the_running_trophy_a_withdrawn_player()
+    {
+        var database = await databases.NewDatabaseAsync();
+        await SeededDatabases.SeedAsync(database);
+
+        await using var reader = new Reader(database);
+        var cup = await reader.GetAsync(Main, $"{Tournament("tournaments-by-state", "running-operations-teams")}/schedule");
+        var trophy = await reader.GetAsync(Main, $"{Tournament("tournaments-by-state", "running-operations-players")}/schedule");
+
+        var attention = cup.GetProperty("operations").GetProperty("attention").EnumerateArray().ShouldHaveSingleItem();
+        (attention.GetProperty("entrant").GetProperty("name").GetString(), attention.GetProperty("player").GetProperty("name").GetString()).ShouldBe(("Copper Owls", "Ada Fenwick"));
+        trophy.GetProperty("entrants").EnumerateArray().Select(entrant => (entrant.GetProperty("name").GetString(), entrant.GetProperty("status").GetString()))
+            .ShouldBe([("Kira Dunmore", "active"), ("Lior Ashby", "withdrawn"), ("Mara Quill", "active"), ("Nils Brandt", "active")]);
+        trophy.GetProperty("operations").GetProperty("rounds")[0].GetProperty("state").GetString().ShouldBe("completed");
+        trophy.GetProperty("operations").GetProperty("resolved").GetInt32().ShouldBe(4);
     }
 
     [Fact]
