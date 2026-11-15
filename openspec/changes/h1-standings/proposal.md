@@ -2,6 +2,8 @@
 
 **Proposed in H1 batch 2's proposals pull request, 15 November 2026.** The rules come from the functional discovery (F-09, §7.2, §8.1; §15 rows D-04 and D-25) and the batch's decision session of 15 November 2026. It depends on `h1-operator-results` and can run beside `h1-exceptional-outcomes`. Merging the proposals pull request approves this change (ADR 0018); task 1.1 records that approval.
 
+**Approved for implementation on 15 November 2026**, when the maintainer merged the batch 2 proposals pull request (#63), with the review answers below (ADR 0018).
+
 **Review answers, 15 November 2026 (#63):** the maintainer accepted Q1 and Q2 (0/0 outcomes count as resolved only; the seven columns) as proposed, and the prototypes as they are.
 
 ## Why
