@@ -9,7 +9,7 @@ namespace Herald.Host.Tests;
 // The match-lineups and match-results specs through the Admin API: matches appear when the competition starts, frozen rosters arrive
 // from Registration and the lineup size from Tournaments (h1-match-lineups D-1, D-4).
 [Collection(OrganisationApiTests.Name)]
-public class MatchTests(OrganisationApi api)
+public partial class MatchTests(OrganisationApi api)
 {
     private sealed record League(HttpClient Client, string Organisation, string Path);
 
