@@ -61,7 +61,7 @@
             <h2 [id]="side.name + '-lineup'">{{ side.entrant }} · lineup</h2>
             @if (side.locked) {
               <herald-status-label tone="success">Locked</herald-status-label>
-            } @else {
+            } @else if (!m.result) {
               <herald-status-label [id]="side.name + '-count'" [tone]="side.complete ? 'success' : 'danger'">{{ side.count }} of {{ side.required }} selected</herald-status-label>
             }
           </div>
@@ -75,6 +75,9 @@
             @if (side.reserves.length) {
               <p class="help">Reserves: {{ side.reserves.map((player) => player.name).join(', ') }}</p>
             }
+          } @else if (m.result) {
+            <!-- An administrative outcome resolves a match without starting it, so no lineup was locked (h1-exceptional-outcomes D-2). -->
+            <p class="help">Resolved without a start: no lineup was locked.</p>
           } @else {
             <p class="help">Choose {{ side.required }} players from the frozen roster. Unselected players are reserves for this match.</p>
             <fieldset class="choice" [disabled]="state() === 'busy'">
@@ -119,7 +122,7 @@
       }
     }
 
-    @if (!started()) {
+    @if (!started() && !m.result) {
       <section class="operation" aria-labelledby="start-heading">
         <h2 id="start-heading">Start</h2>
         <p class="help">

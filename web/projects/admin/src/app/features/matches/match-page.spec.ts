@@ -370,6 +370,23 @@ describe('The match page', () => {
     expect(await violations(page())).toEqual([]);
   });
 
+  it('offers no start or lineup change on a team match resolved without a start', async () => {
+    const conceded = teamMatch({
+      revision: 4,
+      state: 'resolved',
+      first: { ...teamMatch().first, lineups: [lineup(1, falcons.slice(0, 5))] },
+      blockers: [],
+      result: { outcome: 'second', cause: 'concession', played: false, reason: null, recordedAt: '2026-11-22T09:40:00Z' },
+    });
+    const { page, button } = await open({ getMatch: () => of(conceded) });
+    await vi.waitFor(() => expect(page().textContent).toContain('River Falcons conceded before play · North Stars wins · no play recorded'));
+    expect(button('Start match')).toBeUndefined();
+    expect(button('Save lineup')).toBeUndefined();
+    expect(page().querySelector('input[type=checkbox]')).toBeNull();
+    expect(page().textContent).toContain('Resolved without a start: no lineup was locked.');
+    expect(await violations(page())).toEqual([]);
+  });
+
   describe('records an exceptional outcome', () => {
     it('sends a concession before play with only its fields', async () => {
       const recordResult = vi.fn(() => of(resolvedAs({ cause: 'concession', outcome: 'first' })));
@@ -453,6 +470,7 @@ describe('The match page', () => {
       await vi.waitFor(() => expect(page().textContent).toContain(words));
       expect(page().textContent).not.toContain('· played');
       expect(button('Record result')).toBeUndefined();
+      expect(button('Start match')).toBeUndefined();
       expect(await violations(page())).toEqual([]);
     });
   });

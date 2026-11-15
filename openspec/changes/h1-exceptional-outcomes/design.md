@@ -69,3 +69,15 @@ Visual choices (G-/RU-): progressive disclosure inside one panel rather than fou
 
 - `scripts/check all` passed.
 - End-to-end suite: 21 journeys passed, journey 21 included. Test scripts: 8 passed, `seeded-exceptional-outcomes` included.
+
+## Visual comparison
+
+Captured from the seeded Lantern Shield (synthetic persona; one match of each cause, two to play) at 1440 and 390 px and compared with `prototypes/frontend/play-and-score-states.html` at the same widths. Browser verification of the composed application.
+
+| State | Match | Difference and resolution |
+|---|---|---|
+| `outcome-concession`, `outcome-absence`, `outcome-no-contest-missing-reason` | "What happened?" with nothing selected, then only the chosen cause's radio groups; "Record result" disabled and described until complete; the reason's help says it is private and limits it to 500 characters | The prototype marks the empty reason invalid with a field error ("Give a reason for the no contest."); the build states "A no contest needs a reason." beside the disabled button, like the panel's other incomplete choices, because nothing has been submitted yet. Kept. |
+| `resolved-concession`, `resolved-double-absence`, `resolved-no-contest` | The cause in one sentence, "Resolved" beside the heading, "no play recorded" or "play recorded" | Found in the capture: a match resolved by an administrative cause never starts, and the build still offered the Start panel and, for a team match, lineup editing. Fixed in this task (no Start panel once resolved; "Resolved without a start: no lineup was locked."), with a Vitest. Wording: "Both were absent · 0 each · no play recorded" drops the prototype's repeated "double absence"; the no contest reads "No contest: Venue closed · 0 each · …" as the proposal words it, instead of a trailing "Reason: Venue closed". |
+| `schedule-exceptional` | Each resolved row shows "Resolved" and the same sentence as the Match page, with no score, at 1440 and 390 px | The cause line is centred under the pairing, as the operator-results schedule already does; the prototype left-aligns it. The prototype's operations panel and round labels belong to `h1-round-operations`. |
+
+`outcome-team-play-not-started` was checked with Vitest and `axe-core` (`match-page.spec.ts`), not captured in a browser: the seeded running team league has no unstarted match left to resolve. The absence choice is not offered on a started match (Implementation notes).
