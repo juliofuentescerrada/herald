@@ -1,0 +1,31 @@
+h1 { font-size: 32px; }
+.page-header { margin-bottom: var(--herald-space-6); }
+.title { display: flex; flex-wrap: wrap; align-items: center; gap: var(--herald-space-2) var(--herald-space-4); margin: var(--herald-space-4) 0 var(--herald-space-2); }
+.title h1 { margin: 0; }
+.back { display: inline-flex; align-items: center; gap: var(--herald-space-2); color: var(--herald-color-text-secondary); }
+.labels { display: flex; flex-wrap: wrap; gap: var(--herald-space-2); margin: 0; }
+.column { display: flex; flex-direction: column; gap: var(--herald-space-6); }
+.column herald-notice { display: flex; }
+.notice-action { display: block; margin-top: var(--herald-space-3); }
+.help { color: var(--herald-color-text-secondary); margin: 0; max-inline-size: 75ch; }
+h2 { font-size: 20px; margin: 0; }
+.panel { padding: var(--herald-space-6); }
+.actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--herald-space-3); margin-top: var(--herald-space-4); }
+.summary-title { display: flex; flex-wrap: wrap; align-items: center; gap: var(--herald-space-2) var(--herald-space-4); margin-bottom: var(--herald-space-2); }
+.when { white-space: nowrap; }
+.operation { padding: var(--herald-space-6); background: var(--herald-color-surface-default); border: 1px solid var(--herald-color-border-default); }
+/* A short list of players: as many columns as fit, one at narrow widths. */
+.players { list-style: none; margin: var(--herald-space-3) 0; padding: 0; display: grid; grid-template-columns: repeat(auto-fill, minmax(14rem, 1fr)); gap: var(--herald-space-2) var(--herald-space-4); }
+.choice { border: 0; padding: 0; margin: var(--herald-space-3) 0 0; }
+.choice legend { font-weight: 700; padding: 0; }
+.choice label { display: inline-flex; align-items: center; gap: var(--herald-space-2); min-height: var(--herald-target-min); }
+.history { margin-top: var(--herald-space-4); }
+.history summary { display: inline-flex; align-items: center; min-height: var(--herald-target-min); font-weight: 700; cursor: pointer; }
+.history summary::after { content: '+' / ''; margin-left: var(--herald-space-2); }
+.history[open] summary::after { content: '−' / ''; }
+.history ul { list-style: none; margin: 0; padding: 0; }
+.history li { padding: var(--herald-space-2) 0; border-top: 1px solid var(--herald-color-border-default); }
+.history .help { font-size: var(--herald-text-sm); }
+@media (max-width: 699px) {
+  .operation { padding: var(--herald-space-4); }
+}

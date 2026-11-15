@@ -1,0 +1,152 @@
+<a class="back" routerLink="../../schedule"><herald-icon name="arrow-left" size="metadata" />Back to schedule</a>
+
+@if (match.isPending() || tournament.isPending()) {
+  <p class="panel" role="status">Loading match…</p>
+} @else if (match.isError() || tournament.isError()) {
+  <section class="panel">
+    <herald-notice tone="danger" heading="The match could not be loaded">
+      It does not exist in this organisation, or the request failed. Nothing changed.
+    </herald-notice>
+    <div class="actions">
+      <button herald-button variant="primary" type="button" [loading]="match.isFetching()" (click)="match.refetch()">Try again</button>
+      <a herald-button routerLink="../../schedule"><herald-icon name="arrow-left" />Back to schedule</a>
+    </div>
+  </section>
+} @else {
+  @let m = match.data()!;
+  <header class="page-header">
+    <div class="title">
+      <h1>Match · {{ tournament.data()!.configuration.title }}</h1>
+      <p class="labels">
+        @for (label of labels(); track label.text) {
+          <herald-status-label [icon]="label.icon">{{ label.text }}</herald-status-label>
+        }
+      </p>
+    </div>
+  </header>
+
+  <!-- Stacked at every width: the match, notices, each side's lineup, then the start. -->
+  <div class="column">
+    <section class="summary" aria-labelledby="summary-heading" [attr.aria-busy]="state() === 'busy' || null">
+      <div class="summary-title">
+        <h2 id="summary-heading">Round {{ m.round }} · {{ names().first }} vs {{ names().second }}</h2>
+        <herald-status-label [tone]="inPlay() ? 'info' : 'neutral'">{{ inPlay() ? 'In play' : 'Scheduled' }}</herald-status-label>
+      </div>
+      <p class="help">{{ team() ? 'Direct team match · ' + m.activePlayers + ' active players per side' : 'Individual match' }} · single round-robin</p>
+      @if (m.start; as start) {
+        <p class="help">Started <span class="when">{{ zoned(start.startedAt) }}</span></p>
+      }
+    </section>
+
+    @if (state() === 'conflict') {
+      <herald-notice tone="danger" heading="This match changed elsewhere">
+        Nothing changed with this request. Reload the match before trying again.
+        <span class="notice-action"><button herald-button type="button" (click)="reload()">Reload latest</button></span>
+      </herald-notice>
+    }
+    @if (failure(); as failed) {
+      <herald-notice tone="danger" [heading]="failed.heading">{{ failed.text }}</herald-notice>
+    }
+    @if (rostersUnknown()) {
+      <herald-notice heading="Waiting for the frozen rosters">
+        Lineups can be chosen once the teams’ frozen rosters have arrived. Try again in a moment.
+        <span class="notice-action"><button herald-button type="button" [loading]="match.isFetching()" (click)="match.refetch()">Try again</button></span>
+      </herald-notice>
+    }
+
+    @if (team() && !rostersUnknown()) {
+      @for (side of sides(); track side.name) {
+        <section class="operation" [attr.aria-labelledby]="side.name + '-lineup'">
+          <div class="summary-title">
+            <h2 [id]="side.name + '-lineup'">{{ side.entrant }} · lineup</h2>
+            @if (side.locked) {
+              <herald-status-label tone="success">Locked</herald-status-label>
+            } @else {
+              <herald-status-label [id]="side.name + '-count'" [tone]="side.complete ? 'success' : 'danger'">{{ side.count }} of {{ side.required }} selected</herald-status-label>
+            }
+          </div>
+          @if (side.locked; as locked) {
+            <p class="help">Locked at match start · lineup revision {{ locked.number }}</p>
+            <ul class="players" [attr.aria-label]="side.entrant + ' starters'">
+              @for (player of locked.players; track player.playerId) {
+                <li>{{ player.name }}</li>
+              }
+            </ul>
+            @if (side.reserves.length) {
+              <p class="help">Reserves: {{ side.reserves.map((player) => player.name).join(', ') }}</p>
+            }
+          } @else {
+            <p class="help">Choose {{ side.required }} players from the frozen roster. Unselected players are reserves for this match.</p>
+            <fieldset class="choice" [disabled]="state() === 'busy'">
+              <legend>Players</legend>
+              <ul class="players">
+                @for (player of side.roster; track player.playerId) {
+                  <li>
+                    <label>
+                      <input type="checkbox" [checked]="side.selected.has(player.playerId)" [attr.aria-describedby]="side.name + '-count'"
+                        (change)="toggle(side.name, player.playerId, $any($event.target).checked)" />
+                      {{ player.name }}
+                    </label>
+                  </li>
+                }
+              </ul>
+            </fieldset>
+            <div class="actions">
+              <button herald-button type="button" [loading]="state() === 'busy'" [disabled]="!side.dirty || !side.complete"
+                [attr.aria-describedby]="side.dirty && !side.complete ? side.name + '-save-why' : null" (click)="save(side.name)">Save lineup</button>
+              @if (side.dirty) {
+                <button herald-button variant="quiet" type="button" [disabled]="state() === 'busy'" (click)="discard(side.name)">Discard changes</button>
+              }
+              @if (side.dirty && !side.complete) {
+                <p class="help" [id]="side.name + '-save-why'">Choose exactly {{ side.required }} players.</p>
+              }
+            </div>
+          }
+          @if (side.history.length) {
+            <details class="history">
+              <summary>Lineup history</summary>
+              <ul [attr.aria-label]="side.entrant + ' lineup history'">
+                @for (lineup of side.history; track lineup.number) {
+                  <li>
+                    <strong>Revision {{ lineup.number }}</strong>
+                    <p class="help">Saved {{ zoned(lineup.recordedAt) }} · {{ lineup.players.map((player) => player.name).join(', ') }}</p>
+                  </li>
+                }
+              </ul>
+            </details>
+          }
+        </section>
+      }
+    }
+
+    @if (!inPlay()) {
+      <section class="operation" aria-labelledby="start-heading">
+        <h2 id="start-heading">Start</h2>
+        <p class="help">
+          @if (team()) {
+            Starting validates both lineups and locks them. No player is substituted.
+          } @else {
+            Starting shows the match as in play. Recording a result later also starts it.
+          }
+        </p>
+        <div class="actions">
+          <button herald-button variant="primary" type="button" [loading]="state() === 'busy'"
+            [disabled]="!!startBlocked() && state() !== 'busy'" [attr.aria-describedby]="startBlocked() ? 'start-why' : null" (click)="askStart($any($event.currentTarget))">Start match</button>
+          @if (startBlocked(); as why) {
+            <p class="help" id="start-why">{{ why }}</p>
+          }
+        </div>
+      </section>
+    }
+  </div>
+}
+
+<ng-template #startDialog>
+  <herald-dialog heading="Start this match?" [busy]="state() === 'busy'">
+    <p>Starting locks both lineups: {{ names().first }} and {{ names().second }} with {{ match.data()?.activePlayers }} players each. Lineups cannot change once the match is in play.</p>
+    <div class="actions">
+      <button herald-button variant="primary" type="button" [loading]="state() === 'busy'" (click)="start()">Start match</button>
+      <button herald-button type="button" data-herald-initial-focus [disabled]="state() === 'busy'" (click)="close()">Keep as it is</button>
+    </div>
+  </herald-dialog>
+</ng-template>

@@ -106,6 +106,26 @@ public static class Scenarios
 
         await admin.CloseRegistrationAsync(organisation, cup);
         await admin.PublishScheduleAsync(organisation, cup);
+
+        // Running with five a side: two teams of seven frozen at start, their match scheduled without lineups
+        // (h1-match-lineups).
+        var running = Ids.For("tournament", "running-teams");
+        await admin.CreateTournamentAsync(organisation, running, Configuration(clock, "Saltmarsh Team League", opens: -6, closes: -1, starts: 1, capacity: 4, team: true, rosters: (5, 7, 5)));
+        await admin.PublishAsync(organisation, running);
+        await admin.OpenRegistrationAsync(organisation, running);
+        player = 0;
+        foreach (var team in Names.Teams[2..])
+        {
+            var entry = await admin.EnterAsync(organisation, running, await admin.CreateGuestAsync(organisation, "team", team));
+            for (var member = 0; member < 7; member++)
+            {
+                await admin.AddRosterMemberAsync(organisation, running, entry, await admin.CreateGuestAsync(organisation, "player", Names.Players[player++]));
+            }
+        }
+
+        await admin.CloseRegistrationAsync(organisation, running);
+        await admin.PublishScheduleAsync(organisation, running);
+        await admin.StartCompetitionAsync(organisation, running);
     }
 
     private static async Task SecondOrganisationAsync(Admin admin, Guid organisation, Clock clock)
@@ -120,15 +140,15 @@ public static class Scenarios
         }
     }
 
-    private static object Configuration(Clock clock, string title, int opens, int closes, int starts, int capacity = 16, bool team = false, string checkIn = "optional") => new
+    private static object Configuration(Clock clock, string title, int opens, int closes, int starts, int capacity = 16, bool team = false, string checkIn = "optional", (int Minimum, int Maximum, int Active)? rosters = null) => new
     {
         title,
         gameVariant = team ? "Team strategy · Standard" : "Strategy game · Standard",
         entryKind = team ? "team" : "individual",
         capacity,
-        minimumRosterSize = team ? 3 : (int?)null,
-        maximumRosterSize = team ? 5 : (int?)null,
-        activePlayersPerSide = team ? 3 : (int?)null,
+        minimumRosterSize = team ? rosters?.Minimum ?? 3 : (int?)null,
+        maximumRosterSize = team ? rosters?.Maximum ?? 5 : (int?)null,
+        activePlayersPerSide = team ? rosters?.Active ?? 3 : (int?)null,
         registrationOpensAt = clock.At(opens, 9),
         registrationClosesAt = clock.At(closes, 18),
         plannedStartAt = clock.At(starts, 10),

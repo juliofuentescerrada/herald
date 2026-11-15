@@ -2,7 +2,7 @@ import type { Page } from '@playwright/test';
 import { createOrganisation, expect, test } from '../fixtures.ts';
 
 /** Creates, completes and publishes a tournament, opens its registration and goes to its entries. */
-const openForEntries = async (page: Page, title: string, terms: { team: boolean; capacity: number; admission: 'Automatic' | 'Manual'; checkIn?: 'Optional' | 'Mandatory' }) => {
+const openForEntries = async (page: Page, title: string, terms: { team: boolean; capacity: number; admission: 'Automatic' | 'Manual'; checkIn?: 'Optional' | 'Mandatory'; rosters?: [minimum: number, maximum: number, active: number] }) => {
   await page.getByRole('link', { name: 'Tournaments', exact: true }).click();
   await page.getByRole('link', { name: 'Create tournament' }).click();
   await page.getByLabel('Title', { exact: true }).fill(title);
@@ -10,9 +10,10 @@ const openForEntries = async (page: Page, title: string, terms: { team: boolean;
   await page.getByLabel('Entry kind', { exact: true }).selectOption(terms.team ? 'Team' : 'Individual');
   await page.getByLabel(terms.team ? 'Capacity in teams' : 'Capacity in individual entries', { exact: true }).fill(String(terms.capacity));
   if (terms.team) {
-    await page.getByLabel('Minimum roster size', { exact: true }).fill('3');
-    await page.getByLabel('Maximum roster size', { exact: true }).fill('5');
-    await page.getByLabel('Active players per side', { exact: true }).fill('3');
+    const [minimum, maximum, active] = terms.rosters ?? [3, 5, 3];
+    await page.getByLabel('Minimum roster size', { exact: true }).fill(String(minimum));
+    await page.getByLabel('Maximum roster size', { exact: true }).fill(String(maximum));
+    await page.getByLabel('Active players per side', { exact: true }).fill(String(active));
   }
   await page.getByLabel('Registration opening', { exact: true }).fill('2026-11-10T09:00');
   await page.getByLabel('Registration closure', { exact: true }).fill('2026-11-13T18:00');
@@ -336,5 +337,102 @@ test('An owner sees a team tournament’s start blocked by an incomplete roster,
   const frozen = page.getByRole('dialog', { name: 'Roster · River Falcons' });
   await expect(frozen.getByText('Frozen at start')).toBeVisible();
   await expect(frozen.getByRole('button', { name: 'Add player' })).toHaveCount(0);
+  await expectAccessible();
+});
+
+test('An owner records a team match’s lineups from seven-player frozen rosters, is stopped from starting with four starters on one side, completes the lineup and starts the match, which locks both lineups', async ({ page, signIn, expectAccessible }) => {
+  // Fourteen roster members are entered through the drawer, one by one.
+  test.slow();
+  await signIn();
+  await createOrganisation(page);
+  await openForEntries(page, 'Saltmarsh League', { team: true, capacity: 4, admission: 'Automatic', rosters: [5, 7, 5] });
+  await addNew(page, 'team', 'North Stars');
+  await addNew(page, 'team', 'River Falcons');
+  const admitted = page.getByRole('list', { name: 'Admitted · 2' });
+  const squads: Record<string, string[]> = {
+    'North Stars': ['Robin Vale', 'Sam Reed', 'Jamie Brook', 'Taylor Finch', 'Rowan Lake', 'Ellis Stone', 'Morgan Hale'],
+    'River Falcons': ['Alex Kim', 'Casey Moss', 'Drew Lane', 'Eli Hart', 'Frankie Cole', 'Gale Ross', 'Harper Quinn'],
+  };
+  for (const [team, players] of Object.entries(squads)) {
+    await admitted.getByRole('button', { name: `Roster: ${team}` }).click();
+    const roster = page.getByRole('dialog', { name: `Roster · ${team}` });
+    for (const player of players) {
+      await roster.getByRole('button', { name: 'Add player' }).click();
+      await roster.getByRole('button', { name: 'Create new' }).click();
+      await roster.getByLabel('Name (alias)').fill(player);
+      await roster.getByRole('button', { name: 'Create and add player' }).click();
+      await expect(roster.getByText(player, { exact: true })).toBeVisible();
+    }
+    await roster.getByRole('button', { name: 'Back to entries' }).click();
+    await expect(roster).toBeHidden();
+  }
+
+  // Close, publish and start; each module learns the others' changes through local queues.
+  await page.getByRole('link', { name: 'Back to configuration' }).click();
+  const registration = page.getByRole('region', { name: 'Registration' });
+  await registration.getByRole('button', { name: 'Close registration' }).click();
+  await expect(registration.getByRole('button', { name: 'Reopen registration' })).toBeVisible();
+  await page.getByRole('link', { name: 'View schedule' }).click();
+  await expect(page.getByRole('heading', { name: 'Schedule · Saltmarsh League' })).toBeVisible();
+  const admissionOrder = page.getByRole('radio', { name: 'Admission order' });
+  await expect(async () => {
+    await page.reload();
+    await expect(admissionOrder).toBeVisible({ timeout: 1_000 });
+  }).toPass();
+  await admissionOrder.check();
+  await page.getByRole('button', { name: 'Generate draft' }).click();
+  await page.getByRole('button', { name: 'Publish' }).click();
+  await expect(page.getByText('Schedule published · revision 1.')).toBeVisible();
+  await page.getByRole('link', { name: 'Back to configuration' }).click();
+  const competition = page.getByRole('region', { name: 'Competition' });
+  await expect(competition).toBeVisible();
+  await expect(async () => {
+    await page.reload();
+    await expect(competition.getByText('Ready to start')).toBeVisible({ timeout: 1_000 });
+  }).toPass();
+  await competition.getByRole('button', { name: 'Start competition' }).click();
+  await page.getByRole('dialog', { name: 'Start the competition?' }).getByRole('button', { name: 'Start competition' }).click();
+  await expect(competition.getByText('Running', { exact: true })).toBeVisible();
+
+  // The running schedule links its match; the frozen rosters reach Competition through a local queue.
+  await page.getByRole('link', { name: 'View schedule' }).click();
+  await expect(page.getByRole('heading', { name: 'Schedule · Saltmarsh League' })).toBeVisible();
+  const matchLink = page.getByRole('link', { name: 'North Stars vs River Falcons' });
+  await expect(async () => {
+    await page.reload();
+    await expect(matchLink).toBeVisible({ timeout: 1_000 });
+  }).toPass();
+  await matchLink.click();
+  await expect(page.getByRole('heading', { name: 'Round 1 · North Stars vs River Falcons' })).toBeVisible();
+  const stars = page.getByRole('region', { name: 'North Stars · lineup' });
+  const falcons = page.getByRole('region', { name: 'River Falcons · lineup' });
+  await expect(async () => {
+    await page.reload();
+    await expect(stars.getByRole('checkbox', { name: 'Robin Vale' })).toBeVisible({ timeout: 1_000 });
+  }).toPass();
+  await expect(page.getByText('North Stars has no lineup.')).toBeVisible();
+  await expectAccessible();
+
+  for (const player of squads['North Stars'].slice(0, 5)) await stars.getByRole('checkbox', { name: player }).check();
+  await stars.getByRole('button', { name: 'Save lineup' }).click();
+  await expect(page.getByText('North Stars’ lineup saved.')).toBeVisible();
+  for (const player of squads['River Falcons'].slice(0, 4)) await falcons.getByRole('checkbox', { name: player }).check();
+  await expect(falcons.getByText('4 of 5 selected')).toBeVisible();
+  await expect(falcons.getByRole('button', { name: 'Save lineup' })).toBeDisabled();
+  await expect(falcons.getByText('Choose exactly 5 players.')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Start match' })).toBeDisabled();
+  await expectAccessible();
+
+  await falcons.getByRole('checkbox', { name: 'Frankie Cole' }).check();
+  await falcons.getByRole('button', { name: 'Save lineup' }).click();
+  await expect(page.getByText('River Falcons’ lineup saved.')).toBeVisible();
+  await page.getByRole('button', { name: 'Start match' }).click();
+  const confirm = page.getByRole('dialog', { name: 'Start this match?' });
+  await expect(confirm.getByText('Starting locks both lineups: North Stars and River Falcons with 5 players each.', { exact: false })).toBeVisible();
+  await confirm.getByRole('button', { name: 'Start match' }).click();
+  await expect(page.getByText('In play', { exact: true })).toBeVisible();
+  await expect(stars.getByText('Locked', { exact: true })).toBeVisible();
+  await expect(falcons.getByText('Locked', { exact: true })).toBeVisible();
+  await expect(falcons.getByText('Reserves: Gale Ross, Harper Quinn')).toBeVisible();
   await expectAccessible();
 });

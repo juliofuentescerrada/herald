@@ -1,6 +1,6 @@
 namespace Herald.Competition.Domain;
 
-public sealed record Match(int Round, Guid First, Guid Second);
+public sealed record Pairing(int Round, Guid First, Guid Second);
 
 public sealed record Rest(int Round, Guid EntryId);
 
@@ -8,7 +8,7 @@ public sealed record Rest(int Round, Guid EntryId);
 // An odd field gets an empty slot, and whoever meets it rests that round, so each entrant rests once.
 public static class RoundRobin
 {
-    public static (IReadOnlyList<Match> Matches, IReadOnlyList<Rest> Rests) Pair(IReadOnlyList<Guid> seeded)
+    public static (IReadOnlyList<Pairing> Matches, IReadOnlyList<Rest> Rests) Pair(IReadOnlyList<Guid> seeded)
     {
         List<Guid?> slots = [.. seeded.Select(id => (Guid?)id)];
         if (slots.Count % 2 == 1)
@@ -18,7 +18,7 @@ public static class RoundRobin
 
         var n = slots.Count;
         var rotating = slots.Skip(1).ToList();
-        List<Match> matches = [];
+        List<Pairing> matches = [];
         List<Rest> rests = [];
         for (var round = 1; round < n; round++)
         {

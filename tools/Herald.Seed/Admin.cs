@@ -85,6 +85,10 @@ public sealed class Admin(Seeding seeding, Persona persona)
         }));
     }
 
+    public async Task StartCompetitionAsync(Guid organisation, Guid tournament) =>
+        await WriteAsync($"start the competition of {tournament}", async () =>
+            await _client.PostAsJsonAsync($"{Path(organisation, tournament)}/competition/start", new { expectedRevision = await RevisionAsync(organisation, tournament) }));
+
     private static string Path(Guid organisation, Guid tournament) => $"/api/organisations/{organisation}/tournaments/{tournament}";
 
     private async Task<int> RevisionAsync(Guid organisation, Guid tournament) =>

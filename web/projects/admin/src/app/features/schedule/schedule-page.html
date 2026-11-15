@@ -176,7 +176,15 @@
             <h2 [id]="'round-' + round.number">Round {{ round.number }}</h2>
             <ul class="rows matches" [attr.aria-labelledby]="'round-' + round.number">
               @for (match of round.matches; track match.first.entryId) {
-                <li><span class="home">{{ match.first.name }}</span><span class="vs"> vs </span><span>{{ match.second.name }}</span></li>
+                @if (matchFor(round.number, match.first.entryId); as played) {
+                  <!-- Running: each match opens its own page (h1-match-lineups D-5). -->
+                  <li class="running">
+                    <a class="match-link" [routerLink]="['../matches', played.matchId]"><span class="home">{{ match.first.name }}</span><span class="vs"> vs </span><span>{{ match.second.name }}</span></a>
+                    <herald-status-label [tone]="played.state === 'inPlay' ? 'info' : 'neutral'">{{ played.state === 'inPlay' ? 'In play' : 'Scheduled' }}</herald-status-label>
+                  </li>
+                } @else {
+                  <li><span class="home">{{ match.first.name }}</span><span class="vs"> vs </span><span>{{ match.second.name }}</span></li>
+                }
               }
             </ul>
             @if (round.rest) {

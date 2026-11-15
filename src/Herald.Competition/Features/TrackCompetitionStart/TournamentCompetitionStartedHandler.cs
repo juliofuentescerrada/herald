@@ -8,6 +8,7 @@ using Wolverine.Attributes;
 namespace Herald.Competition.Features.TrackCompetitionStart;
 
 // The start fixes the schedule (h1-competition-start D-3): withdrawing and generating are rejected from now on.
+// Each pairing of the started revision becomes a match (h1-match-lineups D-1).
 // A start decided on a revision already withdrawn is reported by the schedule, never repaired (D-4).
 public static class TournamentCompetitionStartedHandler
 {
@@ -20,8 +21,9 @@ public static class TournamentCompetitionStartedHandler
 
         // A schedule exists: start needs a published revision, which needs a tracked field.
         if (await db.Schedules.SingleOrDefaultAsync(schedule => schedule.Id == id, cancellationToken) is { } schedule
-            && schedule.ApplyStart(message.ScheduleRevision, message.StartedAt))
+            && schedule.ApplyStart(message.ScheduleRevision, message.StartedAt, message.ActivePlayersPerSide))
         {
+            await db.ScheduleMatchesAsync(schedule, cancellationToken);
             await db.SaveChangesAsync(cancellationToken);
         }
     }

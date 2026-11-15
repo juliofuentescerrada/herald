@@ -14,6 +14,8 @@ public sealed class CompetitionDbContext(DbContextOptions<CompetitionDbContext> 
 
     public DbSet<Schedule> Schedules => Set<Schedule>();
 
+    public DbSet<Match> Matches => Set<Match>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.MapModule(Schema);
@@ -27,6 +29,7 @@ public sealed class CompetitionDbContext(DbContextOptions<CompetitionDbContext> 
             schedule.Ignore(s => s.IsDraftStale);
             schedule.Ignore(s => s.DraftChange);
             schedule.Ignore(s => s.CrossedChange);
+            schedule.Ignore(s => s.StartedPairings);
             schedule.Property(s => s.Id).HasConversion(id => id.Value, value => new TournamentId(value));
             // Two writes based on the same schedule cannot both succeed.
             schedule.Property(s => s.Revision).IsConcurrencyToken();
@@ -35,7 +38,33 @@ public sealed class CompetitionDbContext(DbContextOptions<CompetitionDbContext> 
             Json(schedule.Property(s => s.Field));
             Json(schedule.Property(s => s.Draft));
             Json(schedule.Property(s => s.Publications));
+            Json(schedule.Property(s => s.Rosters));
         });
+
+        OrganisationOwned<Match>(modelBuilder);
+        modelBuilder.Entity<Match>(match =>
+        {
+            match.Ignore(m => m.DomainEvents);
+            match.Ignore(m => m.State);
+            match.Ignore(m => m.IsTeamMatch);
+            match.Property(m => m.Id).HasConversion(id => id.Value, value => new MatchId(value));
+            match.Property(m => m.TournamentId).HasConversion(id => id.Value, value => new TournamentId(value));
+            match.HasIndex(m => m.TournamentId);
+            match.Property(m => m.Revision).IsConcurrencyToken();
+            // A match's lineups and start are read and written whole with it.
+            Json(match.Property(m => m.FirstLineups));
+            Json(match.Property(m => m.SecondLineups));
+            Json(match.Property(m => m.Start));
+        });
+    }
+
+    // Once per tournament: the started revision's pairings become matches, unless they already did (h1-match-lineups D-1).
+    public async Task ScheduleMatchesAsync(Schedule schedule, CancellationToken cancellationToken)
+    {
+        if (schedule.StartedPairings is not null && !await Matches.AnyAsync(match => match.TournamentId == schedule.Id, cancellationToken))
+        {
+            Matches.AddRange(schedule.ScheduleMatches());
+        }
     }
 
     private static readonly JsonSerializerOptions _json = new(JsonSerializerDefaults.Web);

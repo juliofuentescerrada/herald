@@ -19,7 +19,7 @@ public sealed record PendingEntrant(Guid EntryId, string Name);
 public sealed record EligibleField(int Revision, bool RegistrationClosed, IReadOnlyList<PendingEntrant> Pending, IReadOnlyList<Entrant> Entrants);
 
 // A draft or published set of pairings, with the field and seeding it came from.
-public sealed record Pairings(Seeding Seeding, int? Seed, int EligibleRevision, IReadOnlyList<Entrant> Entrants, IReadOnlyList<Match> Matches, IReadOnlyList<Rest> Rests);
+public sealed record Pairings(Seeding Seeding, int? Seed, int EligibleRevision, IReadOnlyList<Entrant> Entrants, IReadOnlyList<Pairing> Matches, IReadOnlyList<Rest> Rests);
 
 // OperationId lets a retried generation return the same draft (D-8); a draft returned by a withdrawal has none.
 public sealed record Draft(Guid? OperationId, Pairings Pairings, Guid GeneratedBy, DateTimeOffset GeneratedAt);
@@ -36,6 +36,13 @@ public sealed record Publication(
 {
     public bool IsWithdrawn => WithdrawnAt is not null;
 }
+
+// A team entry's roster frozen at start, as Registration reported it (h1-match-lineups D-4).
+public sealed record FrozenRoster(Guid EntryId, int Revision, IReadOnlyList<RosterPlayer> Players);
+
+public sealed record RosterPlayer(Guid PlayerId, string Name);
+
+public sealed record FrozenRosters(int Revision, IReadOnlyList<FrozenRoster> Teams);
 
 // What changed between the field a set of pairings came from and the current one (D-5).
 public sealed record FieldChange(IReadOnlyList<Entrant> Added, IReadOnlyList<Entrant> Removed);
@@ -80,6 +87,16 @@ public sealed class Schedule : AggregateRoot<TournamentId>
 
     public DateTimeOffset? StartedAt { get; private set; }
 
+    // The profile's players per side, fixed at start; null for an individual tournament (h1-match-lineups D-4).
+    public int? ActivePlayersPerSide { get; private set; }
+
+    // Null until Registration reports the frozen rosters of a team tournament.
+    public FrozenRosters? Rosters { get; private set; }
+
+    // The pairings the matches come from: the started revision, or after a crossed withdrawal the revision published
+    // after start (h1-match-lineups D-1). Null before start and while no revision is current.
+    public Pairings? StartedPairings => StartedAt is null ? null : Current?.Pairings;
+
     // The start was decided on a revision withdrawn just before Competition learned of it (D-4).
     public bool StartCrossedWithdrawal => StartedOnRevision is { } number && _publications.Exists(publication => publication.Number == number && publication.IsWithdrawn);
 
@@ -93,7 +110,7 @@ public sealed class Schedule : AggregateRoot<TournamentId>
     public static Schedule Track(TournamentId id, EligibleField field) => new(id, field);
 
     // Once only: a later start report changes nothing. Nothing is repaired here (D-4).
-    public bool ApplyStart(int scheduleRevision, DateTimeOffset at)
+    public bool ApplyStart(int scheduleRevision, DateTimeOffset at, int? activePlayersPerSide = null)
     {
         if (StartedOnRevision is not null)
         {
@@ -102,9 +119,31 @@ public sealed class Schedule : AggregateRoot<TournamentId>
 
         StartedOnRevision = scheduleRevision;
         StartedAt = at;
+        ActivePlayersPerSide = activePlayersPerSide;
         Revision++;
         return true;
     }
+
+    // One scheduled match per pairing of the started revision; rests never become matches (h1-match-lineups D-1).
+    public IReadOnlyList<Match> ScheduleMatches() =>
+        StartedPairings is { } pairings ? [.. pairings.Matches.Select(pairing => Match.Schedule(Id, pairing, ActivePlayersPerSide))] : [];
+
+    // Newer reports replace the rosters; older ones change nothing.
+    public bool ApplyRosters(FrozenRosters rosters)
+    {
+        if (rosters.Revision <= (Rosters?.Revision ?? 0))
+        {
+            return false;
+        }
+
+        Rosters = rosters;
+        Revision++;
+        return true;
+    }
+
+    // The frozen roster's player identities for an entry, or null while unknown.
+    public IReadOnlyCollection<Guid>? RosterOf(Guid entryId) =>
+        Rosters?.Teams.SingleOrDefault(team => team.EntryId == entryId)?.Players.Select(player => player.PlayerId).ToHashSet();
 
     // Newer reports replace the field; older ones change nothing. Nothing else changes with it.
     public bool ApplyField(EligibleField field)

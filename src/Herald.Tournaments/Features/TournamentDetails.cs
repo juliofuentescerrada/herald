@@ -129,7 +129,8 @@ internal static class TournamentResults
                 if (started is not null)
                 {
                     await bus.PublishAsync(new TournamentCompetitionStarted(
-                        organisationId, tournament.Id.Value, tournament.Revision, started.EligibleRevision, started.ScheduleRevision, started.StartedBy, started.StartedAt));
+                        organisationId, tournament.Id.Value, tournament.Revision, started.EligibleRevision, started.ScheduleRevision, started.StartedBy, started.StartedAt,
+                        tournament.Configuration.ActivePlayersPerSide));
                 }
 
                 break;

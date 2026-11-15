@@ -17,6 +17,7 @@ export default defineConfig({
     ignoreHTTPSErrors: true,
     trace: 'retain-on-failure',
   },
-  projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
+  // A machine with its own Chromium names it, as scripts.config.ts does.
+  projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'], launchOptions: process.env['HERALD_CHROMIUM'] ? { executablePath: process.env['HERALD_CHROMIUM'] } : {} } }],
   webServer,
 });

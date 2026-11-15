@@ -11,6 +11,9 @@ public sealed record EntrantDetails(Guid EntryId, string Name);
 
 public sealed record MatchDetails(EntrantDetails First, EntrantDetails Second);
 
+// A match of the running competition, for the Schedule page (h1-match-lineups D-5).
+public sealed record MatchSummary(Guid MatchId, int Round, EntrantDetails First, EntrantDetails Second, MatchState State);
+
 public sealed record RoundDetails(int Number, IReadOnlyList<MatchDetails> Matches, EntrantDetails? Rest);
 
 public sealed record PairingsDetails(Seeding Seeding, int? Seed, int Entrants, int Matches, IReadOnlyList<RoundDetails> Rounds);
@@ -38,9 +41,10 @@ public sealed record ScheduleDetails(
     IReadOnlyList<PublicationDetails> History,
     int? StartedOnRevision,
     DateTimeOffset? StartedAt,
-    bool StartCrossedWithdrawal)
+    bool StartCrossedWithdrawal,
+    IReadOnlyList<MatchSummary> Matches)
 {
-    public static ScheduleDetails Of(Schedule schedule) => new(
+    public static ScheduleDetails Of(Schedule schedule, IReadOnlyList<Match> matches) => new(
         schedule.Id.Value,
         schedule.Revision,
         schedule.Field.RegistrationClosed,
@@ -54,7 +58,20 @@ public sealed record ScheduleDetails(
         [.. schedule.Publications.Reverse().Select(PublicationOf)],
         schedule.StartedOnRevision,
         schedule.StartedAt,
-        schedule.StartCrossedWithdrawal);
+        schedule.StartCrossedWithdrawal,
+        MatchesOf(schedule, matches));
+
+    private static List<MatchSummary> MatchesOf(Schedule schedule, IReadOnlyList<Match> matches)
+    {
+        var names = schedule.StartedPairings?.Entrants.ToDictionary(entrant => entrant.EntryId, entrant => entrant.Name) ?? [];
+        EntrantDetails Entrant(Guid id) => new(id, names.GetValueOrDefault(id, ""));
+        // In the schedule's own order, as the pairings list them.
+        var order = schedule.StartedPairings?.Matches.Select((pairing, index) => (pairing, index)).ToDictionary(item => (item.pairing.First, item.pairing.Second), item => item.index) ?? [];
+        return [.. matches.OrderBy(match => match.Round).ThenBy(match => order.GetValueOrDefault((match.First, match.Second))).Select(match => new MatchSummary(match.Id.Value, match.Round, Entrant(match.First), Entrant(match.Second), match.State))];
+    }
+
+    public static async Task<ScheduleDetails> OfAsync(CompetitionDbContext db, Schedule schedule, CancellationToken cancellationToken) =>
+        Of(schedule, await db.Matches.AsNoTracking().Where(match => match.TournamentId == schedule.Id).ToListAsync(cancellationToken));
 
     // The snapshot Tournaments keeps to lock the field and, later, to check start (D-4).
     public static TournamentScheduleChanged Changed(Guid organisationId, Schedule schedule) =>
@@ -112,14 +129,16 @@ internal static class ScheduleResults
                 case WriteOutcome.Rejected:
                     return Results.ValidationProblem(
                         result.Broken.GroupBy(rule => rule.Field).ToDictionary(field => field.Key, field => field.Select(rule => rule.Rule).ToArray()),
-                        extensions: new Dictionary<string, object?> { ["schedule"] = ScheduleDetails.Of(schedule) });
+                        extensions: new Dictionary<string, object?> { ["schedule"] = await ScheduleDetails.OfAsync(db, schedule, cancellationToken) });
                 case WriteOutcome.Stale:
                     return Results.Problem(
                         statusCode: StatusCodes.Status409Conflict,
                         title: "Conflict",
                         type: RevisionConflict,
-                        extensions: new Dictionary<string, object?> { ["currentRevision"] = schedule.Revision, ["schedule"] = ScheduleDetails.Of(schedule) });
+                        extensions: new Dictionary<string, object?> { ["currentRevision"] = schedule.Revision, ["schedule"] = await ScheduleDetails.OfAsync(db, schedule, cancellationToken) });
                 case WriteOutcome.Applied:
+                    // A revision published after a crossed withdrawal is the one the matches come from.
+                    await db.ScheduleMatchesAsync(schedule, cancellationToken);
                     try
                     {
                         await db.SaveChangesAsync(cancellationToken);
@@ -135,7 +154,7 @@ internal static class ScheduleResults
                     break;
             }
 
-            return Results.Ok(ScheduleDetails.Of(schedule));
+            return Results.Ok(await ScheduleDetails.OfAsync(db, schedule, cancellationToken));
         }
     }
 }

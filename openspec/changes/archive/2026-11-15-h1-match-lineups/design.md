@@ -57,3 +57,38 @@ Visual choices (style guide G-/RU-): the Lineups panels stack (one column, §7.2
 
 - [Rosters arrive after the start] → the Match page says it is waiting; nothing can be recorded on an unknown roster.
 - [Renaming the round-robin record] → a mechanical rename in Competition; persisted pairings keep their JSON shape.
+
+## Implementation notes
+
+Deviations from the plan above, each kept small:
+
+- **Rosters and lineup size on the schedule (D-4).** Competition keeps the frozen rosters and `ActivePlayersPerSide` on its `Schedule` (one per tournament, already the holder of the field projection) instead of a separate projection; each `Match` copies the lineup size when it is created.
+- **Repeats by state.** As for publishing a schedule, a repeated start returns the started match and recording the current lineup again is a repeat, without an operation identifier.
+- **Players by name.** The Match page lists a frozen roster by name; the roster's own order is the order members were added, which reads as random.
+- **Individual start.** The Start panel also starts an individual match, without confirmation (A-2), and says that recording a result later also starts it.
+- **No icons for "In play", "Scheduled" or "Locked".** `docs/ui/icons.md` has no reviewed meaning for these states; they are text with tone only (info for in play, success for locked, neutral for scheduled).
+- **Unsaved selection.** A side's unsaved selection offers "Discard changes", and "Start match" stays disabled until it is saved or discarded.
+- **No recorder's or starter's name.** Competition stores who recorded each lineup and who started the match, but cannot name them (W-1, as for registration and start): the Match page shows when, not "by Alex Morgan". The scenario "Starting from the Match page" says "with who and when"; the maintainer decides whether a later change names the actor.
+- **Lineup history in its panel.** Each side's history closes its own Lineups panel, before the Start panel, instead of after every actionable group (D-5): a side's revisions read beside the lineup they replaced.
+- **A player outside the roster is named.** The rejection names each such player (`player-<id>`: `not-on-roster`), and the page shows the player's name.
+- **End-to-end configuration.** `e2e/playwright.config.ts` accepts `HERALD_CHROMIUM`, as `scripts.config.ts` already did, so a machine whose preinstalled browser does not match the pinned Playwright can run the journeys.
+
+## Verification
+
+15 November 2026, cloud session:
+
+- `scripts/check all`: rules, spec coverage, format, build, Wolverine codegen current, .NET tests (domain, API against PostgreSQL, architecture, seed), OpenAPI client current, lint, boundaries, Vitest, SSR isolation and build all passed.
+- End-to-end suite: 19 journeys passed, journey 19 included. Test scripts: 6 passed, `seeded-lineups` included.
+- `NotifiableFactsTests` named `Lineup` and `MatchStart`; they are exempted with the proposal's reason (F-10 lists no lineup or match start notice).
+
+## Visual comparison
+
+Captured from `e2e/scripts/seeded-lineups.spec.ts` (synthetic persona, seeded data) at 1440 and 390 px and compared with `prototypes/frontend/play-and-score-states.html` (`lineup-incomplete`, `lineup-ready`, `start-match-confirm`, `match-team-in-play`). Browser verification of the composed application, not source inspection.
+
+| State | Match | Difference and resolution |
+|---|---|---|
+| Match scheduled, one side incomplete | Lineups panels stacked, count badge beside each heading (danger at 4 of 5, success at 5 of 5), checkboxes in columns at 1440 and one column at 390 | The implementation adds "Discard changes" and the reason "Choose exactly 5 players." beside a disabled "Save lineup"; kept |
+| Start blocked | "Start match" disabled, described by the first blocker | Unsaved changes are named first ("Save or discard the lineup changes first."); kept |
+| Start confirmation | Dialog names both teams and the five players each | None |
+| In play | "In play" beside the heading, "Locked" on each side, starters and reserves | Started time shown under the match summary; kept |
+| 390 px | One column, actions stacked full width as on every admin page (`.actions` at the 700 px breakpoint) | None |

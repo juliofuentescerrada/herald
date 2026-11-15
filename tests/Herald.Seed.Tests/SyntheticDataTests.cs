@@ -35,8 +35,25 @@ public class SyntheticDataTests(SeededDatabases databases)
             join registration."Entries" entry on entry."Id" = change."EntryId"
             where change."ChangedBy" <> entry."EnteredBy"
             """)).ShouldBe(0);
-        // Eight in the team league and eight in the cup.
-        (await SeededDatabases.CountAsync(database, """select count(*) from registration."RosterChanges" """)).ShouldBe(16);
+        // Eight in the team league, eight in the cup and fourteen in the running league.
+        (await SeededDatabases.CountAsync(database, """select count(*) from registration."RosterChanges" """)).ShouldBe(30);
+    }
+
+    [Fact]
+    public async Task The_seeded_running_league_has_a_scheduled_match_between_two_frozen_rosters_of_seven()
+    {
+        var database = await databases.NewDatabaseAsync();
+        await SeededDatabases.SeedAsync(database);
+
+        await using var reader = new Reader(database);
+        var path = Tournament("tournaments-by-state", "running-teams");
+        var match = (await reader.GetAsync(Main, $"{path}/schedule")).GetProperty("matches").EnumerateArray().ShouldHaveSingleItem();
+        var details = await reader.GetAsync(Main, $"{path}/matches/{match.GetProperty("matchId").GetGuid()}");
+
+        details.GetProperty("state").GetString().ShouldBe("scheduled");
+        details.GetProperty("activePlayers").GetInt32().ShouldBe(5);
+        details.GetProperty("first").GetProperty("roster").GetArrayLength().ShouldBe(7);
+        details.GetProperty("second").GetProperty("roster").GetArrayLength().ShouldBe(7);
     }
 
     [Fact]
