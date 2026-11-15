@@ -2,6 +2,8 @@
 
 **Proposed in H1 batch 2's proposals pull request, 15 November 2026.** The rules come from the functional discovery (F-09, §7.2, §8.1; §15 rows D-04 and D-25) and the batch's decision session of 15 November 2026. It depends on `h1-operator-results` and can run beside `h1-exceptional-outcomes`. Merging the proposals pull request approves this change (ADR 0018); task 1.1 records that approval.
 
+**Review answers, 15 November 2026 (#63):** the maintainer accepted Q1 and Q2 (0/0 outcomes count as resolved only; the seven columns) as proposed, and the prototypes as they are.
+
 ## Why
 
 Results exist but nobody can read who is first. F-09 asks for standings from effective results that show they are provisional and explain each entrant's points; D-04 fixes 3/1/0, shared positions on equal points and rests without points. ADR 0004 gives this to the Standings module, which is still empty, as a projection that carries the revision of the results it reflects (ADR 0007).

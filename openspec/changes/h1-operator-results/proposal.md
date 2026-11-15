@@ -2,6 +2,8 @@
 
 **Proposed in H1 batch 2's proposals pull request, 15 November 2026.** The rules come from the batch's decision session of the same day, recorded in the functional discovery (§8 "Confirmed for operator results", §8.1, F-07, §15 row D-25). It depends on `h1-match-lineups`. Merging the proposals pull request approves this change (ADR 0018); task 1.1 records that approval.
 
+**Review answers, 15 November 2026 (#63):** the maintainer accepted Q1 and Q2 (appearances from the locked lineups, §5.1's "Resolve a pairing" row) as proposed, and the prototypes as they are.
+
 ## Why
 
 Matches can start but cannot finish. F-07 has the operator enter a directly effective result in H1, and §8 fixes its shape: a winner or a draw and its cause, no score. Standings (`h1-standings`) and the exceptional outcomes (`h1-exceptional-outcomes`) build on one effective resolution per match.
@@ -27,7 +29,7 @@ Out of scope: concessions, absences, no contest and administrative outcomes (`h1
 | D-07 Corrections | Proposed (batch 3) | A resolved match rejects a second result |
 | D-02, D-15 API contract | Proposed (batch 3) | Idempotent operation identity, as every Herald write already has |
 
-§5.1's "Resolve a pairing" row is still proposed; this change implements its played part (Q2).
+§5.1's "Resolve a pairing" row was confirmed as written on 15 November 2026 (#63); this change implements its played part.
 
 ## Open questions for the review
 

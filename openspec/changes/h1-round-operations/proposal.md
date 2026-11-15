@@ -2,6 +2,8 @@
 
 **Proposed in H1 batch 2's proposals pull request, 15 November 2026.** The rules come from the batch's decision session of the same day, recorded in the functional discovery (§8.1, §9.2, §10.2.1, F-08; §15 rows D-05, D-23 and D-25). It depends on `h1-exceptional-outcomes` and, for its standings flags, `h1-standings`. Merging the proposals pull request approves this change (ADR 0018); task 1.1 records that approval.
 
+**Review answers, 15 November 2026 (#63):** the maintainer accepted Q1 to Q3 (Competition records departures after start, §5.1's round completion, a disqualification resolves its match in play as a concession after play) and the reasons of A-2 as proposed, and the prototypes as they are.
+
 ## Why
 
 Matches can be prepared, started and resolved one by one, but the owner cannot see a round's progress, and nobody can leave a running competition: after start, the entries page is read-only and says a departure is a competitive withdrawal. D-05 and D-23, confirmed on 15 November 2026, fix what withdrawal, disqualification, a player's withdrawal and a player's sanction do. AT-05 and AT-06 test them.
@@ -30,7 +32,7 @@ Out of scope: reinstatement and undoing a departure, substitutions within a matc
 | D-25 Terminal outcomes | Confirmed 15 Nov 2026 | Concession after play on an in-play withdrawal; zero active entrants |
 | D-08 Lifecycle ownership | Confirmed ownership; departure after start specified here | Competition records competitive departure |
 
-§5.1's "Resolve a pairing" row (round completion) is still proposed; this change implements it as written (Q2).
+§5.1's "Resolve a pairing" row (round completion) was confirmed as written on 15 November 2026 (#63).
 
 ## Open questions for the review
 

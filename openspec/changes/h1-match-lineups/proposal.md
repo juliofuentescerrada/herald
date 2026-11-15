@@ -2,6 +2,8 @@
 
 **Proposed in H1 batch 2's proposals pull request, 15 November 2026.** The rules come from the batch's decision session of the same day, recorded in the functional discovery (§8, §10.2 "Confirmed for match lineups", §10.2.1, §15 rows D-18 and D-23). It depends on batch 1 (`h1-competition-start`). Merging the proposals pull request approves this change (ADR 0018); task 1.1 records that approval.
 
+**Review answers, 15 November 2026 (#63):** the maintainer accepted Q1 and Q2 (§5.1's "Start a match" row, lineups at any time after start, confirmation on a team start) as proposed, and the prototypes as they are.
+
 ## Why
 
 A started competition fixes the schedule and the team rosters, but no match can be played: matches have no identity of their own, and a team match has no lineup. §5.1's "Start a match" row and TM-06/07 make each match start the moment its lineups are validated and locked, and F-08 asks that a team short of eligible players cannot start.
@@ -27,7 +29,7 @@ Out of scope: results (`h1-operator-results`), player withdrawal and sanctions a
 | D-19 Substitution windows | Confirmed exclusion | No change within a running match |
 | D-08 Lifecycle ownership | Confirmed ownership | Competition owns matches and lineups; Registration owns the frozen roster |
 
-§10.2 "Confirmed for match lineups" (15 Nov 2026) settles the lock at match start. §5.1's "Start a match" row is still proposed; this change implements it as written, except for "no competitive departure preventing play", which arrives with `h1-round-operations` (Q1).
+§10.2 "Confirmed for match lineups" (15 Nov 2026) settles the lock at match start. §5.1's "Start a match" row was confirmed as written on 15 November 2026 (#63); this change implements it, except for "no competitive departure preventing play", which arrives with `h1-round-operations` (Q1).
 
 ## Open questions for the review
 
