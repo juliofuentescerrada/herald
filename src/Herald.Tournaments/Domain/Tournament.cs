@@ -54,6 +54,8 @@ public sealed record TournamentRegistrationOpened(TournamentId TournamentId, Gui
 
 public sealed record TournamentRegistrationClosed(TournamentId TournamentId, Guid ClosedBy, DateTimeOffset ClosedAt) : IDomainEvent;
 
+public sealed record CompetitionStarted(TournamentId TournamentId, int EligibleRevision, int ScheduleRevision, Guid StartedBy, DateTimeOffset StartedAt) : IDomainEvent;
+
 public sealed class Tournament : AggregateRoot<TournamentId>
 {
     // For EF Core, which sets the configuration after constructing.
@@ -98,7 +100,69 @@ public sealed class Tournament : AggregateRoot<TournamentId>
 
     public DateTimeOffset? RegistrationChangedAt { get; private set; }
 
+    public CompetitionState Competition { get; private set; }
+
+    public Guid? StartedBy { get; private set; }
+
+    public DateTimeOffset? StartedAt { get; private set; }
+
+    // The eligible field and the schedule revision the start was decided on (design D-1).
+    public int? StartedOnEligibleRevision { get; private set; }
+
+    public int? StartedOnScheduleRevision { get; private set; }
+
     public int NextTermsRevision() => ++TermsRevision;
+
+    // Each start condition with whether it holds, in the order the owner reads them (CP-04).
+    public IReadOnlyList<StartCondition> StartConditions(StartReadiness readiness)
+    {
+        List<StartCondition> conditions =
+        [
+            new(StartRules.RegistrationClosed, Registration == RegistrationWindow.Closed),
+            new(StartRules.NoPendingCheckIn, readiness.Pending == 0),
+            new(StartRules.TwoEligible, readiness.Eligible >= 2),
+            new(StartRules.ScheduleCurrent, readiness.ScheduleCurrent),
+        ];
+        if (Configuration.EntryKind == EntryKind.Team)
+        {
+            conditions.Add(new(StartRules.RostersWithinBounds, readiness.RostersOutsideBounds is { Count: 0 }));
+        }
+
+        return conditions;
+    }
+
+    // Running, by the owner's action only, once every condition holds; no match starts and nothing undoes it (§5.1 row 6, A-3).
+    public WriteResult Start(int expectedRevision, StartReadiness readiness, Guid actor, DateTimeOffset at)
+    {
+        if (Competition == CompetitionState.Running)
+        {
+            return WriteOutcome.Repeated;
+        }
+
+        if (expectedRevision != Revision)
+        {
+            return WriteOutcome.Stale;
+        }
+
+        if (Publication != Publication.Published)
+        {
+            return new(WriteOutcome.Rejected, [new("competition", "not-published")]);
+        }
+
+        if (StartConditions(readiness).Where(condition => !condition.Met).ToList() is { Count: > 0 } unmet)
+        {
+            return new(WriteOutcome.Rejected, [.. unmet.Select(condition => new BrokenRule("competition", condition.Rule))]);
+        }
+
+        Competition = CompetitionState.Running;
+        StartedBy = actor;
+        StartedAt = at;
+        StartedOnEligibleRevision = readiness.EligibleRevision;
+        StartedOnScheduleRevision = readiness.PublishedScheduleRevision;
+        Touch(actor, at);
+        Raise(new CompetitionStarted(Id, readiness.EligibleRevision!.Value, readiness.PublishedScheduleRevision!.Value, actor, at));
+        return WriteOutcome.Applied;
+    }
 
     public static Tournament Draft(TournamentId id, TournamentConfiguration configuration, Guid actor, DateTimeOffset at)
     {
@@ -139,6 +203,11 @@ public sealed class Tournament : AggregateRoot<TournamentId>
         if (broken.Count == 0)
         {
             broken = LockedByEntries(configuration, entries);
+        }
+
+        if (broken.Count == 0)
+        {
+            broken = LockedByStart(configuration);
         }
 
         if (broken.Count > 0)
@@ -201,6 +270,11 @@ public sealed class Tournament : AggregateRoot<TournamentId>
             return new(WriteOutcome.Rejected, [.. missing.Select(field => new BrokenRule(field, "required"))]);
         }
 
+        if (Competition == CompetitionState.Running)
+        {
+            return new(WriteOutcome.Rejected, [new("registration", "competition-started")]);
+        }
+
         if (schedulePublished)
         {
             return new(WriteOutcome.Rejected, [new("registration", "schedule-published")]);
@@ -260,6 +334,28 @@ public sealed class Tournament : AggregateRoot<TournamentId>
         }
 
         return broken;
+    }
+
+    // Start fixes the field and its rules (§5.1 row 6): what decides entries and rosters cannot change once running.
+    private List<BrokenRule> LockedByStart(TournamentConfiguration configuration)
+    {
+        if (Competition != CompetitionState.Running)
+        {
+            return [];
+        }
+
+        var current = Configuration;
+        (string Field, bool Changed)[] fixedFields =
+        [
+            ("capacity", configuration.Capacity != current.Capacity),
+            ("entryKind", configuration.EntryKind != current.EntryKind),
+            ("admission", configuration.Admission != current.Admission),
+            ("checkIn", configuration.CheckIn != current.CheckIn),
+            ("minimumRosterSize", configuration.MinimumRosterSize != current.MinimumRosterSize),
+            ("maximumRosterSize", configuration.MaximumRosterSize != current.MaximumRosterSize),
+            ("activePlayersPerSide", configuration.ActivePlayersPerSide != current.ActivePlayersPerSide),
+        ];
+        return [.. fixedFields.Where(field => field.Changed).Select(field => new BrokenRule(field.Field, "competition-started"))];
     }
 
     private static List<BrokenRule> Required(TournamentConfiguration configuration, bool withRegistrationDates) =>

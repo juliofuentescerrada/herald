@@ -19,7 +19,24 @@
       <p [class.readiness-warning]="current.readiness !== 'complete'">{{ readiness() }}</p>
     </div>
 
-    @if (readOnly()) {
+    @if (frozen()) {
+      <div class="drawer-notice">
+        <herald-notice heading="Frozen at start">
+          The competition has started. This roster froze on revision {{ current.frozenRevision }}, {{ zoned(current.frozenAt!) }}; members cannot be added or removed.
+        </herald-notice>
+      </div>
+      @if (current.readiness !== 'complete') {
+        <div class="drawer-notice">
+          <herald-notice tone="danger" heading="The frozen roster is outside its bounds">
+            A roster change crossed the start. Nothing was repaired; resolve it from the round operations.
+          </herald-notice>
+        </div>
+      }
+    } @else if (started() && current.entryState !== 'cancelled') {
+      <div class="drawer-notice">
+        <herald-notice heading="Read only">The competition has started; this team’s roster cannot change.</herald-notice>
+      </div>
+    } @else if (readOnly()) {
       <div class="drawer-notice">
         <herald-notice heading="Read only">This team’s entry was cancelled. Its roster is kept as a record and cannot change.</herald-notice>
       </div>

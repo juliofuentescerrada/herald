@@ -95,9 +95,36 @@ public sealed record FieldDetails(
             [.. admitted.Concat(queue).Concat(cancelled).Select(Of)]);
     }
 
-    // The counts Tournaments keeps for its own rules and reads (design D-2).
-    public static TournamentFieldChanged Changed(Guid organisationId, Field field) =>
-        new(organisationId, field.Id.Value, field.Revision, field.Admitted, field.Waiting, field.CheckedIn);
+    // The counts Tournaments keeps for its own rules and reads (design D-2), with what start readiness needs
+    // (h1-competition-start D-2): rosters outside their bounds and member names shared across admitted teams.
+    public static async Task<TournamentFieldChanged> ChangedAsync(Guid organisationId, Field field, RegistrationDbContext db, CancellationToken cancellationToken)
+    {
+        var teams = field.Entries.Where(entry => entry.State == EntryState.Admitted && entry.GuestKind == GuestKind.Team).ToList();
+        var guestIds = teams.Select(team => team.GuestId).Concat(teams.SelectMany(team => team.Members.Select(member => member.GuestId))).Distinct().ToList();
+        var guests = guestIds.Count == 0 ? [] : await db.Guests.AsNoTracking()
+            .Where(guest => guestIds.Contains(guest.Id))
+            .ToDictionaryAsync(guest => guest.Id, cancellationToken);
+        string NameOf(GuestId id) => guests.TryGetValue(id, out var guest) ? guest.Name : "";
+
+        var shared = teams
+            .SelectMany(team => team.Members.Where(member => guests.ContainsKey(member.GuestId)).Select(member => (Team: team, Guest: guests[member.GuestId])))
+            .GroupBy(held => held.Guest.NormalisedName)
+            .Where(name => name.Select(held => held.Guest.Id).Distinct().Count() > 1 && name.Select(held => held.Team.Id).Distinct().Count() > 1)
+            .Select(name => new SharedMemberName(name.First().Guest.Name, [.. name.Select(held => NameOf(held.Team.GuestId)).Distinct()]))
+            .ToList();
+        return new(
+            organisationId,
+            field.Id.Value,
+            field.Revision,
+            field.Admitted,
+            field.Waiting,
+            field.CheckedIn,
+            field.EligibleRevision,
+            field.Eligible.Count,
+            field.Pending,
+            [.. field.RostersOutsideBounds.Select(team => new RosterOutsideBounds(team.Id.Value, NameOf(team.GuestId), team.Members.Count))],
+            shared);
+    }
 
     // The eligible entrants Competition drafts from (h1-round-robin-pairings D-2).
     public static async Task<TournamentEligibleFieldChanged> EligibleAsync(Guid organisationId, Field field, RegistrationDbContext db, CancellationToken cancellationToken)
@@ -120,7 +147,7 @@ public sealed record FieldDetails(
     // Both snapshots, in the transaction of the change; the eligible one only when it changed.
     public static async Task PublishAsync(IMessageBus bus, Guid organisationId, Field field, int eligibleRevisionBefore, RegistrationDbContext db, CancellationToken cancellationToken)
     {
-        await bus.PublishAsync(Changed(organisationId, field));
+        await bus.PublishAsync(await ChangedAsync(organisationId, field, db, cancellationToken));
         if (field.EligibleRevision != eligibleRevisionBefore)
         {
             await bus.PublishAsync(await EligibleAsync(organisationId, field, db, cancellationToken));

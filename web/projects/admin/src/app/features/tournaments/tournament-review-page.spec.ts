@@ -43,14 +43,14 @@ describe('Reviewing a tournament before publishing', () => {
     expect(texts('herald-status-label')).toEqual(['Draft', 'Registration not open', 'Preparing']);
   });
 
-  it('publishes the reviewed revision and shows the published tournament, with nothing to start it', async () => {
+  it('publishes the reviewed revision and shows the published tournament, with start not yet available', async () => {
     const published = details({ revision: 4, publication: 'published' });
     const { page, texts, text, publish, calls, router } = await render([() => of(details({ revision: 3 }))], [() => of(published)]);
     publish().click();
     await vi.waitFor(() => expect(router.url).toBe(`${base}/${tournamentId}`));
     expect(calls).toEqual([{ expectedRevision: 3 }]);
     await vi.waitFor(() => expect(text('h1')).toBe('Autumn Open'));
-    expect(texts('herald-status-label')).toEqual(['Published', 'Registration not open', 'Preparing']);
+    expect(texts('.labels herald-status-label')).toEqual(['Published', 'Registration not open', 'Preparing']);
     expect(page().textContent).not.toMatch(/start (the )?tournament/i);
   });
 

@@ -151,6 +151,9 @@ export class EntriesPage {
   });
   /** A published schedule locks the field: admitting, cancelling and check-in wait for its withdrawal (D-3). */
   protected readonly locked = computed(() => !!this.field.data()?.terms.fieldLocked);
+  protected readonly running = computed(() => !!this.field.data()?.terms.competitionStarted);
+  /** Why the field cannot change: the start fixes it, a published schedule locks it. */
+  protected readonly lockedText = computed(() => (this.running() ? 'The competition has started.' : 'The schedule is published. Withdraw it to change the field.'));
   /** The absence review: pending entries under a mandatory policy, once registration has closed (F-05). */
   protected readonly reviewing = computed(() => {
     const field = this.field.data();
@@ -164,7 +167,7 @@ export class EntriesPage {
     if (this.state() === 'busy') return 'Request in progress. Please wait; do not submit again.';
     if (this.state() === 'conflict') return 'Reload the latest version first.';
     if (!field) return null;
-    if (field.terms.fieldLocked) return 'The schedule is published. Withdraw it to change the field.';
+    if (field.terms.fieldLocked) return this.lockedText();
     if (field.overCapacityBy > 0) return 'Field is over capacity. Cancel an admitted entry before adding or admitting.';
     if (field.kindMismatch) return 'The field has entries of the other kind. Resolve that before adding or admitting.';
     if (field.terms.registration === 'closed') return 'Registration is closed. Reopen registration in configuration to add entries.';
@@ -174,7 +177,7 @@ export class EntriesPage {
   /** Why a waiting entry cannot be admitted, said under its row; null when it can. */
   protected readonly admitBlocked = computed(() => {
     const field = this.field.data();
-    if (field?.terms.fieldLocked) return 'The schedule is published. Withdraw it to change the field.';
+    if (field?.terms.fieldLocked) return this.lockedText();
     if (!field || hasFreeSlot(field)) return null;
     if (field.overCapacityBy > 0) return 'Field is over capacity. Cancel an admitted entry first.';
     if (field.kindMismatch) return 'The field has entries of the other kind. Resolve that first.';

@@ -47,6 +47,12 @@ namespace Herald.Competition.Persistence.Migrations
                         .IsConcurrencyToken()
                         .HasColumnType("integer");
 
+                    b.Property<DateTimeOffset?>("StartedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("StartedOnRevision")
+                        .HasColumnType("integer");
+
                     b.HasKey("Id");
 
                     b.HasIndex("OrganisationId");

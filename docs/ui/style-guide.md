@@ -85,7 +85,7 @@ The narrow layout starts below 700 px. Preserve reading order, wrap action group
 
 Use a link for a destination and a button for an operation. `herald-button` changes appearance, not semantics. Use one primary action per operation area; a registration operation and a configuration-save operation may each have their own primary action. In a result list, repeated row actions normally use secondary weight so the list does not become a wall of accent.
 
-Use the [selection table](components.md#choose-by-intent) before choosing between a status, notice, toast, dialog, drawer and review page. Keep consequential actions visibly labelled. Explain unavailability near the action and connect it with `aria-describedby` when useful. A busy action communicates progress, blocks repeats and preserves focus and the surrounding layout.
+Use the [selection table](components.md#choose-by-intent) before choosing between a status, notice, toast, dialog, drawer and review page. Keep consequential actions visibly labelled. Explain unavailability near the action and connect it with `aria-describedby` when useful. Disable an action, with its reason, while the person can still make it available (a published schedule locks the field until it is withdrawn); hide it when the state is final and it can never apply again (a running competition's entry actions), and say why once, in a notice, instead of on every row. A busy action communicates progress, blocks repeats and preserves focus and the surrounding layout.
 
 **Review:** a person can distinguish navigation, reversible actions and destructive confirmation; keyboard activation has the same result as pointer activation. Do not use an unexplained disabled action as the only explanation of a permission rule.
 

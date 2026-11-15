@@ -39,6 +39,7 @@ const tournament = (over: Partial<TournamentDetails> = {}): TournamentDetails =>
   waitingEntries: 0,
   checkedInEntries: 0,
   schedulePublished: false,
+  start: { conditions: [], eligible: null, pending: null, rostersOutsideBounds: null, sharedMemberNames: [], publishedScheduleRevision: null, startedAt: null, startedOnScheduleRevision: null },
   ...over,
 });
 
@@ -506,6 +507,8 @@ describe('The roster of a team entry', () => {
       readiness,
       members,
       history: members.map((m, index) => ({ rosterRevision: index + 1, guestId: m.guestId, name: m.name, kind: 'added' as const, changedBy: 'p-owner', changedAt: m.addedAt })),
+      frozenRevision: null,
+      frozenAt: null,
       ...over,
     };
   };
@@ -771,6 +774,30 @@ describe('The roster of a team entry', () => {
     expect(harness.text('.history summary')).toBe('History · 2');
   });
 
+  it('shows a roster frozen at start read only with its revision and when it froze', async () => {
+    const harness = await page(() => of(roster(3, { frozenRevision: 3, frozenAt: '2026-11-21T09:05:00Z' })));
+    await openRoster(harness);
+    await vi.waitFor(() => expect(harness.texts('herald-notice strong')).toContain('Frozen at start'));
+    expect(harness.text('.drawer-notice herald-notice')).toContain('froze on revision 3, 21 November 2026, 10:05 · Europe/Madrid');
+    expect(document.querySelector('[aria-label^="Remove: "]')).toBeNull();
+    expect(harness.button('Add player')).toBeUndefined();
+  });
+
+  it('keeps a waiting team’s roster read only once the competition started', async () => {
+    const harness = await page(() => of(roster(2, { entryState: 'waiting' })), {
+      getField: () => of(teams([team('Team A', 4, 'complete'), team('River Falcons', 2, 'incomplete')], { fieldLocked: true, competitionStarted: true })),
+    });
+    await openRoster(harness);
+    await vi.waitFor(() => expect(harness.text('.drawer-notice herald-notice')).toContain('The competition has started; this team’s roster cannot change.'));
+    expect(harness.button('Add player')).toBeUndefined();
+  });
+
+  it('reports a frozen roster outside its bounds', async () => {
+    const harness = await page(() => of(roster(2, { frozenRevision: 3, frozenAt: '2026-11-21T09:05:00Z' })));
+    await openRoster(harness);
+    await vi.waitFor(() => expect(harness.texts('herald-notice strong')).toContain('The frozen roster is outside its bounds'));
+  });
+
   it('waits for the tournament’s roster sizes before any roster change', async () => {
     const harness = await page(() => of(roster(2, { minimumRosterSize: null, maximumRosterSize: null, readiness: 'awaitingTerms' })));
     await openRoster(harness);
@@ -1025,5 +1052,16 @@ describe('Check-in on the entries page', () => {
         expect(page().querySelector('herald-notice a')?.getAttribute('href')).toBe(`/organisations/${organisation}/tournaments/${tournamentId}/schedule`);
         expect(await violations(page())).toEqual([]);
       });
+
+    it('hides a running competition’s entry actions and says why once', async () => {
+      const started = closed([entry('Robin Vale', { checkIn: 'confirmed', checkInRevision: 1 })], {}, { fieldLocked: true, competitionStarted: true });
+      const { button, text } = await open({ getField: () => of(started) }, tournament({ registration: 'closed', schedulePublished: true, competition: 'running' }));
+      await vi.waitFor(() => expect(text('herald-notice')).toContain('Running · entries are read-only'));
+      expect(text('herald-notice')).toContain('Leaving now is a competitive withdrawal');
+      // Final, unlike the published schedule's lock: the actions are gone, not disabled.
+      expect(button('Undo check-in')).toBeUndefined();
+      expect(button('Cancel entry')).toBeUndefined();
+      expect(button('Add player')).toBeUndefined();
+    });
   });
 });

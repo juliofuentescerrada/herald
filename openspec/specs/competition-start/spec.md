@@ -1,5 +1,8 @@
-## ADDED Requirements
+# competition-start Specification
 
+## Purpose
+An owner reads why a tournament's competition can or cannot start, starts it once every condition holds, and from then on the field, the schedule and the team rosters are fixed; a change that crossed the start is reported, never repaired.
+## Requirements
 ### Requirement: The owner reads the start readiness
 For a published tournament whose competition has not started, the owner SHALL read each start condition with whether it holds and how to fix it: registration closed; no admitted entry pending a mandatory check-in; at least two eligible entrants; a published schedule built from the current eligible field; for a team tournament, every admitted team's roster within the profile's minimum and maximum. A same-name flag on a roster SHALL be shown as a warning and SHALL NOT block.
 
@@ -31,7 +34,7 @@ An owner SHALL start the competition of a tournament whose start conditions all 
 - **THEN** the start is rejected naming the schedule
 
 ### Requirement: Start fixes the field
-After start, admitting, cancelling and checking in or undoing a check-in SHALL be rejected stating that the competition has started.
+After start, admitting, cancelling and checking in or undoing a check-in SHALL be rejected stating that the competition has started, and so SHALL reopening registration and changing the capacity, entry kind, admission, check-in policy or roster sizes.
 
 #### Scenario: Cancelling after start
 - **WHEN** an owner cancels an admitted entry of a running competition
@@ -49,4 +52,5 @@ The tournament's configuration page SHALL show a Competition panel after the Reg
 
 #### Scenario: The owner starts from the panel
 - **WHEN** an owner confirms "Start competition" on a ready tournament
-- **THEN** the page shows "Running" beside the title and the panel shows who started it and when
+- **THEN** the page shows "Running" beside the title and the panel shows when it started and the schedule revision it fixed
+

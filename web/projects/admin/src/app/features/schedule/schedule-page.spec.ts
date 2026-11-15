@@ -29,6 +29,7 @@ const tournament = (over: Partial<TournamentDetails> = {}): TournamentDetails =>
   waitingEntries: 0,
   checkedInEntries: 0,
   schedulePublished: false,
+  start: { conditions: [], eligible: null, pending: null, rostersOutsideBounds: null, sharedMemberNames: [], publishedScheduleRevision: null, startedAt: null, startedOnScheduleRevision: null },
   ...over,
 });
 
@@ -76,6 +77,9 @@ const schedule = (over: Partial<ScheduleDetails> = {}): ScheduleDetails => ({
   current: null,
   crossedChange: null,
   history: [],
+  startedOnRevision: null,
+  startedAt: null,
+  startCrossedWithdrawal: false,
   ...over,
 });
 
@@ -192,6 +196,23 @@ describe('The schedule page', () => {
       expect(button('Withdraw')).toBeTruthy();
       expect(text('.column herald-notice')).toContain('The field is locked');
     });
+
+  it('offers no withdrawal or generation once the competition is running', async () => {
+    const { button, text } = await open({ getSchedule: () => of(schedule({ revision: 7, current: publication(1), history: [publication(1)], startedOnRevision: 1, startedAt: '2026-11-21T09:05:00Z' })) });
+    await vi.waitFor(() => expect(text('.column herald-notice')).toContain('The competition started on revision 1. The schedule can no longer be withdrawn or regenerated.'));
+    expect(button('Withdraw')).toBeUndefined();
+    expect(button('Generate draft')).toBeUndefined();
+  });
+
+  it('reports a start on a withdrawn revision and offers to publish the draft once', async () => {
+    const withdrawn = publication(1, { withdrawnAt: '2026-11-21T09:04:00Z', withdrawalReason: 'Late absence' });
+    const { button, text } = await open({
+      getSchedule: () => of(schedule({ revision: 8, draft: draft(), history: [withdrawn], startedOnRevision: 1, startedAt: '2026-11-21T09:05:00Z', startCrossedWithdrawal: true })),
+    });
+    await vi.waitFor(() => expect(text('.column herald-notice strong')).toBe('The competition started on revision 1, which was withdrawn'));
+    expect(button('Publish')).toBeTruthy();
+    expect(button('Regenerate')).toBeUndefined();
+  });
 
   it('requires a reason to withdraw and keeps the revision in the history',
     { meta: { type: 'covers', description: 'round-robin-pairings: Withdraw and republish' } }, async () => {

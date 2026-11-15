@@ -44,6 +44,7 @@ Herald runs tournaments (league, knockout, single match) and is game-agnostic: g
 - Read large documents by section (`grep` for the D-, F- or § reference, then read those lines), never whole: the discovery alone is about 37,000 tokens.
 - Stop and ask instead of retrying when the same CI failure returns after one fix, when a flaky journey fails again after one retry, or when a slice clearly outgrows its `tasks.md` (propose splitting it). Never skip or disable a test to get green.
 - Schedule only one-off wake-ups; no recurring schedule that starts sessions without a limit.
+- Usage limits: a session that hits the 5-hour limit stops until someone writes to it. So, in a cloud session doing autonomous work (a slice, a review round), keep one safety-net wake-up (`send_later`, 305 minutes, initiation `human_request` when the maintainer asked for the work) that says to continue from `node scripts/slice-state.mjs` and `git status`; renew it (delete, then create) at each task checkpoint push, and delete it once the work ends or waits for the maintainer. The window resets at most five hours after it began, so a wake-up five hours after the last checkpoint lands after the reset. It does not cover the weekly limit.
 - `.claude/hooks/guard.mjs` enforces a tool budget since the maintainer's last message, refuses a command after repeated identical failures, limits pushes once a pull request is open and refuses production edits without an approved change (ADR 0018). When it refuses, report where you stopped and end the turn; do not work around it.
 
 ## Commands

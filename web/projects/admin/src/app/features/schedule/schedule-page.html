@@ -57,9 +57,11 @@
           }
         </div>
         @if (current()) {
-          <div class="summary-action">
-            <button herald-button type="button" [disabled]="state() !== 'ready'" (click)="askWithdraw($any($event.currentTarget))">Withdraw</button>
-          </div>
+          @if (!started()) {
+            <div class="summary-action">
+              <button herald-button type="button" [disabled]="state() !== 'ready'" (click)="askWithdraw($any($event.currentTarget))">Withdraw</button>
+            </div>
+          }
         } @else if (draft()) {
           <div class="summary-action">
             @if (draft()!.stale) {
@@ -108,13 +110,21 @@
           Regenerate before publishing.
         </herald-notice>
       }
-      @if (current() && !s.crossedChange) {
+      @if (started() && s.startCrossedWithdrawal && !current()) {
+        <herald-notice tone="danger" heading="The competition started on revision {{ s.startedOnRevision }}, which was withdrawn">
+          A withdrawal crossed the start. Nothing was repaired. Publish the current draft once to give the running competition its schedule.
+        </herald-notice>
+      } @else if (started()) {
+        <herald-notice heading="Running">
+          The competition started on revision {{ s.startedOnRevision }}. The schedule can no longer be withdrawn or regenerated.
+        </herald-notice>
+      } @else if (current() && !s.crossedChange) {
         <herald-notice heading="The field is locked">
           While this revision is published, entries cannot be admitted, cancelled or checked in, and registration cannot reopen. Withdraw it to change the field.
         </herald-notice>
       }
 
-      @if (!current()) {
+      @if (!current() && !started()) {
         <section class="operation" aria-labelledby="generate-heading">
           <h2 id="generate-heading">{{ draft() ? 'Regenerate the draft' : 'Before generating' }}</h2>
           @if (blockers().length) {

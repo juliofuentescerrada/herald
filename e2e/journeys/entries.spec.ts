@@ -255,3 +255,86 @@ test('An owner marks a pending player absent, publishes a five-player schedule w
   await expect(page.getByText('Published · revision 2', { exact: true })).toBeVisible();
   await expectAccessible();
 });
+
+test('An owner sees a team tournament’s start blocked by an incomplete roster, completes it, starts the competition and is stopped from adding to the frozen roster', async ({ page, signIn, expectAccessible }) => {
+  await signIn();
+  await createOrganisation(page);
+  await openForEntries(page, 'Harbour Cup', { team: true, capacity: 4, admission: 'Automatic' });
+  await addNew(page, 'team', 'North Stars');
+  await addNew(page, 'team', 'River Falcons');
+  const admitted = page.getByRole('list', { name: 'Admitted · 2' });
+  const build = async (team: string, players: string[]) => {
+    await admitted.getByRole('button', { name: `Roster: ${team}` }).click();
+    const roster = page.getByRole('dialog', { name: `Roster · ${team}` });
+    for (const player of players) {
+      await roster.getByRole('button', { name: 'Add player' }).click();
+      await roster.getByRole('button', { name: 'Create new' }).click();
+      await roster.getByLabel('Name (alias)').fill(player);
+      await roster.getByRole('button', { name: 'Create and add player' }).click();
+      await expect(roster.getByText(player, { exact: true })).toBeVisible();
+    }
+    await roster.getByRole('button', { name: 'Back to entries' }).click();
+    await expect(roster).toBeHidden();
+  };
+  await build('North Stars', ['Robin Vale', 'Sam Reed', 'Jamie Brook']);
+  await build('River Falcons', ['Taylor Finch', 'Rowan Lake']);
+
+  // Close registration and publish the schedule; Competition learns the field through a local queue.
+  await page.getByRole('link', { name: 'Back to configuration' }).click();
+  await page.getByRole('region', { name: 'Registration' }).getByRole('button', { name: 'Close registration' }).click();
+  await page.getByRole('link', { name: 'View schedule' }).click();
+  await expect(page.getByRole('heading', { name: 'Schedule · Harbour Cup' })).toBeVisible();
+  const admissionOrder = page.getByRole('radio', { name: 'Admission order' });
+  await expect(async () => {
+    await page.reload();
+    await expect(admissionOrder).toBeVisible({ timeout: 1_000 });
+  }).toPass();
+  await admissionOrder.check();
+  await page.getByRole('button', { name: 'Generate draft' }).click();
+  await page.getByRole('button', { name: 'Publish' }).click();
+  await expect(page.getByText('Schedule published · revision 1.')).toBeVisible();
+
+  // Tournaments learns the schedule and the rosters through local queues: reload until the panel says why it is blocked.
+  await page.getByRole('link', { name: 'Back to configuration' }).click();
+  const competition = page.getByRole('region', { name: 'Competition' });
+  await expect(competition).toBeVisible();
+  await expect(async () => {
+    await page.reload();
+    await expect(competition.getByText('River Falcons’ roster is below the minimum')).toBeVisible({ timeout: 1_000 });
+  }).toPass();
+  await expect(competition.getByText('River Falcons has 2 players (minimum 3).')).toBeVisible();
+  await expect(competition.getByRole('button', { name: 'Start competition' })).toBeDisabled();
+  await expectAccessible();
+
+  await page.getByRole('link', { name: 'View entries' }).click();
+  await expect(page.getByRole('heading', { name: 'Entries · Harbour Cup' })).toBeVisible();
+  await build('River Falcons', ['Ellis Stone']);
+  await page.getByRole('link', { name: 'Back to configuration' }).click();
+  await expect(competition).toBeVisible();
+  await expect(async () => {
+    await page.reload();
+    await expect(competition.getByText('Ready to start')).toBeVisible({ timeout: 1_000 });
+  }).toPass();
+  await competition.getByRole('button', { name: 'Start competition' }).click();
+  const confirm = page.getByRole('dialog', { name: 'Start the competition?' });
+  await expect(confirm.getByText('Start fixes the 2 entrants, schedule revision 1 and the team rosters. It cannot be undone. No match starts by itself.')).toBeVisible();
+  await confirm.getByRole('button', { name: 'Start competition' }).click();
+  await expect(competition.getByText('Running', { exact: true })).toBeVisible();
+  // Beside the title too, in place of Preparing.
+  await expect(page.getByText('Running', { exact: true })).toHaveCount(2);
+  await expect(page.getByText('Preparing', { exact: true })).toHaveCount(0);
+  await expectAccessible();
+
+  // Registration learns the start through a local queue: reload until the roster is frozen.
+  await page.getByRole('link', { name: 'View entries' }).click();
+  await expect(page.getByRole('heading', { name: 'Entries · Harbour Cup' })).toBeVisible();
+  await expect(async () => {
+    await page.reload();
+    await expect(page.getByText('Running · entries are read-only')).toBeVisible({ timeout: 1_000 });
+  }).toPass();
+  await page.getByRole('list', { name: 'Admitted · 2' }).getByRole('button', { name: 'Roster: River Falcons' }).click();
+  const frozen = page.getByRole('dialog', { name: 'Roster · River Falcons' });
+  await expect(frozen.getByText('Frozen at start')).toBeVisible();
+  await expect(frozen.getByRole('button', { name: 'Add player' })).toHaveCount(0);
+  await expectAccessible();
+});

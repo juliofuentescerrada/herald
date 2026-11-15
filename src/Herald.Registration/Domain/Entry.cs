@@ -116,6 +116,11 @@ public sealed class Entry : Entity<EntryId>
 
     public IReadOnlyList<RosterChange> RosterChanges => _rosterChanges;
 
+    // The roster revision current when Registration learned of the start, and when (h1-competition-start D-3).
+    public int? FrozenRosterRevision { get; private set; }
+
+    public DateTimeOffset? RosterFrozenAt { get; private set; }
+
     // Pending until confirmed; kept after cancellation as evidence (h1-check-in R-3).
     public bool IsCheckedIn { get; private set; }
 
@@ -141,6 +146,12 @@ public sealed class Entry : Entity<EntryId>
     {
         _members.RemoveAll(member => member.GuestId == guest);
         _rosterChanges.Add(new(++RosterRevision, guest, RosterChangeKind.Removed, actor, at));
+    }
+
+    internal void FreezeRoster(DateTimeOffset at)
+    {
+        FrozenRosterRevision = RosterRevision;
+        RosterFrozenAt = at;
     }
 
     internal void SetCheckIn(bool checkedIn, Guid actor, DateTimeOffset at)

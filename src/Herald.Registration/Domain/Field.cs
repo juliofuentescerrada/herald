@@ -34,7 +34,8 @@ public enum CheckInPolicy
 
 // The facts of the tournament that decide its entries, as Tournaments last reported them (design D-3).
 // The roster sizes are set for a team tournament; terms sent before rosters existed lack them.
-// The field is locked while the tournament's schedule is published (h1-round-robin-pairings D-3).
+// The field is locked while the tournament's schedule is published (h1-round-robin-pairings D-3), and
+// fixed with the rosters once the competition started (h1-competition-start D-3).
 public sealed record EntryTerms(
     RegistrationState Registration,
     int Capacity,
@@ -43,7 +44,8 @@ public sealed record EntryTerms(
     int? MinimumRosterSize = null,
     int? MaximumRosterSize = null,
     CheckInPolicy CheckIn = CheckInPolicy.Optional,
-    bool FieldLocked = false);
+    bool FieldLocked = false,
+    bool CompetitionStarted = false);
 
 // An admitted entry that may be paired: checked in under a mandatory policy. Order 1 was admitted first.
 public sealed record EligibleEntry(Entry Entry, int AdmissionOrder);
@@ -157,9 +159,19 @@ public sealed class Field : AggregateRoot<TournamentId>
         }
 
         var before = EligibilityKey;
+        var starts = terms.CompetitionStarted && !Terms.CompetitionStarted;
         Terms = terms;
         TermsRevision = termsRevision;
         TermsReceivedAt = at;
+        if (starts)
+        {
+            // Each admitted team keeps the roster it has now; a write that crossed the start stays visible (D-4).
+            foreach (var entry in _entries.Where(entry => entry.State == EntryState.Admitted && entry.GuestKind == GuestKind.Team))
+            {
+                entry.FreezeRoster(at);
+            }
+        }
+
         Promote(actor: null, at);
         Revision++;
         Changed(before);
@@ -186,6 +198,11 @@ public sealed class Field : AggregateRoot<TournamentId>
         if (HasMismatch)
         {
             return WriteResult.Reject("field", "mismatch");
+        }
+
+        if (Terms.FieldLocked)
+        {
+            return Locked;
         }
 
         if (_entries.Any(entry => entry.GuestId == guest && entry.IsActive))
@@ -351,6 +368,11 @@ public sealed class Field : AggregateRoot<TournamentId>
             return WriteOutcome.Stale;
         }
 
+        if (Terms.CompetitionStarted)
+        {
+            return Frozen;
+        }
+
         if (entry.State == EntryState.Cancelled)
         {
             return WriteResult.Reject("entry", "cancelled");
@@ -399,6 +421,11 @@ public sealed class Field : AggregateRoot<TournamentId>
         if (expectedRosterRevision != entry.RosterRevision)
         {
             return WriteOutcome.Stale;
+        }
+
+        if (Terms.CompetitionStarted)
+        {
+            return Frozen;
         }
 
         if (entry.State == EntryState.Cancelled)
@@ -460,7 +487,14 @@ public sealed class Field : AggregateRoot<TournamentId>
 
     private bool HasFreeSlot => Admitted < Terms.Capacity;
 
-    private static WriteResult Locked => WriteResult.Reject("field", "schedule-published");
+    private WriteResult Locked => WriteResult.Reject("field", Terms.CompetitionStarted ? "competition-started" : "schedule-published");
+
+    private static WriteResult Frozen => WriteResult.Reject("roster", "frozen");
+
+    // Admitted teams whose roster is outside the profile's bounds: they block start (D-17, D-18).
+    public IReadOnlyList<Entry> RostersOutsideBounds => [.. _entries
+        .Where(entry => entry.State == EntryState.Admitted && ReadinessOf(entry) is RosterReadiness.Incomplete or RosterReadiness.AboveMaximum)
+        .OrderBy(entry => entry.AdmittedAt).ThenBy(entry => entry.Sequence)];
 
     // What the eligible revision follows; compared before and after a write, never stored.
     private string EligibilityKey =>

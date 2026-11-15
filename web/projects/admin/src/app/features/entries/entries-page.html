@@ -52,8 +52,11 @@
           <p class="help">{{ checkInSummary() }}</p>
           <p class="help">{{ termsUpdated() }}</p>
         </div>
+        <!-- A final state hides what can never apply again; a temporary lock disables it with its reason. -->
         <div class="summary-action">
-          @if (addBlocked(); as why) {
+          @if (running()) {
+            <!-- Nothing to add once the competition has started; the notice below says why. -->
+          } @else if (addBlocked(); as why) {
             <button herald-button type="button" disabled aria-describedby="add-reason">{{ addLabel() }}</button>
             <p class="help" id="add-reason">{{ why }}</p>
           } @else {
@@ -62,7 +65,11 @@
         </div>
       </section>
 
-      @if (locked()) {
+      @if (running()) {
+        <herald-notice heading="Running · entries are read-only">
+          The competition has started. Leaving now is a competitive withdrawal, handled from the round operations.
+        </herald-notice>
+      } @else if (locked()) {
         <herald-notice heading="Field locked by the published schedule">
           Entries cannot be admitted, cancelled or checked in while the schedule is published. Withdraw it to change the field.
           <span class="notice-action"><a herald-button routerLink="../schedule">Open schedule</a></span>
@@ -135,6 +142,7 @@
                     <button herald-button type="button" [disabled]="state() !== 'ready' || working" (click)="openRoster(entry, $any($event.currentTarget))"
                       [attr.aria-label]="'Roster: ' + entry.guestName">Roster</button>
                   }
+                  @if (!running()) {
                   <button herald-button type="button" [loading]="working" [disabled]="state() !== 'ready' || locked()" (click)="toggleCheckIn(entry)"
                     [attr.aria-label]="(working ? (confirmed ? 'Undoing check-in' : 'Checking in') : confirmed ? 'Undo check-in' : 'Check in') + ': ' + entry.guestName">
                     {{ working ? (confirmed ? 'Undoing…' : 'Checking in…') : confirmed ? 'Undo check-in' : 'Check in' }}
@@ -145,6 +153,7 @@
                   } @else {
                     <button herald-button type="button" [disabled]="state() !== 'ready' || working || locked()" (click)="askCancel(entry, $any($event.currentTarget))"
                       [attr.aria-label]="'Cancel entry: ' + entry.guestName">Cancel entry</button>
+                  }
                   }
                 </div>
               </li>
@@ -169,7 +178,7 @@
                     }
                   </div>
                   <p class="help">{{ waitingReason(entry) }} · Waiting since {{ zoned(entry.waitingSince) }}</p>
-                  @if (admitBlocked(); as why) {
+                  @if (!running() && admitBlocked(); as why) {
                     <p class="help" [id]="'admit-why-' + entry.id">{{ why }}</p>
                   }
                 </div>
@@ -178,11 +187,13 @@
                     <button herald-button type="button" [disabled]="state() !== 'ready'" (click)="openRoster(entry, $any($event.currentTarget))"
                       [attr.aria-label]="'Roster: ' + entry.guestName">Roster</button>
                   }
+                  @if (!running()) {
                   <button herald-button type="button" [disabled]="!!admitBlocked() || state() !== 'ready'"
                     [attr.aria-describedby]="admitBlocked() ? 'admit-why-' + entry.id : null" [attr.aria-label]="'Admit: ' + entry.guestName"
                     (click)="admit(entry, $any($event.currentTarget))">Admit</button>
                   <button herald-button type="button" [disabled]="state() !== 'ready' || locked()" (click)="askCancel(entry, $any($event.currentTarget))"
                     [attr.aria-label]="'Cancel entry: ' + entry.guestName">Cancel entry</button>
+                  }
                 </div>
               </li>
             }
@@ -320,6 +331,7 @@
     [teamName]="entry.guestName"
     [tournamentTitle]="tournament.data()!.configuration.title"
     [zone]="zone()"
+    [started]="running()"
     [organisationName]="workingOrganisation.data()?.name ?? 'this organisation'"
     (leave)="close()"
   />

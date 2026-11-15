@@ -32,7 +32,8 @@ public static class TournamentEntryTermsChangedHandler
             message.MinimumRosterSize,
             message.MaximumRosterSize,
             message.CheckIn == Contract.CheckInPolicy.Mandatory ? Domain.CheckInPolicy.Mandatory : Domain.CheckInPolicy.Optional,
-            message.FieldLocked);
+            message.FieldLocked,
+            message.CompetitionStarted);
         var now = DateTimeOffset.UtcNow;
 
         // A new field publishes its first eligible snapshot too.

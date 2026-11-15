@@ -2,7 +2,6 @@
 
 ## Purpose
 An organisation's owner drafts a single round-robin from the eligible field Registration reports, seeded by admission order or a recorded draw, with one rest per entrant in an odd field; publishes it as a revision that locks the field, withdraws it with a reason, and sees a field change that crossed a draft or a publication reported, never repaired.
-
 ## Requirements
 ### Requirement: Competition knows the eligible field
 Competition SHALL keep, per tournament, the eligible entrants Registration last reported (entry, name, admission order), the registration state, the number of admitted entries pending a mandatory check-in and the eligible revision, keeping the newest revision and ignoring older ones. An eligible entrant SHALL be an admitted entry that, under a mandatory check-in policy, has confirmed its check-in. The eligible revision SHALL change only when the set of eligible entrants does; a roster change or a waiting entry SHALL NOT change it.
@@ -103,4 +102,11 @@ The admin application SHALL offer a Schedule page per tournament, beside Entries
 #### Scenario: The owner reads a published schedule
 - **WHEN** an owner opens the Schedule page of a tournament with revision 2 published
 - **THEN** the page shows "Published · revision 2", its rounds and the history with revision 1 withdrawn and its reason
+
+### Requirement: A started competition keeps its schedule
+After the competition starts, withdrawing the published schedule and generating a draft SHALL be rejected stating that the competition has started. If the start was decided on a revision that a crossed withdrawal had already withdrawn, the schedule SHALL report it and SHALL allow publishing the current draft once.
+
+#### Scenario: Withdrawing after start
+- **WHEN** an owner withdraws the schedule of a running competition
+- **THEN** the write is rejected and the revision is still published
 

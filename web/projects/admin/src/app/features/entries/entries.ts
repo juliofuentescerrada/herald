@@ -53,6 +53,8 @@ export const ruleText = (field: string, rule: string): string => {
     case 'entry/not-admitted': return 'Only an admitted entry can check in.';
     case 'entry/not-pending': return 'Only an entry still pending a mandatory check-in can be marked absent.';
     case 'field/schedule-published': return 'The schedule is published. Withdraw it to change the field.';
+    case 'field/competition-started': return 'The competition has started.';
+    case 'roster/frozen': return 'The roster froze when the competition started.';
     case 'reason/required': return 'Enter a private reason.';
     case 'reason/too-long': return 'Use at most 500 characters.';
     case 'name/required': return 'Enter a name.';

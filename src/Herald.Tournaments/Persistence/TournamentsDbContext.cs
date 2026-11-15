@@ -1,6 +1,9 @@
+using System.Text.Json;
 using Herald.ModuleHosting;
 using Herald.Tournaments.Domain;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.ChangeTracking;
+using Microsoft.EntityFrameworkCore.Metadata.Builders;
 
 namespace Herald.Tournaments.Persistence;
 
@@ -28,6 +31,21 @@ public sealed class TournamentsDbContext(DbContextOptions<TournamentsDbContext> 
             .Select(counts => new EntryCounts(counts.Admitted, counts.Waiting, counts.CheckedIn))
             .SingleOrDefaultAsync(cancellationToken);
 
+    // The start conditions as the projections last saw them (h1-competition-start D-2).
+    public async Task<StartReadiness> StartReadinessAsync(TournamentId id, CancellationToken cancellationToken)
+    {
+        var counts = await FieldCounts.AsNoTracking().SingleOrDefaultAsync(counts => counts.TournamentId == id, cancellationToken);
+        var schedule = await Schedules.AsNoTracking().SingleOrDefaultAsync(schedule => schedule.TournamentId == id, cancellationToken);
+        return new(
+            counts?.EligibleRevision,
+            counts?.Eligible,
+            counts?.Pending,
+            counts?.RostersOutsideBounds,
+            counts?.SharedMemberNames,
+            schedule?.PublishedRevision,
+            schedule?.EligibleRevision);
+    }
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.MapModule(Schema);
@@ -39,6 +57,7 @@ public sealed class TournamentsDbContext(DbContextOptions<TournamentsDbContext> 
             tournament.Property(t => t.Id).HasConversion(id => id.Value, value => new TournamentId(value));
             tournament.Property(t => t.Publication).HasConversion<string>().HasMaxLength(20);
             tournament.Property(t => t.Registration).HasConversion<string>().HasMaxLength(20);
+            tournament.Property(t => t.Competition).HasConversion<string>().HasMaxLength(20);
             // Two writes based on the same revision cannot both succeed.
             tournament.Property(t => t.Revision).IsConcurrencyToken();
             // The schedule's lock bumps only the terms sequence: two snapshots must never share a number (ADR 0016).
@@ -66,6 +85,8 @@ public sealed class TournamentsDbContext(DbContextOptions<TournamentsDbContext> 
             counts.HasKey(c => c.TournamentId);
             counts.Property(c => c.TournamentId).HasConversion(id => id.Value, value => new TournamentId(value));
             counts.Ignore(c => c.Counts);
+            Json(counts.Property(c => c.RostersOutsideBounds));
+            Json(counts.Property(c => c.SharedMemberNames));
         });
 
         modelBuilder.Entity<ScheduleState>(schedule =>
@@ -74,4 +95,16 @@ public sealed class TournamentsDbContext(DbContextOptions<TournamentsDbContext> 
             schedule.Property(s => s.TournamentId).HasConversion(id => id.Value, value => new TournamentId(value));
         });
     }
+
+    private static readonly JsonSerializerOptions _json = new(JsonSerializerDefaults.Web);
+
+    private static void Json<T>(PropertyBuilder<T> property) => property
+        .HasColumnType("jsonb")
+        .HasConversion(
+            value => JsonSerializer.Serialize(value, _json),
+            text => JsonSerializer.Deserialize<T>(text, _json)!,
+            new ValueComparer<T>(
+                (left, right) => JsonSerializer.Serialize(left, _json) == JsonSerializer.Serialize(right, _json),
+                value => JsonSerializer.Serialize(value, _json).GetHashCode(),
+                value => JsonSerializer.Deserialize<T>(JsonSerializer.Serialize(value, _json), _json)!));
 }

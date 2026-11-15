@@ -49,5 +49,5 @@ const registrationIcons: Record<string, IconName> = { notOpen: 'clock', open: 'd
 export const lifecycleLabels = (tournament: { publication: string; registration: string; competition: string }): LifecycleLabel[] => [
   tournament.publication === 'published' ? { text: 'Published', icon: 'world' } : { text: 'Draft', icon: 'pencil' },
   { text: registrationText(tournament.registration), icon: registrationIcons[tournament.registration] },
-  tournament.competition === 'preparation' ? { text: 'Preparing', icon: 'hourglass' } : { text: tournament.competition },
+  tournament.competition === 'running' ? { text: 'Running', icon: 'trophy' } : { text: 'Preparing', icon: 'hourglass' },
 ];

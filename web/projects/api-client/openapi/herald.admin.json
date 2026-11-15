@@ -138,6 +138,88 @@
         }
       }
     },
+    "/api/organisations/{organisationId}/tournaments/{tournamentId}/competition/start": {
+      "post": {
+        "tags": [
+          "Herald.Tournaments.Features.StartCompetition.StartCompetitionEndpoint"
+        ],
+        "summary": "POST_api_organisations_organisationId_tournaments_tournamentId_competition_start",
+        "description": "POST_api_organisations_organisationId_tournaments_tournamentId_competition_start",
+        "operationId": "startCompetition",
+        "parameters": [
+          {
+            "name": "organisationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "tournamentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/StartCompetition"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TournamentDetails"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/organisations/{organisationId}/tournaments/{tournamentId}": {
       "put": {
         "tags": [
@@ -2044,6 +2126,77 @@
           }
         }
       },
+      "CompetitionDetails": {
+        "required": [
+          "conditions",
+          "eligible",
+          "pending",
+          "rostersOutsideBounds",
+          "sharedMemberNames",
+          "publishedScheduleRevision",
+          "startedAt",
+          "startedOnScheduleRevision"
+        ],
+        "type": "object",
+        "properties": {
+          "conditions": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/StartCondition"
+            }
+          },
+          "eligible": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "pending": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "rostersOutsideBounds": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/RosterOutsideBounds"
+            }
+          },
+          "sharedMemberNames": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/SharedMemberName"
+            }
+          },
+          "publishedScheduleRevision": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "startedAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "startedOnScheduleRevision": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          }
+        }
+      },
       "CreatedOrganisation": {
         "required": [
           "id",
@@ -2370,6 +2523,10 @@
             "$ref": "#/components/schemas/CheckInPolicy"
           },
           "fieldLocked": {
+            "type": "boolean",
+            "default": false
+          },
+          "competitionStarted": {
             "type": "boolean",
             "default": false
           }
@@ -2876,7 +3033,9 @@
           "maximumRosterSize",
           "readiness",
           "members",
-          "history"
+          "history",
+          "frozenRevision",
+          "frozenAt"
         ],
         "type": "object",
         "properties": {
@@ -2922,6 +3081,20 @@
             "items": {
               "$ref": "#/components/schemas/RosterChangeDetails"
             }
+          },
+          "frozenRevision": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "frozenAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
           }
         }
       },
@@ -2954,6 +3127,27 @@
                 "$ref": "#/components/schemas/RosterTeam"
               }
             ]
+          }
+        }
+      },
+      "RosterOutsideBounds": {
+        "required": [
+          "entryId",
+          "teamName",
+          "members"
+        ],
+        "type": "object",
+        "properties": {
+          "entryId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "teamName": {
+            "type": "string"
+          },
+          "members": {
+            "type": "integer",
+            "format": "int32"
           }
         }
       },
@@ -3040,7 +3234,10 @@
           "draftChange",
           "current",
           "crossedChange",
-          "history"
+          "history",
+          "startedOnRevision",
+          "startedAt",
+          "startCrossedWithdrawal"
         ],
         "type": "object",
         "properties": {
@@ -3116,6 +3313,23 @@
             "items": {
               "$ref": "#/components/schemas/PublicationDetails"
             }
+          },
+          "startedOnRevision": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "startedAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "startCrossedWithdrawal": {
+            "type": "boolean"
           }
         }
       },
@@ -3124,6 +3338,24 @@
           "admissionOrder",
           "draw"
         ]
+      },
+      "SharedMemberName": {
+        "required": [
+          "name",
+          "teamNames"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "teamNames": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
       },
       "SignedInPerson": {
         "required": [
@@ -3140,6 +3372,29 @@
             "items": {
               "$ref": "#/components/schemas/OwnedOrganisation"
             }
+          }
+        }
+      },
+      "StartCompetition": {
+        "required": [
+          "expectedRevision"
+        ],
+        "type": "object",
+        "properties": {
+          "expectedRevision": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "StartCondition": {
+        "type": "object",
+        "properties": {
+          "rule": {
+            "type": "string"
+          },
+          "met": {
+            "type": "boolean"
           }
         }
       },
@@ -3286,7 +3541,8 @@
           "admittedEntries",
           "waitingEntries",
           "checkedInEntries",
-          "schedulePublished"
+          "schedulePublished",
+          "start"
         ],
         "type": "object",
         "properties": {
@@ -3346,6 +3602,9 @@
           },
           "schedulePublished": {
             "type": "boolean"
+          },
+          "start": {
+            "$ref": "#/components/schemas/CompetitionDetails"
           }
         }
       },
@@ -3491,6 +3750,9 @@
     },
     {
       "name": "Herald.Organisations.Features.CreateOrganisation.CreateOrganisationEndpoint"
+    },
+    {
+      "name": "Herald.Tournaments.Features.StartCompetition.StartCompetitionEndpoint"
     },
     {
       "name": "Herald.Tournaments.Features.SaveTournament.SaveTournamentEndpoint"

@@ -18,6 +18,7 @@ import {
   tournamentsKey,
   tournamentsPath,
 } from './tournaments';
+import { CompetitionArea } from './competition-area';
 import { RegistrationArea } from './registration-area';
 
 const names = [
@@ -94,6 +95,7 @@ const ruleText = (field: string, rule: string): string => {
     case 'below-admitted': return 'Capacity cannot be lower than the admitted entries.';
     case 'locked-by-entries': return 'This cannot change while the tournament has entries.';
     case 'locked-by-check-ins': return 'This cannot change while entries have checked in.';
+    case 'competition-started': return 'This cannot change once the competition has started.';
     case 'skipped-hour': return 'This time does not exist in the reference time zone: the clocks go forward.';
     default: return 'Check this value.';
   }
@@ -110,7 +112,7 @@ const zones = (): string[] => {
 /** Creates a draft, edits it, and edits a published tournament: one form, three moments. */
 @Component({
   selector: 'app-tournament-form-page',
-  imports: [Button, Icon, Notice, RegistrationArea, RouterLink, StatusLabel],
+  imports: [Button, CompetitionArea, Icon, Notice, RegistrationArea, RouterLink, StatusLabel],
   templateUrl: './tournament-form-page.html',
   styleUrl: './tournament-form-page.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
