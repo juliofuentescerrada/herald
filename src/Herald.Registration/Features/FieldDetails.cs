@@ -144,6 +144,24 @@ public sealed record FieldDetails(
             [.. eligible.Select(entry => new EligibleEntrant(entry.Entry.Id.Value, names.GetValueOrDefault(entry.Entry.GuestId, ""), entry.AdmissionOrder))]);
     }
 
+    // The rosters frozen at start, for Competition's lineups (h1-match-lineups D-4); the field's revision orders them.
+    public static async Task<TournamentFrozenRostersChanged> FrozenRostersAsync(Guid organisationId, Field field, RegistrationDbContext db, CancellationToken cancellationToken)
+    {
+        var teams = field.Entries.Where(entry => entry.FrozenRosterRevision is not null).ToList();
+        var guestIds = teams.SelectMany(team => team.Members.Select(member => member.GuestId)).ToList();
+        var names = await db.Guests.AsNoTracking()
+            .Where(guest => guestIds.Contains(guest.Id))
+            .ToDictionaryAsync(guest => guest.Id, guest => guest.Name, cancellationToken);
+        return new(
+            organisationId,
+            field.Id.Value,
+            field.Revision,
+            [.. teams.Select(team => new FrozenRoster(
+                team.Id.Value,
+                team.FrozenRosterRevision!.Value,
+                [.. team.Members.Select(member => new FrozenRosterMember(member.GuestId.Value, names.GetValueOrDefault(member.GuestId, "")))]))]);
+    }
+
     // Both snapshots, in the transaction of the change; the eligible one only when it changed.
     public static async Task PublishAsync(IMessageBus bus, Guid organisationId, Field field, int eligibleRevisionBefore, RegistrationDbContext db, CancellationToken cancellationToken)
     {

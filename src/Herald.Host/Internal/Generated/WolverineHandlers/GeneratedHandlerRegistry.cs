@@ -9,7 +9,7 @@ namespace Internal.Generated.WolverineHandlers
     {
         public override System.Type[] HandlerTypes()
         {
-            return new System.Type[] { typeof(Herald.Competition.Features.TrackCompetitionStart.TournamentCompetitionStartedHandler), typeof(Herald.Competition.Features.TrackEligibleField.TournamentEligibleFieldChangedHandler), typeof(Herald.Registration.Features.TrackTournamentTerms.TournamentEntryTermsChangedHandler), typeof(Herald.Tournaments.Features.TrackFieldCounts.TournamentFieldChangedHandler), typeof(Herald.Tournaments.Features.TrackSchedule.TournamentScheduleChangedHandler) };
+            return new System.Type[] { typeof(Herald.Competition.Features.TrackCompetitionStart.TournamentCompetitionStartedHandler), typeof(Herald.Competition.Features.TrackEligibleField.TournamentEligibleFieldChangedHandler), typeof(Herald.Competition.Features.TrackFrozenRosters.TournamentFrozenRostersChangedHandler), typeof(Herald.Registration.Features.TrackTournamentTerms.TournamentEntryTermsChangedHandler), typeof(Herald.Tournaments.Features.TrackFieldCounts.TournamentFieldChangedHandler), typeof(Herald.Tournaments.Features.TrackSchedule.TournamentScheduleChangedHandler) };
         }
 
         public override System.Type[] MessageTypes()
@@ -32,15 +32,18 @@ namespace Internal.Generated.WolverineHandlers
         [global::System.Diagnostics.CodeAnalysis.DynamicDependency(global::System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.All, typeof(global::Internal.Generated.WolverineHandlers.TournamentEligibleFieldChangedHandler894609019))]
         [global::System.Diagnostics.CodeAnalysis.DynamicDependency(global::System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.All, typeof(global::Internal.Generated.WolverineHandlers.TournamentEntryTermsChangedHandler863110260))]
         [global::System.Diagnostics.CodeAnalysis.DynamicDependency(global::System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.All, typeof(global::Internal.Generated.WolverineHandlers.TournamentFieldChangedHandler1648039412))]
+        [global::System.Diagnostics.CodeAnalysis.DynamicDependency(global::System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.All, typeof(global::Internal.Generated.WolverineHandlers.TournamentFrozenRostersChangedHandler68822302))]
         [global::System.Diagnostics.CodeAnalysis.DynamicDependency(global::System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.All, typeof(global::Internal.Generated.WolverineHandlers.TournamentScheduleChangedHandler1688480777))]
         [global::System.Diagnostics.CodeAnalysis.DynamicDependency(global::System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.All, typeof(global::Herald.Competition.Features.TrackCompetitionStart.TournamentCompetitionStartedHandler))]
         [global::System.Diagnostics.CodeAnalysis.DynamicDependency(global::System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.All, typeof(global::Herald.Competition.Features.TrackEligibleField.TournamentEligibleFieldChangedHandler))]
+        [global::System.Diagnostics.CodeAnalysis.DynamicDependency(global::System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.All, typeof(global::Herald.Competition.Features.TrackFrozenRosters.TournamentFrozenRostersChangedHandler))]
         [global::System.Diagnostics.CodeAnalysis.DynamicDependency(global::System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.All, typeof(global::Herald.Registration.Features.TrackTournamentTerms.TournamentEntryTermsChangedHandler))]
         [global::System.Diagnostics.CodeAnalysis.DynamicDependency(global::System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.All, typeof(global::Herald.Tournaments.Features.TrackFieldCounts.TournamentFieldChangedHandler))]
         [global::System.Diagnostics.CodeAnalysis.DynamicDependency(global::System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.All, typeof(global::Herald.Tournaments.Features.TrackSchedule.TournamentScheduleChangedHandler))]
         [global::System.Diagnostics.CodeAnalysis.DynamicDependency(global::System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.All, typeof(global::Herald.Contracts.Competition.V1.TournamentScheduleChanged))]
         [global::System.Diagnostics.CodeAnalysis.DynamicDependency(global::System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.All, typeof(global::Herald.Contracts.Registration.V1.TournamentEligibleFieldChanged))]
         [global::System.Diagnostics.CodeAnalysis.DynamicDependency(global::System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.All, typeof(global::Herald.Contracts.Registration.V1.TournamentFieldChanged))]
+        [global::System.Diagnostics.CodeAnalysis.DynamicDependency(global::System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.All, typeof(global::Herald.Contracts.Registration.V1.TournamentFrozenRostersChanged))]
         [global::System.Diagnostics.CodeAnalysis.DynamicDependency(global::System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.All, typeof(global::Herald.Contracts.Tournaments.V1.TournamentCompetitionStarted))]
         [global::System.Diagnostics.CodeAnalysis.DynamicDependency(global::System.Diagnostics.CodeAnalysis.DynamicallyAccessedMemberTypes.All, typeof(global::Herald.Contracts.Tournaments.V1.TournamentEntryTermsChanged))]
         public static void Pin()

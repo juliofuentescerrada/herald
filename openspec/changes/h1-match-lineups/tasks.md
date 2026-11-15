@@ -10,12 +10,12 @@
 
 - [x] 3.1 Rename the round-robin record `Match` to `Pairing`; `Match` aggregate with state, lineup revisions and start (design D-1 to D-3); domain tests for every `match-lineups` scenario
 - [x] 3.2 Matches created on start; frozen-roster and active-count projections (D-4); migration
-- [ ] 3.3 Features `GetMatch`, `RecordLineup`, `StartMatch`; the schedule details list matches with their state; API tests against PostgreSQL, including conflicts, repeats and another organisation's 404s
+- [x] 3.3 Features `GetMatch`, `RecordLineup`, `StartMatch`; the schedule details list matches with their state; API tests against PostgreSQL, including conflicts, repeats and another organisation's 404s
 
 ## 4. Registration and Tournaments
 
-- [ ] 4.1 Registration publishes the frozen rosters on start through the outbox; Tournaments sends `ActivePlayersPerSide`; tests for the `team-rosters` scenario
-- [ ] 4.2 Regenerate Wolverine code (`codegen write`) and the OpenAPI documents and client (`pnpm api:generate`); CI drift checks pass
+- [x] 4.1 Registration publishes the frozen rosters on start through the outbox; Tournaments sends `ActivePlayersPerSide`; tests for the `team-rosters` scenario
+- [x] 4.2 Regenerate Wolverine code (`codegen write`) and the OpenAPI documents and client (`pnpm api:generate`); CI drift checks pass
 
 ## 5. Admin application
 

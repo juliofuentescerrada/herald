@@ -21,7 +21,7 @@ public static class GetScheduleEndpoint
     {
         var id = new TournamentId(tournamentId);
         return await db.Schedules.AsNoTracking().SingleOrDefaultAsync(schedule => schedule.Id == id, cancellationToken) is { } schedule
-            ? Results.Ok(ScheduleDetails.Of(schedule))
+            ? Results.Ok(await ScheduleDetails.OfAsync(db, schedule, cancellationToken))
             : ScheduleResults.NotFound();
     }
 }
