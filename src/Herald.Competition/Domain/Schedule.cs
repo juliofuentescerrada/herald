@@ -47,6 +47,19 @@ public sealed record FrozenRosters(int Revision, IReadOnlyList<FrozenRoster> Tea
 // What changed between the field a set of pairings came from and the current one (D-5).
 public sealed record FieldChange(IReadOnlyList<Entrant> Added, IReadOnlyList<Entrant> Removed);
 
+// An entrant's competitive status (h1-round-operations D-2). Stored by number in the departures document: append only.
+public enum EntrantStatus
+{
+    Active,
+    Withdrawn,
+    Disqualified,
+}
+
+// A withdrawal or disqualification of an entrant after start, final in H1; the reason is the organisation's own (A-1).
+public sealed record Departure(Guid EntryId, EntrantStatus Status, string Reason, Guid DepartedBy, DateTimeOffset DepartedAt, Guid OperationId);
+
+public sealed record EntrantDeparted(TournamentId TournamentId, Guid EntryId, EntrantStatus Status, Guid DepartedBy, DateTimeOffset DepartedAt) : IDomainEvent;
+
 public sealed record DraftGenerated(TournamentId TournamentId, Seeding Seeding, int? Seed, int EligibleRevision, Guid GeneratedBy, DateTimeOffset GeneratedAt) : IDomainEvent;
 
 public sealed record SchedulePublished(TournamentId TournamentId, int Number, Guid PublishedBy, DateTimeOffset PublishedAt) : IDomainEvent;
@@ -59,6 +72,7 @@ public sealed class Schedule : AggregateRoot<TournamentId>
     public const int ReasonMaxLength = 500;
 
     private List<Publication> _publications = [];
+    private List<Departure> _departures = [];
 
     // For EF Core, which sets the field after constructing.
     private Schedule(TournamentId id)
@@ -78,6 +92,12 @@ public sealed class Schedule : AggregateRoot<TournamentId>
     {
         get => _publications;
         private set => _publications = [.. value];
+    }
+
+    public IReadOnlyList<Departure> Departures
+    {
+        get => _departures;
+        private set => _departures = [.. value];
     }
 
     public Publication? Current => _publications.LastOrDefault(publication => !publication.IsWithdrawn);
@@ -142,6 +162,66 @@ public sealed class Schedule : AggregateRoot<TournamentId>
 
     // One of the schedule's matches was resolved: the results change.
     public void ResultRecorded() => ResultsRevision++;
+
+    public Departure? DepartureOf(Guid entryId) => _departures.Find(departure => departure.EntryId == entryId);
+
+    public EntrantStatus StatusOf(Guid entryId) => DepartureOf(entryId)?.Status ?? EntrantStatus.Active;
+
+    // Withdraws or disqualifies an entrant of the running competition and, in the same write, resolves its unresolved matches
+    // (h1-round-operations D-2). The matches are the tournament's; the results revision grows once.
+    public WriteResult Depart(
+        Guid operationId, Guid entryId, EntrantStatus status, string? reason, int expectedRevision, IReadOnlyList<Match> matches, Guid actor, DateTimeOffset at)
+    {
+        if (DepartureOf(entryId) is { } departed)
+        {
+            return departed.OperationId == operationId ? WriteOutcome.Repeated : WriteResult.Reject("entrant", "departed");
+        }
+
+        if (expectedRevision != Revision)
+        {
+            return WriteOutcome.Stale;
+        }
+
+        if (StartedPairings is not { } pairings)
+        {
+            return WriteResult.Reject("schedule", "not-started");
+        }
+
+        // The API also binds integers to the enum.
+        if (status is not (EntrantStatus.Withdrawn or EntrantStatus.Disqualified))
+        {
+            return WriteResult.Reject("status", "unknown");
+        }
+
+        if (pairings.Entrants.All(entrant => entrant.EntryId != entryId))
+        {
+            return WriteResult.Reject("entrant", "unknown");
+        }
+
+        reason = reason?.Trim();
+        if (string.IsNullOrEmpty(reason))
+        {
+            return WriteResult.Reject("reason", "required");
+        }
+
+        if (reason.Length > ReasonMaxLength)
+        {
+            return WriteResult.Reject("reason", "too-long");
+        }
+
+        _departures.Add(new(entryId, status, reason, actor, at, operationId));
+        foreach (var match in matches.Where(match => match.First == entryId || match.Second == entryId))
+        {
+            var side = match.First == entryId ? Side.First : Side.Second;
+            var opponent = match.EntryOf(side == Side.First ? Side.Second : Side.First);
+            match.ResolveForDeparture(operationId, side, DepartureOf(opponent)?.OperationId, actor, at);
+        }
+
+        Raise(new EntrantDeparted(Id, entryId, status, actor, at));
+        Revision++;
+        ResultsRevision++;
+        return WriteOutcome.Applied;
+    }
 
     // Newer reports replace the rosters; older ones change nothing.
     public bool ApplyRosters(FrozenRosters rosters)

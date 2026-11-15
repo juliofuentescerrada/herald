@@ -44,6 +44,7 @@ public sealed record Lineup(int Number, IReadOnlyList<Guid> Players, Guid Record
 public sealed record MatchStart(Guid StartedBy, DateTimeOffset StartedAt, int? FirstLineup, int? SecondLineup);
 
 // The one effective result of a match (h1-operator-results D-1), with the players credited with an appearance (D-2).
+// A departure's single absence revised to a double absence keeps it as its predecessor (h1-round-operations D-2).
 public sealed record Resolution(
     Outcome Outcome,
     Cause Cause,
@@ -52,7 +53,8 @@ public sealed record Resolution(
     Guid RecordedBy,
     DateTimeOffset RecordedAt,
     Guid OperationId,
-    string? Reason = null);
+    string? Reason = null,
+    Resolution? Predecessor = null);
 
 public sealed record MatchResolved(MatchId MatchId, Outcome Outcome, Cause Cause, Guid RecordedBy, DateTimeOffset RecordedAt) : IDomainEvent;
 
@@ -332,6 +334,37 @@ public sealed class Match : AggregateRoot<MatchId>
         Raise(new MatchResolved(Id, outcome, cause, actor, at));
         Revision++;
         return WriteOutcome.Applied;
+    }
+
+    // Resolves this match for the departing side's entrant (h1-round-operations D-2); false when nothing changes. The opponent's
+    // departure, when it departed first, is its operation: its own single absence is revised once to a double absence. Any other
+    // resolution stays, a played one above all.
+    public bool ResolveForDeparture(Guid operationId, Side side, Guid? opponentDeparture, Guid actor, DateTimeOffset at)
+    {
+        if (Resolution is { } resolution)
+        {
+            if (resolution.Cause != Cause.SingleAbsence || resolution.OperationId != opponentDeparture)
+            {
+                return false;
+            }
+
+            Resolution = new(Outcome.None, Cause.DoubleAbsence, false, [], actor, at, operationId, Predecessor: resolution);
+        }
+        else if (Start is not null)
+        {
+            // In play: a concession after play, crediting the locked lineups.
+            Resolution = new(side == Side.First ? Outcome.Second : Outcome.First, Cause.Concession, true, Appearances(), actor, at, operationId);
+        }
+        else
+        {
+            Resolution = opponentDeparture is null
+                ? new(side == Side.First ? Outcome.Second : Outcome.First, Cause.SingleAbsence, false, [], actor, at, operationId)
+                : new(Outcome.None, Cause.DoubleAbsence, false, [], actor, at, operationId);
+        }
+
+        Raise(new MatchResolved(Id, Resolution.Outcome, Resolution.Cause, actor, at));
+        Revision++;
+        return true;
     }
 
     // The players of the two locked lineups; none for an individual match, whose entrant is the player (D-2).

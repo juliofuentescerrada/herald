@@ -41,6 +41,7 @@ public sealed class CompetitionDbContext(DbContextOptions<CompetitionDbContext> 
             Json(schedule.Property(s => s.Draft));
             Json(schedule.Property(s => s.Publications));
             Json(schedule.Property(s => s.Rosters));
+            Json(schedule.Property(s => s.Departures));
         });
 
         OrganisationOwned<Match>(modelBuilder);

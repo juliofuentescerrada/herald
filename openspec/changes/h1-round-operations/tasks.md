@@ -5,7 +5,7 @@
 ## 2. Competition
 
 - [x] 2.1 Round state (design D-1) and the operations summary in the schedule details; domain tests for the round scenarios
-- [ ] 2.2 Entrant departures and their resolutions, including either order and the revision to double absence (D-2); domain tests for every departure scenario
+- [x] 2.2 Entrant departures and their resolutions, including either order and the revision to double absence (D-2); domain tests for every departure scenario
 - [ ] 2.3 Player withdrawal and sanction on the frozen-roster projection; lineup and start checks (D-3); domain tests for the `match-lineups` scenarios
 - [ ] 2.4 Migration; features `WithdrawEntrant`, `DisqualifyEntrant`, `WithdrawPlayer`, `SanctionPlayer`, `LiftSanction`; API tests against PostgreSQL, including repeats, conflicts and another organisation's 404s
 
