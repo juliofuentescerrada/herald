@@ -50,3 +50,42 @@ Visual choices (G-/RU-): a real table for tabular data (`docs/ui/components.md`)
 ## Risks / Trade-offs
 
 - [Projection lag after a result] → the page shows the revision it reflects; the operator's own write invalidates the query and shows "Updating" until it arrives.
+
+## Implementation notes
+
+Deviations from the plan above, each kept small:
+
+- **The results revision.** The schedule keeps `ResultsRevision`: 1 when the matches are scheduled, one more per resolution. It is a concurrency token, so two resolutions saved at once cannot publish the same revision; the second is retried and publishes the next one with both results.
+- **The cause crosses as a name.** The contract carries the cause as Competition's camel-case name ("played"), so causes added by `h1-exceptional-outcomes` need no new contract version; the outcome and match state are enums, `None` included from v1.
+- **Updating without a results revision on the write.** A match write answers with the match, not the results revision, so the page compares Competition's resolved count (the schedule it already reads) with the standings' count: while Competition knows more, the label reads "Updating" and the standings are read again every second. A competition started but whose first snapshot has not arrived (404) reads as updating, not missing.
+- **Each line's result.** `GetStandings` gives each explanation line its result for the entrant (won, drawn, lost, no winner), so the explanation reads "Round 1 · vs Jamie Brook · draw · played · 1 point".
+- **Explanation of resolved matches only.** The prototype also lists matches in play or scheduled ("counts nothing yet"); the requirement lists resolved matches and the rest, so the build does not.
+- **Tournament tabs.** Earlier slices left tabs out (`h1-round-robin-pairings`, `h1-competition-start`); this change's task 4.1 asks for them, so Configuration, Entries, Schedule and Standings are route links (with `aria-current="page"`, not ARIA tabs) below the title of each published tournament's pages. The pages keep their back links. The match page has none: it is a child of the schedule.
+- **Journey 21.** Renumbered from 22: `h1-exceptional-outcomes`, which had 21, has not merged; it renumbers its journey to 22.
+- **Seed.** The seeded Lantern Open also records Dario Venn's win over Bram Holloway, so its standings share positions both as seeded and after `seeded-results` adds two results.
+- **Host tests file.** The standings API tests extend `MatchTests` (partial class `StandingsTests.cs`) for its league helpers.
+
+## Verification
+
+15 November 2026, cloud session:
+
+- `scripts/check all` passed.
+- End-to-end suite: 21 journeys passed, journey 21 included. Test scripts: 8 passed, `seeded-standings` included.
+- The admin initial bundle is over its 900 kB budget by about 56 kB, a warning that predates this change's frontend work (the generated client grows with each endpoint).
+
+## Visual comparison
+
+Captured at 1440 and 390 px from the composed application (synthetic persona, seeded data; `standings-empty`, `standings-updating` and `standings-load-failed` with the standings response replaced in the browser) and compared with `prototypes/frontend/play-and-score-states.html`.
+
+| State | Match | Difference and resolution |
+|---|---|---|
+| `standings-before-start` | Notice "Standings begin when the competition starts" below the tabs | None |
+| `standings-empty` | Every entrant 1= with 0 points; "No match resolved yet" in the summary | None |
+| `standings-provisional` | "Provisional" beside the title; summary "Provisional · 4 of 6 matches resolved" with the revision and the rules; points strongest, other numbers muted and right-aligned; "2=" with the accessible name "Position 2, shared" | None |
+| `standings-explained` | The entrant's row expands below it with each resolved match and "Total" | Only resolved matches are listed (above) |
+| `standings-teams` | "Team" heads the entrant column | A plural fix found here: "0 of 1 match resolved" |
+| `standings-updating` | "Updating" in the info tone with the hourglass, in place of "Provisional" | None |
+| `standings-load-failed` | Danger notice with "Try again" | None |
+| Narrow (390 px) | Position, entrant and points only; the explanation wraps | None |
+
+`standings-flags` belongs to `h1-round-operations`.

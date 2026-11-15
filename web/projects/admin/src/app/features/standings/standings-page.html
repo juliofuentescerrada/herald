@@ -37,7 +37,7 @@
       <p role="status">Loading standings…</p>
     } @else {
       <section class="summary">
-        <p><strong>Provisional · {{ view()!.resolvedMatches }} of {{ view()!.matches }} matches resolved</strong></p>
+        <p><strong>Provisional · {{ view()!.resolvedMatches }} of {{ view()!.matches }} {{ view()!.matches === 1 ? 'match' : 'matches' }} resolved</strong></p>
         <p class="help">
           Results revision {{ view()!.revision }} · 3 points a win, 1 a draw · equal points share a position, listed by name{{ view()!.resolvedMatches === 0 ? ' · No match resolved yet' : '' }}
         </p>
