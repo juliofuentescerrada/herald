@@ -53,7 +53,7 @@ import { admittedText, capacityText, dateTimeText, injectOrganisation, lifecycle
               <p class="capacity">{{ capacityLine(tournament) }}</p>
               <p class="labels">
                 @for (label of labels(tournament); track label.text) {
-                  <herald-status-label [icon]="label.icon">{{ label.text }}</herald-status-label>
+                  <herald-status-label [icon]="label.icon" [tone]="label.tone ?? 'neutral'">{{ label.text }}</herald-status-label>
                 }
               </p>
             </div>
@@ -61,6 +61,7 @@ import { admittedText, capacityText, dateTimeText, injectOrganisation, lifecycle
             <div class="row-actions">
               <a herald-button [routerLink]="tournament.id" [attr.aria-label]="action(tournament) + ': ' + tournament.title">{{ action(tournament) }}</a>
               @if (tournament.publication === 'published') {
+                <a herald-button [routerLink]="[tournament.id, 'schedule']" [attr.aria-label]="'View schedule: ' + tournament.title">View schedule</a>
                 <a herald-button [routerLink]="[tournament.id, 'entries']" [attr.aria-label]="'Entries: ' + tournament.title"><herald-icon name="users" />Entries</a>
               }
             </div>
@@ -75,13 +76,15 @@ import { admittedText, capacityText, dateTimeText, injectOrganisation, lifecycle
     .panel h2 { margin-top: 0; }
     .empty-icon { color: var(--herald-color-text-secondary); margin-bottom: var(--herald-space-2); }
     .tournaments { list-style: none; margin: 0; padding: 0; background: var(--herald-color-surface-default); border: 1px solid var(--herald-color-border-default); }
-    li { display: flex; align-items: center; justify-content: space-between; gap: var(--herald-space-4); padding: var(--herald-space-6); }
+    li { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--herald-space-4); padding: var(--herald-space-6); }
+    li > div:first-child { flex: 1 1 240px; min-width: 0; overflow-wrap: anywhere; }
+    .facts, .capacity { font-variant-numeric: tabular-nums; }
     li + li { border-top: 1px solid var(--herald-color-border-default); }
     li h2 { font-size: 20px; margin: 0 0 var(--herald-space-2); }
     .facts { color: var(--herald-color-text-secondary); margin: 0 0 var(--herald-space-2); }
     .capacity { font-weight: 700; font-size: var(--herald-text-lg); margin: 0 0 var(--herald-space-3); }
     .labels { display: flex; flex-wrap: wrap; gap: var(--herald-space-2); margin: 0; }
-    .row-actions { display: flex; flex: none; gap: var(--herald-space-3); }
+    .row-actions { display: flex; flex: 0 1 auto; flex-wrap: wrap; gap: var(--herald-space-3); }
     @media (max-width: 699px) {
       h1 { font-size: 28px; }
       .heading, li, .row-actions { flex-direction: column; align-items: stretch; }

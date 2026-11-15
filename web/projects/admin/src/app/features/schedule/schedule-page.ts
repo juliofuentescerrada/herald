@@ -1,3 +1,4 @@
+import { TournamentNav } from '../../shared';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, computed, inject, signal, TemplateRef, viewChild, ViewContainerRef } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
@@ -24,7 +25,7 @@ interface Failure {
 /** A tournament's round-robin: the draft from the eligible field, its publication and withdrawal (F-06, round-robin-pairings). */
 @Component({
   selector: 'app-schedule-page',
-  imports: [Button, Dialog, Icon, Notice, RouterLink, StatusLabel],
+  imports: [TournamentNav, Button, Dialog, Icon, Notice, RouterLink, StatusLabel],
   templateUrl: './schedule-page.html',
   styleUrl: './schedule-page.css',
   changeDetection: ChangeDetectionStrategy.OnPush,

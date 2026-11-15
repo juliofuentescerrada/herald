@@ -143,13 +143,13 @@ public static class Scenarios
         await admin.StartCompetitionAsync(organisation, playing);
         await admin.RecordResultAsync(organisation, playing, 0, outcome: "first");
 
-        // Running individual league of four with one match of each exceptional cause, the other two to play (h1-exceptional-outcomes).
-        // A tournament of its own, so the test scripts keep Lantern Open's matches to record.
+        // Running individual league of six with one match of each exceptional cause, the other eleven to play (h1-exceptional-outcomes).
+        // A tournament of its own, so the results script keeps Lantern Open's matches; the exceptional outcomes script records here.
         var exceptional = Ids.For("tournament", "running-exceptional");
-        await admin.CreateTournamentAsync(organisation, exceptional, Configuration(clock, "Lantern Shield", opens: -6, closes: -1, starts: 1, capacity: 4));
+        await admin.CreateTournamentAsync(organisation, exceptional, Configuration(clock, "Lantern Shield", opens: -6, closes: -1, starts: 1, capacity: 6));
         await admin.PublishAsync(organisation, exceptional);
         await admin.OpenRegistrationAsync(organisation, exceptional);
-        foreach (var name in Names.Players[4..8])
+        foreach (var name in Names.Players[4..10])
         {
             await admin.EnterAsync(organisation, exceptional, await admin.CreateGuestAsync(organisation, "player", name));
         }

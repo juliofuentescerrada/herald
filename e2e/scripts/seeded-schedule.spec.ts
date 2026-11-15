@@ -22,7 +22,7 @@ test('The seeded owner reviews an absence, publishes the schedule, withdraws it 
   await screen(page, info, 'marked-absent');
 
   await page.getByRole('link', { name: 'Back to configuration' }).click();
-  await page.getByRole('link', { name: 'View schedule' }).click();
+  await page.getByRole('link', { name: 'View schedule', exact: true }).click();
   await expect(page.getByRole('heading', { name: 'Schedule · Lantern League' })).toBeVisible();
   const draw = page.getByRole('radio', { name: 'Draw (the seed is recorded)' });
   await expect(async () => {

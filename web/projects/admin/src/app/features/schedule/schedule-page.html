@@ -18,11 +18,12 @@
       <h1>Schedule · {{ tournament.data()!.configuration.title }}</h1>
       <p class="labels">
         @for (label of labels(); track label.text) {
-          <herald-status-label [icon]="label.icon">{{ label.text }}</herald-status-label>
+          <herald-status-label [icon]="label.icon" [tone]="label.tone ?? 'neutral'">{{ label.text }}</herald-status-label>
         }
       </p>
     </div>
   </header>
+  <app-tournament-nav current="Schedule" />
 
   @if (schedule.isPending()) {
     <section class="operation" role="status" aria-busy="true">
@@ -179,11 +180,16 @@
                 @if (matchFor(round.number, match.first.entryId); as played) {
                   <!-- Running: each match opens its own page (h1-match-lineups D-5). -->
                   <li class="running">
-                    <a class="match-link" [routerLink]="['../matches', played.matchId]"><span class="home">{{ match.first.name }}</span><span class="vs"> vs </span><span>{{ match.second.name }}</span></a>
-                    <herald-status-label [tone]="stateTone[played.state]">{{ stateText[played.state] }}</herald-status-label>
-                    @if (played.result; as result) {
-                      <p class="help outcome">{{ resultText(result, match.first.name, match.second.name) }}</p>
-                    }
+                    <div class="pairing">
+                      <strong>{{ match.first.name }} <span class="vs">vs</span> {{ match.second.name }}</strong>
+                      @if (played.result; as result) {
+                        <p class="help outcome">{{ resultText(result, match.first.name, match.second.name) }}</p>
+                      } @else { <p class="help">No result recorded</p> }
+                    </div>
+                    <div class="actions">
+                      <herald-status-label [tone]="stateTone[played.state]">{{ stateText[played.state] }}</herald-status-label>
+                      <a herald-button [routerLink]="['../matches', played.matchId]" [attr.aria-label]="'View match: ' + match.first.name + ' vs ' + match.second.name">View match</a>
+                    </div>
                   </li>
                 } @else {
                   <li><span class="home">{{ match.first.name }}</span><span class="vs"> vs </span><span>{{ match.second.name }}</span></li>
@@ -198,7 +204,7 @@
       }
 
       @if (withdrawn().length) {
-        <details class="history" open>
+        <details class="history">
           <summary>Publication history · {{ s.history.length }}</summary>
           <ul aria-label="Publication history">
             @for (publication of s.history; track publication.number) {

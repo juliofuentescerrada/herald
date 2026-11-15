@@ -8,7 +8,7 @@
       It does not exist in this organisation, or the request failed. Nothing changed.
     </herald-notice>
     <div class="actions">
-      <button herald-button variant="primary" type="button" [loading]="match.isFetching()" (click)="match.refetch()">Try again</button>
+      <button herald-button variant="primary" type="button" [loading]="match.isFetching() || tournament.isFetching()" (click)="retryLoad()">Try again</button>
       <a herald-button routerLink="../../schedule"><herald-icon name="arrow-left" />Back to schedule</a>
     </div>
   </section>
@@ -19,11 +19,12 @@
       <h1>Match · {{ tournament.data()!.configuration.title }}</h1>
       <p class="labels">
         @for (label of labels(); track label.text) {
-          <herald-status-label [icon]="label.icon">{{ label.text }}</herald-status-label>
+          <herald-status-label [icon]="label.icon" [tone]="label.tone ?? 'neutral'">{{ label.text }}</herald-status-label>
         }
       </p>
     </div>
   </header>
+  <app-tournament-nav current="Schedule" />
 
   <!-- Stacked at every width: the match, notices, each side's lineup, then the start. -->
   <div class="column">
@@ -40,7 +41,7 @@
 
     @if (state() === 'conflict') {
       <herald-notice tone="danger" heading="This match changed elsewhere">
-        Nothing changed with this request. Reload the match before trying again.
+        Nothing changed with this request. Reload the match before trying again. Reloading discards unsaved lineup changes.
         <span class="notice-action"><button herald-button type="button" (click)="reload()">Reload latest</button></span>
       </herald-notice>
     }
@@ -50,13 +51,17 @@
     @if (rostersUnknown()) {
       <herald-notice heading="Waiting for the frozen rosters">
         Lineups can be chosen once the teams’ frozen rosters have arrived. Try again in a moment.
-        <span class="notice-action"><button herald-button type="button" [loading]="match.isFetching()" (click)="match.refetch()">Try again</button></span>
+        <span class="notice-action"><button herald-button type="button" [loading]="match.isFetching() || tournament.isFetching()" (click)="retryLoad()">Try again</button></span>
       </herald-notice>
     }
+
+    @if (started()) { <ng-container [ngTemplateOutlet]="resultPanel" /> }
 
     @if (team() && !rostersUnknown()) {
       @for (side of sides(); track side.name) {
         <section class="operation" [attr.aria-labelledby]="side.name + '-lineup'">
+          <details [open]="!started()">
+          <summary>{{ side.entrant }} · {{ started() ? 'locked lineup' : 'prepare lineup' }}</summary>
           <div class="summary-title">
             <h2 [id]="side.name + '-lineup'">{{ side.entrant }} · lineup</h2>
             @if (side.locked) {
@@ -80,7 +85,7 @@
             <p class="help">Resolved without a start: no lineup was locked.</p>
           } @else {
             <p class="help">Choose {{ side.required }} players from the frozen roster. Unselected players are reserves for this match.</p>
-            <fieldset class="choice" [disabled]="state() === 'busy'">
+            <fieldset class="choice" [disabled]="state() !== 'ready'">
               <legend>Players</legend>
               <ul class="players">
                 @for (player of side.roster; track player.playerId) {
@@ -98,7 +103,7 @@
               <button herald-button type="button" [loading]="state() === 'busy'" [disabled]="!side.dirty || !side.complete"
                 [attr.aria-describedby]="side.dirty && !side.complete ? side.name + '-save-why' : null" (click)="save(side.name)">Save lineup</button>
               @if (side.dirty) {
-                <button herald-button variant="quiet" type="button" [disabled]="state() === 'busy'" (click)="discard(side.name)">Discard changes</button>
+                <button herald-button variant="quiet" type="button" [disabled]="state() !== 'ready'" (click)="discard(side.name)">Discard changes</button>
               }
               @if (side.dirty && !side.complete) {
                 <p class="help" [id]="side.name + '-save-why'">Choose exactly {{ side.required }} players.</p>
@@ -118,6 +123,7 @@
               </ul>
             </details>
           }
+          </details>
         </section>
       }
     }
@@ -143,6 +149,8 @@
       </section>
     }
 
+    @if (!started()) { <ng-container [ngTemplateOutlet]="resultPanel" /> }
+    <ng-template #resultPanel>
     <!-- The result: a choice with nothing preselected, then a read-only summary once resolved (h1-operator-results D-3). -->
     <section class="operation" aria-labelledby="result-heading" [attr.aria-busy]="state() === 'busy' || null">
       <div class="summary-title">
@@ -153,10 +161,10 @@
       </div>
       @if (resultSummary(); as summary) {
         <p><strong>{{ summary }}</strong></p>
-        <p class="help">Recorded <span class="when">{{ zoned(m.result!.recordedAt) }}</span>. Corrections come later.</p>
+        <p class="help">Recorded <span class="when">{{ zoned(m.result!.recordedAt) }}</span>. This result is read-only.</p>
       } @else {
         <!-- What happened first, nothing selected; then only that cause's fields (h1-exceptional-outcomes D-3). -->
-        <fieldset class="choice options" [disabled]="state() === 'busy'">
+        <fieldset class="choice options" [disabled]="state() !== 'ready'">
           <legend>What happened?</legend>
           <label><input type="radio" name="cause" [checked]="cause() === 'played'" (change)="choose('played')" /> Played</label>
           <label><input type="radio" name="cause" [checked]="cause() === 'concession'" (change)="choose('concession')" /> Concession</label>
@@ -174,23 +182,23 @@
               @if (!started()) {
                 <p class="help">This match has not started: recording a played result also starts it.</p>
               }
-              <fieldset class="choice outcomes" [disabled]="state() === 'busy'">
+              <fieldset class="choice outcomes" [disabled]="state() !== 'ready'">
                 <legend>Winner</legend>
-                <label><input type="radio" name="outcome" [checked]="outcome() === 'first'" (change)="outcome.set('first')" /> {{ names().first }} wins</label>
-                <label><input type="radio" name="outcome" [checked]="outcome() === 'draw'" (change)="outcome.set('draw')" /> Draw</label>
-                <label><input type="radio" name="outcome" [checked]="outcome() === 'second'" (change)="outcome.set('second')" /> {{ names().second }} wins</label>
+                <label class="outcome-choice"><input type="radio" name="outcome" [checked]="outcome() === 'first'" (change)="outcome.set('first')" /> {{ names().first }} wins @if (outcome() === 'first') { <span class="selection">Selected</span> }</label>
+                <label class="outcome-choice"><input type="radio" name="outcome" [checked]="outcome() === 'draw'" (change)="outcome.set('draw')" /> Draw @if (outcome() === 'draw') { <span class="selection">Selected</span> }</label>
+                <label class="outcome-choice"><input type="radio" name="outcome" [checked]="outcome() === 'second'" (change)="outcome.set('second')" /> {{ names().second }} wins @if (outcome() === 'second') { <span class="selection">Selected</span> }</label>
               </fieldset>
             }
           }
           @case ('concession') {
-            <fieldset class="choice options" [disabled]="state() === 'busy'">
+            <fieldset class="choice options" [disabled]="state() !== 'ready'">
               <legend>Who conceded?</legend>
               <label><input type="radio" name="conceding" [checked]="conceding() === 'first'" (change)="conceding.set('first')" /> {{ names().first }}</label>
               <label><input type="radio" name="conceding" [checked]="conceding() === 'second'" (change)="conceding.set('second')" /> {{ names().second }}</label>
             </fieldset>
           }
           @case ('absence') {
-            <fieldset class="choice options" [disabled]="state() === 'busy'">
+            <fieldset class="choice options" [disabled]="state() !== 'ready'">
               <legend>Who was absent?</legend>
               <label><input type="radio" name="absent" [checked]="absent() === 'first'" (change)="absent.set('first')" /> {{ names().first }}</label>
               <label><input type="radio" name="absent" [checked]="absent() === 'second'" (change)="absent.set('second')" /> {{ names().second }}</label>
@@ -208,7 +216,7 @@
           }
         }
         @if (cause() === 'concession' || cause() === 'noContest') {
-          <fieldset class="choice options" [disabled]="state() === 'busy'">
+          <fieldset class="choice options" [disabled]="state() !== 'ready'">
             <legend>Did play take place?</legend>
             <label><input type="radio" name="play" [checked]="playTookPlace() === true" (change)="playTookPlace.set(true)" /> Yes</label>
             <label><input type="radio" name="play" [checked]="playTookPlace() === false" (change)="playTookPlace.set(false)" /> No</label>
@@ -228,6 +236,7 @@
         }
       }
     </section>
+    </ng-template>
   </div>
 }
 
@@ -236,7 +245,7 @@
     <p>Starting locks both lineups: {{ names().first }} and {{ names().second }} with {{ match.data()?.activePlayers }} players each. Lineups cannot change once the match is in play.</p>
     <div class="actions">
       <button herald-button variant="primary" type="button" [loading]="state() === 'busy'" (click)="start()">Start match</button>
-      <button herald-button type="button" data-herald-initial-focus [disabled]="state() === 'busy'" (click)="close()">Keep as it is</button>
+      <button herald-button type="button" data-herald-initial-focus [disabled]="state() !== 'ready'" (click)="close()">Keep as it is</button>
     </div>
   </herald-dialog>
 </ng-template>

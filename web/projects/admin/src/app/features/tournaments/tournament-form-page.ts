@@ -1,3 +1,4 @@
+import { TournamentNav } from '../../shared';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, computed, DOCUMENT, effect, ElementRef, inject, signal, untracked, viewChild } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -112,7 +113,7 @@ const zones = (): string[] => {
 /** Creates a draft, edits it, and edits a published tournament: one form, three moments. */
 @Component({
   selector: 'app-tournament-form-page',
-  imports: [Button, CompetitionArea, Icon, Notice, RegistrationArea, RouterLink, StatusLabel],
+  imports: [TournamentNav, Button, CompetitionArea, Icon, Notice, RegistrationArea, RouterLink, StatusLabel],
   templateUrl: './tournament-form-page.html',
   styleUrl: './tournament-form-page.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -189,7 +190,12 @@ export class TournamentFormPage {
     const lockedHelp = 'Locked while the tournament has entries. Cancel every entry to change it.';
     const atLeast = admitted ? ` At least ${admitted}: the admitted entries.` : '';
     const zoneOptions = [...new Set([...zones(), ...(d.timeZone ? [d.timeZone] : [])])].sort().map((zone) => [zone, zone] as const);
-    const field = (name: Name, kind: Field['kind'], help: string, extra: Partial<Field> = {}): Field => ({ name, kind, label: fieldLabels[name], help, ...extra });
+    const fixed = new Set<Name>(['capacity', 'entryKind', 'admission', 'checkIn', 'minimumRosterSize', 'maximumRosterSize', 'activePlayersPerSide']);
+    const running = this.stored()?.competition === 'running';
+    const field = (name: Name, kind: Field['kind'], help: string, extra: Partial<Field> = {}): Field => ({
+      name, kind, label: fieldLabels[name], help, ...extra,
+      ...(running && fixed.has(name) ? { locked: true, help: 'Fixed when the competition started.' } : {}),
+    });
     return [
       {
         heading: 'Tournament details',

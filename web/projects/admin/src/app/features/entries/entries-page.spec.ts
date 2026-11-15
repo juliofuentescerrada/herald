@@ -151,7 +151,7 @@ describe('The entries page', () => {
     expect(texts('herald-status-label')).toEqual(['Published', 'Registration open', 'Preparing']);
     expect(texts('.summary .help')).toEqual(['Automatic admission · 0 waiting for a slot', 'Check-in optional', 'Entry terms updated 11 November 2026, 10:10 · Europe/Madrid']);
     expect(text('#empty-heading')).toBe('No entries yet');
-    expect(texts('.group h2')).toEqual(['Admitted · 0', 'Waiting · 0']);
+    expect(texts('.group h2')).toEqual([]);
     // No history, no cancelled group.
     expect(page().querySelector('details.cancelled')).toBeNull();
     expect(page().querySelector('a.back')?.getAttribute('href')).toBe(`/organisations/${organisation}/tournaments/${tournamentId}`);

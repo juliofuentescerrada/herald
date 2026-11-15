@@ -29,7 +29,7 @@ export const ruleText = (field: string, rule: string, required: number | null, f
     case 'unknown': return 'The frozen rosters have not arrived yet. Try again in a moment.';
     case 'started': return 'The match has started; its lineups are locked.';
     case 'individual': return 'An individual match has no lineup.';
-    case 'resolved': return 'This match already has a result. Corrections come later.';
+    case 'resolved': return 'This match already has a result. This result is read-only.';
     case 'not-started': return 'Start the match first: its lineups lock at start.';
     default: return 'Check the request and try again.';
   }
