@@ -53,3 +53,10 @@ Each tournament SHALL have a Standings page beside Configuration, Entries and Sc
 - **WHEN** an owner reads standings where two entrants have 4 points
 - **THEN** both rows read position 2, marked shared
 
+### Requirement: Standings flag departures
+A withdrawn or disqualified entrant SHALL keep its points and position in the standings and SHALL be flagged as withdrawn or disqualified.
+
+#### Scenario: A withdrawn leader
+- **WHEN** the entrant with most points withdraws
+- **THEN** it stays first with its points and is flagged as withdrawn
+
