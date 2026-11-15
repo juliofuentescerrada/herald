@@ -188,8 +188,14 @@ internal static class ScheduleResults
     public static IResult NotFound() => Results.Problem(statusCode: StatusCodes.Status404NotFound, title: "Not found");
 
     // Loads the schedule, applies the write and saves it with its snapshot event in the same transaction.
+    public static Task<IResult> WriteAsync(
+        this CompetitionDbContext db, IMessageBus bus, Guid organisationId, Guid tournamentId, Func<Schedule, WriteResult> write, CancellationToken cancellationToken) =>
+        db.WriteAsync(bus, organisationId, tournamentId, (schedule, _) => write(schedule), cancellationToken);
+
+    // The same with the tournament's matches, tracked, for a write that resolves them too (h1-round-operations D-2). A change of the
+    // results revision publishes the results with it.
     public static async Task<IResult> WriteAsync(
-        this CompetitionDbContext db, IMessageBus bus, Guid organisationId, Guid tournamentId, Func<Schedule, WriteResult> write, CancellationToken cancellationToken)
+        this CompetitionDbContext db, IMessageBus bus, Guid organisationId, Guid tournamentId, Func<Schedule, IReadOnlyList<Match>, WriteResult> write, CancellationToken cancellationToken)
     {
         var id = new TournamentId(tournamentId);
         for (var attempt = 1; ; attempt++)
@@ -199,7 +205,9 @@ internal static class ScheduleResults
                 return NotFound();
             }
 
-            var result = write(schedule);
+            var tracked = await db.Matches.Where(match => match.TournamentId == id).ToListAsync(cancellationToken);
+            var resultsRevision = schedule.ResultsRevision;
+            var result = write(schedule, tracked);
             switch (result.Outcome)
             {
                 // Both carry the current schedule, so a rejection names its blockers (pending entries included) and a
@@ -216,7 +224,7 @@ internal static class ScheduleResults
                         extensions: new Dictionary<string, object?> { ["currentRevision"] = schedule.Revision, ["schedule"] = await ScheduleDetails.OfAsync(db, schedule, cancellationToken) });
                 case WriteOutcome.Applied:
                     // A revision published after a crossed withdrawal is the one the matches come from.
-                    var matches = await db.ScheduleMatchesAsync(schedule, cancellationToken);
+                    await db.ScheduleMatchesAsync(schedule, cancellationToken);
                     try
                     {
                         await db.SaveChangesAsync(cancellationToken);
@@ -229,8 +237,9 @@ internal static class ScheduleResults
 
                     // Stored with the change by the transaction around the endpoint, sent after its commit.
                     await bus.PublishAsync(ScheduleDetails.Changed(organisationId, schedule));
-                    if (matches.Count > 0)
+                    if (schedule.ResultsRevision != resultsRevision)
                     {
+                        var matches = await db.Matches.Where(match => match.TournamentId == id).ToListAsync(cancellationToken);
                         await bus.PublishAsync(ResultsSnapshot.Of(organisationId, schedule, matches));
                     }
                     break;
