@@ -15,6 +15,7 @@ public static class Scenarios
         new("empty-organisation", Personas.Main, "Harbour Games Club", (_, _, _) => Task.CompletedTask),
         new("tournaments-by-state", Personas.Main, "Lantern Hall Players", TournamentsByStateAsync),
         new("second-organisation", Personas.Rival, "Riverside Board Society", SecondOrganisationAsync),
+        new("pilot-applications", Personas.Main, "Beacon Street Gamers", PilotApplicationsAsync),
     ];
 
     private static async Task TournamentsByStateAsync(Admin admin, Guid organisation, Clock clock)
@@ -214,6 +215,18 @@ public static class Scenarios
         {
             await admin.EnterAsync(organisation, open, await admin.CreateGuestAsync(organisation, "player", name));
         }
+    }
+
+    // An active grant for one tournament's results and a revoked one for all tournaments (h1-pilot-access).
+    private static async Task PilotApplicationsAsync(Admin admin, Guid organisation, Clock clock)
+    {
+        var open = Ids.For("tournament", "pilot-open");
+        await admin.CreateTournamentAsync(organisation, open, Configuration(clock, "Beacon Saturday Open", opens: -1, closes: 4, starts: 6, capacity: 8));
+        await admin.PublishAsync(organisation, open);
+        await admin.CreateTournamentAsync(organisation, Ids.For("tournament", "pilot-cup"), Configuration(clock, "Beacon Sunday Cup", opens: 3, closes: 9, starts: 10));
+        var scoreboard = await admin.GrantAsync(organisation, "Old scoreboard", Ids.For("application", "old-scoreboard"), null, "read");
+        await admin.RevokeAsync(organisation, scoreboard);
+        await admin.GrantAsync(organisation, "Results bot", Ids.For("application", "results-bot"), [open], "read", "results");
     }
 
     private static object Configuration(Clock clock, string title, int opens, int closes, int starts, int capacity = 16, bool team = false, string checkIn = "optional", (int Minimum, int Maximum, int Active)? rosters = null) => new

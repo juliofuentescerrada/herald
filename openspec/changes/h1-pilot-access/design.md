@@ -58,6 +58,7 @@ Choices made while implementing, within D-1 to D-4; each is for the review of th
 - **N-3** A grant for selected tournaments does not allow an endpoint that reaches every tournament (listing and creating tournaments), declared with `AllTournaments`. Guests belong to the organisation, not a tournament, so the `entries` and `read` groups reach them whatever the tournaments.
 - **N-4** `OperationGroup` lives in `Herald.BuildingBlocks`: the Organisations domain holds it and may depend only on the building blocks.
 - **N-5** The responsible source is named through `IActorNames` (ModuleHosting, implemented by Organisations): the match view's result carries `recordedBy`, "Results bot (granted by Alex Morgan)" or the person's name. No screen shows it yet; the change log (`h1-change-log`) is where history is read. It is resolved at run time (`AlwaysUseServiceLocationFor`), so Competition's generated code never builds the Organisations database context.
+- **N-7** The fake identity provider issues the pilot application's client-credentials token (`e2e/environment.ts`, `pilotApplication`; checked by hand against the container while implementing). The suite reaches the system only through the browser, so journey 29 does not use it; `h1-api-journey`'s independent client does.
 - **N-6** Grant tournaments are identifiers the Organisations module does not check: an identifier of another organisation's tournament never matches, because the application's requests there have no grant.
 
 ## Risks / Trade-offs
