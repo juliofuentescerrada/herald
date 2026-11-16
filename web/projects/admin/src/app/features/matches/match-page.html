@@ -41,7 +41,11 @@
 
     @if (state() === 'conflict') {
       <herald-notice tone="danger" heading="This match changed elsewhere">
-        Nothing changed with this request. Reload the match before trying again. Reloading discards unsaved lineup changes.
+        @if (correcting()) {
+          Nothing changed with this request. Reload the match and review the impact again; your correction and reason are kept.
+        } @else {
+          Nothing changed with this request. Reload the match before trying again. Reloading discards unsaved lineup changes.
+        }
         <span class="notice-action"><button herald-button type="button" (click)="reload()">Reload latest</button></span>
       </herald-notice>
     }

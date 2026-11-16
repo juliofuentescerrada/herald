@@ -36,7 +36,7 @@ public class CorrectionTests
 
         (match.Resolution!.Outcome, match.Resolution.Cause, match.Resolution.Played, match.Resolution.RecordedBy).ShouldBe((Outcome.Draw, Cause.Played, true, _corrector));
         var replaced = match.ReplacedResolutions.ShouldHaveSingleItem();
-        (replaced.Resolution, replaced.ReplacedBy, replaced.ReplacedAt, replaced.Reason).ShouldBe((win, _corrector, _later, "Score sheet misread"));
+        (replaced.Resolution, replaced.ReplacedBy, replaced.ReplacedAt, replaced.Reason, replaced.MatchRevision).ShouldBe((win, _corrector, _later, "Score sheet misread", revision));
         match.Revision.ShouldBe(revision + 1);
         match.DomainEvents.OfType<ResultCorrected>().ShouldHaveSingleItem().Outcome.ShouldBe(Outcome.Draw);
     }
@@ -137,6 +137,31 @@ public class CorrectionTests
         Correct(match, Cause.Played, Outcome.Second).Outcome.ShouldBe(WriteOutcome.Applied);
 
         (match.Resolution!.Outcome, match.Resolution.Played).ShouldBe((Outcome.Second, true));
+        match.Start.ShouldNotBeNull().StartedBy.ShouldBe(_corrector);
+        match.DomainEvents.OfType<MatchStarted>().ShouldHaveSingleItem();
+    }
+
+    [Fact]
+    public void The_same_operation_with_another_reason_conflicts()
+    {
+        var match = Won();
+        var operation = Guid.NewGuid();
+        Correct(match, Cause.Played, Outcome.Draw, operation: operation);
+
+        Correct(match, Cause.Played, Outcome.Draw, reason: "Another reason", operation: operation).Outcome.ShouldBe(WriteOutcome.Stale);
+        match.ReplacedResolutions.ShouldHaveSingleItem().Reason.ShouldBe("Score sheet misread");
+    }
+
+    [Fact]
+    public void A_retried_result_still_returns_once_the_match_was_corrected()
+    {
+        var match = Individual();
+        var operation = Guid.NewGuid();
+        match.RecordPlayed(operation, Outcome.First, match.Revision, _owner, _at);
+        Correct(match, Cause.Played, Outcome.Draw);
+
+        match.RecordPlayed(operation, Outcome.First, 1, _owner, _at).Outcome.ShouldBe(WriteOutcome.Repeated);
+        match.Resolution!.Outcome.ShouldBe(Outcome.Draw);
     }
 
     [Fact]

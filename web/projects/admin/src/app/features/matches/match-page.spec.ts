@@ -654,6 +654,32 @@ describe('Correcting a result on the match page', () => {
     expect(await violations(page())).toEqual([]);
   });
 
+  it('asks for a new review once the match moved on, never applying the impact reviewed on an older revision', async () => {
+    let reads = 0;
+    const getMatch = () => of(++reads === 1 ? won() : won({ revision: 3, result: { ...won().result!, outcome: 'second' } }));
+    const correctResult = vi.fn(() => throwError(() => problem(409, { type: 'match-revision-conflict' })));
+    const opened = await open({ getMatch, previewCorrection: () => of(preview()), correctResult });
+    await vi.waitFor(() => expect(opened.button('Correct result')).toBeTruthy());
+    opened.button('Correct result')!.click();
+    await opened.settle();
+    await choose(opened.page, opened.settle, 'outcome', 1);
+    await type(opened.settle, 'correction-reason', 'Score sheet misread');
+    opened.button('Review impact')!.click();
+    await opened.settle();
+    await vi.waitFor(() => expect(opened.button('Apply correction')).toBeTruthy());
+    opened.button('Apply correction')!.click();
+    await opened.settle();
+    await vi.waitFor(() => expect(opened.button('Reload latest')).toBeTruthy());
+
+    opened.button('Reload latest')!.click();
+    await opened.settle();
+
+    await vi.waitFor(() => expect(opened.button('Review impact')).toBeTruthy());
+    expect(opened.button('Apply correction')).toBeUndefined();
+    expect((correctResult.mock.calls[0] as unknown[])[3]).toMatchObject({ expectedRevision: 2 });
+    expect(correctResult).toHaveBeenCalledTimes(1);
+  });
+
   it('keeps the correction when saving fails', async () => {
     const { button, settle, text } = await toDraw({ previewCorrection: () => of(preview()), correctResult: () => throwError(() => problem(0)) });
     button('Review impact')!.click();

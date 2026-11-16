@@ -73,11 +73,25 @@ Visual choices (G-/RU-): the correction is not destructive but changes points, s
 
 ## Comparison with the prototypes
 
-Captured at 1440 and 390 px (`test-script-screens`: `seeded-corrections`) against `correct-close-open-states.html` states `correct-impact` and `corrected`:
+Captured at 1440 and 390 px (`test-script-screens`: `seeded-corrections`, both tests) for every Visual input state but `correct-finalised`: `resolved-match` (`correct-resolved`), `correction-form` (`correct-form`), `correction-impact` (`correct-impact`), `stale-preview` (`correct-stale`), `conflict` (`correct-conflict`), `failed-save` (`correct-failed`) and `corrected-with-history` (`corrected`). The stale, conflict and failed states are produced by answering the preview or the correction in the browser on the seeded match; nothing is applied. Differences from `correct-close-open-states.html`:
 
-- **Who:** the prototype names the actor ("Recorded by Alex Morgan", "replaced by Alex Morgan"). The admin application shows no person's name anywhere yet, so the page shows when and why; the actor is stored with each replaced resolution (D-1) and can be shown once names are available.
+- **Who:** the prototype names the actor ("Recorded by Alex Morgan", "replaced by Alex Morgan"). The admin application shows no person's name anywhere yet, so the page shows when and why; the actor is stored with each replaced resolution (D-1) but not yet exposed by the match view, so showing names later adds it to the API.
 - **Result panel while correcting:** the prototype replaces it with the form; the page keeps the read-only Result panel above the Correct result panel, so the current result stays visible beside its correction.
 - **Outcome choice:** the page reuses batch 2's outcome cards ("Winner") instead of the prototype's plain "Outcome" radios, so recording and correcting look the same.
 - **Now / After the correction:** plain labelled values instead of bordered boxes; "Edit correction" sits beside "Apply correction" instead of at the far right.
-- **Stale preview:** "Results changed after this match was loaded" without the new revision number, which Standings does not return in that case.
+- **Stale preview:** "Results changed after this match was loaded" without the new revision number, which Standings does not return in that case. The conflict and failure notices sit at the top of the page, as every match write's do, rather than inside the correction panel.
 - **Finalised match (`correct-finalised`):** not implemented here; it lands with `h1-finalisation` (D-4).
+
+## Review
+
+`herald-reviewer` on `git diff main...HEAD`, 16 November 2026, and how each finding was resolved:
+
+1. **Apply could use an impact reviewed on an older match revision** (blocking): the review keeps the match revision it was computed on, a newer match drops it, and the correction sends that reviewed revision as its expected revision; Vitest covers a 409 followed by a reload to a newer revision.
+2. **No predecessor revision on a replaced resolution:** `ReplacedResolution` records the match revision it was effective at; ADR 0017's row names it.
+3. **Prototype comparison covered two states:** every implemented state is now captured at both widths (above).
+4. **A repeat ignored the reason:** the same operation with another reason conflicts.
+5. **A retried original result answered 400 after a correction:** recording treats an operation whose resolution was corrected as a repeat.
+6. **A played correction did not start an unstarted individual match:** it starts it, as recording does.
+7. **The preview lives in a signal, not a query:** kept; it is a one-off answer to an explicit "Review impact", and finding 1's revision binding removes the staleness the query key would have prevented.
+8. **The typed reason was not a draft:** the session-expiry draft and the leave warning include it.
+9. **Deviations and loose preview validation:** the `jsonb` history and the missing actor names are listed in the pull request for the maintainer's acceptance; the preview's cause stays an open name, as the results contract defines it, and only changes how a line is labelled, never points.

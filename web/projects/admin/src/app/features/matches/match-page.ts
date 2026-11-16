@@ -80,12 +80,12 @@ export class MatchPage {
   /** Correcting a resolved match: the cause-first form with the current values, a reason, then the impact (h1-safe-corrections D-5). */
   protected readonly correcting = signal(false);
   protected readonly correctionReason = signal('');
-  /** The impact Standings computed for the form as it was; editing the form leaves the review. */
-  private readonly review = signal<{ readonly key: string; readonly view: CorrectionPreviewView } | null>(null);
+  /** The impact Standings computed for the form and match revision as they were; editing the form or a newer match leaves the review. */
+  private readonly review = signal<{ readonly key: string; readonly revision: number; readonly view: CorrectionPreviewView } | null>(null);
   protected readonly reviewing = signal(false);
   protected readonly impact = computed(() => {
     const review = this.review();
-    return review && review.key === this.correctionKey() ? review.view : null;
+    return review && review.key === this.correctionKey() && review.revision === this.match.data()?.revision ? review.view : null;
   });
   /** Play was recorded: the correction keeps it (§8.1), so the form asks no play question and offers no absence. */
   protected readonly playRecorded = computed(() => this.correcting() && !!this.match.data()?.result?.played);
@@ -186,13 +186,13 @@ export class MatchPage {
   }
 
   constructor() {
-    this.access.keepDraft(() => this.dirty() ? this.sides().filter((side) => side.dirty).map((side) =>
+    this.access.keepDraft(() => this.correcting() && this.correctionReason().trim() ? `Reason for the correction: ${this.correctionReason().trim()}` : this.dirty() ? this.sides().filter((side) => side.dirty).map((side) =>
       `${side.entrant}: ${side.roster.filter((player) => side.selected.has(player.playerId)).map((player) => player.name).join(', ')}`,
     ).join('\n') : '');
   }
 
   protected beforeUnload(event: BeforeUnloadEvent): void {
-    if (this.dirty()) event.preventDefault();
+    if (this.dirty() || (this.correcting() && this.correctionReason().trim())) event.preventDefault();
   }
 
   protected async retryLoad(): Promise<void> {
@@ -294,14 +294,15 @@ export class MatchPage {
     const body = this.resultBody();
     if (!body || this.correctBlocked() || this.reviewing()) return;
     const key = this.correctionKey();
+    const revision = this.match.data()!.revision;
     const proposed = this.proposedResult(body);
     this.reviewing.set(true);
     this.failure.set(null);
     try {
       const view = await firstValueFrom(this.api.previewCorrection<CorrectionPreviewView>(this.organisation, this.tournamentId, {
-        match: this.matchId, matchRevision: this.match.data()!.revision, outcome: proposed.outcome, cause: proposed.cause,
+        match: this.matchId, matchRevision: revision, outcome: proposed.outcome, cause: proposed.cause,
       }));
-      this.review.set({ key, view });
+      this.review.set({ key, revision, view });
     } catch {
       if (!this.access.problem()) this.failure.set({ heading: 'The impact could not be reviewed', text: 'The request failed. Nothing changed. Your correction is kept; try again.' });
     } finally {
@@ -310,14 +311,15 @@ export class MatchPage {
   }
 
   protected applyCorrection(): void {
-    const match = this.match.data()!;
     const fields = this.resultBody();
-    if (!fields || !this.impact() || this.impact()!.updating) return;
+    const review = this.review();
+    if (!fields || !review || !this.impact() || this.impact()!.updating || this.correctBlocked()) return;
     const key = this.correctionKey();
-    if (this.correctionOperation?.revision !== match.revision || this.correctionOperation.body !== key) {
-      this.correctionOperation = { id: crypto.randomUUID(), revision: match.revision, body: key };
+    if (this.correctionOperation?.revision !== review.revision || this.correctionOperation.body !== key) {
+      this.correctionOperation = { id: crypto.randomUUID(), revision: review.revision, body: key };
     }
-    const body: CorrectResult = { operationId: this.correctionOperation.id, expectedRevision: match.revision, correctionReason: this.correctionReason().trim(), ...fields };
+    // The revision the owner reviewed, so a match that moved on is refused rather than corrected unseen (design Risks).
+    const body: CorrectResult = { operationId: this.correctionOperation.id, expectedRevision: review.revision, correctionReason: this.correctionReason().trim(), ...fields };
     void this.run(
       'The correction could not be saved',
       () => firstValueFrom(this.api.correctResult<MatchView>(this.organisation, this.tournamentId, this.matchId, body)),

@@ -56,8 +56,9 @@ public sealed record Resolution(
     string? Reason = null,
     Resolution? Predecessor = null);
 
-// A resolution replaced by a correction, with who replaced it, when, why and by which operation (h1-safe-corrections D-1).
-public sealed record ReplacedResolution(Resolution Resolution, Guid ReplacedBy, DateTimeOffset ReplacedAt, string Reason, Guid OperationId);
+// A resolution replaced by a correction, with who replaced it, when, why, by which operation and the match revision it was
+// effective at (h1-safe-corrections D-1, ADR 0007).
+public sealed record ReplacedResolution(Resolution Resolution, Guid ReplacedBy, DateTimeOffset ReplacedAt, string Reason, Guid OperationId, int MatchRevision = 0);
 
 public sealed record MatchResolved(MatchId MatchId, Outcome Outcome, Cause Cause, Guid RecordedBy, DateTimeOffset RecordedAt) : IDomainEvent;
 
@@ -250,7 +251,7 @@ public sealed class Match : AggregateRoot<MatchId>
     // A played result; an individual match not yet started starts with it, a team match must be in play (h1-operator-results D-1).
     public WriteResult RecordPlayed(Guid operationId, Outcome outcome, int expectedRevision, Guid actor, DateTimeOffset at)
     {
-        if (Resolution?.OperationId == operationId)
+        if (Resolved(operationId))
         {
             return WriteOutcome.Repeated;
         }
@@ -296,7 +297,7 @@ public sealed class Match : AggregateRoot<MatchId>
     public WriteResult RecordAdministrative(
         Guid operationId, Cause cause, Side? entrant, bool? played, string? reason, int expectedRevision, Guid actor, DateTimeOffset at)
     {
-        if (Resolution?.OperationId == operationId)
+        if (Resolved(operationId))
         {
             return WriteOutcome.Repeated;
         }
@@ -340,7 +341,9 @@ public sealed class Match : AggregateRoot<MatchId>
         {
             // A retry returns what that correction produced; the same operation with other content conflicts.
             var produced = index + 1 < _replacedResolutions.Count ? _replacedResolutions[index + 1].Resolution : Resolution!;
-            return proposal.Broken.Count == 0 && Same(produced, proposal) ? WriteOutcome.Repeated : WriteOutcome.Stale;
+            return proposal.Broken.Count == 0 && Same(produced, proposal) && _replacedResolutions[index].Reason == reason?.Trim()
+                ? WriteOutcome.Repeated
+                : WriteOutcome.Stale;
         }
 
         if (Resolution is not { } current)
@@ -380,13 +383,24 @@ public sealed class Match : AggregateRoot<MatchId>
             return new(WriteOutcome.Rejected, broken);
         }
 
-        _replacedResolutions.Add(new(current, actor, at, reason!, operationId));
+        _replacedResolutions.Add(new(current, actor, at, reason!, operationId, Revision));
+        // A played result starts an individual match that never started, as recording one does (D-2).
+        if (proposal.TookPlace && Start is null)
+        {
+            Start = new(actor, at, null, null);
+            Raise(new MatchStarted(Id, actor, at));
+        }
+
         var appearances = current.Played ? current.Appearances : proposal.TookPlace ? Appearances() : [];
         Resolution = new(proposal.Outcome, cause, proposal.TookPlace, appearances, actor, at, operationId, proposal.NoContestReason);
         Raise(new ResultCorrected(Id, proposal.Outcome, cause, actor, at));
         Revision++;
         return WriteOutcome.Applied;
     }
+
+    // This operation resolved the match, whether its resolution is still effective or was corrected since (match-results: A double submission).
+    private bool Resolved(Guid operationId) =>
+        Resolution?.OperationId == operationId || _replacedResolutions.Exists(replaced => replaced.Resolution.OperationId == operationId);
 
     private sealed record Proposal(List<BrokenRule> Broken, Outcome Outcome, bool TookPlace, string? NoContestReason, Cause Cause);
 
