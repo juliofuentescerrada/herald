@@ -5,6 +5,186 @@
     "version": "1.0.0"
   },
   "paths": {
+    "/api/organisations/{organisationId}/applications/{grantId}/revocation": {
+      "post": {
+        "tags": [
+          "Herald.Organisations.Features.RevokeGrant.RevokeGrantEndpoint"
+        ],
+        "summary": "POST_api_organisations_organisationId_applications_grantId_revocation",
+        "description": "POST_api_organisations_organisationId_applications_grantId_revocation",
+        "operationId": "revokeGrant",
+        "parameters": [
+          {
+            "name": "organisationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "grantId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GrantDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/organisations/{organisationId}/applications": {
+      "get": {
+        "tags": [
+          "Herald.Organisations.Features.ListGrants.ListGrantsEndpoint"
+        ],
+        "summary": "GET_api_organisations_organisationId_applications",
+        "description": "GET_api_organisations_organisationId_applications",
+        "operationId": "listGrants",
+        "parameters": [
+          {
+            "name": "organisationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/GrantDetails"
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/organisations/{organisationId}/applications/{grantId}": {
+      "put": {
+        "tags": [
+          "Herald.Organisations.Features.GrantApplication.GrantApplicationEndpoint"
+        ],
+        "summary": "PUT_api_organisations_organisationId_applications_grantId",
+        "description": "PUT_api_organisations_organisationId_applications_grantId",
+        "operationId": "grantApplication",
+        "parameters": [
+          {
+            "name": "organisationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "grantId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/GrantApplication"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/GrantDetails"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/organisations/{organisationId}": {
       "get": {
         "tags": [
@@ -3622,6 +3802,112 @@
           }
         }
       },
+      "GrantApplication": {
+        "required": [
+          "name",
+          "applicationId",
+          "tournaments",
+          "groups"
+        ],
+        "type": "object",
+        "properties": {
+          "name": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "applicationId": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "uuid"
+          },
+          "tournaments": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "groups": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "$ref": "#/components/schemas/OperationGroup"
+            }
+          }
+        }
+      },
+      "GrantDetails": {
+        "required": [
+          "id",
+          "name",
+          "applicationId",
+          "tournaments",
+          "groups",
+          "grantedBy",
+          "grantedAt",
+          "revokedBy",
+          "revokedAt"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "applicationId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tournaments": {
+            "type": [
+              "null",
+              "array"
+            ],
+            "items": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          "groups": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/OperationGroup"
+            }
+          },
+          "grantedBy": {
+            "type": "string"
+          },
+          "grantedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "revokedBy": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "revokedAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          }
+        }
+      },
       "GuestConflict": {
         "required": [
           "type",
@@ -3989,6 +4275,16 @@
           }
         }
       },
+      "OperationGroup": {
+        "enum": [
+          "read",
+          "setup",
+          "entries",
+          "schedule",
+          "results",
+          "finalisation"
+        ]
+      },
       "OperationsDetails": {
         "required": [
           "scheduled",
@@ -4340,6 +4636,12 @@
           "recordedAt": {
             "type": "string",
             "format": "date-time"
+          },
+          "recordedBy": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },
@@ -5438,6 +5740,15 @@
     }
   },
   "tags": [
+    {
+      "name": "Herald.Organisations.Features.RevokeGrant.RevokeGrantEndpoint"
+    },
+    {
+      "name": "Herald.Organisations.Features.ListGrants.ListGrantsEndpoint"
+    },
+    {
+      "name": "Herald.Organisations.Features.GrantApplication.GrantApplicationEndpoint"
+    },
     {
       "name": "Herald.Organisations.Features.GetOrganisation.GetOrganisationEndpoint"
     },

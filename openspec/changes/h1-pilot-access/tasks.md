@@ -7,7 +7,7 @@
 - [x] 2.1 `PilotApplication` role, `Caller` kind and the grant in `OrganisationContext` (design D-1); host tests
 - [x] 2.2 `ApplicationGrant`, `GrantApplication`, `RevokeGrant`, `ListGrants`; `IOrganisationAccess` resolves grants; migration (D-2); domain and API tests
 - [x] 2.3 Operation groups on every admin endpoint and the filter (D-3, D-4); a host test for missing groups; API tests for every `pilot-access` scenario, including revocation between requests and another organisation's 404s
-- [ ] 2.4 Regenerate Wolverine code (`codegen write`) and the OpenAPI documents and client (`pnpm api:generate`); CI drift checks pass
+- [x] 2.4 Regenerate Wolverine code (`codegen write`) and the OpenAPI documents and client (`pnpm api:generate`); CI drift checks pass
 
 ## 3. Admin application
 
