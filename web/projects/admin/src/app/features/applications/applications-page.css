@@ -2,7 +2,7 @@
 h1 { font-size: 32px; margin: 0; }
 .summary { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: var(--herald-space-4); margin-bottom: var(--herald-space-6); }
 .summary > div { flex: 1 1 320px; }
-.summary h2 { margin-top: 0; }
+.summary h2 { font-size: var(--herald-text-lg); margin: 0 0 var(--herald-space-1); }
 herald-notice { display: block; margin-bottom: var(--herald-space-6); }
 .grants { list-style: none; margin: 0; padding: 0; background: var(--herald-color-surface-default); border: 1px solid var(--herald-color-border-default); }
 li { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--herald-space-4); padding: var(--herald-space-6); }
@@ -24,4 +24,6 @@ herald-dialog herald-notice { margin: var(--herald-space-6) 0 0; }
 @media (max-width: 699px) {
   h1 { font-size: 28px; }
   .summary, li, .row-actions { flex-direction: column; align-items: stretch; }
+  /* In a column the basis would become a height. */
+  .summary > div, li > div:first-child { flex-basis: auto; }
 }

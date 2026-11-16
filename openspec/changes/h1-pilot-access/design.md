@@ -68,3 +68,18 @@ Choices made while implementing, within D-1 to D-4; each is for the review of th
 ## Verification
 
 16 November 2026, on the slice's branch: `scripts/check all` passed every step (rules, specification coverage, format, build, Wolverine code current, 589 .NET tests, OpenAPI client current, lint and boundaries, web tests, SSR isolation, build). The end-to-end suite passed all 24 journeys, journey 29 included, and the 13 test scripts passed, `seeded-pilot-access` included.
+
+## Comparison with the prototypes
+
+Captured 16 November 2026 from the end-to-end environment (seeded persona) at 1440 and 390 px, against `correct-close-open-states.html` states `apps-empty`, `apps-list`, `apps-grant`, `apps-grant-errors` and `apps-revoke` at the same widths.
+
+| Difference | Resolution |
+|---|---|
+| At 390 px the summary and each grant row left a tall empty gap: a flex basis became a height in the column layout | Fixed: the basis is `auto` below the breakpoint |
+| The rail's Applications link carries an icon (`plug-connected`); the prototype's rail has none | Kept: every workspace destination has its icon (`docs/ui/icons.md`, row added) |
+| Status labels and group labels have no icons; the prototype draws a check, a cross and circles | Kept: `StatusLabel` derives no icon from its tone and no grant-state icon is reviewed; text carries the meaning |
+| "Revoke" uses the destructive variant; the prototype draws a neutral button | Kept: D-5 asks for danger tone, as the revocation is immediate and final for the grant |
+| Rows also show "Granted by … · time"; times are in the viewer's zone, without a zone name | Kept: the grant's author is part of the record (D-2); the page is organisation-wide, so no tournament zone applies |
+| Tournament scope is a radio pair with a checkbox per tournament; the prototype shows "Selected: Saturday Open" inline | Kept: an owner may choose several tournaments |
+| Group descriptions: setup reads "registration window" instead of "dates, visibility"; results omit "corrections" | Kept: they name the endpoints that exist; `h1-tournament-cancel-and-dates` and `h1-safe-corrections` extend them with their endpoints |
+| The dialog's error lines carry the error icon and "Error:" prefix | Kept: the admin application's field-error pattern |
