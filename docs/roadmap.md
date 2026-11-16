@@ -110,15 +110,16 @@ Goal: the tournament is corrected safely, finalised, announced, read by link and
 | Slice | Delivers | Main module | Depends on |
 |---|---|---|---|
 | `h1-safe-corrections` | Corrections with a revision and an impact preview (UJ-06, D-07) | Competition, Standings | batch 2 |
-| `h1-tournament-cancel-and-dates` | Cancellation, archiving and postponed dates (AT-09, AT-11, D-27) | Tournaments | batch 2 |
-| `h1-finalisation` | Review and finalisation, and history (F-09, D-24) | Standings | `h1-safe-corrections` |
+| `h1-tournament-cancel-and-dates` | Cancellation, archiving and postponed dates (AT-09, AT-11, D-27) | Tournaments, Competition | `h1-finalisation` |
+| `h1-finalisation` | Review and finalisation, and history (F-09, D-24) | Competition, Standings | `h1-safe-corrections` |
 | `h1-change-log` | An operator-visible change log: admissions, cancellations, published pairings, material changes (F-10, D-26) | Tournaments | `h1-tournament-cancel-and-dates` |
-| `h1-public-read` | The public or unlisted page with rounds and standings (UJ-07, D-09, D-27) | Tournaments, public web | `h1-tournament-cancel-and-dates` |
-| `h1-api-journey` | A complete league without Angular: receipts, revision-aware reads, idempotency (UJ-08, F-11) | across modules | `h1-finalisation`, `h1-change-log`, `h1-public-read` |
+| `h1-public-read` | The public or unlisted page with rounds and standings (UJ-07, D-09, D-27) | Tournaments, public web | `h1-tournament-cancel-and-dates`, `h1-change-log` |
+| `h1-pilot-access` | Pilot server applications under owner-recorded grants (D-12, D-14); proposed as a split of `h1-api-journey` | Organisations, host | batch 2 |
+| `h1-api-journey` | A complete league without Angular: receipts, revision-aware reads, idempotency (UJ-08, F-11) | across modules | `h1-finalisation`, `h1-change-log`, `h1-public-read`, `h1-pilot-access` |
 
-Cancelling after the start voids unresolved pairings, which is Competition's state. Competition does so on Tournaments' cancellation event, so `h1-tournament-cancel-and-dates` changes only Tournaments' model; if its proposal needs to change Competition's, it runs after `h1-safe-corrections` instead of beside it.
+Cancelling after the start voids unresolved pairings, which is Competition's state. Competition does so on Tournaments' cancellation event; its proposal needs a cancelled state in Competition's model, so it runs after `h1-finalisation`, which also changes that model, instead of beside `h1-safe-corrections`. The batch's proposals (pull request of 15 November 2026) also move finalisation to Competition and split `h1-pilot-access` out of `h1-api-journey`; the review of 15 November 2026 (#74) confirmed them.
 
-Decision rows: D-07 (corrections), D-24 (finalisation barrier), D-26 (H1 announcements, a new proposal), D-27 (visibility, cancellation, dates), D-09 (public identity), D-02, D-12 and D-15 (the API's result and identity contract), D-14 (pilot).
+Decision rows: D-07 (corrections), D-24 (finalisation barrier), D-26 (H1 announcements, a new proposal), D-27 (visibility, cancellation, dates), D-09 (public identity), D-02, D-12 and D-15 (the API's result and identity contract), D-14 (pilot). The decision session of 15 November 2026 closed them ([§15](herald-functional-discovery.md#15-decision-register-and-development-gates)): any effective resolution corrected with reason and impact preview; finalisation behind the full §9.3 barrier, with reasoned reopening; §5.1's cancellation and archive rows as written and deletion of a never-published draft; dates changed only before start, per date; visibility changeable in any state; the change log of F-10 as written; the public page from publication, alias-only; delegated user tokens plus pilot server applications under an owner-recorded grant; queryable receipts and API-06's identifiers as the public contract.
 Acceptance journey: AT-07 to AT-11, AT-13 and AT-14; with it, H1's exit criteria below.
 
 ### Review answers

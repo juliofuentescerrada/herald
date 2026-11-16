@@ -1,0 +1,11 @@
+/* Batch 3 additions over the play-and-score composition. */
+.cco-compare{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:var(--space-4);margin:var(--space-4) 0}.cco-compare>div{border:1px solid var(--line);padding:var(--space-3)}.cco-compare h3{margin:0 0 var(--space-2);font-size:1rem}
+.cco-revisions{list-style:none;margin:var(--space-3) 0;padding:0;display:grid;gap:var(--space-2)}.cco-revisions li{display:flex;justify-content:space-between;gap:var(--space-3);border-bottom:1px solid var(--line);padding-bottom:var(--space-2)}
+.cco-dates{display:grid;gap:var(--space-3);margin:var(--space-4) 0}.cco-dates .row{display:grid;grid-template-columns:auto 1fr minmax(16rem,1fr);gap:var(--space-3);align-items:center;border-bottom:1px solid var(--line);padding-bottom:var(--space-3)}.cco-dates input[type=checkbox]{width:auto;height:auto;min-height:0;margin:0;accent-color:var(--ink)}
+.cco-log{list-style:none;margin:var(--space-4) 0;padding:0}.cco-log li{display:grid;grid-template-columns:auto 1fr auto;gap:var(--space-3);border-bottom:1px solid var(--line);padding:var(--space-3) 0}.cco-log .fl-icon{margin-top:2px}
+.cco-filter{display:flex;flex-wrap:wrap;gap:0;margin:var(--space-3) 0}.cco-filter button{border-radius:0}.cco-filter button[aria-pressed=true]{background:var(--ink);color:var(--herald-color-neutral-page,#fff)}
+.cco-mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.9em}
+.cco-public{max-width:none;margin:0;padding:0}.cco-public-head{display:flex;justify-content:space-between;align-items:center;padding:var(--space-3) var(--space-5);border-bottom:1px solid var(--line)}.cco-public-head .brand{font-weight:800;text-decoration:none;color:var(--ink)}
+.cco-public main{padding:var(--space-5);display:grid;gap:var(--space-5)}.cco-public .text{max-width:75ch}
+.cco-facts{display:grid;grid-template-columns:max-content 1fr;gap:var(--space-2) var(--space-4);margin:0}.cco-facts dt{color:var(--secondary)}.cco-facts dd{margin:0}
+@media(max-width:699px){.cco-compare{grid-template-columns:1fr}.cco-dates .row{grid-template-columns:auto 1fr}.cco-dates .row .new{grid-column:2}.cco-public main,.cco-public-head{padding:var(--space-4)}.cco-log li{grid-template-columns:auto 1fr}.cco-log li .sp-badge{grid-column:2;justify-self:start}}
