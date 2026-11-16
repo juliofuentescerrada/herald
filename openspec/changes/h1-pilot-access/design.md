@@ -64,3 +64,7 @@ Choices made while implementing, within D-1 to D-4; each is for the review of th
 ## Risks / Trade-offs
 
 - [A token issued before revocation] → revocation is checked on every request, so the token stops working at once; tokens are not revoked at the directory.
+
+## Verification
+
+16 November 2026, on the slice's branch: `scripts/check all` passed every step (rules, specification coverage, format, build, Wolverine code current, 589 .NET tests, OpenAPI client current, lint and boundaries, web tests, SSR isolation, build). The end-to-end suite passed all 24 journeys, journey 29 included, and the 13 test scripts passed, `seeded-pilot-access` included.
