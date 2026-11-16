@@ -51,6 +51,7 @@ The suite SHALL cover these journeys, each as one test named as a sentence:
 21. An owner records a concession before play, a double absence and a no contest with its reason, and sees each cause on the schedule with no score and no appearances.
 22. An owner records the results of a four-player league and reads its standings, with two players sharing a position and one player's points traced to its results.
 23. An owner withdraws a player during the competition with a reason, sees the player's unplayed matches resolved as absences and the player flagged in the standings, and sees round 1 completed in the operations summary.
+29. An owner grants a pilot application access to one tournament's result operations, sees the grant listed, and revokes it.
 
 #### Scenario: Each journey checks what the person sees
 - **WHEN** a journey runs
