@@ -17,7 +17,7 @@ public sealed record SideDetails(EntrantDetails Entrant, IReadOnlyList<PlayerDet
 // private to the organisation: admin API only.
 // RecordedBy names who recorded it as they were named then: a person, or an application with the owner who granted it
 // (pilot-access); null for results recorded before names were kept, and for those a departure resolved.
-public sealed record ResultDetails(Outcome Outcome, Cause Cause, bool Played, string? Reason, DateTimeOffset RecordedAt, string? RecordedBy);
+public sealed record ResultDetails(Outcome Outcome, Cause Cause, bool Played, string? Reason, DateTimeOffset RecordedAt, string? RecordedBy = null);
 
 public sealed record MatchStartDetails(DateTimeOffset StartedAt, int? FirstLineup, int? SecondLineup);
 

@@ -4964,8 +4964,7 @@
           "cause",
           "played",
           "reason",
-          "recordedAt",
-          "recordedBy"
+          "recordedAt"
         ],
         "type": "object",
         "properties": {
