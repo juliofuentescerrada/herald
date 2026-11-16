@@ -21,7 +21,7 @@
 
 - [x] 5.1 `tools/Herald.Seed`: a running league with a corrected result
 - [x] 5.2 Journey 24; the suite passes
-- [ ] 5.3 Test script in `e2e/scripts/` (seeded data, `scriptPersona`) with a screenshot per step: resolved match, correction form, impact, corrected result with history
+- [x] 5.3 Test script in `e2e/scripts/` (seeded data, `scriptPersona`) with a screenshot per step: resolved match, correction form, impact, corrected result with history
 
 ## 6. Validation and completion
 
