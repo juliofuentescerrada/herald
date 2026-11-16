@@ -16,7 +16,7 @@
 ## 4. Admin application
 
 - [x] 4.1 `tournaments` feature: summary actions, change dates dialog, cancel and delete confirmations, cancelled notice, "Show archived" (D-6)
-- [ ] 4.2 `schedule` and `standings` features: voided matches and the cancelled status
+- [x] 4.2 `schedule` and `standings` features: voided matches and the cancelled status
 - [ ] 4.3 Vitest for each Visual input state and `axe-core`; lint and boundary checks pass
 
 ## 5. End-to-end journey and seeds

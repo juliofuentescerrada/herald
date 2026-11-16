@@ -38,7 +38,13 @@ export class StandingsPage {
     retry: false,
   }));
   /** Started: running or finalised; standings exist from the start on. */
-  protected readonly running = computed(() => !!this.tournament.data() && this.tournament.data()!.competition !== 'preparation');
+  protected readonly running = computed(() => {
+    const t = this.tournament.data();
+    // A tournament cancelled before start never ran.
+    return !!t && t.competition !== 'preparation' && (t.competition !== 'cancelled' || t.start.startedAt != null);
+  });
+  /** Cancelled after start: the last results stay, with no champion and no final ranking (h1-tournament-cancel-and-dates D-2). */
+  protected readonly cancelled = computed(() => this.tournament.data()?.competition === 'cancelled');
   /** Competition's own view of the matches and results revision: when it is ahead of the standings, they are updating. */
   protected readonly schedule = injectQuery(() => ({
     queryKey: scheduleKey(this.organisation, this.tournamentId),
