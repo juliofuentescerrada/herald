@@ -302,7 +302,7 @@ export class MatchPage {
         match: this.matchId, matchRevision: this.match.data()!.revision, outcome: proposed.outcome, cause: proposed.cause,
       }));
       this.review.set({ key, view });
-    } catch (error) {
+    } catch {
       if (!this.access.problem()) this.failure.set({ heading: 'The impact could not be reviewed', text: 'The request failed. Nothing changed. Your correction is kept; try again.' });
     } finally {
       this.reviewing.set(false);

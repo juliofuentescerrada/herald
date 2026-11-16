@@ -3,7 +3,7 @@ import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
-import { HeraldHostAdminService, LineupDetails, MatchView, PlayerDetails, TournamentDetails } from '@herald/api-client/admin';
+import { CorrectionPreviewView, HeraldHostAdminService, LineupDetails, MatchView, PlayerDetails, TournamentDetails } from '@herald/api-client/admin';
 import { Toasts } from '@herald/ui';
 import { provideTanStackQuery, QueryClient } from '@tanstack/angular-query-experimental';
 import axe from 'axe-core';
@@ -529,5 +529,140 @@ describe('The match page', () => {
     view.button('Try again')!.click();
     await vi.waitFor(() => expect(view.page().textContent).toContain('Sam Reed vs Jamie Brook'));
     expect(reads).toBe(2);
+  });
+});
+
+describe('Correcting a result on the match page', () => {
+  afterEach(() => TestBed.resetTestingModule());
+
+  const won = (over: Partial<MatchView> = {}) => individual({
+    revision: 2,
+    state: 'resolved',
+    start: { startedAt: '2026-11-22T09:40:00Z', firstLineup: null, secondLineup: null },
+    result: { outcome: 'first', cause: 'played', played: true, reason: null, recordedAt: '2026-11-22T09:40:00Z' },
+    ...over,
+  });
+  const preview = (over: Partial<CorrectionPreviewView> = {}): CorrectionPreviewView => ({
+    tournamentId, revision: 9, updating: false, matchRevision: 2,
+    entrants: [
+      { entryId: 'e-sam', name: 'Sam Reed', status: 'active', pointsBefore: 3, pointsAfter: 1, positionBefore: 1, sharedBefore: false, positionAfter: 1, sharedAfter: true },
+      { entryId: 'e-jamie', name: 'Jamie Brook', status: 'active', pointsBefore: 0, pointsAfter: 1, positionBefore: 2, sharedBefore: false, positionAfter: 1, sharedAfter: true },
+    ],
+    ...over,
+  });
+  const type = async (settle: () => Promise<unknown>, id: string, value: string) => {
+    const input = document.getElementById(id) as HTMLTextAreaElement;
+    input.value = value;
+    input.dispatchEvent(new Event('input'));
+    await settle();
+  };
+  /** Opens the form on Sam Reed's win and chooses a draw with a reason. */
+  const toDraw = async (api: Record<string, unknown>) => {
+    const opened = await open({ getMatch: () => of(won()), ...api });
+    await vi.waitFor(() => expect(opened.button('Correct result')).toBeTruthy());
+    opened.button('Correct result')!.click();
+    await opened.settle();
+    await choose(opened.page, opened.settle, 'outcome', 1);
+    await type(opened.settle, 'correction-reason', 'Score sheet misread');
+    return opened;
+  };
+
+  it('offers to correct a resolved result', async () => {
+    const { page, button, text } = await open({ getMatch: () => of(won()) });
+    await vi.waitFor(() => expect(button('Correct result')).toBeTruthy());
+    expect(text('#result-heading')).toBe('Result');
+    expect(page().textContent).toContain('Sam Reed won · played');
+    expect(await violations(page())).toEqual([]);
+  });
+
+  it('opens the cause-first form with the current values and needs a different result and a reason', async () => {
+    const { page, button, settle, text } = await open({ getMatch: () => of(won()) });
+    await vi.waitFor(() => expect(button('Correct result')).toBeTruthy());
+    button('Correct result')!.click();
+    await settle();
+
+    expect(page().querySelectorAll<HTMLInputElement>('input[name=cause]')[0].checked).toBe(true);
+    expect(page().querySelectorAll<HTMLInputElement>('input[name=outcome]')[0].checked).toBe(true);
+    // Play was recorded: no absence and no play question.
+    expect([...page().querySelectorAll('input[name=cause]')].length).toBe(3);
+    expect(page().querySelector('input[name=play]')).toBeNull();
+    expect(button('Review impact')!.disabled).toBe(true);
+    expect(text('#correct-why')).toBe('Give a reason for the correction.');
+    await type(settle, 'correction-reason', 'Score sheet misread');
+    expect(text('#correct-why')).toBe('Choose a different result: this is the current one.');
+    await choose(page, settle, 'outcome', 1);
+    expect(button('Review impact')!.disabled).toBe(false);
+    expect(await violations(page())).toEqual([]);
+  });
+
+  it('reviews the impact before applying, then shows the corrected result with its history',
+    { meta: { type: 'covers', description: 'result-corrections: Reviewing before applying' } }, async () => {
+      const corrected = won({
+        revision: 3,
+        result: { outcome: 'draw', cause: 'played', played: true, reason: null, recordedAt: '2026-11-22T11:05:00Z' },
+        replacedResults: [{ result: won().result!, replacedAt: '2026-11-22T11:05:00Z', correctionReason: 'Score sheet misread' }],
+      });
+      const previewCorrection = vi.fn(() => of(preview()));
+      const correctResult = vi.fn(() => of(corrected));
+      const { page, button, settle, texts, toasts } = await toDraw({ previewCorrection, correctResult });
+
+      button('Review impact')!.click();
+      await settle();
+      await vi.waitFor(() => expect(button('Apply correction')).toBeTruthy());
+
+      expect(previewCorrection).toHaveBeenCalledWith(organisation, tournamentId, { match: matchId, matchRevision: 2, outcome: 'draw', cause: 'played' });
+      expect(texts('tbody td')).toEqual(['Sam Reed', '3 → 1', '1 → 1=', 'Jamie Brook', '0 → 1', '2 → 1=']);
+      expect(page().textContent).toContain('Draw · played · appearances unchanged');
+      expect(page().querySelectorAll<HTMLInputElement>('input[name=outcome]')[1].matches(':disabled')).toBe(true);
+      expect(correctResult).not.toHaveBeenCalled();
+      expect(await violations(page())).toEqual([]);
+
+      button('Apply correction')!.click();
+      await settle();
+
+      const body = (correctResult.mock.calls[0] as unknown[])[3] as Record<string, unknown>;
+      expect(body).toMatchObject({ expectedRevision: 2, cause: 'played', outcome: 'draw', correctionReason: 'Score sheet misread' });
+      await vi.waitFor(() => expect(texts('.operation .summary-title herald-status-label')).toEqual(['Resolved', 'Corrected']));
+      expect(page().textContent).toContain('Draw · played');
+      expect(texts('.history li')[0]).toContain('Sam Reed won · played');
+      expect(texts('.history li')[0]).toContain('Reason: Score sheet misread');
+      expect(button('Apply correction')).toBeUndefined();
+      expect(toasts()).toEqual(['Result corrected. Standings updated.']);
+      expect(await violations(page())).toEqual([]);
+    });
+
+  it('waits for the standings when they have not applied the match yet', async () => {
+    const { page, button, settle } = await toDraw({ previewCorrection: () => of(preview({ updating: true, matchRevision: 1, entrants: [] })) });
+    button('Review impact')!.click();
+    await settle();
+    await vi.waitFor(() => expect(page().textContent).toContain('The standings are updating'));
+    expect(button('Apply correction')).toBeUndefined();
+    expect(button('Review again')).toBeTruthy();
+  });
+
+  it('keeps the correction when the match changed elsewhere', async () => {
+    const correctResult = () => throwError(() => problem(409, { type: 'match-revision-conflict' }));
+    const { page, button, settle, text } = await toDraw({ previewCorrection: () => of(preview()), correctResult });
+    button('Review impact')!.click();
+    await settle();
+    await vi.waitFor(() => expect(button('Apply correction')).toBeTruthy());
+    button('Apply correction')!.click();
+    await settle();
+    await vi.waitFor(() => expect(text('herald-notice')).toContain('This match changed elsewhere'));
+    expect((document.getElementById('correction-reason') as HTMLTextAreaElement).value).toBe('Score sheet misread');
+    expect(button('Apply correction')!.disabled).toBe(true);
+    expect(await violations(page())).toEqual([]);
+  });
+
+  it('keeps the correction when saving fails', async () => {
+    const { button, settle, text } = await toDraw({ previewCorrection: () => of(preview()), correctResult: () => throwError(() => problem(0)) });
+    button('Review impact')!.click();
+    await settle();
+    await vi.waitFor(() => expect(button('Apply correction')).toBeTruthy());
+    button('Apply correction')!.click();
+    await settle();
+    await vi.waitFor(() => expect(text('herald-notice')).toContain('The correction could not be saved'));
+    expect((document.getElementById('correction-reason') as HTMLTextAreaElement).value).toBe('Score sheet misread');
+    expect(button('Apply correction')).toBeTruthy();
   });
 });
