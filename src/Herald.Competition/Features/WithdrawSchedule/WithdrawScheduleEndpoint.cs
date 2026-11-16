@@ -1,3 +1,4 @@
+using Herald.BuildingBlocks;
 using Herald.Competition.Persistence;
 using Herald.ModuleHosting;
 using Microsoft.AspNetCore.Http;
@@ -16,6 +17,7 @@ public static class WithdrawScheduleEndpoint
     [WolverinePost("/api/organisations/{organisationId}/tournaments/{tournamentId}/schedule/withdrawal")]
     [EndpointGroupName(HeraldApi.Admin)]
     [EndpointName("withdrawSchedule")]
+    [OperationGroup(OperationGroup.Schedule)]
     [ProducesResponseType<ScheduleDetails>(StatusCodes.Status200OK)]
     [ProducesResponseType<HttpValidationProblemDetails>(StatusCodes.Status400BadRequest, "application/problem+json")]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound, "application/problem+json")]

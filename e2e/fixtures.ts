@@ -1,7 +1,7 @@
 import AxeBuilder from '@axe-core/playwright';
 import { expect, test as base, type Page } from '@playwright/test';
 import { randomUUID } from 'node:crypto';
-import { audience, authority } from './environment.ts';
+import { audience, authority, tenantId } from './environment.ts';
 
 export interface Persona {
   readonly oid: string;
@@ -40,9 +40,10 @@ export const test = base.extend<Fixtures>({
 
       if (path !== null) await on.goto(path);
       await on.waitForURL((url) => url.href.startsWith(authority));
-      // The provider puts these claims, as the directory names them, into the access token; it sets `tid` itself.
+      // The provider puts these claims, as the directory names them, into the access token. `tid` is given too: with the
+      // pilot application's token callback configured, the provider no longer adds its issuer id itself.
       await on.locator('[name=username]').fill(persona.name);
-      await on.locator('[name=claims]').fill(JSON.stringify({ ...persona, aud: audience }));
+      await on.locator('[name=claims]').fill(JSON.stringify({ ...persona, tid: tenantId, aud: audience }));
       await on.getByRole('button', { name: 'Sign-in' }).click();
       await on.waitForURL((url) => !url.href.startsWith(authority));
       return persona;

@@ -1,3 +1,4 @@
+using Herald.BuildingBlocks;
 using Herald.Competition.Domain;
 using Herald.Competition.Persistence;
 using Herald.ModuleHosting;
@@ -21,6 +22,7 @@ public static class CorrectResultEndpoint
     [WolverinePost("/api/organisations/{organisationId}/tournaments/{tournamentId}/matches/{matchId}/result/correction")]
     [EndpointGroupName(HeraldApi.Admin)]
     [EndpointName("correctResult")]
+    [OperationGroup(OperationGroup.Results)]
     [ProducesResponseType<MatchView>(StatusCodes.Status200OK)]
     [ProducesResponseType<HttpValidationProblemDetails>(StatusCodes.Status400BadRequest, "application/problem+json")]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound, "application/problem+json")]
@@ -32,7 +34,7 @@ public static class CorrectResultEndpoint
         return await db.WriteAsync(bus, organisationId, tournamentId, matchId,
             (match, _) => match.Correct(
                 command.OperationId, command.Cause, command.Outcome, command.Entrant, command.Played, command.Reason, command.CorrectionReason,
-                command.ExpectedRevision, actor, DateTimeOffset.UtcNow),
+                command.ExpectedRevision, actor, DateTimeOffset.UtcNow, context.ActorName),
             cancellationToken);
     }
 }

@@ -45,11 +45,16 @@ public partial class MatchTests(OrganisationApi api)
 
     private Task<HttpResponseMessage> SettledAsync(Func<Task<HttpResponseMessage>> request) => api.SettledAsync(request);
 
-    private async Task<League> OpenAsync(string entryKind, HttpClient? client = null)
+    // A new organisation's league, or another league of an organisation the client already owns.
+    private async Task<League> OpenAsync(string entryKind, HttpClient? client = null, Guid? existing = null)
     {
         client ??= api.As(Guid.NewGuid());
-        var organisation = Guid.NewGuid();
-        (await client.CreateAsync(organisation, "Northside Gaming")).StatusCode.ShouldBe(HttpStatusCode.Created);
+        var organisation = existing ?? Guid.NewGuid();
+        if (existing is null)
+        {
+            (await client.CreateAsync(organisation, "Northside Gaming")).StatusCode.ShouldBe(HttpStatusCode.Created);
+        }
+
         var id = Guid.NewGuid();
         var league = new League(client, $"/api/organisations/{organisation}", $"/api/organisations/{organisation}/tournaments/{id}");
         (await client.PostAsJsonAsync($"{league.Organisation}/tournaments", new { tournamentId = id, configuration = Configuration(entryKind) }, Cancellation)).StatusCode.ShouldBe(HttpStatusCode.Created);

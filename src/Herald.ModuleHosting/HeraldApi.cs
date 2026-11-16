@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -19,6 +20,9 @@ public static class HeraldApi
 
     // The same answer whether the organisation does not exist or the caller is not a member (ADR 0014).
     public const string OrganisationNotAvailable = "organisation-not-available";
+
+    // An application's request outside what its grant allows (design D-4): names the group, never the tournament's content.
+    public const string OperationNotGranted = "operation-not-granted";
     public static readonly IReadOnlyList<string> Documents = [Public, Admin];
 
     public static IServiceCollection AddHeraldApi(this IServiceCollection services)
@@ -53,6 +57,19 @@ public static class HeraldApi
                 {
                     chain.Metadata.RequireAuthorization(HeraldAuthentication.OrganiserPolicy);
                 }
+
+                // For the access step, which reads them from the endpoint to check an application's grant.
+                foreach (var attribute in chain.Method.Method.GetCustomAttributes()
+                    .Where(attribute => attribute is OperationGroupAttribute or PeopleOnlyAttribute))
+                {
+                    chain.Metadata.WithMetadata(attribute);
+                }
+
+                // An application outside its grant is refused (design D-4): part of each grouped endpoint's contract.
+                if (chain.Method.Method.GetCustomAttribute<OperationGroupAttribute>() is not null)
+                {
+                    chain.Metadata.Produces<ProblemDetails>(StatusCodes.Status403Forbidden, "application/problem+json");
+                }
             });
         });
         // Development only for now, like /health: what Azure exposes is decided in M4.
@@ -64,24 +81,66 @@ public static class HeraldApi
         return app;
     }
 
-    // Every organisation-scoped route names {organisationId}; membership is checked on every request, never cached.
+    // Every organisation-scoped route names {organisationId}; access is checked on every request, never cached, so a removed
+    // membership or a revoked grant stops the next request.
     private static async Task EnterOrganisation(HttpContext http, RequestDelegate next)
     {
+        var caller = Caller.From(http.User);
         if (http.GetRouteValue("organisationId") is string value)
         {
-            var caller = Caller.From(http.User);
             var access = http.RequestServices.GetRequiredService<IOrganisationAccess>();
             if (!Guid.TryParse(value, out var organisationId) || caller is null
-                || await access.FindMemberAsync(organisationId, caller, http.RequestAborted) is not { } actorId)
+                || await access.FindAccessAsync(organisationId, caller, http.RequestAborted) is not { } found)
             {
                 await Results.Problem(statusCode: StatusCodes.Status404NotFound, title: "Not found", type: OrganisationNotAvailable)
                     .ExecuteAsync(http);
                 return;
             }
 
-            http.RequestServices.GetRequiredService<OrganisationContext>().Enter(organisationId, actorId);
+            if (found.Grant is { } grant && Refusal(http, grant) is { } refusal)
+            {
+                await NotGranted(http, refusal);
+                return;
+            }
+
+            http.RequestServices.GetRequiredService<OrganisationContext>().Enter(organisationId, found.ActorId, found.Grant, found.Name);
+        }
+        else if (caller?.Kind == CallerKind.Application && IsAdmin(http))
+        {
+            // Creating an organisation and a person's own details are a person's (design D-1).
+            await NotGranted(http, "An application acts only within an organisation that granted it access.");
+            return;
         }
 
         await next(http);
     }
+
+    // Why an application's request falls outside its grant, or null when the grant allows it (design D-4). Never names the
+    // tournament: the refusal must not tell an application anything about one it was not granted.
+    private static string? Refusal(HttpContext http, Grant grant)
+    {
+        var metadata = http.GetEndpoint()?.Metadata;
+        if (metadata?.GetMetadata<OperationGroupAttribute>() is not { } declared || metadata.GetMetadata<PeopleOnlyAttribute>() is not null)
+        {
+            return "Applications cannot perform this operation.";
+        }
+
+        var group = JsonNamingPolicy.CamelCase.ConvertName(declared.Group.ToString());
+        if (!grant.Groups.Contains(declared.Group))
+        {
+            return $"The grant does not include the '{group}' operations.";
+        }
+
+        var outside = http.GetRouteValue("tournamentId") is string value
+            ? grant.Tournaments is { } tournaments && (!Guid.TryParse(value, out var tournament) || !tournaments.Contains(tournament))
+            : declared.AllTournaments && grant.Tournaments is not null;
+        return outside ? $"The grant does not cover this tournament for the '{group}' operations." : null;
+    }
+
+    private static bool IsAdmin(HttpContext http) =>
+        http.GetEndpoint()?.Metadata.GetMetadata<IEndpointGroupNameMetadata>()?.EndpointGroupName == Admin;
+
+    private static Task NotGranted(HttpContext http, string detail) =>
+        Results.Problem(statusCode: StatusCodes.Status403Forbidden, title: "Forbidden", type: OperationNotGranted, detail: detail)
+            .ExecuteAsync(http);
 }

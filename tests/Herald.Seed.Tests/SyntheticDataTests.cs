@@ -40,6 +40,20 @@ public class SyntheticDataTests(SeededDatabases databases)
     }
 
     [Fact]
+    public async Task The_seeded_pilot_organisation_has_an_active_grant_for_one_tournament_and_a_revoked_one()
+    {
+        var database = await databases.NewDatabaseAsync();
+        await SeededDatabases.SeedAsync(database);
+
+        await using var reader = new Reader(database);
+        var grants = (await reader.GetAsync(Main, $"/api/organisations/{Organisation("pilot-applications")}/applications")).EnumerateArray().ToList();
+
+        grants.Select(grant => (grant.GetProperty("name").GetString(), grant.GetProperty("revokedAt").ValueKind == System.Text.Json.JsonValueKind.Null))
+            .ShouldBe([("Results bot", true), ("Old scoreboard", false)]);
+        grants[0].GetProperty("tournaments").EnumerateArray().Select(id => id.GetGuid()).ShouldBe([Ids.For("tournament", "pilot-open")]);
+    }
+
+    [Fact]
     public async Task The_seeded_running_league_has_a_scheduled_match_between_two_frozen_rosters_of_seven()
     {
         var database = await databases.NewDatabaseAsync();
@@ -189,7 +203,7 @@ public class SyntheticDataTests(SeededDatabases databases)
         await using var reader = new Reader(database);
         var me = await reader.GetAsync(Main, "/api/me");
         me.GetProperty("organisations").EnumerateArray().Select(organisation => organisation.GetProperty("id").GetGuid())
-            .ShouldBe([Organisation("empty-organisation"), Organisation("tournaments-by-state")], ignoreOrder: true);
+            .ShouldBe([Organisation("empty-organisation"), Organisation("tournaments-by-state"), Organisation("pilot-applications")], ignoreOrder: true);
         (await reader.GetAsync(Main, Tournament("second-organisation", "rival-open"))).TryGetProperty("revision", out _).ShouldBeFalse();
         (await reader.GetAsync(Rival, Tournament("second-organisation", "rival-open"))).GetProperty("registration").GetString().ShouldBe("open");
     }

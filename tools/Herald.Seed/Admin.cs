@@ -51,6 +51,18 @@ public sealed class Admin(Seeding seeding, Persona persona)
         return entry;
     }
 
+    // A pilot application's grant (pilot-access); tournaments null covers all of them.
+    public async Task<Guid> GrantAsync(Guid organisation, string name, Guid application, Guid[]? tournaments, params string[] groups)
+    {
+        var id = Ids.For(organisation.ToString(), "grant", name);
+        await WriteAsync($"grant '{name}'", () => _client.PutAsJsonAsync(
+            $"/api/organisations/{organisation}/applications/{id}", new { name, applicationId = application, tournaments, groups }));
+        return id;
+    }
+
+    public Task RevokeAsync(Guid organisation, Guid grant) =>
+        WriteAsync($"revoke grant {grant}", () => _client.PostAsync($"/api/organisations/{organisation}/applications/{grant}/revocation", null));
+
     public async Task CancelAsync(Guid organisation, Guid tournament, Guid entry) =>
         await WriteAsync($"cancel entry {entry}", async () =>
             await _client.PostAsJsonAsync($"{Path(organisation, tournament)}/entries/{entry}/cancellation", new { expectedRevision = await EntryRevisionAsync(organisation, tournament, entry) }));

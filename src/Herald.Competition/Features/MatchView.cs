@@ -15,7 +15,9 @@ public sealed record SideDetails(EntrantDetails Entrant, IReadOnlyList<PlayerDet
 
 // A match's effective result; appearances are named on the match view only (h1-operator-results D-2). The reason is a no contest's,
 // private to the organisation: admin API only.
-public sealed record ResultDetails(Outcome Outcome, Cause Cause, bool Played, string? Reason, DateTimeOffset RecordedAt);
+// RecordedBy names who recorded it as they were named then: a person, or an application with the owner who granted it
+// (pilot-access); null for results recorded before names were kept, and for those a departure resolved.
+public sealed record ResultDetails(Outcome Outcome, Cause Cause, bool Played, string? Reason, DateTimeOffset RecordedAt, string? RecordedBy = null);
 
 // A result replaced by a correction, with when it was replaced and why (h1-safe-corrections D-5); admin API only.
 public sealed record ReplacedResultDetails(ResultDetails Result, DateTimeOffset ReplacedAt, string CorrectionReason);
@@ -77,7 +79,8 @@ public sealed record MatchView(
 
     public static ResultDetails? ResultOf(Match match) => match.Resolution is { } resolution ? Of(resolution) : null;
 
-    private static ResultDetails Of(Resolution resolution) => new(resolution.Outcome, resolution.Cause, resolution.Played, resolution.Reason, resolution.RecordedAt);
+    private static ResultDetails Of(Resolution resolution) =>
+        new(resolution.Outcome, resolution.Cause, resolution.Played, resolution.Reason, resolution.RecordedAt, resolution.RecordedByName);
 }
 
 internal static class MatchResults

@@ -13,6 +13,7 @@ public partial class NotifiableFactsTests
     private static readonly Dictionary<string, string> _exemptions = new()
     {
         ["RosterMember"] = "Its addition is the roster change the inventory names as RosterChange.",
+        ["ApplicationGrant"] = "Granting and revoking pilot application access are not notifiable facts (h1-pilot-access proposal).",
         ["Organisation"] = "Creating an organisation is not a notifiable fact in F-10.",
         ["Guest"] = "Creating a guest is not a notifiable fact in F-10.",
         ["CheckInChange"] = "Check-in is not a notifiable fact in F-10 (h1-check-in R-8).",

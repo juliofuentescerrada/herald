@@ -1,3 +1,4 @@
+using Herald.BuildingBlocks;
 using Herald.ModuleHosting;
 using Herald.Organisations.Domain;
 using Herald.Organisations.Persistence;
@@ -17,6 +18,7 @@ public static class GetOrganisationEndpoint
     [WolverineGet("/api/organisations/{organisationId}")]
     [EndpointGroupName(HeraldApi.Admin)]
     [EndpointName("getOrganisation")]
+    [OperationGroup(OperationGroup.Read)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound, "application/problem+json")]
     public static async Task<OrganisationSummary> Get(Guid organisationId, OrganisationContext context, OrganisationsDbContext db, CancellationToken cancellationToken)
     {

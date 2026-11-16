@@ -484,6 +484,44 @@ export interface GenerateDraft {
   seeding: Seeding;
 }
 
+export type OperationGroup = typeof OperationGroup[keyof typeof OperationGroup];
+
+
+export const OperationGroup = {
+  read: 'read',
+  setup: 'setup',
+  entries: 'entries',
+  schedule: 'schedule',
+  results: 'results',
+  finalisation: 'finalisation',
+} as const;
+
+export interface GrantApplication {
+  /** @nullable */
+  name: string | null;
+  /** @nullable */
+  applicationId: string | null;
+  /** @nullable */
+  tournaments: string[] | null;
+  /** @nullable */
+  groups: OperationGroup[] | null;
+}
+
+export interface GrantDetails {
+  id: string;
+  name: string;
+  applicationId: string;
+  /** @nullable */
+  tournaments: string[] | null;
+  groups: OperationGroup[];
+  grantedBy: string;
+  grantedAt: string;
+  /** @nullable */
+  revokedBy: string | null;
+  /** @nullable */
+  revokedAt: string | null;
+}
+
 export interface RosterTeam {
   entryId: string;
   name: string;
@@ -570,6 +608,8 @@ export interface ResultDetails {
   /** @nullable */
   reason: string | null;
   recordedAt: string;
+  /** @nullable */
+  recordedBy?: string | null;
 }
 
 export interface MatchSummary {
@@ -1033,6 +1073,129 @@ function filterParams(
 @Injectable({ providedIn: 'root' })
 export class HeraldHostAdminService {
   private readonly http = inject(HttpClient);
+/**
+ * POST_api_organisations_organisationId_applications_grantId_revocation
+ * @summary POST_api_organisations_organisationId_applications_grantId_revocation
+ */
+ revokeGrant<TData = GrantDetails>(organisationId: string,
+    grantId: string, options?: HttpClientBodyOptions): Observable<TData>;
+ revokeGrant<TData = GrantDetails>(organisationId: string,
+    grantId: string, options?: HttpClientEventOptions): Observable<HttpEvent<TData>>;
+ revokeGrant<TData = GrantDetails>(organisationId: string,
+    grantId: string, options?: HttpClientResponseOptions): Observable<AngularHttpResponse<TData>>;
+  revokeGrant<TData = GrantDetails>(
+    organisationId: string,
+    grantId: string, options?: HttpClientObserveOptions): Observable<TData | HttpEvent<TData> | AngularHttpResponse<TData>> {
+    if (options?.observe === 'events') {
+      return this.http.post<TData>(
+      `/api/organisations/${organisationId}/applications/${grantId}/revocation`,
+      undefined,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'events',
+      }
+    );
+    }
+
+    if (options?.observe === 'response') {
+      return this.http.post<TData>(
+      `/api/organisations/${organisationId}/applications/${grantId}/revocation`,
+      undefined,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'response',
+      }
+    );
+    }
+
+    return this.http.post<TData>(
+      `/api/organisations/${organisationId}/applications/${grantId}/revocation`,
+      undefined,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'body',
+      }
+    );
+  }
+
+/**
+ * GET_api_organisations_organisationId_applications
+ * @summary GET_api_organisations_organisationId_applications
+ */
+ listGrants<TData = GrantDetails[]>(organisationId: string, options?: HttpClientBodyOptions): Observable<TData>;
+ listGrants<TData = GrantDetails[]>(organisationId: string, options?: HttpClientEventOptions): Observable<HttpEvent<TData>>;
+ listGrants<TData = GrantDetails[]>(organisationId: string, options?: HttpClientResponseOptions): Observable<AngularHttpResponse<TData>>;
+  listGrants<TData = GrantDetails[]>(
+    organisationId: string, options?: HttpClientObserveOptions): Observable<TData | HttpEvent<TData> | AngularHttpResponse<TData>> {
+    if (options?.observe === 'events') {
+      return this.http.get<TData>(
+      `/api/organisations/${organisationId}/applications`,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'events',
+      }
+    );
+    }
+
+    if (options?.observe === 'response') {
+      return this.http.get<TData>(
+      `/api/organisations/${organisationId}/applications`,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'response',
+      }
+    );
+    }
+
+    return this.http.get<TData>(
+      `/api/organisations/${organisationId}/applications`,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'body',
+      }
+    );
+  }
+
+/**
+ * PUT_api_organisations_organisationId_applications_grantId
+ * @summary PUT_api_organisations_organisationId_applications_grantId
+ */
+ grantApplication<TData = GrantDetails>(organisationId: string,
+    grantId: string,
+    grantApplicationBody: GrantApplication, options?: HttpClientBodyOptions): Observable<TData>;
+ grantApplication<TData = GrantDetails>(organisationId: string,
+    grantId: string,
+    grantApplicationBody: GrantApplication, options?: HttpClientEventOptions): Observable<HttpEvent<TData>>;
+ grantApplication<TData = GrantDetails>(organisationId: string,
+    grantId: string,
+    grantApplicationBody: GrantApplication, options?: HttpClientResponseOptions): Observable<AngularHttpResponse<TData>>;
+  grantApplication<TData = GrantDetails>(
+    organisationId: string,
+    grantId: string,
+    grantApplicationBody: GrantApplication, options?: HttpClientObserveOptions): Observable<TData | HttpEvent<TData> | AngularHttpResponse<TData>> {
+    if (options?.observe === 'events') {
+      return this.http.put<TData>(
+      `/api/organisations/${organisationId}/applications/${grantId}`,
+      grantApplicationBody,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'events',
+      }
+    );
+    }
+
+    if (options?.observe === 'response') {
+      return this.http.put<TData>(
+      `/api/organisations/${organisationId}/applications/${grantId}`,
+      grantApplicationBody,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'response',
+      }
+    );
+    }
+
+    return this.http.put<TData>(
+      `/api/organisations/${organisationId}/applications/${grantId}`,
+      grantApplicationBody,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'body',
+      }
+    );
+  }
+
 /**
  * GET_api_organisations_organisationId
  * @summary GET_api_organisations_organisationId
@@ -2834,6 +2997,9 @@ export class HeraldHostAdminService {
 
 };
 
+export type RevokeGrantClientResult = NonNullable<GrantDetails>
+export type ListGrantsClientResult = NonNullable<GrantDetails[]>
+export type GrantApplicationClientResult = NonNullable<GrantDetails>
 export type GetOrganisationClientResult = NonNullable<OrganisationSummary>
 export type GetMeClientResult = NonNullable<SignedInPerson>
 export type CreateOrganisationClientResult = NonNullable<IResult | CreatedOrganisation>

@@ -1,3 +1,4 @@
+using Herald.BuildingBlocks;
 using Herald.ModuleHosting;
 using Herald.Tournaments.Domain;
 using Herald.Tournaments.Persistence;
@@ -30,6 +31,7 @@ public static class ListTournamentsEndpoint
     [WolverineGet("/api/organisations/{organisationId}/tournaments")]
     [EndpointGroupName(HeraldApi.Admin)]
     [EndpointName("listTournaments")]
+    [OperationGroup(OperationGroup.Read, AllTournaments = true)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound, "application/problem+json")]
     public static async Task<IReadOnlyList<TournamentSummary>> Get(Guid organisationId, TournamentsDbContext db, CancellationToken cancellationToken)
     {

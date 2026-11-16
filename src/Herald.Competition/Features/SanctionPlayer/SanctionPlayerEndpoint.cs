@@ -1,3 +1,4 @@
+using Herald.BuildingBlocks;
 using Herald.Competition.Persistence;
 using Herald.ModuleHosting;
 using Microsoft.AspNetCore.Http;
@@ -16,6 +17,7 @@ public static class SanctionPlayerEndpoint
     [WolverinePost("/api/organisations/{organisationId}/tournaments/{tournamentId}/entrants/{entryId}/players/{playerId}/sanction")]
     [EndpointGroupName(HeraldApi.Admin)]
     [EndpointName("sanctionPlayer")]
+    [OperationGroup(OperationGroup.Results)]
     [ProducesResponseType<ScheduleDetails>(StatusCodes.Status200OK)]
     [ProducesResponseType<HttpValidationProblemDetails>(StatusCodes.Status400BadRequest, "application/problem+json")]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound, "application/problem+json")]

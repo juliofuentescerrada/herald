@@ -86,6 +86,34 @@ A person who cannot sign in starts with the provider's own recovery: the sign-in
 5. **Remove the old identity's assignments** (section 5).
 6. Ask the person to sign in with the new identity and confirm they see their organisations.
 
+## 7. Pilot applications
+
+Pilot applications are the few programs that an owner lets act for their organisation (D-12, D-14). Herald records what each one may do. A general application console arrives in H5. Each provisioning is one record that the platform operator keeps with the invitation thread: the responsible owner and organisation, the application and its object id, the operations and tournaments agreed, and the date. Never commit that record: it holds real identifiers.
+
+### Interactive applications
+
+An application that acts *for a signed-in person* (a scorer's tool, for example) uses that person's token. It needs no role of its own and no grant in Herald: the person's `Organiser` role and memberships decide, exactly as in the admin application.
+
+1. Register the application in the shared directory like `herald-admin` (section 2): its own redirect URI, the API permission `access_as_user` with admin consent, and **Assignment required?** *Yes*.
+2. Assign the people who will use it to the application. They also need their `herald-api` assignment from section 4.
+3. To remove access, remove the application's assignments, or the person's as in section 5.
+
+### Server applications
+
+An application that acts *on its own* (a results bot, for example) signs in with client credentials. It carries the `PilotApplication` role, and it acts only within the grant that an owner records in Herald.
+
+1. Once, on `herald-api`, go to *App roles* → **Create app role**: display name `PilotApplication`, allowed member types *Applications*, value `PilotApplication`, description "A pilot server application acting within an owner's grant", enabled.
+2. Register the application in the shared directory: **New registration**, accounts in this directory only, no redirect URI. Under *Certificates & secrets*, add a certificate (preferred) or a short-lived secret, and hand it to the responsible owner over the invitation thread, never through the repository.
+3. *API permissions* → **Add a permission** → *My APIs* → `herald-api` → *Application permissions* → `PilotApplication` → **Grant admin consent**. The token then carries `roles: ["PilotApplication"]` and no `scp`. Herald refuses a token that has both.
+4. Note the application's **object id** from *Enterprise applications* → the application → *Properties* → *Object ID*. Herald keys on that id together with the directory, never on the name. Give it to the owner.
+5. The owner opens **Applications** in their organisation's workspace and chooses **Grant access**: a name, that object id, the tournaments (all, or selected ones) and the operation groups. Until the owner records the grant, every request from the application is answered with the generic "not available".
+6. **Demonstrate the scope before the pilot starts:** with the application's token, read a tournament inside the grant (200), then one outside it (403, `operation-not-granted`), then one of another organisation (404). Note the results in the record.
+
+To revoke access:
+
+- **From one organisation:** the owner chooses **Revoke** on the Applications page. This takes effect from the application's next request, including requests with a token issued earlier, because the grant is checked on every request. The grant stays listed with who revoked it and when, and what the application recorded stays attributed to it. To change a grant, the owner revokes it and grants again.
+- **From Herald entirely:** the platform operator removes the `PilotApplication` permission, or deletes the application's credential or registration. New tokens are then refused. A token already issued keeps its role until it expires (about an hour), but every Herald grant check still applies to it.
+
 ## Troubleshooting
 
 | Symptom | Likely cause |
@@ -95,3 +123,6 @@ A person who cannot sign in starts with the provider's own recovery: the sign-in
 | API 401 with `invalid_token`, issuer invalid | The host's authority is not `<auth-authority>/v2.0`, or the API registration still issues v1 tokens (`requestedAccessTokenVersion`) |
 | Sign-in fails with a consent error | Admin consent not granted on `herald-admin` (section 2, step 1) |
 | Redirect URI mismatch | The registration has `http://localhost:4200` without the trailing slash |
+| A server application gets 404 `organisation-not-available` | No active grant in that organisation: the owner has not granted it, has revoked it, or entered another object id |
+| A server application gets 403 `operation-not-granted` | The grant does not include that operation group, or does not cover that tournament. The detail names the group |
+| A server application gets 403 on every endpoint | Its token has no `PilotApplication` role, or it carries a delegated `scp` |

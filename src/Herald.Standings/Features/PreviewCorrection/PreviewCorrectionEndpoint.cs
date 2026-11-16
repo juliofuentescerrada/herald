@@ -1,3 +1,4 @@
+using Herald.BuildingBlocks;
 using Herald.ModuleHosting;
 using Herald.Standings.Domain;
 using Herald.Standings.Persistence;
@@ -22,6 +23,7 @@ public static class PreviewCorrectionEndpoint
     [WolverineGet("/api/organisations/{organisationId}/tournaments/{tournamentId}/standings/preview")]
     [EndpointGroupName(HeraldApi.Admin)]
     [EndpointName("previewCorrection")]
+    [OperationGroup(OperationGroup.Results)]
     [ProducesResponseType<CorrectionPreviewView>(StatusCodes.Status200OK)]
     [ProducesResponseType<HttpValidationProblemDetails>(StatusCodes.Status400BadRequest, "application/problem+json")]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound, "application/problem+json")]

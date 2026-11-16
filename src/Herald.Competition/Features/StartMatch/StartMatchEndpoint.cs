@@ -1,3 +1,4 @@
+using Herald.BuildingBlocks;
 using Herald.Competition.Persistence;
 using Herald.ModuleHosting;
 using Microsoft.AspNetCore.Http;
@@ -16,6 +17,7 @@ public static class StartMatchEndpoint
     [WolverinePost("/api/organisations/{organisationId}/tournaments/{tournamentId}/matches/{matchId}/start")]
     [EndpointGroupName(HeraldApi.Admin)]
     [EndpointName("startMatch")]
+    [OperationGroup(OperationGroup.Results)]
     [ProducesResponseType<MatchView>(StatusCodes.Status200OK)]
     [ProducesResponseType<HttpValidationProblemDetails>(StatusCodes.Status400BadRequest, "application/problem+json")]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound, "application/problem+json")]

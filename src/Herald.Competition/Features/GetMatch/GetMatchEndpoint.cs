@@ -1,3 +1,4 @@
+using Herald.BuildingBlocks;
 using Herald.Competition.Domain;
 using Herald.Competition.Persistence;
 using Herald.ModuleHosting;
@@ -15,6 +16,7 @@ public static class GetMatchEndpoint
     [WolverineGet("/api/organisations/{organisationId}/tournaments/{tournamentId}/matches/{matchId}")]
     [EndpointGroupName(HeraldApi.Admin)]
     [EndpointName("getMatch")]
+    [OperationGroup(OperationGroup.Read)]
     [ProducesResponseType<MatchView>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound, "application/problem+json")]
     public static async Task<IResult> Get(Guid organisationId, Guid tournamentId, Guid matchId, CompetitionDbContext db, CancellationToken cancellationToken)
