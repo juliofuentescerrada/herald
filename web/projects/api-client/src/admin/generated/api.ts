@@ -197,6 +197,59 @@ export interface CompetitorDetails {
   roster: RosterPlayerDetails[] | null;
 }
 
+export interface PreviewEntrant {
+  entryId: string;
+  name: string;
+  status: EntrantStatus;
+  pointsBefore: number;
+  pointsAfter: number;
+  positionBefore: number;
+  sharedBefore: boolean;
+  positionAfter: number;
+  sharedAfter: boolean;
+}
+
+export interface CorrectionPreviewView {
+  tournamentId: string;
+  revision: number;
+  updating: boolean;
+  /** @nullable */
+  matchRevision: number | null;
+  entrants: PreviewEntrant[];
+}
+
+export type Outcome = typeof Outcome[keyof typeof Outcome];
+
+
+export const Outcome = {
+  first: 'first',
+  second: 'second',
+  draw: 'draw',
+  none: 'none',
+} as const;
+
+export type Side = typeof Side[keyof typeof Side] | null;
+
+
+export const Side = {
+  first: 'first',
+  second: 'second',
+} as const;
+
+export interface CorrectResult {
+  operationId: string;
+  expectedRevision: number;
+  /** @nullable */
+  correctionReason: string | null;
+  cause?: Cause;
+  outcome?: null | Outcome;
+  entrant?: null | Side;
+  /** @nullable */
+  played?: boolean | null;
+  /** @nullable */
+  reason?: string | null;
+}
+
 export interface CreatedOrganisation {
   id: string;
   name: string;
@@ -510,16 +563,6 @@ export const MatchState = {
   resolved: 'resolved',
 } as const;
 
-export type Outcome = typeof Outcome[keyof typeof Outcome];
-
-
-export const Outcome = {
-  first: 'first',
-  second: 'second',
-  draw: 'draw',
-  none: 'none',
-} as const;
-
 export interface ResultDetails {
   outcome: Outcome;
   cause: Cause;
@@ -545,6 +588,12 @@ export interface SideDetails {
   lineups: LineupDetails[];
 }
 
+export interface ReplacedResultDetails {
+  result: ResultDetails;
+  replacedAt: string;
+  correctionReason: string;
+}
+
 export interface MatchView {
   matchId: string;
   revision: number;
@@ -557,6 +606,7 @@ export interface MatchView {
   start: null | MatchStartDetails;
   blockers: string[];
   result: null | ResultDetails;
+  replacedResults: ReplacedResultDetails[];
   appearances: PlayerDetails[];
   unavailable: PlayerDetails[];
 }
@@ -640,14 +690,6 @@ export interface RecordLineup {
   expectedRevision: number;
   players: string[];
 }
-
-export type Side = typeof Side[keyof typeof Side] | null;
-
-
-export const Side = {
-  first: 'first',
-  second: 'second',
-} as const;
 
 export interface RecordResult {
   operationId: string;
@@ -865,6 +907,13 @@ export type FindGuestsParams = {
   kind?: GuestKind;
   name?: string;
   tournamentId?: string;
+};
+
+export type PreviewCorrectionParams = {
+  match?: string;
+  matchRevision?: number;
+  outcome?: string;
+  cause?: string;
 };
 
 interface HttpClientOptions {
@@ -2650,6 +2699,101 @@ export class HeraldHostAdminService {
   }
 
 /**
+ * POST_api_organisations_organisationId_tournaments_tournamentId_matches_matchId_result_correction
+ * @summary POST_api_organisations_organisationId_tournaments_tournamentId_matches_matchId_result_correction
+ */
+ correctResult<TData = MatchView>(organisationId: string,
+    tournamentId: string,
+    matchId: string,
+    correctResultBody: CorrectResult, options?: HttpClientBodyOptions): Observable<TData>;
+ correctResult<TData = MatchView>(organisationId: string,
+    tournamentId: string,
+    matchId: string,
+    correctResultBody: CorrectResult, options?: HttpClientEventOptions): Observable<HttpEvent<TData>>;
+ correctResult<TData = MatchView>(organisationId: string,
+    tournamentId: string,
+    matchId: string,
+    correctResultBody: CorrectResult, options?: HttpClientResponseOptions): Observable<AngularHttpResponse<TData>>;
+  correctResult<TData = MatchView>(
+    organisationId: string,
+    tournamentId: string,
+    matchId: string,
+    correctResultBody: CorrectResult, options?: HttpClientObserveOptions): Observable<TData | HttpEvent<TData> | AngularHttpResponse<TData>> {
+    if (options?.observe === 'events') {
+      return this.http.post<TData>(
+      `/api/organisations/${organisationId}/tournaments/${tournamentId}/matches/${matchId}/result/correction`,
+      correctResultBody,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'events',
+      }
+    );
+    }
+
+    if (options?.observe === 'response') {
+      return this.http.post<TData>(
+      `/api/organisations/${organisationId}/tournaments/${tournamentId}/matches/${matchId}/result/correction`,
+      correctResultBody,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'response',
+      }
+    );
+    }
+
+    return this.http.post<TData>(
+      `/api/organisations/${organisationId}/tournaments/${tournamentId}/matches/${matchId}/result/correction`,
+      correctResultBody,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'body',
+      }
+    );
+  }
+
+/**
+ * GET_api_organisations_organisationId_tournaments_tournamentId_standings_preview
+ * @summary GET_api_organisations_organisationId_tournaments_tournamentId_standings_preview
+ */
+ previewCorrection<TData = CorrectionPreviewView>(organisationId: string,
+    tournamentId: string,
+    params?: PreviewCorrectionParams, options?: HttpClientBodyOptions): Observable<TData>;
+ previewCorrection<TData = CorrectionPreviewView>(organisationId: string,
+    tournamentId: string,
+    params?: PreviewCorrectionParams, options?: HttpClientEventOptions): Observable<HttpEvent<TData>>;
+ previewCorrection<TData = CorrectionPreviewView>(organisationId: string,
+    tournamentId: string,
+    params?: PreviewCorrectionParams, options?: HttpClientResponseOptions): Observable<AngularHttpResponse<TData>>;
+  previewCorrection<TData = CorrectionPreviewView>(
+    organisationId: string,
+    tournamentId: string,
+    params?: PreviewCorrectionParams, options?: HttpClientObserveOptions): Observable<TData | HttpEvent<TData> | AngularHttpResponse<TData>> {
+    const filteredParams = filterParams({...params, ...options?.params}, new Set<string>([]));
+
+    if (options?.observe === 'events') {
+      return this.http.get<TData>(
+      `/api/organisations/${organisationId}/tournaments/${tournamentId}/standings/preview`,{
+    ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'events',
+        params: filteredParams,}
+    );
+    }
+
+    if (options?.observe === 'response') {
+      return this.http.get<TData>(
+      `/api/organisations/${organisationId}/tournaments/${tournamentId}/standings/preview`,{
+    ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'response',
+        params: filteredParams,}
+    );
+    }
+
+    return this.http.get<TData>(
+      `/api/organisations/${organisationId}/tournaments/${tournamentId}/standings/preview`,{
+    ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'body',
+        params: filteredParams,}
+    );
+  }
+
+/**
  * GET_api_organisations_organisationId_tournaments_tournamentId_standings
  * @summary GET_api_organisations_organisationId_tournaments_tournamentId_standings
  */
@@ -2726,4 +2870,6 @@ export type GetScheduleClientResult = NonNullable<ScheduleDetails>
 export type GetMatchClientResult = NonNullable<MatchView>
 export type GenerateDraftClientResult = NonNullable<ScheduleDetails>
 export type DisqualifyEntrantClientResult = NonNullable<ScheduleDetails>
+export type CorrectResultClientResult = NonNullable<MatchView>
+export type PreviewCorrectionClientResult = NonNullable<CorrectionPreviewView>
 export type GetStandingsClientResult = NonNullable<StandingsView>

@@ -2838,6 +2838,189 @@
         }
       }
     },
+    "/api/organisations/{organisationId}/tournaments/{tournamentId}/matches/{matchId}/result/correction": {
+      "post": {
+        "tags": [
+          "Herald.Competition.Features.CorrectResult.CorrectResultEndpoint"
+        ],
+        "summary": "POST_api_organisations_organisationId_tournaments_tournamentId_matches_matchId_result_correction",
+        "description": "POST_api_organisations_organisationId_tournaments_tournamentId_matches_matchId_result_correction",
+        "operationId": "correctResult",
+        "parameters": [
+          {
+            "name": "organisationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "tournamentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "matchId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CorrectResult"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MatchView"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/organisations/{organisationId}/tournaments/{tournamentId}/standings/preview": {
+      "get": {
+        "tags": [
+          "Herald.Standings.Features.PreviewCorrection.PreviewCorrectionEndpoint"
+        ],
+        "summary": "GET_api_organisations_organisationId_tournaments_tournamentId_standings_preview",
+        "description": "GET_api_organisations_organisationId_tournaments_tournamentId_standings_preview",
+        "operationId": "previewCorrection",
+        "parameters": [
+          {
+            "name": "organisationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "tournamentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "match",
+            "in": "query",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "matchRevision",
+            "in": "query",
+            "schema": {
+              "type": "integer",
+              "format": "int32"
+            }
+          },
+          {
+            "name": "outcome",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "name": "cause",
+            "in": "query",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CorrectionPreviewView"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/organisations/{organisationId}/tournaments/{tournamentId}/standings": {
       "get": {
         "tags": [
@@ -3149,6 +3332,101 @@
             "items": {
               "$ref": "#/components/schemas/RosterPlayerDetails"
             }
+          }
+        }
+      },
+      "CorrectionPreviewView": {
+        "required": [
+          "tournamentId",
+          "revision",
+          "updating",
+          "matchRevision",
+          "entrants"
+        ],
+        "type": "object",
+        "properties": {
+          "tournamentId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "revision": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "updating": {
+            "type": "boolean"
+          },
+          "matchRevision": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "entrants": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PreviewEntrant"
+            }
+          }
+        }
+      },
+      "CorrectResult": {
+        "required": [
+          "operationId",
+          "expectedRevision",
+          "correctionReason"
+        ],
+        "type": "object",
+        "properties": {
+          "operationId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "expectedRevision": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "correctionReason": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "cause": {
+            "$ref": "#/components/schemas/Cause"
+          },
+          "outcome": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Outcome"
+              }
+            ]
+          },
+          "entrant": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Side"
+              }
+            ]
+          },
+          "played": {
+            "type": [
+              "null",
+              "boolean"
+            ]
+          },
+          "reason": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         }
       },
@@ -3904,6 +4182,7 @@
           "start",
           "blockers",
           "result",
+          "replacedResults",
           "appearances",
           "unavailable"
         ],
@@ -3962,6 +4241,12 @@
                 "$ref": "#/components/schemas/ResultDetails"
               }
             ]
+          },
+          "replacedResults": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ReplacedResultDetails"
+            }
           },
           "appearances": {
             "type": "array",
@@ -4123,6 +4408,54 @@
           "withdrawn",
           "sanctioned"
         ]
+      },
+      "PreviewEntrant": {
+        "required": [
+          "entryId",
+          "name",
+          "status",
+          "pointsBefore",
+          "pointsAfter",
+          "positionBefore",
+          "sharedBefore",
+          "positionAfter",
+          "sharedAfter"
+        ],
+        "type": "object",
+        "properties": {
+          "entryId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "name": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/EntrantStatus"
+          },
+          "pointsBefore": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "pointsAfter": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "positionBefore": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "sharedBefore": {
+            "type": "boolean"
+          },
+          "positionAfter": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "sharedAfter": {
+            "type": "boolean"
+          }
+        }
       },
       "ProblemDetails": {
         "type": "object",
@@ -4311,6 +4644,26 @@
           "open",
           "closed"
         ]
+      },
+      "ReplacedResultDetails": {
+        "required": [
+          "result",
+          "replacedAt",
+          "correctionReason"
+        ],
+        "type": "object",
+        "properties": {
+          "result": {
+            "$ref": "#/components/schemas/ResultDetails"
+          },
+          "replacedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "correctionReason": {
+            "type": "string"
+          }
+        }
       },
       "ResultDetails": {
         "required": [
@@ -5545,6 +5898,12 @@
     },
     {
       "name": "Herald.Competition.Features.DisqualifyEntrant.DisqualifyEntrantEndpoint"
+    },
+    {
+      "name": "Herald.Competition.Features.CorrectResult.CorrectResultEndpoint"
+    },
+    {
+      "name": "Herald.Standings.Features.PreviewCorrection.PreviewCorrectionEndpoint"
     },
     {
       "name": "Herald.Standings.Features.GetStandings.GetStandingsEndpoint"
