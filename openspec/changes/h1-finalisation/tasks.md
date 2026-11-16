@@ -6,7 +6,7 @@
 
 - [x] 2.1 Finalised state, final revisions, the barrier and reopening (design D-1, D-3); domain tests for every `competition-finalisation` scenario
 - [x] 2.2 Every competitive write rejects a finalised competition (D-2); domain tests
-- [ ] 2.3 Migration; features `FinaliseCompetition`, `ReopenCompetition`; `CompetitionFinalised` and `CompetitionReopened` v1 through the outbox; API tests against PostgreSQL, including stale reviews, repeats and another organisation's 404s
+- [x] 2.3 Migration; features `FinaliseCompetition`, `ReopenCompetition`; `CompetitionFinalised` and `CompetitionReopened` v1 through the outbox; API tests against PostgreSQL, including stale reviews, repeats and another organisation's 404s
 
 ## 3. Standings and Tournaments
 

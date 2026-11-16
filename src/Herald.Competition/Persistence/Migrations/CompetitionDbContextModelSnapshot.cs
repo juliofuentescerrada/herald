@@ -97,6 +97,10 @@ namespace Herald.Competition.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("jsonb");
 
+                    b.Property<string>("Finals")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
                     b.Property<Guid>("OrganisationId")
                         .HasColumnType("uuid");
 

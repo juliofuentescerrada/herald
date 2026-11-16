@@ -76,8 +76,17 @@ public enum EntrantStatus
 public sealed record Departure(Guid EntryId, EntrantStatus Status, string Reason, Guid DepartedBy, DateTimeOffset DepartedAt, Guid OperationId, int Revision);
 
 // A finalisation of the competition at a results revision, kept for good; a reopening adds its reason, who and when (h1-finalisation D-1, D-3).
+// The names are the actors' at the time, for the Final revisions list.
 public sealed record FinalRevision(
-    int Number, int ResultsRevision, Guid FinalisedBy, DateTimeOffset FinalisedAt, string? ReopenReason = null, Guid? ReopenedBy = null, DateTimeOffset? ReopenedAt = null)
+    int Number,
+    int ResultsRevision,
+    Guid FinalisedBy,
+    DateTimeOffset FinalisedAt,
+    string? ReopenReason = null,
+    Guid? ReopenedBy = null,
+    DateTimeOffset? ReopenedAt = null,
+    string? FinalisedByName = null,
+    string? ReopenedByName = null)
 {
     public bool IsReopened => ReopenedAt is not null;
 }
@@ -520,7 +529,7 @@ public sealed class Schedule : AggregateRoot<TournamentId>
     }
 
     // Every match resolved and the reviewed results revision current: the review barrier (h1-finalisation D-1).
-    public WriteResult Finalise(int reviewedRevision, int expectedRevision, IReadOnlyList<Match> matches, Guid actor, DateTimeOffset at)
+    public WriteResult Finalise(int reviewedRevision, int expectedRevision, IReadOnlyList<Match> matches, Guid actor, DateTimeOffset at, string? actorName = null)
     {
         if (Final?.ResultsRevision == reviewedRevision)
         {
@@ -553,14 +562,14 @@ public sealed class Schedule : AggregateRoot<TournamentId>
         }
 
         var number = _finals.Count + 1;
-        _finals.Add(new(number, ResultsRevision, actor, at));
+        _finals.Add(new(number, ResultsRevision, actor, at, FinalisedByName: actorName));
         Raise(new CompetitionFinalised(Id, number, ResultsRevision, actor, at));
         Revision++;
         return WriteOutcome.Applied;
     }
 
     // Back to running for corrections; the final revision stays listed with the reason (h1-finalisation D-3).
-    public WriteResult Reopen(string? reason, int expectedRevision, Guid actor, DateTimeOffset at)
+    public WriteResult Reopen(string? reason, int expectedRevision, Guid actor, DateTimeOffset at, string? actorName = null)
     {
         if (Final is not { } final)
         {
@@ -583,7 +592,7 @@ public sealed class Schedule : AggregateRoot<TournamentId>
             return WriteResult.Reject("reason", "too-long");
         }
 
-        _finals[^1] = final with { ReopenReason = reason, ReopenedBy = actor, ReopenedAt = at };
+        _finals[^1] = final with { ReopenReason = reason, ReopenedBy = actor, ReopenedAt = at, ReopenedByName = actorName };
         Raise(new CompetitionReopened(Id, final.Number, final.ResultsRevision, actor, at));
         Revision++;
         return WriteOutcome.Applied;
