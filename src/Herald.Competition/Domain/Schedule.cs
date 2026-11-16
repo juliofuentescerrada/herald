@@ -75,6 +75,17 @@ public enum EntrantStatus
 // Revision is the schedule's revision after the departure (ADR 0007, ADR 0017).
 public sealed record Departure(Guid EntryId, EntrantStatus Status, string Reason, Guid DepartedBy, DateTimeOffset DepartedAt, Guid OperationId, int Revision);
 
+// A finalisation of the competition at a results revision, kept for good; a reopening adds its reason, who and when (h1-finalisation D-1, D-3).
+public sealed record FinalRevision(
+    int Number, int ResultsRevision, Guid FinalisedBy, DateTimeOffset FinalisedAt, string? ReopenReason = null, Guid? ReopenedBy = null, DateTimeOffset? ReopenedAt = null)
+{
+    public bool IsReopened => ReopenedAt is not null;
+}
+
+public sealed record CompetitionFinalised(TournamentId TournamentId, int Number, int ResultsRevision, Guid FinalisedBy, DateTimeOffset FinalisedAt) : IDomainEvent;
+
+public sealed record CompetitionReopened(TournamentId TournamentId, int Number, int ResultsRevision, Guid ReopenedBy, DateTimeOffset ReopenedAt) : IDomainEvent;
+
 public sealed record EntrantDeparted(TournamentId TournamentId, Guid EntryId, EntrantStatus Status, Guid DepartedBy, DateTimeOffset DepartedAt) : IDomainEvent;
 
 public sealed record DraftGenerated(TournamentId TournamentId, Seeding Seeding, int? Seed, int EligibleRevision, Guid GeneratedBy, DateTimeOffset GeneratedAt) : IDomainEvent;
@@ -91,6 +102,7 @@ public sealed class Schedule : AggregateRoot<TournamentId>
     private List<Publication> _publications = [];
     private List<Departure> _departures = [];
     private List<PlayerAvailability> _players = [];
+    private List<FinalRevision> _finals = [];
 
     // For EF Core, which sets the field after constructing.
     private Schedule(TournamentId id)
@@ -123,6 +135,17 @@ public sealed class Schedule : AggregateRoot<TournamentId>
         get => _players;
         private set => _players = [.. value];
     }
+
+    public IReadOnlyList<FinalRevision> Finals
+    {
+        get => _finals;
+        private set => _finals = [.. value];
+    }
+
+    // The current final revision; null while the competition is not finalised.
+    public FinalRevision? Final => _finals.Count > 0 && !_finals[^1].IsReopened ? _finals[^1] : null;
+
+    public bool IsFinalised => Final is not null;
 
     // The frozen-roster players who cannot be in a lineup now, across the tournament's teams.
     public IReadOnlyCollection<Guid> UnavailablePlayers => _players.Where(player => player.IsUnavailable).Select(player => player.PlayerId).ToHashSet();
@@ -485,6 +508,79 @@ public sealed class Schedule : AggregateRoot<TournamentId>
         Revision++;
         return WriteOutcome.Applied;
     }
+
+    // Every match resolved and the reviewed results revision current: the review barrier (h1-finalisation D-1).
+    public WriteResult Finalise(int reviewedRevision, int expectedRevision, IReadOnlyList<Match> matches, Guid actor, DateTimeOffset at)
+    {
+        if (Final?.ResultsRevision == reviewedRevision)
+        {
+            return WriteOutcome.Repeated;
+        }
+
+        if (expectedRevision != Revision)
+        {
+            return WriteOutcome.Stale;
+        }
+
+        if (StartedAt is null || matches.Count == 0)
+        {
+            return WriteResult.Reject("schedule", "not-started");
+        }
+
+        if (IsFinalised)
+        {
+            return FinalisedRefusal;
+        }
+
+        if (matches.Where(match => match.State != MatchState.Resolved).OrderBy(match => match.Round).ToList() is { Count: > 0 } unresolved)
+        {
+            return new(WriteOutcome.Rejected, [.. unresolved.Select(match => new BrokenRule($"match-{match.Id.Value}", "unresolved"))]);
+        }
+
+        if (reviewedRevision != ResultsRevision)
+        {
+            return WriteResult.Reject("review", "stale");
+        }
+
+        var number = _finals.Count + 1;
+        _finals.Add(new(number, ResultsRevision, actor, at));
+        Raise(new CompetitionFinalised(Id, number, ResultsRevision, actor, at));
+        Revision++;
+        return WriteOutcome.Applied;
+    }
+
+    // Back to running for corrections; the final revision stays listed with the reason (h1-finalisation D-3).
+    public WriteResult Reopen(string? reason, int expectedRevision, Guid actor, DateTimeOffset at)
+    {
+        if (Final is not { } final)
+        {
+            return _finals.Count > 0 ? WriteOutcome.Repeated : WriteResult.Reject("competition", "not-finalised");
+        }
+
+        if (expectedRevision != Revision)
+        {
+            return WriteOutcome.Stale;
+        }
+
+        reason = reason?.Trim();
+        if (string.IsNullOrEmpty(reason))
+        {
+            return WriteResult.Reject("reason", "required");
+        }
+
+        if (reason.Length > ReasonMaxLength)
+        {
+            return WriteResult.Reject("reason", "too-long");
+        }
+
+        _finals[^1] = final with { ReopenReason = reason, ReopenedBy = actor, ReopenedAt = at };
+        Raise(new CompetitionReopened(Id, final.Number, final.ResultsRevision, actor, at));
+        Revision++;
+        return WriteOutcome.Applied;
+    }
+
+    // What every competitive write answers on a finalised competition: reopen it first (h1-finalisation D-2).
+    public static WriteResult FinalisedRefusal => WriteResult.Reject("competition", "finalised");
 
     private static WriteResult Started => WriteResult.Reject("schedule", "competition-started");
 
