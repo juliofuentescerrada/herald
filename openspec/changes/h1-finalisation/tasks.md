@@ -21,7 +21,7 @@
 
 ## 5. End-to-end journey and seeds
 
-- [ ] 5.1 `tools/Herald.Seed`: a finalised league and a fully resolved running one
+- [x] 5.1 `tools/Herald.Seed`: a finalised league and a fully resolved running one
 - [ ] 5.2 Journey 25; the suite passes
 - [ ] 5.3 Test script in `e2e/scripts/` (seeded data, `scriptPersona`) with a screenshot per step: review panel, final standings, reopen confirmation, reopened with history, final again
 
