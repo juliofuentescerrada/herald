@@ -70,9 +70,10 @@ describe('The admin shell', () => {
     expect(links.map((a) => [a.firstElementChild?.getAttribute('data-icon'), a.textContent?.trim()])).toEqual([
       ['layout-dashboard', 'Overview'],
       ['trophy', 'Tournaments'],
+      ['plug-connected', 'Applications'],
     ]);
-    expect(links.map((a) => a.querySelector('svg')?.getAttribute('aria-hidden'))).toEqual(['true', 'true']);
-    expect(links.map((a) => a.querySelector('svg')?.getAttribute('width'))).toEqual(['24', '24']);
+    expect(links.map((a) => a.querySelector('svg')?.getAttribute('aria-hidden'))).toEqual(['true', 'true', 'true']);
+    expect(links.map((a) => a.querySelector('svg')?.getAttribute('width'))).toEqual(['24', '24', '24']);
   });
 
   it('says when no organisation is selected', async () => {
