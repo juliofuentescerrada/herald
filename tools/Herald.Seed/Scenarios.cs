@@ -202,6 +202,24 @@ public static class Scenarios
         await admin.StartCompetitionAsync(organisation, trophy);
         await admin.RecordWinAsync(organisation, trophy, Names.Players[10], Names.Players[13]);
         await admin.WithdrawEntrantAsync(organisation, trophy, Names.Players[11], "Moved away");
+
+        // Running individual league of four: Mara Quill's win over Nils Brandt corrected to a draw, and Odile Faure's win over
+        // Piers Galloway left for the corrections script to correct (h1-safe-corrections).
+        var plate = Ids.For("tournament", "running-corrections");
+        await admin.CreateTournamentAsync(organisation, plate, Configuration(clock, "Lantern Plate", opens: -6, closes: -1, starts: 1, capacity: 4));
+        await admin.PublishAsync(organisation, plate);
+        await admin.OpenRegistrationAsync(organisation, plate);
+        foreach (var name in Names.Players[12..16])
+        {
+            await admin.EnterAsync(organisation, plate, await admin.CreateGuestAsync(organisation, "player", name));
+        }
+
+        await admin.CloseRegistrationAsync(organisation, plate);
+        await admin.PublishScheduleAsync(organisation, plate);
+        await admin.StartCompetitionAsync(organisation, plate);
+        await admin.RecordWinAsync(organisation, plate, Names.Players[12], Names.Players[13]);
+        await admin.RecordWinAsync(organisation, plate, Names.Players[14], Names.Players[15]);
+        await admin.CorrectToDrawAsync(organisation, plate, Names.Players[12], Names.Players[13], "Score sheet misread");
     }
 
     private static async Task SecondOrganisationAsync(Admin admin, Guid organisation, Clock clock)
