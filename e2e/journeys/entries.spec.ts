@@ -636,3 +636,40 @@ test('An owner withdraws a player during the competition with a reason, sees the
   await expect(page.getByRole('table', { name: 'Standings' }).getByRole('row').filter({ hasText: 'Sam Reed' })).toContainText('Withdrawn');
   await expectAccessible();
 });
+
+test('An owner corrects a recorded win to a draw with a reason, reviews the impact on points and standings before confirming, and sees the corrected result with its earlier version', async ({ page, signIn, expectAccessible }) => {
+  await signIn();
+  await runningLanternOpen(page);
+  await recordResult(page, 'Robin Vale', 'Sam Reed', 'Robin Vale wins');
+  // The preview is Standings' own: wait until they have applied the win.
+  await page.getByRole('navigation', { name: 'Tournament sections' }).getByRole('link', { name: 'Standings' }).click();
+  await expect(page.getByText('Provisional · 1 of 6 matches resolved')).toBeVisible();
+  await page.getByRole('navigation', { name: 'Tournament sections' }).getByRole('link', { name: 'Schedule' }).click();
+
+  await matchLink(page, 'Robin Vale', 'Sam Reed').click();
+  await page.getByRole('button', { name: 'Correct result' }).click();
+  const form = page.getByRole('region', { name: 'Correct result' });
+  await expect(form.getByRole('radio', { name: 'Robin Vale wins' })).toBeChecked();
+  await form.getByRole('radio', { name: 'Draw' }).check();
+  await expect(form.getByRole('button', { name: 'Review impact' })).toBeDisabled();
+  await form.getByRole('textbox', { name: 'Reason for the correction (required)' }).fill('Score sheet misread');
+  await form.getByRole('button', { name: 'Review impact' }).click();
+
+  // Nothing is applied until the owner confirms the reviewed impact.
+  const impact = page.getByRole('region', { name: 'Impact of this correction' });
+  const points = impact.getByRole('table', { name: 'Points and positions' });
+  await expect(points.getByRole('row').filter({ hasText: 'Robin Vale' })).toContainText('3 → 1');
+  await expect(points.getByRole('row').filter({ hasText: 'Sam Reed' })).toContainText('0 → 1');
+  await expectAccessible();
+  await impact.getByRole('button', { name: 'Apply correction' }).click();
+
+  await expect(page.getByText('Result corrected. Standings updated.')).toBeVisible();
+  const result = page.getByRole('region', { name: 'Result', exact: true });
+  await expect(result.getByText('Draw · played')).toBeVisible();
+  await expect(result.getByText('Corrected', { exact: true })).toBeVisible();
+  await result.getByText('Result history').click();
+  const history = result.getByRole('list', { name: 'Result history' });
+  await expect(history).toContainText('Robin Vale won · played');
+  await expect(history).toContainText('Reason: Score sheet misread');
+  await expectAccessible();
+});
