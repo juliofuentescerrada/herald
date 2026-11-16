@@ -76,6 +76,8 @@ export class StandingsPage {
   /** Competition decides finalisation: its schedule says whether the competition is final and lists the final revisions. */
   protected readonly finalised = computed(() => this.schedule.data()?.finalised ?? false);
   protected readonly finals = computed(() => this.schedule.data()?.finals ?? []);
+  /** Matches voided by the cancellation: resolved with no points, never played. */
+  protected readonly voided = computed(() => this.schedule.data()?.matches.filter((match) => match.result?.cause === 'voidedCancelled').length ?? 0);
   protected readonly unresolved = computed(() => this.schedule.data()?.matches.filter((match) => match.state !== 'resolved') ?? []);
   protected readonly zone = computed(() => this.tournament.data()?.configuration.timeZone ?? 'UTC');
   protected readonly zoned = (instant: string | null | undefined) => (instant ? `${instantText(instant, this.zone())} · ${this.zone()}` : '');

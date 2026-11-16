@@ -200,6 +200,7 @@ describe('The standings page', () => {
     const { page, text } = await open(() => of(provisional), tournament({ competition: 'cancelled' }), resolvedMatches(4));
 
     expect(text('.title')).toContain('Cancelled');
+    expect(text('.summary')).toContain('Cancelled ·');
     expect(text('.title')).not.toContain('Provisional');
     expect(text('.column herald-notice')).toContain('Cancelled · no champion or final ranking');
     expect(page().querySelector('#review-heading')).toBeNull();

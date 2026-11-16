@@ -104,7 +104,11 @@
         }
       }
       <section class="summary">
-        <p><strong>{{ finalised() ? 'Final' : 'Provisional' }} · {{ view()!.resolvedMatches }} of {{ view()!.matches }} {{ view()!.matches === 1 ? 'match' : 'matches' }} resolved</strong></p>
+        @if (cancelled()) {
+          <p><strong>Cancelled · {{ view()!.resolvedMatches - voided() }} of {{ view()!.matches }} {{ view()!.matches === 1 ? 'match' : 'matches' }} resolved · {{ voided() }} voided</strong></p>
+        } @else {
+          <p><strong>{{ finalised() ? 'Final' : 'Provisional' }} · {{ view()!.resolvedMatches }} of {{ view()!.matches }} {{ view()!.matches === 1 ? 'match' : 'matches' }} resolved</strong></p>
+        }
         <p class="help">
           Results revision {{ view()!.revision }} · 3 points a win, 1 a draw · equal points share a position, listed by name{{ view()!.resolvedMatches === 0 ? ' · No match resolved yet' : '' }}
         </p>

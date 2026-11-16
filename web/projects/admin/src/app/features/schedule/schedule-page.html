@@ -92,7 +92,8 @@
       @if (!dialogOpen() && failure(); as failed) {
         <herald-notice tone="danger" [heading]="failed.heading">{{ failed.text }}</herald-notice>
       }
-      @if (s.crossedChange; as change) {
+      <!-- A cancellation also cancels the entries, which is no field change to act on. -->
+      @if (!s.cancelled && s.crossedChange; as change) {
         <herald-notice tone="danger" heading="The field changed since publication">
           @if (change.removed.length) {
             No longer eligible: {{ names(change.removed) }}.

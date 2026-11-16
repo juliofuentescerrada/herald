@@ -374,6 +374,7 @@ describe('The schedule page of a running competition', () => {
     expect(texts('.running herald-status-label').slice(2)).toEqual(['Voided', 'Voided', 'Voided', 'Voided']);
     expect(texts('.running .outcome').slice(2)).toEqual(Array(4).fill('Voided: tournament cancelled · no points'));
     expect([...page().querySelectorAll('.summary button')]).toEqual([]);
+    expect(texts('app-entrants-panel button')).toEqual([]);
     expect(await violations(page())).toEqual([]);
   });
 
