@@ -19,7 +19,7 @@
 - [x] 4.1 The fake identity provider issues application tokens (ADR 0015); `tools/Herald.Seed`: an organisation with an active and a revoked grant
 - [x] 4.2 Journey 29; the suite passes
 - [x] 4.3 Test script in `e2e/scripts/` (seeded data, `scriptPersona`) with a screenshot per step: empty page, grant dialog, list, revoke confirmation
-- [ ] 4.4 `docs/operations/identity.md`: provisioning and revocation for interactive and server pilot applications
+- [x] 4.4 `docs/operations/identity.md`: provisioning and revocation for interactive and server pilot applications
 
 ## 5. Validation and completion
 
