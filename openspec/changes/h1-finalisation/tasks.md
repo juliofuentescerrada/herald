@@ -12,7 +12,7 @@
 
 - [x] 3.1 Standings: final status, final revisions, no active champion (D-4, D-5); tests for the `standings` scenarios
 - [x] 3.2 Tournaments: `CompetitionState.Finalised` from the events; lifecycle labels
-- [ ] 3.3 Regenerate Wolverine code (`codegen write`) and the OpenAPI documents and client (`pnpm api:generate`); CI drift checks pass
+- [x] 3.3 Regenerate Wolverine code (`codegen write`) and the OpenAPI documents and client (`pnpm api:generate`); CI drift checks pass
 
 ## 4. Admin application
 

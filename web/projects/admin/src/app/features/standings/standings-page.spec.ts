@@ -55,9 +55,12 @@ const provisional: StandingsView = {
     ]),
     row(4, false, taylor, [1, 0, 0, 1, 0]),
   ],
+  final: null,
+  finals: [],
+  noChampion: false,
 };
 
-const empty: StandingsView = { tournamentId, revision: 1, resolvedMatches: 0, matches: 6, rows: [robin, jamie, sam, taylor].map((who) => row(1, true, who, [0, 0, 0, 0, 0])) };
+const empty: StandingsView = { tournamentId, revision: 1, resolvedMatches: 0, matches: 6, rows: [robin, jamie, sam, taylor].map((who) => row(1, true, who, [0, 0, 0, 0, 0])), final: null, finals: [], noChampion: false };
 
 const resolvedMatches = (count: number): ScheduleDetails =>
   ({ matches: Array.from({ length: 6 }, (_, index) => ({ state: index < count ? 'resolved' : 'scheduled' }) as MatchSummary) }) as ScheduleDetails;

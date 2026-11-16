@@ -478,6 +478,32 @@ export interface FieldDetails {
   entries: EntryDetails[];
 }
 
+export interface FinaliseCompetition {
+  reviewedRevision: number;
+  expectedRevision: number;
+}
+
+export interface FinalRevisionDetails {
+  number: number;
+  resultsRevision: number;
+  finalisedAt: string;
+  /** @nullable */
+  finalisedBy: string | null;
+  /** @nullable */
+  reopenReason: string | null;
+  /** @nullable */
+  reopenedAt: string | null;
+  /** @nullable */
+  reopenedBy: string | null;
+}
+
+export interface FinalRevisionView {
+  number: number;
+  resultsRevision: number;
+  finalisedAt: string;
+  reopened: boolean;
+}
+
 export interface GenerateDraft {
   operationId: string;
   expectedRevision: number;
@@ -752,6 +778,12 @@ export const RegistrationWindow = {
   closed: 'closed',
 } as const;
 
+export interface ReopenCompetition {
+  /** @nullable */
+  reason: string | null;
+  expectedRevision: number;
+}
+
 export type RosterChangeKind = typeof RosterChangeKind[keyof typeof RosterChangeKind];
 
 
@@ -825,6 +857,9 @@ export interface ScheduleDetails {
   matches: MatchSummary[];
   operations: null | OperationsDetails;
   entrants: CompetitorDetails[];
+  resultsRevision: number;
+  finalised: boolean;
+  finals: FinalRevisionDetails[];
 }
 
 export interface SignedInPerson {
@@ -865,6 +900,9 @@ export interface StandingsView {
   resolvedMatches: number;
   matches: number;
   rows: StandingsRow[];
+  final: null | FinalRevisionView;
+  finals: FinalRevisionView[];
+  noChampion: boolean;
 }
 
 export interface StartCompetition {
@@ -2480,6 +2518,52 @@ export class HeraldHostAdminService {
   }
 
 /**
+ * POST_api_organisations_organisationId_tournaments_tournamentId_reopening
+ * @summary POST_api_organisations_organisationId_tournaments_tournamentId_reopening
+ */
+ reopenCompetition<TData = ScheduleDetails>(organisationId: string,
+    tournamentId: string,
+    reopenCompetitionBody: ReopenCompetition, options?: HttpClientBodyOptions): Observable<TData>;
+ reopenCompetition<TData = ScheduleDetails>(organisationId: string,
+    tournamentId: string,
+    reopenCompetitionBody: ReopenCompetition, options?: HttpClientEventOptions): Observable<HttpEvent<TData>>;
+ reopenCompetition<TData = ScheduleDetails>(organisationId: string,
+    tournamentId: string,
+    reopenCompetitionBody: ReopenCompetition, options?: HttpClientResponseOptions): Observable<AngularHttpResponse<TData>>;
+  reopenCompetition<TData = ScheduleDetails>(
+    organisationId: string,
+    tournamentId: string,
+    reopenCompetitionBody: ReopenCompetition, options?: HttpClientObserveOptions): Observable<TData | HttpEvent<TData> | AngularHttpResponse<TData>> {
+    if (options?.observe === 'events') {
+      return this.http.post<TData>(
+      `/api/organisations/${organisationId}/tournaments/${tournamentId}/reopening`,
+      reopenCompetitionBody,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'events',
+      }
+    );
+    }
+
+    if (options?.observe === 'response') {
+      return this.http.post<TData>(
+      `/api/organisations/${organisationId}/tournaments/${tournamentId}/reopening`,
+      reopenCompetitionBody,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'response',
+      }
+    );
+    }
+
+    return this.http.post<TData>(
+      `/api/organisations/${organisationId}/tournaments/${tournamentId}/reopening`,
+      reopenCompetitionBody,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'body',
+      }
+    );
+  }
+
+/**
  * POST_api_organisations_organisationId_tournaments_tournamentId_matches_matchId_result
  * @summary POST_api_organisations_organisationId_tournaments_tournamentId_matches_matchId_result
  */
@@ -2812,6 +2896,52 @@ export class HeraldHostAdminService {
   }
 
 /**
+ * POST_api_organisations_organisationId_tournaments_tournamentId_finalisation
+ * @summary POST_api_organisations_organisationId_tournaments_tournamentId_finalisation
+ */
+ finaliseCompetition<TData = ScheduleDetails>(organisationId: string,
+    tournamentId: string,
+    finaliseCompetitionBody: FinaliseCompetition, options?: HttpClientBodyOptions): Observable<TData>;
+ finaliseCompetition<TData = ScheduleDetails>(organisationId: string,
+    tournamentId: string,
+    finaliseCompetitionBody: FinaliseCompetition, options?: HttpClientEventOptions): Observable<HttpEvent<TData>>;
+ finaliseCompetition<TData = ScheduleDetails>(organisationId: string,
+    tournamentId: string,
+    finaliseCompetitionBody: FinaliseCompetition, options?: HttpClientResponseOptions): Observable<AngularHttpResponse<TData>>;
+  finaliseCompetition<TData = ScheduleDetails>(
+    organisationId: string,
+    tournamentId: string,
+    finaliseCompetitionBody: FinaliseCompetition, options?: HttpClientObserveOptions): Observable<TData | HttpEvent<TData> | AngularHttpResponse<TData>> {
+    if (options?.observe === 'events') {
+      return this.http.post<TData>(
+      `/api/organisations/${organisationId}/tournaments/${tournamentId}/finalisation`,
+      finaliseCompetitionBody,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'events',
+      }
+    );
+    }
+
+    if (options?.observe === 'response') {
+      return this.http.post<TData>(
+      `/api/organisations/${organisationId}/tournaments/${tournamentId}/finalisation`,
+      finaliseCompetitionBody,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'response',
+      }
+    );
+    }
+
+    return this.http.post<TData>(
+      `/api/organisations/${organisationId}/tournaments/${tournamentId}/finalisation`,
+      finaliseCompetitionBody,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'body',
+      }
+    );
+  }
+
+/**
  * POST_api_organisations_organisationId_tournaments_tournamentId_entrants_entryId_disqualification
  * @summary POST_api_organisations_organisationId_tournaments_tournamentId_entrants_entryId_disqualification
  */
@@ -3028,6 +3158,7 @@ export type WithdrawPlayerClientResult = NonNullable<ScheduleDetails>
 export type WithdrawEntrantClientResult = NonNullable<ScheduleDetails>
 export type StartMatchClientResult = NonNullable<MatchView>
 export type SanctionPlayerClientResult = NonNullable<ScheduleDetails>
+export type ReopenCompetitionClientResult = NonNullable<ScheduleDetails>
 export type RecordResultClientResult = NonNullable<MatchView>
 export type RecordLineupClientResult = NonNullable<MatchView>
 export type PublishScheduleClientResult = NonNullable<ScheduleDetails>
@@ -3035,6 +3166,7 @@ export type LiftSanctionClientResult = NonNullable<ScheduleDetails>
 export type GetScheduleClientResult = NonNullable<ScheduleDetails>
 export type GetMatchClientResult = NonNullable<MatchView>
 export type GenerateDraftClientResult = NonNullable<ScheduleDetails>
+export type FinaliseCompetitionClientResult = NonNullable<ScheduleDetails>
 export type DisqualifyEntrantClientResult = NonNullable<ScheduleDetails>
 export type CorrectResultClientResult = NonNullable<MatchView>
 export type PreviewCorrectionClientResult = NonNullable<CorrectionPreviewView>
