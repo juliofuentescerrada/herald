@@ -55,7 +55,7 @@ Visual choices (G-/RU-): cancellation and deletion are destructive and final, so
 
 - **A-1** The reason for cancellation is private; the public page shows that the tournament was cancelled and when.
 - **A-2** Unarchiving needs no reason; archiving asks no confirmation.
-- **A-3** (found in task 2.1) "Change dates" moves a date or sets a missing one but never removes one, so after Q3 a published tournament cannot lose a registration date: the `registration-window` scenario "A closed registration lost a date" is removed (its delta in this change). Opening without dates is still rejected for a tournament published without them.
+- **A-3** (found in task 2.1) "Change dates" moves a date or sets a missing one but never removes one, so after Q3 a published tournament cannot lose a registration date: the `registration-window` scenario "A closed registration lost a date" now states that rule (its delta in this change). Opening without dates is still rejected for a tournament published without them.
 
 ## Risks / Trade-offs
 

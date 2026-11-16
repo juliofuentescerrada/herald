@@ -204,6 +204,7 @@ public class RegistrationWindowTests(OrganisationApi api)
     }
 
     [Fact]
+    [Trait("covers", "registration-window: A closed registration lost a date")]
     public async Task A_save_cannot_remove_a_registration_date_of_a_published_tournament()
     {
         var (client, tournaments, id) = await TournamentAsync();
