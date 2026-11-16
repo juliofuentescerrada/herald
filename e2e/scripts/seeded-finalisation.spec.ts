@@ -62,6 +62,11 @@ test('The seeded owner sees the unresolved, updating, stale, finalising, no-cham
 
   await page.getByRole('link', { name: 'Tournaments', exact: true }).click();
   await page.getByRole('link', { name: 'Edit configuration: Lantern Bowl' }).click();
+  // The first script may have finalised Lantern Bowl: its schedule is answered as running and fully resolved, nothing is written.
+  await page.route('**/schedule', async (route) => {
+    const response = await route.fetch();
+    await route.fulfill({ response, json: { ...(await response.json()), finalised: false, finals: [] } });
+  });
   // Standings one revision behind Competition's results.
   await page.route('**/standings', async (route) => {
     const response = await route.fetch();
@@ -88,13 +93,14 @@ test('The seeded owner sees the unresolved, updating, stale, finalising, no-cham
     await route.fulfill({
       status: 400,
       contentType: 'application/problem+json',
-      body: JSON.stringify({ status: 400, errors: { review: ['stale'] }, schedule: { ...schedule, resultsRevision: schedule.resultsRevision + 1 } }),
+      body: JSON.stringify({ status: 400, errors: { review: ['stale'] }, schedule: { ...schedule, finalised: false, finals: [], resultsRevision: schedule.resultsRevision + 1 } }),
     });
   });
   await review.getByRole('button', { name: 'Finalise' }).click();
   await expect(page.getByText('Standings changed since your review')).toBeVisible();
   await both(page, info, 'finalise-stale');
   await page.unroute('**/finalisation');
+  await page.unroute('**/schedule');
 
   // The finalised Lantern Cup, its standings answered as if every entrant had departed.
   await page.getByRole('link', { name: 'Tournaments', exact: true }).click();
