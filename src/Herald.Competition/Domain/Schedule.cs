@@ -227,6 +227,11 @@ public sealed class Schedule : AggregateRoot<TournamentId>
             return departed.OperationId == operationId ? WriteOutcome.Repeated : WriteResult.Reject("entrant", "departed");
         }
 
+        if (IsFinalised)
+        {
+            return FinalisedRefusal;
+        }
+
         if (expectedRevision != Revision)
         {
             return WriteOutcome.Stale;
@@ -332,6 +337,11 @@ public sealed class Schedule : AggregateRoot<TournamentId>
         if (result.Outcome != WriteOutcome.Applied)
         {
             return result;
+        }
+
+        if (IsFinalised)
+        {
+            return FinalisedRefusal;
         }
 
         if (expectedRevision != Revision)

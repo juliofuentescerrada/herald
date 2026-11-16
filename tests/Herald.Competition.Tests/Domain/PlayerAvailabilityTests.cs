@@ -140,4 +140,17 @@ public class PlayerAvailabilityTests
         _match.StartBlockers(_schedule.RosterOf(_match.First), _schedule.RosterOf(_match.Second), _schedule.UnavailablePlayers).ShouldBe([new BrokenRule("first-lineup", "unavailable")]);
         Start().Broken.ShouldBe([new BrokenRule("first-lineup", "unavailable"), new BrokenRule($"player-{_falcons[0]}", "unavailable"), new BrokenRule($"player-{_falcons[1]}", "unavailable")]);
     }
+
+    [Fact]
+    public void Player_withdrawals_and_sanctions_are_refused_on_a_finalised_competition()
+    {
+        Start();
+        _match.RecordPlayed(Guid.NewGuid(), Outcome.First, _match.Revision, _owner, _at);
+        _schedule.ResultRecorded();
+        _schedule.Finalise(_schedule.ResultsRevision, _schedule.Revision, [_match], _owner, _at).Outcome.ShouldBe(WriteOutcome.Applied);
+
+        Sanction(_falcons[0]).Broken.ShouldBe([new BrokenRule("competition", "finalised")]);
+        _schedule.WithdrawPlayer(Falcons, _falcons[0], null, _schedule.Revision, _owner, _at).Broken.ShouldBe([new BrokenRule("competition", "finalised")]);
+        _schedule.Players.ShouldBeEmpty();
+    }
 }

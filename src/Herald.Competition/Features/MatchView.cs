@@ -109,7 +109,7 @@ internal static class MatchResults
 
             // A first resolution or a correction (h1-safe-corrections D-1) changes the results.
             var before = match.Resolution;
-            var result = write(match, schedule);
+            var result = schedule.IsFinalised ? Schedule.FinalisedRefusal : write(match, schedule);
             var resolved = result.Outcome == WriteOutcome.Applied && !ReferenceEquals(before, match.Resolution);
             switch (result.Outcome)
             {
@@ -128,6 +128,10 @@ internal static class MatchResults
                     {
                         schedule.ResultRecorded();
                     }
+
+                    // Checked against the schedule's revision, so a write racing a finalisation commits first or is retried and
+                    // refused (h1-finalisation D-2).
+                    db.Entry(schedule).Property(s => s.Revision).IsModified = true;
 
                     try
                     {

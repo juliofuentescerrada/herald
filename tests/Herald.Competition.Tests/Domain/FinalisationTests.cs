@@ -182,4 +182,19 @@ public class FinalisationTests
 
         Finalise(_schedule.ResultsRevision + 1).Broken.ShouldBe([new BrokenRule("competition", "finalised")]);
     }
+
+    [Fact]
+    public void A_departure_from_a_finalised_competition_is_refused_until_it_is_reopened()
+    {
+        ResolveAll();
+        Finalise(_schedule.ResultsRevision);
+        var entrant = _schedule.Field.Entrants[0].EntryId;
+
+        _schedule.Depart(Guid.NewGuid(), entrant, EntrantStatus.Withdrawn, "Moved away", _schedule.Revision, _matches, _owner, _at)
+            .Broken.ShouldBe([new BrokenRule("competition", "finalised")]);
+        _schedule.Departures.ShouldBeEmpty();
+
+        Reopen("Result appeal upheld");
+        _schedule.Depart(Guid.NewGuid(), entrant, EntrantStatus.Withdrawn, "Moved away", _schedule.Revision, _matches, _owner, _at).Outcome.ShouldBe(WriteOutcome.Applied);
+    }
 }
