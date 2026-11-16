@@ -67,6 +67,7 @@ public static class GrantApplicationEndpoint
         var name = GrantName.Create(command.Name);
         var owner = new PersonId(context.ActorId ?? throw new InvalidOperationException($"No acting person in organisation {organisationId}."));
         // The application is in the owner's directory: Herald's applications are provisioned there (docs/operations/identity.md).
+        // shortcut: an owner relinked to another directory grants in that one; take the configured directory if Herald ever spans two.
         var directory = await db.Persons.AsNoTracking().Where(person => person.Id == owner)
             .Select(person => EF.Property<Guid>(person, nameof(IdentityKey.DirectoryId))).SingleAsync(cancellationToken);
         var application = new IdentityKey(directory, command.ApplicationId!.Value);

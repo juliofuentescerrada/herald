@@ -26,6 +26,8 @@ public sealed record Caller(Guid DirectoryId, Guid ObjectId, CallerKind Kind = C
             return null;
         }
 
+        // shortcut: a client-credentials token with Organiser would be a person; the API registration offers Organiser to users and
+        // groups only (docs/operations/identity.md). Require `scp` for people if that ever changes.
         var roles = principal.FindAll("roles").Select(claim => claim.Value).ToHashSet(StringComparer.Ordinal);
         if (roles.Contains(HeraldAuthentication.OrganiserRole))
         {
@@ -41,21 +43,15 @@ public sealed record Caller(Guid DirectoryId, Guid ObjectId, CallerKind Kind = C
 // An application's active grant in one organisation: the tournaments it covers (null for all of them) and its groups.
 public sealed record Grant(Guid Id, IReadOnlySet<Guid>? Tournaments, IReadOnlySet<OperationGroup> Groups);
 
-// The actor a request acts as: a member's person identifier, or an application's grant identifier with the grant.
-public sealed record Access(Guid ActorId, Grant? Grant = null);
+// The actor a request acts as: a member's person identifier, or an application's grant identifier with the grant. Name is how
+// history shows the actor now: a person's display name, or "Results bot (granted by Alex Morgan)" (pilot-access).
+public sealed record Access(Guid ActorId, string Name, Grant? Grant = null);
 
 // Implemented by the Organisations module; other modules see only the OrganisationContext it produces.
 public interface IOrganisationAccess
 {
     // The caller's access to the organisation, or null when it has none: no membership, or no active grant.
     Task<Access?> FindAccessAsync(Guid organisationId, Caller caller, CancellationToken cancellationToken);
-}
-
-// Implemented by the Organisations module: how history names an actor of the current organisation, a person by their display
-// name and an application as "Results bot (granted by Alex Morgan)" (pilot-access, API-10). Unknown actors are left out.
-public interface IActorNames
-{
-    Task<IReadOnlyDictionary<Guid, string>> NamesAsync(IReadOnlyCollection<Guid> actors, CancellationToken cancellationToken);
 }
 
 // The organisation the current request or message acts for; one per scope, entered once.
@@ -66,10 +62,13 @@ public sealed class OrganisationContext
     // Who acts in this scope, for modules that record who made a change: a person, or an application's grant; null outside a request.
     public Guid? ActorId { get; private set; }
 
+    // How history shows the actor, for modules that keep it with a change; null outside a request.
+    public string? ActorName { get; private set; }
+
     // Set when an application acts: what its owner allowed.
     public Grant? Grant { get; private set; }
 
-    public void Enter(Guid organisationId, Guid? actorId = null, Grant? grant = null)
+    public void Enter(Guid organisationId, Guid? actorId = null, Grant? grant = null, string? actorName = null)
     {
         if (OrganisationId is { } current && current != organisationId)
         {
@@ -79,6 +78,7 @@ public sealed class OrganisationContext
         OrganisationId = organisationId;
         ActorId = actorId ?? ActorId;
         Grant = grant ?? Grant;
+        ActorName = actorName ?? ActorName;
     }
 }
 

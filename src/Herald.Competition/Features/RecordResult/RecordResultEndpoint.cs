@@ -27,17 +27,17 @@ public static class RecordResultEndpoint
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound, "application/problem+json")]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict, "application/problem+json")]
     public static async Task<IResult> Post(
-        Guid organisationId, Guid tournamentId, Guid matchId, RecordResult command, OrganisationContext context, CompetitionDbContext db, IMessageBus bus, IActorNames names,
-        CancellationToken cancellationToken)
+        Guid organisationId, Guid tournamentId, Guid matchId, RecordResult command, OrganisationContext context, CompetitionDbContext db, IMessageBus bus, CancellationToken cancellationToken)
     {
         var actor = context.ActorId ?? throw new InvalidOperationException($"No acting person in organisation {organisationId}.");
-        return await db.WriteAsync(bus, names, organisationId, tournamentId, matchId,
+        return await db.WriteAsync(bus, organisationId, tournamentId, matchId,
             (match, _) => command.Cause == Cause.Played
                 ? command.Outcome is { } outcome
-                    ? match.RecordPlayed(command.OperationId, outcome, command.ExpectedRevision, actor, DateTimeOffset.UtcNow)
+                    ? match.RecordPlayed(command.OperationId, outcome, command.ExpectedRevision, actor, DateTimeOffset.UtcNow, context.ActorName)
                     : WriteResult.Reject("outcome", "required")
                 : match.RecordAdministrative(
-                    command.OperationId, command.Cause, command.Entrant, command.Played, command.Reason, command.ExpectedRevision, actor, DateTimeOffset.UtcNow),
+                    command.OperationId, command.Cause, command.Entrant, command.Played, command.Reason, command.ExpectedRevision, actor, DateTimeOffset.UtcNow,
+                    context.ActorName),
             cancellationToken);
     }
 }

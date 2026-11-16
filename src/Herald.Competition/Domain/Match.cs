@@ -54,7 +54,8 @@ public sealed record Resolution(
     DateTimeOffset RecordedAt,
     Guid OperationId,
     string? Reason = null,
-    Resolution? Predecessor = null);
+    Resolution? Predecessor = null,
+    string? RecordedByName = null);
 
 public sealed record MatchResolved(MatchId MatchId, Outcome Outcome, Cause Cause, Guid RecordedBy, DateTimeOffset RecordedAt) : IDomainEvent;
 
@@ -235,7 +236,7 @@ public sealed class Match : AggregateRoot<MatchId>
     }
 
     // A played result; an individual match not yet started starts with it, a team match must be in play (h1-operator-results D-1).
-    public WriteResult RecordPlayed(Guid operationId, Outcome outcome, int expectedRevision, Guid actor, DateTimeOffset at)
+    public WriteResult RecordPlayed(Guid operationId, Outcome outcome, int expectedRevision, Guid actor, DateTimeOffset at, string? actorName = null)
     {
         if (Resolution?.OperationId == operationId)
         {
@@ -270,7 +271,7 @@ public sealed class Match : AggregateRoot<MatchId>
             Raise(new MatchStarted(Id, actor, at));
         }
 
-        Resolution = new(outcome, Cause.Played, true, Appearances(), actor, at, operationId);
+        Resolution = new(outcome, Cause.Played, true, Appearances(), actor, at, operationId, RecordedByName: actorName);
         Raise(new MatchResolved(Id, outcome, Cause.Played, actor, at));
         Revision++;
         return WriteOutcome.Applied;
@@ -281,7 +282,8 @@ public sealed class Match : AggregateRoot<MatchId>
     // A concession, an absence or a no contest (h1-exceptional-outcomes D-1, D-2). The entrant is the conceding or absent side;
     // played states whether play took place, which an absence never records. None of them starts the match.
     public WriteResult RecordAdministrative(
-        Guid operationId, Cause cause, Side? entrant, bool? played, string? reason, int expectedRevision, Guid actor, DateTimeOffset at)
+        Guid operationId, Cause cause, Side? entrant, bool? played, string? reason, int expectedRevision, Guid actor, DateTimeOffset at,
+        string? actorName = null)
     {
         if (Resolution?.OperationId == operationId)
         {
@@ -343,7 +345,7 @@ public sealed class Match : AggregateRoot<MatchId>
         var outcome = cause is Cause.Concession or Cause.SingleAbsence
             ? entrant == Side.First ? Outcome.Second : Outcome.First
             : Outcome.None;
-        Resolution = new(outcome, cause, tookPlace, tookPlace ? Appearances() : [], actor, at, operationId, cause == Cause.NoContest ? reason : null);
+        Resolution = new(outcome, cause, tookPlace, tookPlace ? Appearances() : [], actor, at, operationId, cause == Cause.NoContest ? reason : null, RecordedByName: actorName);
         Raise(new MatchResolved(Id, outcome, cause, actor, at));
         Revision++;
         return WriteOutcome.Applied;

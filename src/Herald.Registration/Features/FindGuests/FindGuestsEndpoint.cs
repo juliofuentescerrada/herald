@@ -19,7 +19,7 @@ public static class FindGuestsEndpoint
     [WolverineGet("/api/organisations/{organisationId}/guests")]
     [EndpointGroupName(HeraldApi.Admin)]
     [EndpointName("findGuests")]
-    [OperationGroup(OperationGroup.Read)]
+    [OperationGroup(OperationGroup.Read, AllTournaments = true)]
     [ProducesResponseType<IReadOnlyList<GuestDetails>>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound, "application/problem+json")]
     public static async Task<IReadOnlyList<GuestDetails>> Get(

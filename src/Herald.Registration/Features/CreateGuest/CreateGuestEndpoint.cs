@@ -19,7 +19,7 @@ public static class CreateGuestEndpoint
     [WolverinePut("/api/organisations/{organisationId}/guests/{guestId}")]
     [EndpointGroupName(HeraldApi.Admin)]
     [EndpointName("createGuest")]
-    [OperationGroup(OperationGroup.Entries)]
+    [OperationGroup(OperationGroup.Entries, AllTournaments = true)]
     [ProducesResponseType<GuestDetails>(StatusCodes.Status200OK)]
     [ProducesResponseType<HttpValidationProblemDetails>(StatusCodes.Status400BadRequest, "application/problem+json")]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound, "application/problem+json")]

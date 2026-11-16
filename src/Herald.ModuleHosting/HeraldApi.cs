@@ -3,6 +3,7 @@ using System.Text.Json;
 using System.Text.Json.Serialization;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -63,6 +64,12 @@ public static class HeraldApi
                 {
                     chain.Metadata.WithMetadata(attribute);
                 }
+
+                // An application outside its grant is refused (design D-4): part of each grouped endpoint's contract.
+                if (chain.Method.Method.GetCustomAttribute<OperationGroupAttribute>() is not null)
+                {
+                    chain.Metadata.Produces<ProblemDetails>(StatusCodes.Status403Forbidden, "application/problem+json");
+                }
             });
         });
         // Development only for now, like /health: what Azure exposes is decided in M4.
@@ -96,7 +103,7 @@ public static class HeraldApi
                 return;
             }
 
-            http.RequestServices.GetRequiredService<OrganisationContext>().Enter(organisationId, found.ActorId, found.Grant);
+            http.RequestServices.GetRequiredService<OrganisationContext>().Enter(organisationId, found.ActorId, found.Grant, found.Name);
         }
         else if (caller?.Kind == CallerKind.Application && IsAdmin(http))
         {

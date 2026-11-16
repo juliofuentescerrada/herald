@@ -566,7 +566,7 @@ export interface ResultDetails {
   reason: string | null;
   recordedAt: string;
   /** @nullable */
-  recordedBy?: string | null;
+  recordedBy: string | null;
 }
 
 export interface MatchSummary {

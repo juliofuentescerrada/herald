@@ -19,14 +19,13 @@ public static class GetMatchEndpoint
     [OperationGroup(OperationGroup.Read)]
     [ProducesResponseType<MatchView>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound, "application/problem+json")]
-    public static async Task<IResult> Get(Guid organisationId, Guid tournamentId, Guid matchId, CompetitionDbContext db, IActorNames names,
-        CancellationToken cancellationToken)
+    public static async Task<IResult> Get(Guid organisationId, Guid tournamentId, Guid matchId, CompetitionDbContext db, CancellationToken cancellationToken)
     {
         var tournament = new TournamentId(tournamentId);
         var id = new MatchId(matchId);
         return await db.Matches.AsNoTracking().SingleOrDefaultAsync(match => match.Id == id && match.TournamentId == tournament, cancellationToken) is { } match
             && await db.Schedules.AsNoTracking().SingleOrDefaultAsync(schedule => schedule.Id == tournament, cancellationToken) is { } schedule
-            ? Results.Ok(await MatchView.NamedAsync(match, schedule, names, cancellationToken))
+            ? Results.Ok(MatchView.Of(match, schedule))
             : ScheduleResults.NotFound();
     }
 }

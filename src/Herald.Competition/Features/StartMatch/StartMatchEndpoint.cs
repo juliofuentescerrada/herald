@@ -23,11 +23,10 @@ public static class StartMatchEndpoint
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound, "application/problem+json")]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict, "application/problem+json")]
     public static async Task<IResult> Post(
-        Guid organisationId, Guid tournamentId, Guid matchId, StartMatch command, OrganisationContext context, CompetitionDbContext db, IMessageBus bus, IActorNames names,
-        CancellationToken cancellationToken)
+        Guid organisationId, Guid tournamentId, Guid matchId, StartMatch command, OrganisationContext context, CompetitionDbContext db, IMessageBus bus, CancellationToken cancellationToken)
     {
         var actor = context.ActorId ?? throw new InvalidOperationException($"No acting person in organisation {organisationId}.");
-        return await db.WriteAsync(bus, names, organisationId, tournamentId, matchId,
+        return await db.WriteAsync(bus, organisationId, tournamentId, matchId,
             (match, schedule) => match.StartMatch(schedule.RosterOf(match.First), schedule.RosterOf(match.Second), command.ExpectedRevision, actor, DateTimeOffset.UtcNow, schedule.UnavailablePlayers),
             cancellationToken);
     }

@@ -75,7 +75,7 @@ public partial class MatchTests
     }
 
     [Fact]
-    public async Task An_application_granted_selected_tournaments_cannot_list_or_create_tournaments()
+    public async Task An_application_granted_selected_tournaments_cannot_list_or_create_tournaments_or_reach_the_organisations_guests()
     {
         var (league, _) = await LeagueOfFourAsync();
         var bot = await GrantAsync(league, [TournamentOf(league)], "read", "setup");
@@ -83,6 +83,7 @@ public partial class MatchTests
         (await bot.Client.GetAsync($"{league.Organisation}/tournaments", Cancellation)).StatusCode.ShouldBe(HttpStatusCode.Forbidden);
         (await bot.Client.PostAsJsonAsync($"{league.Organisation}/tournaments",
             new { tournamentId = Guid.NewGuid(), configuration = new { title = "Bot Cup" } }, Cancellation)).StatusCode.ShouldBe(HttpStatusCode.Forbidden);
+        (await bot.Client.GetAsync($"{league.Organisation}/guests?kind=player&name=Robin", Cancellation)).StatusCode.ShouldBe(HttpStatusCode.Forbidden);
         (await bot.Client.GetAsync(league.Path, Cancellation)).StatusCode.ShouldBe(HttpStatusCode.OK);
     }
 
