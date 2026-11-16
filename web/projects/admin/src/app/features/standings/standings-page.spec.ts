@@ -62,10 +62,25 @@ const provisional: StandingsView = {
 
 const empty: StandingsView = { tournamentId, revision: 1, resolvedMatches: 0, matches: 6, rows: [robin, jamie, sam, taylor].map((who) => row(1, true, who, [0, 0, 0, 0, 0])), final: null, finals: [], noChampion: false };
 
-const resolvedMatches = (count: number): ScheduleDetails =>
-  ({ matches: Array.from({ length: 6 }, (_, index) => ({ state: index < count ? 'resolved' : 'scheduled' }) as MatchSummary) }) as ScheduleDetails;
+const names = [[robin, sam], [jamie, taylor], [robin, jamie], [sam, taylor], [robin, taylor], [sam, jamie]];
+const resolvedMatches = (count: number, resultsRevision = count + 1, over: Partial<ScheduleDetails> = {}): ScheduleDetails =>
+  ({
+    revision: 9,
+    resultsRevision,
+    finalised: false,
+    finals: [],
+    matches: names.map(([first, second], index) => ({
+      matchId: `m-${index}`,
+      round: Math.floor(index / 2) + 1,
+      first: { entryId: first.entryId, name: first.name },
+      second: { entryId: second.entryId, name: second.name },
+      state: index < count ? 'resolved' : index === count ? 'inPlay' : 'scheduled',
+      result: null,
+    }) as MatchSummary),
+    ...over,
+  }) as ScheduleDetails;
 
-async function open(standings: () => Observable<StandingsView>, details: TournamentDetails = tournament(), schedule = resolvedMatches(4)) {
+async function open(standings: () => Observable<StandingsView>, details: TournamentDetails = tournament(), schedule = resolvedMatches(4), api: Record<string, unknown> = {}) {
   const client = new QueryClient();
   TestBed.configureTestingModule({
     providers: [
@@ -75,7 +90,7 @@ async function open(standings: () => Observable<StandingsView>, details: Tournam
       { provide: AppContext, useValue: { organisation: signal(organisation), home: signal(`/organisations/${organisation}`) } },
       { provide: Session, useValue: { account: signal({ username: 'ana' }) } },
       { provide: AccessState, useValue: { problem: signal(null) } },
-      { provide: HeraldHostAdminService, useValue: { getTournament: () => of(details), getSchedule: () => of(schedule), getStandings: standings } },
+      { provide: HeraldHostAdminService, useValue: { getTournament: () => of(details), getSchedule: () => of(schedule), getStandings: standings, ...api } },
     ],
   });
   const harness = await RouterTestingHarness.create(`/organisations/${organisation}/tournaments/${tournamentId}/standings`);
@@ -178,7 +193,7 @@ describe('The standings page', () => {
   });
 
   it('shows Updating while Competition knows more results than the standings', async () => {
-    const { page, text } = await open(() => of(provisional), tournament(), resolvedMatches(5));
+    const { page, text } = await open(() => of(provisional), tournament(), resolvedMatches(4, 6));
 
     expect(text('.title')).toContain('Updating');
     expect(text('.title')).not.toContain('Provisional');

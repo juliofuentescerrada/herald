@@ -16,6 +16,7 @@ export const splitBlocker = (code: string): [string, string] => {
 
 /** The API's rule codes in words, naming the side's team; the API applies the rules, the page only reports them. */
 export const ruleText = (field: string, rule: string, required: number | null, first: string, second: string, unavailable: readonly string[] = []): string => {
+  if (field === 'competition' && rule === 'finalised') return 'The competition is finalised. Reopen it with a reason first, from the Standings page.';
   if (field === 'outcome') return 'Choose one of the outcomes offered.';
   if (field === 'reason') return rule === 'too-long' ? 'The reason can have at most 500 characters.' : 'A no contest needs a reason.';
   if (field === 'correction-reason') return rule === 'too-long' ? 'The reason for the correction can have at most 500 characters.' : 'Give a reason for the correction.';

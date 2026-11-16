@@ -16,7 +16,9 @@
   <header class="page-header">
     <div class="title">
       <h1>Standings · {{ tournament.data()!.configuration.title }}</h1>
-      @if (updating()) {
+      @if (finalised()) {
+        <herald-status-label tone="success">Final</herald-status-label>
+      } @else if (updating()) {
         <herald-status-label tone="info" icon="hourglass">Updating</herald-status-label>
       } @else if (running() && view()) {
         <herald-status-label>Provisional</herald-status-label>
@@ -36,8 +38,65 @@
     } @else if (!view()) {
       <p role="status">Loading standings…</p>
     } @else {
+      @if (schedule.data(); as competition) {
+        @if (finalised()) {
+          @let current = finals()[0];
+          <section class="final-summary">
+            <div>
+              <p><strong>Final revision {{ current.number }} · results revision {{ current.resultsRevision }}</strong></p>
+              <p class="help">
+                Finalised@if (current.finalisedBy) { by {{ current.finalisedBy }}}, {{ zoned(current.finalisedAt) }}. Registration stays closed; nothing can change unless the competition is reopened.
+              </p>
+            </div>
+            <button herald-button type="button" (click)="askReopen($any($event.currentTarget))">Reopen</button>
+          </section>
+          @if (view()!.noChampion) {
+            <herald-notice heading="No active entrant">Every entrant withdrew or was disqualified. Points and positions stay; no champion is declared.</herald-notice>
+          }
+        } @else {
+          <section class="review" aria-labelledby="review-heading" [attr.aria-busy]="busy() || null">
+            <h2 id="review-heading">Review and finalise</h2>
+            @if (staleAt() !== null) {
+              <herald-notice tone="danger" heading="Standings changed since your review">
+                A result or correction moved the results to revision {{ staleAt() }} while you reviewed revision {{ view()!.revision }}. Nothing was finalised.
+                <span class="notice-action"><button herald-button type="button" [loading]="standings.isFetching()" (click)="refresh()">Review again</button></span>
+              </herald-notice>
+            } @else if (unresolved().length) {
+              <p>{{ unresolved().length }} {{ unresolved().length === 1 ? 'match is' : 'matches are' }} unresolved. Resolve {{ unresolved().length === 1 ? 'it' : 'them' }} before finalising.</p>
+              <ul class="unresolved">
+                @for (match of unresolved(); track match.matchId) {
+                  <li>
+                    <a [routerLink]="['../matches', match.matchId]">Round {{ match.round }} · {{ match.first.name }} vs {{ match.second.name }}</a>
+                    @if (match.state === 'inPlay') {
+                      <herald-status-label tone="info">In play</herald-status-label>
+                    } @else {
+                      <herald-status-label>Scheduled</herald-status-label>
+                    }
+                  </li>
+                }
+              </ul>
+            } @else if (updating()) {
+              <herald-notice heading="Standings are updating">
+                Results revision {{ competition.resultsRevision }} has not reached the standings yet (revision {{ view()!.revision }}). Finalising becomes available when they are current.
+              </herald-notice>
+            } @else {
+              <p>All {{ view()!.matches }} {{ view()!.matches === 1 ? 'match is' : 'matches are' }} resolved. Finalising makes these standings final; results then cannot change unless the competition is reopened.</p>
+              <p class="help">Results revision {{ competition.resultsRevision }} · standings revision {{ view()!.revision }} · you are reviewing revision {{ view()!.revision }}</p>
+              @if (failure(); as failed) {
+                <herald-notice tone="danger" heading="The competition was not finalised">{{ failed }}</herald-notice>
+              }
+              @if (busy()) {
+                <p class="help" role="status">Finalising. Please wait; do not submit again.</p>
+              }
+              <div class="actions">
+                <button herald-button variant="primary" type="button" [loading]="busy()" (click)="finalise()">{{ busy() ? 'Finalising…' : 'Finalise' }}</button>
+              </div>
+            }
+          </section>
+        }
+      }
       <section class="summary">
-        <p><strong>Provisional · {{ view()!.resolvedMatches }} of {{ view()!.matches }} {{ view()!.matches === 1 ? 'match' : 'matches' }} resolved</strong></p>
+        <p><strong>{{ finalised() ? 'Final' : 'Provisional' }} · {{ view()!.resolvedMatches }} of {{ view()!.matches }} {{ view()!.matches === 1 ? 'match' : 'matches' }} resolved</strong></p>
         <p class="help">
           Results revision {{ view()!.revision }} · 3 points a win, 1 a draw · equal points share a position, listed by name{{ view()!.resolvedMatches === 0 ? ' · No match resolved yet' : '' }}
         </p>
@@ -102,6 +161,58 @@
           }
         </tbody>
       </table>
+      <!-- Read-only history after the actionable groups (visual direction §7.2). -->
+      @if (finals().length) {
+        <details class="history" [open]="!finalised()">
+          <summary>Final revisions</summary>
+          <ul aria-label="Final revisions">
+            @for (final of finals(); track final.number) {
+              <li>
+                <p><strong>Final revision {{ final.number }}</strong> · results revision {{ final.resultsRevision }}</p>
+                <p class="help">
+                  Finalised@if (final.finalisedBy) { by {{ final.finalisedBy }}}, {{ zoned(final.finalisedAt) }}@if (final.reopenedAt) { · reopened {{ zoned(final.reopenedAt) }} · Reason: {{ final.reopenReason }}} @else { · current}
+                </p>
+              </li>
+            }
+          </ul>
+        </details>
+      }
     }
   </div>
 }
+
+<ng-template #reopenDialog>
+  <herald-dialog [heading]="'Reopen ' + (tournament.data()?.configuration?.title ?? '') + '?'" [busy]="busy()">
+    <p>
+      The competition returns to running so results can be corrected. Final revision {{ finals()[0]?.number }} is kept and listed. Registration stays closed
+      and rosters stay frozen; finalising again needs a new review.
+    </p>
+    <form novalidate (submit)="$event.preventDefault(); reopen()">
+      <div class="field">
+        <label for="reopen-reason">Reason (required)</label>
+        <textarea
+          id="reopen-reason"
+          #reopenReason
+          rows="3"
+          maxlength="500"
+          [value]="reason()"
+          (input)="reason.set(reopenReason.value); reasonError.set(null)"
+          [readOnly]="busy()"
+          [attr.aria-invalid]="reasonError() ? 'true' : null"
+          [attr.aria-describedby]="reasonError() ? 'reopen-reason-help reopen-reason-error' : 'reopen-reason-help'"
+        ></textarea>
+        <p class="help" id="reopen-reason-help">Private to the organisation. At most 500 characters.</p>
+        @if (reasonError(); as message) {
+          <p class="field-error" id="reopen-reason-error"><herald-icon name="alert-circle" size="metadata" />Error: {{ message }}</p>
+        }
+      </div>
+      @if (failure(); as failed) {
+        <herald-notice tone="danger" heading="The competition was not reopened">{{ failed }}</herald-notice>
+      }
+      <div class="actions">
+        <button herald-button variant="primary" type="submit" [loading]="busy()">{{ busy() ? 'Reopening…' : failure() ? 'Try again' : 'Reopen' }}</button>
+        <button herald-button type="button" data-herald-initial-focus [disabled]="busy()" (click)="closeDialog()">Keep it final</button>
+      </div>
+    </form>
+  </herald-dialog>
+</ng-template>

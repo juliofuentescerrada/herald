@@ -60,6 +60,8 @@ export class MatchPage {
   /** The owner's unsaved choice per side; null shows the current lineup. */
   protected readonly chosen = signal<Record<SideName, readonly string[] | null>>({ first: null, second: null });
 
+  /** A finalised competition takes no result write until it is reopened (h1-finalisation D-2). */
+  protected readonly finalised = computed(() => this.tournament.data()?.competition === 'finalised');
   protected readonly labels = computed(() => (this.tournament.data() ? lifecycleLabels(this.tournament.data()!) : []));
   protected readonly zone = computed(() => this.tournament.data()?.configuration.timeZone ?? 'UTC');
   protected readonly team = computed(() => this.match.data()?.activePlayers != null);

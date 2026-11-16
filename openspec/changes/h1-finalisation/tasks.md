@@ -16,7 +16,7 @@
 
 ## 4. Admin application
 
-- [ ] 4.1 `standings` feature: review panel, stale review, final status, reopen with reason, final revisions (D-6); `matches` feature: finalised refusals
+- [x] 4.1 `standings` feature: review panel, stale review, final status, reopen with reason, final revisions (D-6); `matches` feature: finalised refusals
 - [ ] 4.2 Vitest for each Visual input state and `axe-core`; lint and boundary checks pass
 
 ## 5. End-to-end journey and seeds

@@ -59,6 +59,7 @@ export const ruleText = (field: string, rule: string): string => {
     case 'entrant/departed': return 'This entrant has already left the competition.';
     case 'entrant/unknown': return 'This entrant is not in the running competition.';
     case 'schedule/not-started': return 'The competition has not started.';
+    case 'competition/finalised': return 'The competition is finalised. Reopen it with a reason first, from the Standings page.';
     case 'player/not-on-roster': return 'This player is not on the team’s frozen roster.';
     case 'player/withdrawn': return 'This player has withdrawn from the tournament.';
     case 'player/not-sanctioned': return 'This player has no sanction to lift.';

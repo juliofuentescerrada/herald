@@ -46,9 +46,15 @@ export interface LifecycleLabel {
 
 const registrationIcons: Record<string, IconName> = { notOpen: 'clock', open: 'door-enter', closed: 'lock' };
 
+/** A finalised competition has no reviewed icon meaning yet, so its label keeps its text only (ui-icons D-1, h1-finalisation). */
+const competitionLabel = (competition: string): LifecycleLabel =>
+  competition === 'running' ? { text: 'Running', icon: 'trophy', tone: 'info' }
+    : competition === 'finalised' ? { text: 'Finalised', tone: 'success' }
+    : { text: 'Preparing', icon: 'hourglass' };
+
 /** Publication, registration and competition are three facts, never one "Active" label; each icon follows its meaning (ui-icons D-1). */
 export const lifecycleLabels = (tournament: { publication: string; registration: string; competition: string }): LifecycleLabel[] => [
   tournament.publication === 'published' ? { text: 'Published', icon: 'world' } : { text: 'Draft', icon: 'pencil' },
   { text: registrationText(tournament.registration), icon: registrationIcons[tournament.registration] },
-  tournament.competition === 'running' ? { text: 'Running', icon: 'trophy', tone: 'info' } : { text: 'Preparing', icon: 'hourglass' },
+  competitionLabel(tournament.competition),
 ];

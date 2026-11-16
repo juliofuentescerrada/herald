@@ -191,7 +191,7 @@ export class TournamentFormPage {
     const atLeast = admitted ? ` At least ${admitted}: the admitted entries.` : '';
     const zoneOptions = [...new Set([...zones(), ...(d.timeZone ? [d.timeZone] : [])])].sort().map((zone) => [zone, zone] as const);
     const fixed = new Set<Name>(['capacity', 'entryKind', 'admission', 'checkIn', 'minimumRosterSize', 'maximumRosterSize', 'activePlayersPerSide']);
-    const running = this.stored()?.competition === 'running';
+    const running = this.stored()?.competition !== undefined && this.stored()?.competition !== 'preparation';
     const field = (name: Name, kind: Field['kind'], help: string, extra: Partial<Field> = {}): Field => ({
       name, kind, label: fieldLabels[name], help, ...extra,
       ...(running && fixed.has(name) ? { locked: true, help: 'Fixed when the competition started.' } : {}),

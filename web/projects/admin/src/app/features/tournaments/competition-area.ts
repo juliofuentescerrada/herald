@@ -117,7 +117,8 @@ export class CompetitionArea {
   readonly reload = output<void>();
 
   protected readonly state = signal<'ready' | 'busy' | 'failed' | 'conflict'>('ready');
-  protected readonly running = computed(() => this.tournament().competition === 'running');
+  /** Started: running or finalised (h1-finalisation). */
+  protected readonly running = computed(() => this.tournament().competition !== 'preparation');
   private readonly team = computed(() => this.tournament().configuration.entryKind === 'team');
   private readonly zone = computed(() => this.tournament().configuration.timeZone ?? 'UTC');
 
@@ -178,7 +179,8 @@ export class CompetitionArea {
 
   private readonly firstUnmet = computed(() => this.conditions().find((condition) => !condition.met) ?? null);
 
-  protected readonly badge = computed<{ text: string; tone: StatusTone; icon: IconName }>(() => {
+  protected readonly badge = computed<{ text: string; tone: StatusTone; icon?: IconName }>(() => {
+    if (this.tournament().competition === 'finalised') return { text: 'Finalised', tone: 'success' };
     if (this.running()) return { text: 'Running', tone: 'info', icon: 'trophy' };
     if (this.state() === 'busy') return { text: 'Starting', tone: 'info', icon: 'hourglass' };
     const unmet = this.firstUnmet();

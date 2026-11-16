@@ -51,7 +51,7 @@ import { dateTimeText, fieldLabels, instantText, registrationText } from './tour
       @if (reason(); as why) {
         <p class="help" id="registration-reason">{{ why }}</p>
       }
-      @if (tournament().competition !== 'running') {
+      @if (tournament().competition === 'preparation') {
         <button herald-button variant="primary" type="button" [loading]="state() === 'busy'" [disabled]="!!reason()" [attr.aria-describedby]="reason() ? 'registration-reason' : null" (click)="change()">
           {{ actionText() }}
         </button>
@@ -111,7 +111,7 @@ export class RegistrationArea {
     if (this.state() === 'conflict') return 'Reload the latest version first.';
     if (this.unsaved()) return 'Save your changes first.';
     // The start fixes the field: registration stays closed and no action is offered (h1-competition-start).
-    if (this.tournament().competition === 'running') return null;
+    if (this.tournament().competition !== 'preparation') return null;
     if (!this.isOpen() && this.tournament().schedulePublished) return 'The schedule is published. Withdraw it before reopening registration.';
     return !this.isOpen() && this.missing().length ? 'Set both registration dates before opening registration.' : null;
   });
