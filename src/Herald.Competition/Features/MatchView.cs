@@ -109,7 +109,7 @@ internal static class MatchResults
 
             // A first resolution or a correction (h1-safe-corrections D-1) changes the results.
             var before = match.Resolution;
-            var result = schedule.IsFinalised ? Schedule.FinalisedRefusal : write(match, schedule);
+            var result = schedule.IsCancelled ? Schedule.CancelledRefusal : schedule.IsFinalised ? Schedule.FinalisedRefusal : write(match, schedule);
             var resolved = result.Outcome == WriteOutcome.Applied && !ReferenceEquals(before, match.Resolution);
             switch (result.Outcome)
             {

@@ -74,7 +74,8 @@ public sealed record ScheduleDetails(
     IReadOnlyList<CompetitorDetails> Entrants,
     int ResultsRevision,
     bool Finalised,
-    IReadOnlyList<FinalRevisionDetails> Finals)
+    IReadOnlyList<FinalRevisionDetails> Finals,
+    bool Cancelled)
 {
     public static ScheduleDetails Of(Schedule schedule, IReadOnlyList<Match> matches) => new(
         schedule.Id.Value,
@@ -97,7 +98,8 @@ public sealed record ScheduleDetails(
         schedule.ResultsRevision,
         schedule.IsFinalised,
         [.. schedule.Finals.Reverse().Select(final => new FinalRevisionDetails(
-            final.Number, final.ResultsRevision, final.FinalisedAt, final.FinalisedByName, final.ReopenReason, final.ReopenedAt, final.ReopenedByName))]);
+            final.Number, final.ResultsRevision, final.FinalisedAt, final.FinalisedByName, final.ReopenReason, final.ReopenedAt, final.ReopenedByName))],
+        schedule.IsCancelled);
 
     // Null until the competition's matches exist.
     private static OperationsDetails? OperationsOf(Schedule schedule, IReadOnlyList<Match> matches)
@@ -218,7 +220,7 @@ internal static class ScheduleResults
 
             var tracked = await db.Matches.Where(match => match.TournamentId == id).ToListAsync(cancellationToken);
             var resultsRevision = schedule.ResultsRevision;
-            var result = write(schedule, tracked);
+            var result = schedule.IsCancelled ? Schedule.CancelledRefusal : write(schedule, tracked);
             switch (result.Outcome)
             {
                 // Both carry the current schedule, so a rejection names its blockers (pending entries included) and a

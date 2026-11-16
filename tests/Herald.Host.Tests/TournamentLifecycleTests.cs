@@ -109,7 +109,6 @@ public class TournamentLifecycleTests(OrganisationApi api)
     }
 
     [Fact]
-    [Trait("covers", "tournament-lifecycle: Show archived")]
     public async Task An_archived_cancelled_tournament_leaves_the_default_list_and_comes_back_when_unarchived()
     {
         var owned = await TournamentAsync();

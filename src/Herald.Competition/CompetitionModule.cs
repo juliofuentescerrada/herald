@@ -16,6 +16,9 @@ public static class CompetitionModule
         options.PublishMessage<TournamentEligibleFieldChanged>().ToLocalQueue(Queue);
         options.PublishMessage<TournamentCompetitionStarted>().ToLocalQueue(Queue);
         options.PublishMessage<TournamentFrozenRostersChanged>().ToLocalQueue(Queue);
+        // Registration consumes the cancellation too; each module's handler is sticky to its own queue.
+        options.PublishMessage<TournamentCancelled>().ToLocalQueue(Queue);
+        options.PublishMessage<TournamentArchiveChanged>().ToLocalQueue(Queue);
         return options.AddHeraldModule<CompetitionDbContext>(CompetitionDbContext.Schema);
     }
 }

@@ -190,7 +190,64 @@ public sealed class Schedule : AggregateRoot<TournamentId>
 
     public FieldChange? CrossedChange => Current is { } current && current.Pairings.EligibleRevision != Field.Revision ? ChangeFrom(current.Pairings) : null;
 
+    // Set once Tournaments' cancellation arrives: every later write is rejected (h1-tournament-cancel-and-dates D-1).
+    public DateTimeOffset? CancelledAt { get; private set; }
+
+    public Guid? CancelledBy { get; private set; }
+
+    public bool IsCancelled => CancelledAt is not null;
+
+    // Tournaments' archive flag at its revision (design D-3): an archived competition is not reopened.
+    public bool Archived { get; private set; }
+
+    public int ArchiveRevision { get; private set; }
+
+    public const string CancellationReason = "Tournament cancelled";
+
     public static Schedule Track(TournamentId id, EligibleField field) => new(id, field);
+
+    // Before start the current publication is withdrawn and a draft discarded; after start every unresolved match is voided.
+    // Idempotent; results and lineups recorded so far stay (h1-tournament-cancel-and-dates D-1, D-2).
+    public bool ApplyCancellation(IReadOnlyList<Match> matches, Guid actor, DateTimeOffset at)
+    {
+        if (IsCancelled)
+        {
+            return false;
+        }
+
+        CancelledAt = at;
+        CancelledBy = actor;
+        if (StartedAt is null && Current is { } current)
+        {
+            _publications[_publications.IndexOf(current)] = current with { WithdrawalReason = CancellationReason, WithdrawnBy = actor, WithdrawnAt = at };
+            Raise(new ScheduleWithdrawn(Id, current.Number, CancellationReason, actor, at));
+        }
+
+        Draft = null;
+        // Every match is visited: Any would stop at the first voided one.
+        var voided = matches.Where(match => match.VoidForCancellation(actor, at)).ToList();
+        if (voided.Count > 0)
+        {
+            ResultsRevision++;
+        }
+
+        Revision++;
+        return true;
+    }
+
+    // Newer archive reports replace the flag; older ones change nothing.
+    public bool ApplyArchive(bool archived, int revision)
+    {
+        if (revision <= ArchiveRevision)
+        {
+            return false;
+        }
+
+        Archived = archived;
+        ArchiveRevision = revision;
+        Revision++;
+        return true;
+    }
 
     // Once only: a later start report changes nothing. Nothing is repaired here (D-4).
     public bool ApplyStart(int scheduleRevision, DateTimeOffset at, int? activePlayersPerSide = null)
@@ -216,7 +273,15 @@ public sealed class Schedule : AggregateRoot<TournamentId>
         }
 
         ResultsRevision++;
-        return [.. pairings.Matches.Select(pairing => Match.Schedule(Id, pairing, ActivePlayersPerSide))];
+        List<Match> matches = [.. pairings.Matches.Select(pairing => Match.Schedule(Id, pairing, ActivePlayersPerSide))];
+        if (IsCancelled)
+        {
+            // The start reached Competition after the cancellation: its matches are voided at once.
+            matches.ForEach(match => match.VoidForCancellation(CancelledBy!.Value, CancelledAt!.Value));
+            ResultsRevision++;
+        }
+
+        return matches;
     }
 
     // One of the schedule's matches was resolved: the results change.
@@ -584,6 +649,11 @@ public sealed class Schedule : AggregateRoot<TournamentId>
             return WriteOutcome.Stale;
         }
 
+        if (Archived)
+        {
+            return WriteResult.Reject("competition", "archived");
+        }
+
         reason = reason?.Trim();
         if (string.IsNullOrEmpty(reason))
         {
@@ -603,6 +673,9 @@ public sealed class Schedule : AggregateRoot<TournamentId>
 
     // What every competitive write answers on a finalised competition: reopen it first (h1-finalisation D-2).
     public static WriteResult FinalisedRefusal => WriteResult.Reject("competition", "finalised");
+
+    // What every write answers once the tournament is cancelled, a late request included (D-1).
+    public static WriteResult CancelledRefusal => WriteResult.Reject("tournament", "cancelled");
 
     private static WriteResult Started => WriteResult.Reject("schedule", "competition-started");
 
