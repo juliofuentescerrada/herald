@@ -45,6 +45,7 @@ export const cancellationEffect = (field: FieldDetails, entry: EntryDetails): st
 export const ruleText = (field: string, rule: string): string => {
   switch (`${field}/${rule}`) {
     case 'registration/not-open': return 'Registration is not open, so entries cannot be added.';
+    case 'tournament/cancelled': return 'The tournament is cancelled. Nothing can change.';
     case 'guest/kind': return 'This guest is of the other kind from the tournament’s entries.';
     case 'guest/already-entered': return 'This guest already has an active entry in this tournament.';
     case 'field/mismatch': return 'The field has a mismatch to resolve first.';

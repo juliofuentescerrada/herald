@@ -22,6 +22,7 @@ const section = async (page: Page, name: string) => {
   await expect(page.getByRole('heading', { level: 1 })).toContainText(name);
 };
 
+// It cancels Lantern Spire and archives Lantern Mast for good, so it runs once per seeded database: seed again before a second run.
 // h1-tournament-cancel-and-dates 5.3 on the seeded Lantern Hall Players: the dates preview on Spring Open (not saved), the cancel
 // confirmations, Lantern Spire cancelled with its matches voided, Lantern Mast archived and the list with "Show archived".
 test('The seeded owner previews a date change, cancels a running league, sees its voided matches and archives a cancelled one', async ({ page, signIn }, info) => {

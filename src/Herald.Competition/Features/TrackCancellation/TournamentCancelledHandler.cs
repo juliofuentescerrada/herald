@@ -9,7 +9,8 @@ using Wolverine.Attributes;
 namespace Herald.Competition.Features.TrackCancellation;
 
 // Withdraws the publication or voids the unresolved matches, then rejects every write (h1-tournament-cancel-and-dates D-1).
-// A write accepted just before this arrives is kept like any earlier one (Q2). A tournament without a schedule has nothing to end.
+// A write accepted just before this arrives is kept like any earlier one (Q2). A tournament not tracked yet is tracked cancelled,
+// so a field report that follows finds it so.
 [StickyHandler(CompetitionModule.Queue)]
 public static class TournamentCancelledHandler
 {
@@ -20,12 +21,13 @@ public static class TournamentCancelledHandler
         var id = new TournamentId(message.TournamentId);
         if (await db.Schedules.SingleOrDefaultAsync(schedule => schedule.Id == id, cancellationToken) is not { } schedule)
         {
-            return;
+            schedule = Schedule.Track(id, new EligibleField(0, false, [], []));
+            db.Schedules.Add(schedule);
         }
 
         var matches = await db.Matches.Where(match => match.TournamentId == id).ToListAsync(cancellationToken);
         var resultsRevision = schedule.ResultsRevision;
-        if (!schedule.ApplyCancellation(matches, message.CancelledBy, message.CancelledAt))
+        if (!schedule.ApplyCancellation(message.AfterStart, matches, message.CancelledBy, message.CancelledAt))
         {
             return;
         }

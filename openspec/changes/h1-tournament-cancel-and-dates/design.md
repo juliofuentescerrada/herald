@@ -96,3 +96,19 @@ Captured at 1440 and 390 px by the test script (`test-results/screens/seeded-can
 | `schedule-cancelled` | Same notice, "Voided" rounds and matches with "Voided: tournament cancelled · no points"; the operations summary still counts voided matches as resolved | Kept: they are resolutions with no points |
 | `standings-cancelled` | "Cancelled" label, notice "Cancelled · no champion or final ranking" and the summary "Cancelled · 4 of 6 matches resolved · 2 voided"; first capture read "Provisional · 6 of 6" | Fixed in task 6.3 |
 | Every cancelled field | First capture repeated "Nothing can change." under each field (RU-03) | Fixed: the notice says it once; locked fields keep their own help |
+
+### herald-reviewer review (task 6.4)
+
+| # | Finding | Resolution |
+|---|---|---|
+| 1 | A tournament cancelled before start read as started in the Competition area and the form | Fixed: both read `start.startedAt`; the area says "Cancelled before it started"; Vitest added |
+| 2 | The cancel confirmation read the schedule outside Query and could state zero matches | Fixed: `injectQuery` on the schedule key; the consequence says "Reading the matches…" or names the effect without counts if the read fails |
+| 3 | The cancellation's revision was not kept (ADR 0007, 0017) | Fixed: `CancelledAtRevision`, with a migration |
+| 4 | `DatesChanged` kept no revisions | Fixed: `FromRevision` and `ToRevision` (jsonb, no migration); ADR 0017's row names them |
+| 5 | A cancellation reaching Competition before its schedule was tracked was lost | Fixed: the schedule is tracked cancelled; a later field report applies to it |
+| 6 | Competition decided before or after start from its own state | Fixed: it follows `TournamentCancelled.AfterStart`; a start not yet learned keeps its publication and its matches are voided as they come |
+| 7 | Tracking the archive flag raised the schedule's revision | Fixed: the flag keeps its own revision only |
+| 8 | A draft deleted by a lost answer was reported as not deleted | Fixed: a 404 on delete reads as deleted |
+| 9 | The entries page of a cancelled tournament pointed to reopening registration | Fixed: a cancelled notice, "Cancelled with the tournament" on each entry and the `tournament/cancelled` text |
+| 10 | The "Two matches left" marker proved only the matches | Fixed: the standings Vitest carries the same marker |
+| 11 | The test script runs once per seeded database | Noted in the script's header |

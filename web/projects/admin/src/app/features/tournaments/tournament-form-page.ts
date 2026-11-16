@@ -194,7 +194,8 @@ export class TournamentFormPage {
     const atLeast = admitted ? ` At least ${admitted}: the admitted entries.` : '';
     const zoneOptions = [...new Set([...zones(), ...(d.timeZone ? [d.timeZone] : [])])].sort().map((zone) => [zone, zone] as const);
     const fixed = new Set<Name>(['capacity', 'entryKind', 'admission', 'checkIn', 'minimumRosterSize', 'maximumRosterSize', 'activePlayersPerSide']);
-    const running = this.stored()?.competition !== undefined && this.stored()?.competition !== 'preparation';
+    // Started is a time, not a state: a tournament cancelled before start never fixed anything (h1-tournament-cancel-and-dates I-1).
+    const running = this.stored()?.start.startedAt != null;
     const dates = new Set<Name>(['registrationOpensAt', 'registrationClosesAt', 'plannedStartAt']);
     const cancelled = this.cancelled();
     const published = this.published();

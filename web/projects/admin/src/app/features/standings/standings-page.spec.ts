@@ -196,7 +196,8 @@ describe('The standings page', () => {
     expect(texts('thead th')[1]).toBe('Team');
   });
 
-  it('shows a competition cancelled after start as Cancelled, with no champion and no review', async () => {
+  it('shows a competition cancelled after start as Cancelled, with no champion and no review',
+    { meta: { type: 'covers', description: 'tournament-lifecycle: Two matches left' } }, async () => {
     const { page, text } = await open(() => of(provisional), tournament({ competition: 'cancelled' }), resolvedMatches(4));
 
     expect(text('.title')).toContain('Cancelled');

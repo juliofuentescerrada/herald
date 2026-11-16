@@ -40,6 +40,9 @@ namespace Herald.Tournaments.Persistence.Migrations
                     b.Property<DateTimeOffset?>("CancelledAt")
                         .HasColumnType("timestamp with time zone");
 
+                    b.Property<int?>("CancelledAtRevision")
+                        .HasColumnType("integer");
+
                     b.Property<Guid?>("CancelledBy")
                         .HasColumnType("uuid");
 

@@ -147,6 +147,15 @@ describe('The tournament lifecycle actions', () => {
     expect(await violations(page())).toEqual([]);
   });
 
+  it('show a tournament cancelled before start as never started', async () => {
+    const { page, text } = await render(cancelled({ start: notReady, cancellation: { cancelledAt: '2026-11-10T14:20:00Z', cancelledByName: null, reason: 'Venue unavailable', afterStart: false } }));
+
+    expect(text('app-competition-area')).toContain('Cancelled before it started. Nothing can change.');
+    expect(text('app-competition-area')).not.toContain('Started');
+    expect(page().querySelector('app-competition-area button')).toBeNull();
+    expect(text('#t-plannedStartAt-help')).toBe('Change it through “Change dates” above.');
+  });
+
   it('archive a cancelled tournament without asking, and unarchive it', async () => {
     const archiveTournament = vi.fn(() => of(cancelled({ archived: true, revision: 7 })));
     const unarchiveTournament = vi.fn(() => of(cancelled({ archived: false, revision: 8 })));

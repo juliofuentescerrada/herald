@@ -207,8 +207,9 @@ public sealed class Schedule : AggregateRoot<TournamentId>
     public static Schedule Track(TournamentId id, EligibleField field) => new(id, field);
 
     // Before start the current publication is withdrawn and a draft discarded; after start every unresolved match is voided.
+    // Tournaments says which: a start not yet learned here keeps its publication and its matches are voided as they come (I-3).
     // Idempotent; results and lineups recorded so far stay (h1-tournament-cancel-and-dates D-1, D-2).
-    public bool ApplyCancellation(IReadOnlyList<Match> matches, Guid actor, DateTimeOffset at)
+    public bool ApplyCancellation(bool afterStart, IReadOnlyList<Match> matches, Guid actor, DateTimeOffset at)
     {
         if (IsCancelled)
         {
@@ -217,7 +218,7 @@ public sealed class Schedule : AggregateRoot<TournamentId>
 
         CancelledAt = at;
         CancelledBy = actor;
-        if (StartedAt is null && Current is { } current)
+        if (!afterStart && StartedAt is null && Current is { } current)
         {
             _publications[_publications.IndexOf(current)] = current with { WithdrawalReason = CancellationReason, WithdrawnBy = actor, WithdrawnAt = at };
             Raise(new ScheduleWithdrawn(Id, current.Number, CancellationReason, actor, at));
@@ -243,9 +244,9 @@ public sealed class Schedule : AggregateRoot<TournamentId>
             return false;
         }
 
+        // A tracked flag, not an owner's write: the schedule's revision, which the owner's writes state, stays.
         Archived = archived;
         ArchiveRevision = revision;
-        Revision++;
         return true;
     }
 

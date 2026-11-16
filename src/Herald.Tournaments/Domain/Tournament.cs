@@ -65,6 +65,8 @@ public sealed record DateSelection(DateTime? RegistrationOpensAt = null, DateTim
 
 // One effective "Change dates", kept with its old and new values (ADR 0007): a notifiable fact (ADR 0017) with no consumer yet.
 public sealed record DatesChanged(
+    int FromRevision,
+    int ToRevision,
     DateTime? OldRegistrationOpensAt,
     DateTime? NewRegistrationOpensAt,
     DateTime? OldRegistrationClosesAt,
@@ -136,6 +138,9 @@ public sealed class Tournament : AggregateRoot<TournamentId>
     public string? CancelledByName { get; private set; }
 
     public DateTimeOffset? CancelledAt { get; private set; }
+
+    // The tournament revision the cancellation took effect at: the fact's subject revision (ADR 0007, ADR 0017).
+    public int? CancelledAtRevision { get; private set; }
 
     // Private to the organisation: no event carries it (A-1).
     public string? CancellationReason { get; private set; }
@@ -449,6 +454,7 @@ public sealed class Tournament : AggregateRoot<TournamentId>
         CancelledAt = at;
         CancellationReason = reason;
         Touch(actor, at);
+        CancelledAtRevision = Revision;
         Raise(new TournamentCancelled(Id, IsStarted, actor, at));
         return WriteOutcome.Applied;
     }
@@ -530,6 +536,7 @@ public sealed class Tournament : AggregateRoot<TournamentId>
 
         Configuration = changed;
         DateChanges = [.. DateChanges, new(
+            Revision, Revision + 1,
             current.RegistrationOpensAt, changed.RegistrationOpensAt,
             current.RegistrationClosesAt, changed.RegistrationClosesAt,
             current.PlannedStartAt, changed.PlannedStartAt,

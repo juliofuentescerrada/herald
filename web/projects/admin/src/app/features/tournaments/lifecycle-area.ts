@@ -3,7 +3,8 @@ import { ChangeDetectionStrategy, Component, computed, inject, input, output, si
 import { HeraldHostAdminService, HttpValidationProblemDetails, problemOf, ScheduleDetails, TournamentDetails } from '@herald/api-client/admin';
 import { Button, Dialog, DialogContext, DialogRef, Dialogs, Icon, Notice, Toasts } from '@herald/ui';
 import { firstValueFrom } from 'rxjs';
-import { AccessState, CONFIRM } from '../../platform';
+import { injectQuery } from '@tanstack/angular-query-experimental';
+import { AccessState, CONFIRM, scheduleKey } from '../../platform';
 import { dateTimeText, instantText } from './tournaments';
 
 type DateName = 'registrationOpensAt' | 'registrationClosesAt' | 'plannedStartAt';
@@ -196,7 +197,14 @@ export class LifecycleArea {
   protected readonly selected = signal<ReadonlySet<DateName>>(new Set());
   protected readonly values = signal<Record<DateName, string>>({ registrationOpensAt: '', registrationClosesAt: '', plannedStartAt: '' });
   protected readonly datesError = signal<string | null>(null);
-  private readonly schedule = signal<ScheduleDetails | null>(null);
+  /** The matches a cancellation after start would void, read when its confirmation opens; Query owns them. */
+  private readonly confirmingAfterStart = signal(false);
+  private readonly schedule = injectQuery(() => ({
+    queryKey: scheduleKey(this.organisation(), this.tournament().id),
+    queryFn: () => firstValueFrom(this.api.getSchedule<ScheduleDetails>(this.organisation(), this.tournament().id)),
+    enabled: this.confirmingAfterStart(),
+    retry: false,
+  }));
 
   protected readonly draft = computed(() => this.tournament().publication === 'draft');
   protected readonly started = computed(() => this.tournament().start.startedAt != null);
@@ -235,7 +243,9 @@ export class LifecycleArea {
         : 'It has no entries.';
       return `Registration closes. ${entries}${t.schedulePublished ? ' The published schedule is withdrawn.' : ''}`;
     }
-    const matches = this.schedule()?.matches ?? [];
+    if (this.schedule.isError()) return 'The matches could not be read: results recorded so far stay, unresolved matches will be voided with no points, and no champion or final ranking is declared.';
+    if (!this.schedule.data()) return 'Reading the matches…';
+    const matches = this.schedule.data()!.matches;
     const unresolved = matches.filter((match) => match.state !== 'resolved').length;
     return `${plural(matches.length - unresolved, 'result', 'results')} recorded so far stay. ${plural(unresolved, 'unresolved match', 'unresolved matches')} will be voided with no points. No champion or final ranking is declared.`;
   });
@@ -279,9 +289,9 @@ export class LifecycleArea {
     this.reason.set('');
     this.reasonError.set(null);
     this.dialogFailure.set(null);
-    this.schedule.set(null);
     if (this.started()) {
-      void firstValueFrom(this.api.getSchedule<ScheduleDetails>(this.organisation(), this.tournament().id)).then((schedule) => this.schedule.set(schedule), () => undefined);
+      this.confirmingAfterStart.set(true);
+      void this.schedule.refetch();
     }
     this.open(this.cancelDialog(), trigger);
   }
@@ -387,6 +397,12 @@ export class LifecycleArea {
       this.deleted.emit();
     } catch (error) {
       if (this.access.problem()) return;
+      // Not found: an earlier attempt deleted it and its answer was lost.
+      if (error instanceof HttpErrorResponse && error.status === 404) {
+        this.toasts.show(`${t.configuration.title} deleted.`);
+        this.deleted.emit();
+        return;
+      }
       this.failure.set(error instanceof HttpErrorResponse && error.status === 409
         ? 'The draft changed elsewhere. Reload the latest version and try again.'
         : 'The draft was not deleted. Try again.');

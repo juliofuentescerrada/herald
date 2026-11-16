@@ -30,7 +30,7 @@ public class CancellationTests
     [Trait("covers", "round-robin-pairings: A published schedule before start")]
     public void A_cancellation_before_start_withdraws_the_publication_and_keeps_it_in_history()
     {
-        _schedule.ApplyCancellation([], _owner, _at).ShouldBeTrue();
+        _schedule.ApplyCancellation(false, [], _owner, _at).ShouldBeTrue();
 
         _schedule.Current.ShouldBeNull();
         _schedule.Draft.ShouldBeNull();
@@ -52,7 +52,7 @@ public class CancellationTests
 
         var resultsRevision = _schedule.ResultsRevision;
 
-        _schedule.ApplyCancellation(matches, _owner, _at).ShouldBeTrue();
+        _schedule.ApplyCancellation(true, matches, _owner, _at).ShouldBeTrue();
 
         matches.Take(4).ShouldAllBe(match => match.Resolution!.Cause == Cause.Played && match.Resolution.Outcome == Outcome.First);
         matches.Skip(4).ShouldAllBe(match => match.Resolution!.Cause == Cause.VoidedCancelled && match.Resolution.Outcome == Outcome.None);
@@ -64,18 +64,26 @@ public class CancellationTests
     public void A_second_delivery_changes_nothing()
     {
         var matches = Started();
-        _schedule.ApplyCancellation(matches, _owner, _at);
+        _schedule.ApplyCancellation(true, matches, _owner, _at);
         var revision = _schedule.Revision;
 
-        _schedule.ApplyCancellation(matches, _owner, _at).ShouldBeFalse();
+        _schedule.ApplyCancellation(true, matches, _owner, _at).ShouldBeFalse();
 
         _schedule.Revision.ShouldBe(revision);
     }
 
     [Fact]
+    public void A_cancellation_after_a_start_not_yet_learned_keeps_the_publication()
+    {
+        _schedule.ApplyCancellation(true, [], _owner, _at).ShouldBeTrue();
+
+        _schedule.Current.ShouldNotBeNull();
+    }
+
+    [Fact]
     public void A_start_that_arrives_after_the_cancellation_voids_its_matches_at_once()
     {
-        _schedule.ApplyCancellation([], _owner, _at);
+        _schedule.ApplyCancellation(false, [], _owner, _at);
         _schedule.ApplyStart(1, _at, null);
 
         _schedule.ScheduleMatches().ShouldAllBe(match => match.Resolution!.Cause == Cause.VoidedCancelled);

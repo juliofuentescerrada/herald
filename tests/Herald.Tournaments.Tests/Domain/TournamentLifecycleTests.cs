@@ -59,6 +59,7 @@ public class TournamentLifecycleTests
         tournament.CancelledAt.ShouldBe(_at);
         tournament.IsStarted.ShouldBeFalse();
         tournament.Revision.ShouldBe(4);
+        tournament.CancelledAtRevision.ShouldBe(4);
         tournament.DomainEvents.ShouldBe([new TournamentCancelled(tournament.Id, false, _owner, _at)]);
     }
 
@@ -181,6 +182,7 @@ public class TournamentLifecycleTests
 
         tournament.Configuration.ShouldBe(CompleteIndividual with { PlannedStartAt = postponed });
         tournament.DateChanges.ShouldBe([new DatesChanged(
+            3, 4,
             CompleteIndividual.RegistrationOpensAt, CompleteIndividual.RegistrationOpensAt,
             CompleteIndividual.RegistrationClosesAt, CompleteIndividual.RegistrationClosesAt,
             CompleteIndividual.PlannedStartAt, postponed,
