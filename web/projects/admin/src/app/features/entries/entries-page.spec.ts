@@ -40,6 +40,8 @@ const tournament = (over: Partial<TournamentDetails> = {}): TournamentDetails =>
   checkedInEntries: 0,
   schedulePublished: false,
   start: { conditions: [], eligible: null, pending: null, rostersOutsideBounds: null, sharedMemberNames: [], publishedScheduleRevision: null, startedAt: null, startedOnScheduleRevision: null },
+  archived: false,
+  cancellation: null,
   ...over,
 });
 

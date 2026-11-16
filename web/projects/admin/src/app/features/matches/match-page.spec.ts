@@ -31,6 +31,8 @@ const tournament: TournamentDetails = {
   checkedInEntries: 0,
   schedulePublished: true,
   start: { conditions: [], eligible: 2, pending: 0, rostersOutsideBounds: [], sharedMemberNames: [], publishedScheduleRevision: 1, startedAt: '2026-11-22T09:05:00Z', startedOnScheduleRevision: 1 },
+  archived: false,
+  cancellation: null,
 } as TournamentDetails;
 
 const players = (team: string): PlayerDetails[] => Array.from({ length: 7 }, (_, index) => ({ playerId: `${team}-${index + 1}`, name: `${team} ${index + 1}` }));

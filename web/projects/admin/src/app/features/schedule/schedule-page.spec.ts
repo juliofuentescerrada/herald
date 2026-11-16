@@ -41,6 +41,8 @@ const tournament = (over: Partial<TournamentDetails> = {}): TournamentDetails =>
   checkedInEntries: 0,
   schedulePublished: false,
   start: { conditions: [], eligible: null, pending: null, rostersOutsideBounds: null, sharedMemberNames: [], publishedScheduleRevision: null, startedAt: null, startedOnScheduleRevision: null },
+  archived: false,
+  cancellation: null,
   ...over,
 });
 
@@ -97,6 +99,7 @@ const schedule = (over: Partial<ScheduleDetails> = {}): ScheduleDetails => ({
   resultsRevision: 0,
   finalised: false,
   finals: [],
+  cancelled: false,
   ...over,
 });
 

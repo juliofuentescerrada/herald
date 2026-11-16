@@ -30,6 +30,8 @@ const tournament = (over: Partial<TournamentDetails> = {}): TournamentDetails =>
   checkedInEntries: 0,
   schedulePublished: true,
   start: { conditions: [], eligible: 4, pending: 0, rostersOutsideBounds: null, sharedMemberNames: [], publishedScheduleRevision: 2, startedAt: '2026-11-21T09:05:00Z', startedOnScheduleRevision: 2 },
+  archived: false,
+  cancellation: null,
   ...over,
 });
 
