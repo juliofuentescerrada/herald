@@ -203,7 +203,7 @@ export class TournamentFormPage {
       ...(running && fixed.has(name) ? { locked: true, help: 'Fixed when the competition started.' } : {}),
       // A published tournament's dates change only through "Change dates" (D-5, Q3).
       ...(published && dates.has(name) ? { locked: true, help: running ? 'Fixed when the competition started.' : 'Change it through “Change dates” above.' } : {}),
-      ...(cancelled ? { locked: true, help: 'The tournament is cancelled. Nothing can change.' } : {}),
+      ...(cancelled ? { locked: true } : {}),
     });
     return [
       {
