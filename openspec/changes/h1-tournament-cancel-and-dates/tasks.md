@@ -1,6 +1,6 @@
 ## 1. Review gates
 
-- [ ] 1.1 Record in proposal.md that merging the batch 3 proposals pull request approved this change, with the review's answers to Q1 to Q3 and any change it asked for (ADR 0018); verify with `openspec validate h1-tournament-cancel-and-dates`
+- [x] 1.1 Record in proposal.md that merging the batch 3 proposals pull request approved this change, with the review's answers to Q1 to Q3 and any change it asked for (ADR 0018); verify with `openspec validate h1-tournament-cancel-and-dates`
 
 ## 2. Tournaments
 
