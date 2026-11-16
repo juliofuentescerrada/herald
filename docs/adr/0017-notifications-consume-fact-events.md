@@ -32,6 +32,8 @@ ADR 0007 already requires owning modules to persist actor, time and reason with 
 | Player withdrawn, sanctioned or the sanction lifted | Competition | `h1-round-operations`: `PlayerWithdrawal` and `PlayerSanction` actor, time, reason, schedule revision; lift actor, time and revision | Not yet |
 | Result corrected, with its reason | Competition | `h1-safe-corrections`: `ReplacedResolution` replaced resolution, actor, time, private reason, operation and the match revision it was effective at | Not yet |
 | Competition finalised, or reopened with its reason | Competition | `h1-finalisation`: `FinalRevision` number, results revision, actor, time; reopening actor, time and private reason | `CompetitionFinalised` v1 and `CompetitionReopened` v1 (no reason text), consumed by Standings and Tournaments |
+| Tournament cancelled, before or after start, with its reason | Tournaments | `h1-tournament-cancel-and-dates`: `Tournament` cancelled state, actor, name, time and private reason, revision | `TournamentCancelled` v1 (no reason text), consumed by Registration and Competition |
+| Tournament dates changed | Tournaments | `h1-tournament-cancel-and-dates`: `DatesChanged` old and new registration opening, closure and planned start, actor, time | Not yet |
 
 Each change that adds a fact adds a row, including H1's tournament publication, material changes and registration opening or closing when their owning change confirms what is recorded.
 

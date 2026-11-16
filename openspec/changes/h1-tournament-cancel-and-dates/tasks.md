@@ -5,7 +5,7 @@
 ## 2. Tournaments
 
 - [x] 2.1 Cancelled state, archive flag, draft deletion and `ChangeDates` (design D-1, D-3 to D-5); domain tests for every `tournament-lifecycle` scenario
-- [ ] 2.2 Migration; features `CancelTournament`, `ArchiveTournament`, `UnarchiveTournament`, `DeleteDraft`, `ChangeDates`; the list filter; `TournamentCancelled` and `TournamentArchiveChanged` v1; API tests against PostgreSQL, including repeats, conflicts and another organisation's 404s
+- [x] 2.2 Migration; features `CancelTournament`, `ArchiveTournament`, `UnarchiveTournament`, `DeleteDraft`, `ChangeDates`; the list filter; `TournamentCancelled` and `TournamentArchiveChanged` v1; API tests against PostgreSQL, including repeats, conflicts and another organisation's 404s
 
 ## 3. Registration and Competition
 

@@ -24,7 +24,8 @@ public sealed record TournamentSummary(
     RegistrationWindow Registration,
     string Competition,
     int AdmittedEntries,
-    int WaitingEntries);
+    int WaitingEntries,
+    bool Archived);
 
 public static class ListTournamentsEndpoint
 {
@@ -33,12 +34,15 @@ public static class ListTournamentsEndpoint
     [EndpointName("listTournaments")]
     [OperationGroup(OperationGroup.Read, AllTournaments = true)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound, "application/problem+json")]
-    public static async Task<IReadOnlyList<TournamentSummary>> Get(Guid organisationId, TournamentsDbContext db, CancellationToken cancellationToken)
+    // Archived tournaments only with "Show archived" (h1-tournament-cancel-and-dates D-3).
+    public static async Task<IReadOnlyList<TournamentSummary>> Get(
+        Guid organisationId, TournamentsDbContext db, CancellationToken cancellationToken, [FromQuery] bool archived = false)
     {
-        // shortcut: no paging, an organisation's list is short in H1; add it when tournaments can be archived.
+        // shortcut: no paging, an organisation's list is short in H1 and archiving keeps the default one short; add it when a list outgrows a page.
         var tournaments = await db.Tournaments.AsNoTracking()
+            .Where(tournament => archived || !tournament.Archived)
             .OrderByDescending(tournament => tournament.CreatedAt)
-            .Select(tournament => new { tournament.Id, tournament.Configuration, tournament.Publication, tournament.Registration, tournament.Competition })
+            .Select(tournament => new { tournament.Id, tournament.Configuration, tournament.Publication, tournament.Registration, tournament.Competition, tournament.Archived })
             .ToListAsync(cancellationToken);
         var ids = tournaments.Select(tournament => tournament.Id).ToList();
         var counts = await db.FieldCounts.AsNoTracking()
@@ -59,6 +63,7 @@ public static class ListTournamentsEndpoint
             tournament.Registration,
             TournamentDetails.CompetitionOf(tournament.Competition),
             counts.GetValueOrDefault(tournament.Id).Admitted,
-            counts.GetValueOrDefault(tournament.Id).Waiting))];
+            counts.GetValueOrDefault(tournament.Id).Waiting,
+            tournament.Archived))];
     }
 }
