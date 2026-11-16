@@ -9,7 +9,7 @@
 
 ## 3. Registration and Competition
 
-- [ ] 3.1 Registration cancels active entries and rejects later writes; tests for the `guest-entries` scenarios
+- [x] 3.1 Registration cancels active entries and rejects later writes; tests for the `guest-entries` scenarios
 - [ ] 3.2 Competition withdraws the publication or voids unresolved matches, rejects later writes, tracks archive; migration; tests for the `round-robin-pairings` scenarios
 - [ ] 3.3 Regenerate Wolverine code (`codegen write`) and the OpenAPI documents and client (`pnpm api:generate`); CI drift checks pass
 

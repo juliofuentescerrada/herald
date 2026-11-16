@@ -95,6 +95,13 @@ public sealed class Field : AggregateRoot<TournamentId>
 
     public EntryTerms Terms { get; private set; }
 
+    // Set once Tournaments' cancellation arrives: every later write is rejected (h1-tournament-cancel-and-dates D-1).
+    public DateTimeOffset? TournamentCancelledAt { get; private set; }
+
+    public bool IsTournamentCancelled => TournamentCancelledAt is not null;
+
+    public static readonly WriteResult Cancelled = WriteResult.Reject("tournament", "cancelled");
+
     // The tournament revision the terms come from; older terms are ignored.
     public int TermsRevision { get; private set; }
 
@@ -285,6 +292,27 @@ public sealed class Field : AggregateRoot<TournamentId>
         Revision++;
         Changed(before);
         return WriteOutcome.Applied;
+    }
+
+    // Every waiting or admitted entry is cancelled with its identity and history, and nobody is promoted; idempotent (D-1).
+    public bool ApplyCancellation(Guid actor, DateTimeOffset at)
+    {
+        if (IsTournamentCancelled)
+        {
+            return false;
+        }
+
+        var before = EligibilityKey;
+        TournamentCancelledAt = at;
+        foreach (var entry in _entries.Where(entry => entry.IsActive))
+        {
+            entry.Cancel(CancellationCause.TournamentCancelled, actor, at);
+            Raise(new EntryCancelled(Id, entry.Id, CancellationCause.TournamentCancelled, actor, at));
+        }
+
+        Revision++;
+        Changed(before);
+        return true;
     }
 
     // Final for the entry; a freed slot follows the policy (EN-3, EN-8).

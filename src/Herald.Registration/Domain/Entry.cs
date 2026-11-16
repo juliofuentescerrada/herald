@@ -35,6 +35,7 @@ public enum CancellationCause
 {
     Owner,
     AbsentAtStart,
+    TournamentCancelled,
 }
 
 public enum CheckInChangeKind
