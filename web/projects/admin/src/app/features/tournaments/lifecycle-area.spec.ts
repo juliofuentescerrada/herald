@@ -1,5 +1,5 @@
 import { TestBed } from '@angular/core/testing';
-import { CancelTournament, ChangeDates, TournamentDetails } from '@herald/api-client/admin';
+import { ChangeDates, TournamentDetails } from '@herald/api-client/admin';
 import { Toasts } from '@herald/ui';
 import axe from 'axe-core';
 import { of, throwError } from 'rxjs';
@@ -100,7 +100,7 @@ describe('The tournament lifecycle actions', () => {
   });
 
   it('cancel before start with a required reason, naming the entries cancelled and the schedule withdrawn', async () => {
-    const cancelTournament = vi.fn((_o: string, _t: string, _body: CancelTournament) => of(cancelled({ cancellation: { cancelledAt: '2026-11-10T14:20:00Z', cancelledByName: 'Alex Morgan', reason: 'Venue unavailable', afterStart: false }, start: notReady, revision: 4 })));
+    const cancelTournament = vi.fn(() => of(cancelled({ cancellation: { cancelledAt: '2026-11-10T14:20:00Z', cancelledByName: 'Alex Morgan', reason: 'Venue unavailable', afterStart: false }, start: notReady, revision: 4 })));
     const { button, settle, type, page } = await render(published({ schedulePublished: true }), { cancelTournament });
 
     button('Cancel tournament')!.click();
