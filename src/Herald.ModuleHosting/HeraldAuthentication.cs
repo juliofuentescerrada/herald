@@ -9,9 +9,12 @@ public static class HeraldAuthentication
 {
     public const string OrganiserPolicy = "organiser";
 
-    // The policy also requires `tid` and `oid` as identifiers, so an admin endpoint always has a Caller.
-    // The application role that assignment to Herald's API grants: no role, no admin endpoint.
+    // The policy requires a Caller: `tid` and `oid` as identifiers and one of the roles below.
+    // The application role that assignment to Herald's API grants a person: no role, no admin endpoint.
     public const string OrganiserRole = "Organiser";
+
+    // The application role the platform operator assigns to a pilot server application (D-12, docs/operations/identity.md).
+    public const string PilotApplicationRole = "PilotApplication";
 
     public static IServiceCollection AddHeraldAuthentication(this IServiceCollection services, IConfiguration configuration)
     {
@@ -33,7 +36,7 @@ public static class HeraldAuthentication
             .Validate(options => !string.IsNullOrEmpty(options.Audience), Missing(section, "Audience"))
             .ValidateOnStart();
         services.AddAuthorizationBuilder()
-            .AddPolicy(OrganiserPolicy, policy => policy.RequireAuthenticatedUser().RequireRole(OrganiserRole)
+            .AddPolicy(OrganiserPolicy, policy => policy.RequireAuthenticatedUser()
                 .RequireAssertion(context => Caller.From(context.User) is not null));
 
         return services;

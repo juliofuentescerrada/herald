@@ -42,6 +42,13 @@ public sealed class OrganisationApi : IAsyncLifetime
         return client;
     }
 
+    public HttpClient AsApplication(Guid objectId)
+    {
+        var client = _host!.CreateClient();
+        client.DefaultRequestHeaders.Authorization = new AuthenticationHeaderValue("Bearer", TestTokens.ForApplication(objectId));
+        return client;
+    }
+
     // Publishes as a module would and waits until every handler it reaches has finished, cascades included.
     public async Task PublishAndWaitAsync(object message) =>
         await _host!.Services.GetRequiredService<IHost>().TrackActivity().PublishMessageAndWaitAsync(message);

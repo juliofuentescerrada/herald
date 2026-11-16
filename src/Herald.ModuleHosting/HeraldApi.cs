@@ -19,6 +19,9 @@ public static class HeraldApi
 
     // The same answer whether the organisation does not exist or the caller is not a member (ADR 0014).
     public const string OrganisationNotAvailable = "organisation-not-available";
+
+    // An application's request outside what its grant allows (design D-4): names the group, never the tournament's content.
+    public const string OperationNotGranted = "operation-not-granted";
     public static readonly IReadOnlyList<string> Documents = [Public, Admin];
 
     public static IServiceCollection AddHeraldApi(this IServiceCollection services)
@@ -64,24 +67,38 @@ public static class HeraldApi
         return app;
     }
 
-    // Every organisation-scoped route names {organisationId}; membership is checked on every request, never cached.
+    // Every organisation-scoped route names {organisationId}; access is checked on every request, never cached, so a removed
+    // membership or a revoked grant stops the next request.
     private static async Task EnterOrganisation(HttpContext http, RequestDelegate next)
     {
+        var caller = Caller.From(http.User);
         if (http.GetRouteValue("organisationId") is string value)
         {
-            var caller = Caller.From(http.User);
             var access = http.RequestServices.GetRequiredService<IOrganisationAccess>();
             if (!Guid.TryParse(value, out var organisationId) || caller is null
-                || await access.FindMemberAsync(organisationId, caller, http.RequestAborted) is not { } actorId)
+                || await access.FindAccessAsync(organisationId, caller, http.RequestAborted) is not { } found)
             {
                 await Results.Problem(statusCode: StatusCodes.Status404NotFound, title: "Not found", type: OrganisationNotAvailable)
                     .ExecuteAsync(http);
                 return;
             }
 
-            http.RequestServices.GetRequiredService<OrganisationContext>().Enter(organisationId, actorId);
+            http.RequestServices.GetRequiredService<OrganisationContext>().Enter(organisationId, found.ActorId, found.Grant);
+        }
+        else if (caller?.Kind == CallerKind.Application && IsAdmin(http))
+        {
+            // Creating an organisation and a person's own details are a person's (design D-1).
+            await NotGranted(http, "An application acts only within an organisation that granted it access.");
+            return;
         }
 
         await next(http);
     }
+
+    private static bool IsAdmin(HttpContext http) =>
+        http.GetEndpoint()?.Metadata.GetMetadata<IEndpointGroupNameMetadata>()?.EndpointGroupName == Admin;
+
+    private static Task NotGranted(HttpContext http, string detail) =>
+        Results.Problem(statusCode: StatusCodes.Status403Forbidden, title: "Forbidden", type: OperationNotGranted, detail: detail)
+            .ExecuteAsync(http);
 }

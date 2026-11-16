@@ -10,4 +10,7 @@
     <PackageReference Include="WolverineFx.Http" />
     <PackageReference Include="WolverineFx.Postgresql" />
   </ItemGroup>
+  <ItemGroup>
+    <ProjectReference Include="..\Herald.BuildingBlocks\Herald.BuildingBlocks.csproj" />
+  </ItemGroup>
 </Project>
