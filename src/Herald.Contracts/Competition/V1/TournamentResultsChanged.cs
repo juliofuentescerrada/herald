@@ -28,9 +28,11 @@ public sealed record ResultsEntrant(Guid EntryId, string Name, ResultsEntrantSta
 
 /// <summary>
 /// A match of the running competition. Outcome, Cause and Played are set once it is resolved; Cause is Competition's
-/// name for why (for example "played"), an open set so new causes need no new version.
+/// name for why (for example "played"), an open set so new causes need no new version. Revision is the match's own, which
+/// a correction preview compares with the one the owner reviewed (h1-safe-corrections D-3); absent from earlier messages.
 /// </summary>
-public sealed record ResultsMatch(Guid MatchId, int Round, Guid First, Guid Second, ResultsMatchState State, ResultOutcome? Outcome, string? Cause, bool? Played);
+public sealed record ResultsMatch(
+    Guid MatchId, int Round, Guid First, Guid Second, ResultsMatchState State, ResultOutcome? Outcome, string? Cause, bool? Played, int? Revision = null);
 
 public sealed record ResultsRest(int Round, Guid EntryId);
 

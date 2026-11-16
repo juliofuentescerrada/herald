@@ -42,6 +42,7 @@ public static class TournamentResultsChangedHandler
             match.First,
             match.Second,
             match.State == ResultsMatchState.Resolved && match.Outcome is { } outcome ? Enum.Parse<Outcome>(outcome.ToString()) : null,
-            match.State == ResultsMatchState.Resolved ? match.Cause : null))],
+            match.State == ResultsMatchState.Resolved ? match.Cause : null,
+            match.Revision))],
         [.. message.Rests.Select(rest => new Rest(rest.Round, rest.EntryId))]);
 }

@@ -9,7 +9,7 @@
 
 ## 3. Standings
 
-- [ ] 3.1 `PreviewCorrection` query over the applied snapshot (D-3); tests for the `standings` scenarios
+- [x] 3.1 `PreviewCorrection` query over the applied snapshot (D-3); tests for the `standings` scenarios
 - [ ] 3.2 Regenerate Wolverine code (`codegen write`) and the OpenAPI documents and client (`pnpm api:generate`); CI drift checks pass
 
 ## 4. Admin application

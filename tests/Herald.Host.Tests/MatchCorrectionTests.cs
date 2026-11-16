@@ -48,6 +48,24 @@ public partial class MatchTests
     }
 
     [Fact]
+    public async Task Standings_preview_a_correction_from_the_results_they_applied_and_change_nothing()
+    {
+        var (league, path, _) = await WonAsync();
+        var match = path.Split('/')[^1];
+
+        var preview = await JsonAsync(await league.Client.GetAsync($"{league.Path}/standings/preview?match={match}&matchRevision=2&outcome=draw&cause=played", Cancellation));
+        var behind = await JsonAsync(await league.Client.GetAsync($"{league.Path}/standings/preview?match={match}&matchRevision=3&outcome=draw&cause=played", Cancellation));
+        var other = await api.As(Guid.NewGuid()).GetAsync($"{league.Path}/standings/preview?match={match}&matchRevision=2&outcome=draw&cause=played", Cancellation);
+
+        (Revision(preview), preview.GetProperty("updating").GetBoolean()).ShouldBe((2, false));
+        var robin = preview.GetProperty("entrants").EnumerateArray().Single(entrant => entrant.GetProperty("name").GetString() == "Robin Vale");
+        (robin.GetProperty("pointsBefore").GetInt32(), robin.GetProperty("pointsAfter").GetInt32()).ShouldBe((3, 1));
+        (behind.GetProperty("updating").GetBoolean(), behind.GetProperty("matchRevision").GetInt32()).ShouldBe((true, 2));
+        other.StatusCode.ShouldBe(HttpStatusCode.NotFound);
+        (await JsonAsync(await league.Client.GetAsync($"{league.Path}/standings", Cancellation))).GetProperty("rows")[0].GetProperty("points").GetInt32().ShouldBe(3);
+    }
+
+    [Fact]
     [Trait("covers", "result-corrections: No reason")]
     [Trait("covers", "result-corrections: A scheduled match")]
     public async Task A_correction_without_a_reason_or_of_an_unresolved_match_is_rejected()
