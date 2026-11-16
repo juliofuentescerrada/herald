@@ -23,6 +23,32 @@ const row = (over: object) => ({
 
 const render = (...answers: (() => Observable<unknown>)[]) => open('', { listTournaments: () => answers.shift()!() });
 
+describe('Show archived', () => {
+  afterEach(() => TestBed.resetTestingModule());
+
+  it('lists archived tournaments only when chosen, each with its Archived label', async () => {
+    const asked: unknown[] = [];
+    const { page, settle, texts } = await open('', {
+      listTournaments: (_organisation: string, params?: { archived?: boolean }) => {
+        asked.push(params);
+        return of(params?.archived
+          ? [row({ title: 'Spring League', publication: 'published', competition: 'running' }), row({ id: 't2', title: 'Autumn Cup', publication: 'published', registration: 'closed', competition: 'cancelled', archived: true })]
+          : [row({ title: 'Spring League', publication: 'published', competition: 'running' })]);
+      },
+    });
+    await vi.waitFor(() => expect(texts('li h2')).toEqual(['Spring League']));
+
+    const toggle = [...page().querySelectorAll<HTMLLabelElement>('label')].find((label) => label.textContent?.trim() === 'Show archived')!.querySelector('input')!;
+    toggle.click();
+    await vi.waitFor(() => expect(texts('li h2')).toEqual(['Spring League', 'Autumn Cup']));
+    await settle();
+
+    expect(asked).toEqual([undefined, { archived: true }]);
+    expect(texts('li:last-child herald-status-label')).toEqual(['Published', 'Registration closed', 'Cancelled', 'Archived']);
+    expect((await axe.run(page(), { rules: { 'color-contrast': { enabled: false } } })).violations.map((v) => v.id)).toEqual([]);
+  });
+});
+
 describe('The tournament list', () => {
   afterEach(() => TestBed.resetTestingModule());
 

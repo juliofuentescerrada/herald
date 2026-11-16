@@ -196,6 +196,17 @@ describe('The standings page', () => {
     expect(texts('thead th')[1]).toBe('Team');
   });
 
+  it('shows a competition cancelled after start as Cancelled, with no champion and no review', async () => {
+    const { page, text } = await open(() => of(provisional), tournament({ competition: 'cancelled' }), resolvedMatches(4));
+
+    expect(text('.title')).toContain('Cancelled');
+    expect(text('.title')).not.toContain('Provisional');
+    expect(text('.column herald-notice')).toContain('Cancelled · no champion or final ranking');
+    expect(page().querySelector('#review-heading')).toBeNull();
+    expect(page().querySelector('table')).not.toBeNull();
+    expect(await violations(page())).toEqual([]);
+  });
+
   it('shows Updating while Competition knows more results than the standings', async () => {
     const { page, text } = await open(() => of(provisional), tournament(), resolvedMatches(4, 6));
 
