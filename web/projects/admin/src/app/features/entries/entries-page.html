@@ -66,7 +66,11 @@
         </div>
       </section>
 
-      @if (running()) {
+      @if (tournamentCancelled()) {
+        <herald-notice tone="danger" heading="This tournament is cancelled">
+          Its active entries were cancelled with it. Nothing can change.
+        </herald-notice>
+      } @else if (running()) {
         <herald-notice heading="Running · entries are read-only">
           The competition has started. Leaving now is a competitive withdrawal, handled from the round operations.
         </herald-notice>
@@ -214,7 +218,7 @@
               <li>
                 <div>
                   <span class="name-line">
-                    <span><span class="name">{{ entry.guestName }}</span><span class="help">{{ (entry.cancellationCause === 'absentAtStart' ? ' · Marked absent ' : ' · Cancelled ') + zoned(entry.cancelledAt) }}</span></span>
+                    <span><span class="name">{{ entry.guestName }}</span><span class="help">{{ (entry.cancellationCause === 'absentAtStart' ? ' · Marked absent ' : entry.cancellationCause === 'tournamentCancelled' ? ' · Cancelled with the tournament ' : ' · Cancelled ') + zoned(entry.cancelledAt) }}</span></span>
                     @if (entry.cancellationCause === 'absentAtStart') {
                       <herald-status-label>Absent at start</herald-status-label>
                     }

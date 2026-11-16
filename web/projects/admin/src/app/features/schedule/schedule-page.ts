@@ -5,6 +5,7 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
 import {
   HeraldHostAdminService,
   HttpValidationProblemDetails,
+  MatchSummary,
   problemOf,
   ScheduleDetails,
   Seeding,
@@ -18,6 +19,8 @@ import { instantText, lifecycleLabels, resultText } from '../../shared';
 import { EntrantsPanel } from './entrants-panel';
 import { OperationsSummary } from './operations-summary';
 import { blockerText, fieldKey, roundStateLabel, ruleText, scheduleKey, seedingText, sizeText, tournamentKey } from './schedule';
+
+const voidedLabel = { text: 'Voided', tone: 'danger' } as const;
 
 interface Failure {
   readonly heading: string;
@@ -82,12 +85,14 @@ export class SchedulePage {
   protected readonly pairings = computed(() => this.current()?.pairings ?? this.draft()?.pairings ?? null);
   protected readonly blockers = computed(() => (this.schedule.data()?.blockers ?? []).map((code) => ({ code, ...(blockerText[code] ?? { condition: code, fix: '', where: 'entries' as const }) })));
   protected readonly statusText = computed(() => {
+    if (this.schedule.data()?.cancelled && !this.current()) return 'Cancelled';
     if (this.current()) return `Published · revision ${this.current()!.number}`;
     if (this.draft()) return this.draft()!.stale ? 'Stale draft' : 'Draft';
     return 'No draft';
   });
-  protected readonly statusTone = computed(() => (this.current() ? 'success' : this.draft()?.stale ? 'warning' : 'neutral'));
-  protected readonly heading = computed(() => (this.pairings() ? sizeText(this.pairings()!, this.teams()) : 'Generate a draft'));
+  protected readonly statusTone = computed(() => (this.schedule.data()?.cancelled && !this.current() ? 'danger' : this.current() ? 'success' : this.draft()?.stale ? 'warning' : 'neutral'));
+  protected readonly heading = computed(() =>
+    this.pairings() ? sizeText(this.pairings()!, this.teams()) : this.schedule.data()?.cancelled ? 'No schedule: the tournament is cancelled' : 'Generate a draft');
   protected readonly meta = computed(() => {
     const pairings = this.pairings();
     if (!pairings) return `Single round-robin · ${this.schedule.data()!.eligible} eligible ${this.teams() ? 'teams' : 'players'}. Generating sends nothing and creates no result.`;
@@ -110,9 +115,15 @@ export class SchedulePage {
   protected readonly id = this.tournamentId;
   /** A running round's state, or undefined before start (h1-round-operations D-1). */
   protected readonly roundState = (round: number) => {
-    const state = this.schedule.data()?.operations?.rounds.find((other) => other.number === round)?.state;
+    const schedule = this.schedule.data();
+    // A cancelled competition's round with a voided match reads as voided, not completed (h1-tournament-cancel-and-dates D-2).
+    if (schedule?.cancelled && schedule.matches.some((match) => match.round === round && match.result?.cause === 'voidedCancelled')) return voidedLabel;
+    const state = schedule?.operations?.rounds.find((other) => other.number === round)?.state;
     return state ? roundStateLabel[state] : undefined;
   };
+  /** A match's state in words; a voided one says so in the danger tone. */
+  protected readonly matchLabel = (match: MatchSummary) =>
+    match.result?.cause === 'voidedCancelled' ? voidedLabel : { text: this.stateText[match.state], tone: this.stateTone[match.state] };
   protected readonly stateText = { scheduled: 'Scheduled', inPlay: 'In play', resolved: 'Resolved' } as const;
   protected readonly stateTone = { scheduled: 'neutral', inPlay: 'info', resolved: 'success' } as const;
   /** The running competition's match for a pairing, or undefined before start. */

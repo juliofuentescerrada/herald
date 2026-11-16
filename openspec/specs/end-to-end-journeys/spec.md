@@ -53,6 +53,7 @@ The suite SHALL cover these journeys, each as one test named as a sentence:
 23. An owner withdraws a player during the competition with a reason, sees the player's unplayed matches resolved as absences and the player flagged in the standings, and sees round 1 completed in the operations summary.
 24. An owner corrects a recorded win to a draw with a reason, reviews the impact on points and standings before confirming, and sees the corrected result with its earlier version in the match history.
 25. An owner reviews the standings of a fully resolved league, finalises it, sees them final, then reopens it with a reason, corrects a result and finalises again with the earlier final revision kept.
+26. An owner postpones a published tournament's planned start through the dates preview, cancels another running tournament with a reason, sees its unresolved matches voided and no champion, and archives it.
 
 #### Scenario: Each journey checks what the person sees
 - **WHEN** a journey runs

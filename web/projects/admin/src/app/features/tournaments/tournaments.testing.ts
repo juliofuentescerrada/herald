@@ -81,6 +81,8 @@ export const details = (over: Partial<TournamentDetails> = {}, config: Partial<T
   checkedInEntries: 0,
   schedulePublished: false,
   start: notReady,
+  archived: false,
+  cancellation: null,
   ...over,
 });
 

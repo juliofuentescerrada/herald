@@ -135,6 +135,9 @@ namespace Herald.Registration.Persistence.Migrations
                     b.Property<int>("TermsRevision")
                         .HasColumnType("integer");
 
+                    b.Property<DateTimeOffset?>("TournamentCancelledAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.ComplexProperty(typeof(Dictionary<string, object>), "Terms", "Herald.Registration.Domain.Field.Terms#EntryTerms", b1 =>
                         {
                             b1.IsRequired();

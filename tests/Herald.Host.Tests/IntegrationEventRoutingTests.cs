@@ -16,6 +16,7 @@ public class IntegrationEventRoutingTests(PostgresFixture postgres)
     [InlineData(typeof(TournamentEntryTermsChanged), "local://registration/")]
     [InlineData(typeof(TournamentFieldChanged), "local://tournaments/")]
     [InlineData(typeof(TournamentResultsChanged), "local://standings/")]
+    [InlineData(typeof(TournamentArchiveChanged), "local://competition/")]
     public async Task An_integration_event_goes_to_its_consumers_durable_local_queue(Type integrationEvent, string queue)
     {
         await using var host = new HostFactory(postgres.ConnectionString);
@@ -40,5 +41,17 @@ public class IntegrationEventRoutingTests(PostgresFixture postgres)
         var routes = runtime.RoutingFor(integrationEvent).Routes.OfType<MessageRoute>().Select(route => route.Uri).ToList();
 
         routes.ShouldBe([new Uri("local://tournaments/"), new Uri("local://standings/")], ignoreOrder: true);
+    }
+
+    [Fact]
+    public async Task A_cancellation_goes_to_Registrations_and_Competitions_durable_local_queues()
+    {
+        await using var host = new HostFactory(postgres.ConnectionString);
+        _ = host.CreateClient();
+        var runtime = host.Services.GetRequiredService<IWolverineRuntime>();
+
+        var routes = runtime.RoutingFor(typeof(TournamentCancelled)).Routes.OfType<MessageRoute>().Select(route => route.Uri).ToList();
+
+        routes.ShouldBe([new Uri("local://registration/"), new Uri("local://competition/")], ignoreOrder: true);
     }
 }

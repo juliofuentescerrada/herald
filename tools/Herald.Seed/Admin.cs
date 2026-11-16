@@ -170,6 +170,16 @@ public sealed class Admin(Seeding seeding, Persona persona)
         });
     }
 
+    // Cancels the tournament for good with a private reason (h1-tournament-cancel-and-dates); a rerun repeats.
+    public async Task CancelTournamentAsync(Guid organisation, Guid tournament, string reason) =>
+        await WriteAsync($"cancel tournament {tournament}", async () =>
+            await _client.PostAsJsonAsync($"{Path(organisation, tournament)}/cancellation", new { reason, expectedRevision = await RevisionAsync(organisation, tournament) }));
+
+    // Hides a finalised or cancelled tournament from the default list (h1-tournament-cancel-and-dates D-3).
+    public async Task ArchiveAsync(Guid organisation, Guid tournament) =>
+        await WriteAsync($"archive tournament {tournament}", async () =>
+            await _client.PostAsJsonAsync($"{Path(organisation, tournament)}/archiving", new { expectedRevision = await RevisionAsync(organisation, tournament) }));
+
     // Records a side's lineup of the schedule's match at that position from its frozen roster's first players (h1-match-lineups).
     public async Task RecordLineupAsync(Guid organisation, Guid tournament, int index, string side, int players)
     {

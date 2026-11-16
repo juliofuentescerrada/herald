@@ -144,6 +144,26 @@ public class SyntheticDataTests(SeededDatabases databases)
     }
 
     [Fact]
+    public async Task The_seeded_lifecycle_leagues_are_one_running_one_cancelled_with_two_matches_voided_and_one_archived()
+    {
+        var database = await databases.NewDatabaseAsync();
+        await SeededDatabases.SeedAsync(database);
+
+        await using var reader = new Reader(database);
+        var cancelled = await reader.GetAsync(Main, Tournament("tournaments-by-state", "cancelled"));
+        var voided = (await reader.GetAsync(Main, $"{Tournament("tournaments-by-state", "cancelled")}/schedule")).GetProperty("matches").EnumerateArray()
+            .Count(match => match.GetProperty("result").GetProperty("cause").GetString() == "voidedCancelled");
+        var archived = await reader.GetAsync(Main, Tournament("tournaments-by-state", "archived"));
+        var list = await reader.GetAsync(Main, $"/api/organisations/{Organisation("tournaments-by-state")}/tournaments");
+
+        (await reader.GetAsync(Main, Tournament("tournaments-by-state", "cancellable"))).GetProperty("competition").GetString().ShouldBe("running");
+        cancelled.GetProperty("competition").GetString().ShouldBe("cancelled");
+        voided.ShouldBe(2);
+        (archived.GetProperty("competition").GetString(), archived.GetProperty("archived").GetBoolean()).ShouldBe(("finalised", true));
+        list.EnumerateArray().Select(row => row.GetProperty("title").GetString()).ShouldNotContain("Lantern Urn");
+    }
+
+    [Fact]
     public async Task The_seeded_exceptional_league_has_one_match_of_each_cause()
     {
         var database = await databases.NewDatabaseAsync();

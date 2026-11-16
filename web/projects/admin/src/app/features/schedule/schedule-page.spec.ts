@@ -41,6 +41,8 @@ const tournament = (over: Partial<TournamentDetails> = {}): TournamentDetails =>
   checkedInEntries: 0,
   schedulePublished: false,
   start: { conditions: [], eligible: null, pending: null, rostersOutsideBounds: null, sharedMemberNames: [], publishedScheduleRevision: null, startedAt: null, startedOnScheduleRevision: null },
+  archived: false,
+  cancellation: null,
   ...over,
 });
 
@@ -97,6 +99,7 @@ const schedule = (over: Partial<ScheduleDetails> = {}): ScheduleDetails => ({
   resultsRevision: 0,
   finalised: false,
   finals: [],
+  cancelled: false,
   ...over,
 });
 
@@ -359,6 +362,21 @@ describe('The schedule page of a running competition', () => {
     });
   // Round 1 resolved and round 2 in play: 2 resolved, 1 in play, 3 scheduled.
   const midway = summaries((index) => (index < 2 ? { state: 'resolved', result: won } : index === 2 ? { state: 'inPlay', result: null } : { state: 'scheduled', result: null }));
+
+  it('shows a cancelled competition’s voided matches and offers nothing', async () => {
+    const voided = { outcome: 'none' as const, cause: 'voidedCancelled' as const, played: false, reason: null, recordedAt: '2026-11-21T15:20:00Z' };
+    const matches = summaries((index) => (index < 2 ? { state: 'resolved', result: won } : { state: 'resolved', result: voided }));
+    const { page, text, texts } = await open({ getSchedule: () => of(running(matches, ['completed', 'completed', 'completed'], { cancelled: true })) });
+    await vi.waitFor(() => expect(text('.column herald-notice')).toContain('This tournament is cancelled'));
+
+    expect(text('.column herald-notice')).toContain('Results recorded before stay; unresolved matches were voided with no points. Nothing can change.');
+    expect(texts('.round-title herald-status-label')).toEqual(['Completed', 'Voided', 'Voided']);
+    expect(texts('.running herald-status-label').slice(2)).toEqual(['Voided', 'Voided', 'Voided', 'Voided']);
+    expect(texts('.running .outcome').slice(2)).toEqual(Array(4).fill('Voided: tournament cancelled · no points'));
+    expect([...page().querySelectorAll('.summary button')]).toEqual([]);
+    expect(texts('app-entrants-panel button')).toEqual([]);
+    expect(await violations(page())).toEqual([]);
+  });
 
   it('opens with the operations summary: match counts and each round’s state', async () => {
     const { page, text, texts } = await open({ getSchedule: () => of(running(midway, ['completed', 'running', 'notStarted'])) });

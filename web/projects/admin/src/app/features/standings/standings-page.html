@@ -16,7 +16,9 @@
   <header class="page-header">
     <div class="title">
       <h1>Standings · {{ tournament.data()!.configuration.title }}</h1>
-      @if (finalised()) {
+      @if (cancelled()) {
+        <herald-status-label tone="danger">Cancelled</herald-status-label>
+      } @else if (finalised()) {
         <herald-status-label tone="success">Final</herald-status-label>
       } @else if (updating()) {
         <herald-status-label tone="info" icon="hourglass">Updating</herald-status-label>
@@ -28,7 +30,9 @@
   <app-tournament-nav current="Standings" />
 
   <div class="column">
-    @if (!running()) {
+    @if (cancelled() && !running()) {
+      <herald-notice tone="danger" heading="This tournament was cancelled before it started">Nothing was ranked.</herald-notice>
+    } @else if (!running()) {
       <herald-notice heading="Standings begin when the competition starts">Nothing is ranked before start.</herald-notice>
     } @else if (failed()) {
       <herald-notice tone="danger" heading="The standings could not be loaded">
@@ -38,7 +42,11 @@
     } @else if (!view()) {
       <p role="status">Loading standings…</p>
     } @else {
-      @if (schedule.data(); as competition) {
+      @if (cancelled()) {
+        <herald-notice tone="danger" heading="Cancelled · no champion or final ranking">
+          The standings stay as the results left them. Unresolved matches were voided with no points. Nothing can change.
+        </herald-notice>
+      } @else if (schedule.data(); as competition) {
         @if (finalised()) {
           @let current = finals()[0];
           <section class="final-summary">
@@ -96,7 +104,11 @@
         }
       }
       <section class="summary">
-        <p><strong>{{ finalised() ? 'Final' : 'Provisional' }} · {{ view()!.resolvedMatches }} of {{ view()!.matches }} {{ view()!.matches === 1 ? 'match' : 'matches' }} resolved</strong></p>
+        @if (cancelled()) {
+          <p><strong>Cancelled · {{ view()!.resolvedMatches - voided() }} of {{ view()!.matches }} {{ view()!.matches === 1 ? 'match' : 'matches' }} resolved · {{ voided() }} voided</strong></p>
+        } @else {
+          <p><strong>{{ finalised() ? 'Final' : 'Provisional' }} · {{ view()!.resolvedMatches }} of {{ view()!.matches }} {{ view()!.matches === 1 ? 'match' : 'matches' }} resolved</strong></p>
+        }
         <p class="help">
           Results revision {{ view()!.revision }} · 3 points a win, 1 a draw · equal points share a position, listed by name{{ view()!.resolvedMatches === 0 ? ' · No match resolved yet' : '' }}
         </p>

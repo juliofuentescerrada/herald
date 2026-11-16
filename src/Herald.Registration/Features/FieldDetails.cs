@@ -208,7 +208,7 @@ internal static class FieldResults
             }
 
             var eligibleRevision = field.EligibleRevision;
-            var result = write(field);
+            var result = field.IsTournamentCancelled ? Field.Cancelled : write(field);
             switch (result.Outcome)
             {
                 case WriteOutcome.Rejected:

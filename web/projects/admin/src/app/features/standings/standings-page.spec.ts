@@ -30,6 +30,8 @@ const tournament = (over: Partial<TournamentDetails> = {}): TournamentDetails =>
   checkedInEntries: 0,
   schedulePublished: true,
   start: { conditions: [], eligible: 4, pending: 0, rostersOutsideBounds: null, sharedMemberNames: [], publishedScheduleRevision: 2, startedAt: '2026-11-21T09:05:00Z', startedOnScheduleRevision: 2 },
+  archived: false,
+  cancellation: null,
   ...over,
 });
 
@@ -192,6 +194,19 @@ describe('The standings page', () => {
     const { texts } = await open(() => of(provisional), tournament({ configuration: { title: 'Club League', entryKind: 'team', capacity: 8, timeZone: 'Europe/Madrid' } }));
 
     expect(texts('thead th')[1]).toBe('Team');
+  });
+
+  it('shows a competition cancelled after start as Cancelled, with no champion and no review',
+    { meta: { type: 'covers', description: 'tournament-lifecycle: Two matches left' } }, async () => {
+    const { page, text } = await open(() => of(provisional), tournament({ competition: 'cancelled' }), resolvedMatches(4));
+
+    expect(text('.title')).toContain('Cancelled');
+    expect(text('.summary')).toContain('Cancelled ·');
+    expect(text('.title')).not.toContain('Provisional');
+    expect(text('.column herald-notice')).toContain('Cancelled · no champion or final ranking');
+    expect(page().querySelector('#review-heading')).toBeNull();
+    expect(page().querySelector('table')).not.toBeNull();
+    expect(await violations(page())).toEqual([]);
   });
 
   it('shows Updating while Competition knows more results than the standings', async () => {

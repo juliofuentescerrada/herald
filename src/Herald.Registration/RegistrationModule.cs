@@ -13,6 +13,8 @@ public static class RegistrationModule
     {
         // Integration events this module consumes come through its durable local queue (ADR 0016).
         options.PublishMessage<TournamentEntryTermsChanged>().ToLocalQueue(Queue);
+        // Competition consumes it too; each module's handler is sticky to its own queue.
+        options.PublishMessage<TournamentCancelled>().ToLocalQueue(Queue);
         return options.AddHeraldModule<RegistrationDbContext>(RegistrationDbContext.Schema);
     }
 }

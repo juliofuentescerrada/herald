@@ -148,7 +148,6 @@ page-layout: No history
 page-layout: The entries page
 page-layout: The public home on a wide screen
 page-layout: The tournament configuration
-registration-window: A closed registration lost a date
 registration-window: A draft has no registration area
 registration-window: An owner closes and reopens registration
 registration-window: An owner opens registration from the tournament page

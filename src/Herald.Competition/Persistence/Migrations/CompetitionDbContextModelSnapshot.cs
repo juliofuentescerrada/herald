@@ -86,6 +86,18 @@ namespace Herald.Competition.Persistence.Migrations
                     b.Property<int?>("ActivePlayersPerSide")
                         .HasColumnType("integer");
 
+                    b.Property<int>("ArchiveRevision")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("Archived")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTimeOffset?>("CancelledAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("CancelledBy")
+                        .HasColumnType("uuid");
+
                     b.Property<string>("Departures")
                         .IsRequired()
                         .HasColumnType("jsonb");

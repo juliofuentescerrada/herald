@@ -55,6 +55,10 @@ public sealed class TournamentsDbContext(DbContextOptions<TournamentsDbContext> 
         {
             tournament.Ignore(t => t.DomainEvents);
             tournament.Ignore(t => t.IsStarted);
+            tournament.Ignore(t => t.IsCancelled);
+            tournament.Property(t => t.CancellationReason).HasMaxLength(Tournament.ReasonMaxLength);
+            tournament.Property(t => t.CancelledByName).HasMaxLength(200);
+            Json(tournament.Property(t => t.DateChanges)).HasDefaultValueSql("'[]'::jsonb");
             tournament.Property(t => t.Id).HasConversion(id => id.Value, value => new TournamentId(value));
             tournament.Property(t => t.Publication).HasConversion<string>().HasMaxLength(20);
             tournament.Property(t => t.Registration).HasConversion<string>().HasMaxLength(20);
@@ -99,7 +103,7 @@ public sealed class TournamentsDbContext(DbContextOptions<TournamentsDbContext> 
 
     private static readonly JsonSerializerOptions _json = new(JsonSerializerDefaults.Web);
 
-    private static void Json<T>(PropertyBuilder<T> property) => property
+    private static PropertyBuilder<T> Json<T>(PropertyBuilder<T> property) => property
         .HasColumnType("jsonb")
         .HasConversion(
             value => JsonSerializer.Serialize(value, _json),

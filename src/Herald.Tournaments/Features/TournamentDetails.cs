@@ -21,6 +21,9 @@ public sealed record CompetitionDetails(
     DateTimeOffset? StartedAt,
     int? StartedOnScheduleRevision);
 
+// When and by whom the tournament was cancelled, with its private reason (D-6, A-1).
+public sealed record CancellationDetails(DateTimeOffset CancelledAt, string? CancelledByName, string Reason, bool AfterStart);
+
 // What every tournament write and the single read answer with: the response shape is one contract, not a feature.
 public sealed record TournamentDetails(
     Guid Id,
@@ -37,13 +40,17 @@ public sealed record TournamentDetails(
     int WaitingEntries,
     int CheckedInEntries,
     bool SchedulePublished,
-    CompetitionDetails Start)
+    CompetitionDetails Start,
+    bool Archived,
+    CancellationDetails? Cancellation)
 {
     public const string CompetitionPreparation = "preparation";
 
     public const string CompetitionRunning = "running";
 
     public const string CompetitionFinalised = "finalised";
+
+    public const string CompetitionCancelled = "cancelled";
 
     // The only H1 profile (D-04): single round-robin, 3 / 1 / 0.
     public const string RoundRobinProfile = "singleRoundRobin-3-1-0";
@@ -52,6 +59,7 @@ public sealed record TournamentDetails(
     {
         CompetitionState.Running => CompetitionRunning,
         CompetitionState.Finalised => CompetitionFinalised,
+        CompetitionState.Cancelled => CompetitionCancelled,
         _ => CompetitionPreparation,
     };
 
@@ -79,7 +87,11 @@ public sealed record TournamentDetails(
             readiness.SharedMemberNames ?? [],
             readiness.PublishedScheduleRevision,
             tournament.StartedAt,
-            tournament.StartedOnScheduleRevision));
+            tournament.StartedOnScheduleRevision),
+        tournament.Archived,
+        tournament.CancelledAt is { } cancelledAt
+            ? new(cancelledAt, tournament.CancelledByName, tournament.CancellationReason!, tournament.IsStarted)
+            : null);
 }
 
 internal static class TournamentResults
@@ -113,6 +125,8 @@ internal static class TournamentResults
             case WriteOutcome.Applied:
                 var locked = await db.SchedulePublishedAsync(tournament.Id, cancellationToken);
                 var started = tournament.DomainEvents.OfType<CompetitionStarted>().SingleOrDefault();
+                var cancelled = tournament.DomainEvents.OfType<Domain.TournamentCancelled>().SingleOrDefault();
+                var archive = tournament.DomainEvents.OfType<Domain.TournamentArchiveChanged>().SingleOrDefault();
                 if (tournament.Publication == Publication.Published)
                 {
                     tournament.NextTermsRevision();
@@ -138,6 +152,18 @@ internal static class TournamentResults
                     await bus.PublishAsync(new TournamentCompetitionStarted(
                         organisationId, tournament.Id.Value, tournament.Revision, started.EligibleRevision, started.ScheduleRevision, started.StartedBy, started.StartedAt,
                         tournament.Configuration.ActivePlayersPerSide));
+                }
+
+                if (cancelled is not null)
+                {
+                    await bus.PublishAsync(new Contract.TournamentCancelled(
+                        organisationId, tournament.Id.Value, tournament.Revision, cancelled.AfterStart, cancelled.CancelledBy, cancelled.CancelledAt));
+                }
+
+                if (archive is not null)
+                {
+                    await bus.PublishAsync(new Contract.TournamentArchiveChanged(
+                        organisationId, tournament.Id.Value, tournament.Revision, archive.Archived, archive.ChangedBy, archive.ChangedAt));
                 }
 
                 break;

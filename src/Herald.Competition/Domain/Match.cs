@@ -35,6 +35,9 @@ public enum Cause
     SingleAbsence,
     DoubleAbsence,
     NoContest,
+
+    // The tournament was cancelled before the match was resolved: no winner and no points (D-25).
+    VoidedCancelled,
 }
 
 // One recorded lineup of a side: the players chosen from the frozen roster, kept for good once recorded (design D-2).
@@ -489,6 +492,20 @@ public sealed class Match : AggregateRoot<MatchId>
                 : new(Outcome.None, Cause.DoubleAbsence, false, [], actor, at, operationId);
         }
 
+        Raise(new MatchResolved(Id, Resolution.Outcome, Resolution.Cause, actor, at));
+        Revision++;
+        return true;
+    }
+
+    // An unresolved match of a cancelled competition: voided with no points, its lineups and start kept (h1-tournament-cancel-and-dates D-1).
+    public bool VoidForCancellation(Guid actor, DateTimeOffset at)
+    {
+        if (Resolution is not null)
+        {
+            return false;
+        }
+
+        Resolution = new(Outcome.None, Cause.VoidedCancelled, false, [], actor, at, Guid.Empty);
         Raise(new MatchResolved(Id, Resolution.Outcome, Resolution.Cause, actor, at));
         Revision++;
         return true;

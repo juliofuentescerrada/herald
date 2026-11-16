@@ -10,4 +10,11 @@ describe('Lifecycle labels', () => {
     expect(lifecycleLabels({ publication: 'published', registration: 'closed', competition: 'running' })[2].text).toBe('Running');
     expect(lifecycleLabels({ publication: 'draft', registration: 'notOpen', competition: 'preparation' })[2].text).toBe('Preparing');
   });
+
+  it('show a cancelled competition as Cancelled and an archived one with Archived beside it', () => {
+    expect(lifecycleLabels({ publication: 'published', registration: 'closed', competition: 'cancelled', archived: true }).slice(2)).toEqual([
+      { text: 'Cancelled', tone: 'danger' },
+      { text: 'Archived' },
+    ]);
+  });
 });

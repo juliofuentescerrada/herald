@@ -258,7 +258,8 @@ export class MatchPage {
   /** Opens the correction form with the current result chosen. */
   protected startCorrection(): void {
     const result = this.match.data()?.result;
-    if (!result) return;
+    // A voided match belongs to a cancelled tournament, which takes no correction.
+    if (!result || result.cause === 'voidedCancelled') return;
     const winner = result.outcome === 'first' ? 'first' : result.outcome === 'second' ? 'second' : null;
     const loser = winner === 'first' ? 'second' : winner === 'second' ? 'first' : null;
     const cause: CauseChoice = result.cause === 'singleAbsence' || result.cause === 'doubleAbsence' ? 'absence' : result.cause;

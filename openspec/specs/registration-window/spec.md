@@ -42,8 +42,8 @@ An owner SHALL be able to close an open registration and reopen a closed one. Cl
 - **THEN** registration is open
 
 #### Scenario: A closed registration lost a date
-- **WHEN** an owner reopens a closed registration after its registration opening was removed
-- **THEN** the action is rejected naming the registration opening and registration is still closed
+- **WHEN** an owner saves the configuration of a published tournament without its registration opening
+- **THEN** the save is rejected pointing to "Change dates", which moves or sets a date but never removes one, and registration stays as it was
 
 #### Scenario: Registration was never opened
 - **WHEN** an owner closes the registration of a tournament whose registration is not open

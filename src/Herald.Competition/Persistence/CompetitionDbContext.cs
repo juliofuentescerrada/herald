@@ -33,6 +33,7 @@ public sealed class CompetitionDbContext(DbContextOptions<CompetitionDbContext> 
             schedule.Ignore(s => s.UnavailablePlayers);
             schedule.Ignore(s => s.Final);
             schedule.Ignore(s => s.IsFinalised);
+            schedule.Ignore(s => s.IsCancelled);
             schedule.Property(s => s.Id).HasConversion(id => id.Value, value => new TournamentId(value));
             // Two writes based on the same schedule cannot both succeed.
             schedule.Property(s => s.Revision).IsConcurrencyToken();
