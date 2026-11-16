@@ -305,7 +305,7 @@ describe('The match page', () => {
     expect(bodies[1].outcome).toBe('first');
     await vi.waitFor(() => expect(texts('.operation .summary-title herald-status-label')).toContain('Resolved'));
     expect(page().textContent).toContain('Sam Reed won · played');
-    expect(page().textContent).toContain('This result is read-only.');
+    expect(page().textContent).toContain('Recorded');
     expect(button('Start match')).toBeUndefined();
     expect(toasts()).toEqual(['Result recorded.']);
   });
@@ -344,7 +344,7 @@ describe('The match page', () => {
     await choose(page, settle, 'outcome', 0);
     button('Record result')!.click();
     await settle();
-    await vi.waitFor(() => expect(text('herald-notice')).toContain('This match already has a result. This result is read-only. Nothing changed.'));
+    await vi.waitFor(() => expect(text('herald-notice')).toContain('This match already has a result. Use “Correct result” to change it. Nothing changed.'));
   });
 
   it('shows the result as saving and blocks a repeat while it is recorded', async () => {

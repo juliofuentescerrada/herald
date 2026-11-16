@@ -3,7 +3,7 @@ import { TournamentNav } from '../../shared';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, computed, inject, signal, TemplateRef, viewChild, ViewContainerRef } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
-import { HeraldHostAdminService, HttpValidationProblemDetails, MatchView, Outcome, problemOf, RecordResult, SideDetails, TournamentDetails } from '@herald/api-client/admin';
+import { CorrectionPreviewView, CorrectResult, HeraldHostAdminService, HttpValidationProblemDetails, MatchView, Outcome, problemOf, RecordResult, ResultDetails, SideDetails, TournamentDetails } from '@herald/api-client/admin';
 import { Button, Dialog, DialogContext, DialogRef, Dialogs, Icon, Notice, StatusLabel, Toasts } from '@herald/ui';
 import { injectQuery } from '@tanstack/angular-query-experimental';
 import { firstValueFrom } from 'rxjs';
@@ -77,17 +77,53 @@ export class MatchPage {
   protected readonly reason = signal('');
   /** A team match not yet in play cannot record play (D-2). */
   protected readonly playWithoutStart = computed(() => this.team() && !this.started() && this.cause() !== 'played' && this.cause() !== 'absence' && this.playTookPlace() === true);
+  /** Correcting a resolved match: the cause-first form with the current values, a reason, then the impact (h1-safe-corrections D-5). */
+  protected readonly correcting = signal(false);
+  protected readonly correctionReason = signal('');
+  /** The impact Standings computed for the form as it was; editing the form leaves the review. */
+  private readonly review = signal<{ readonly key: string; readonly view: CorrectionPreviewView } | null>(null);
+  protected readonly reviewing = signal(false);
+  protected readonly impact = computed(() => {
+    const review = this.review();
+    return review && review.key === this.correctionKey() ? review.view : null;
+  });
+  /** Play was recorded: the correction keeps it (§8.1), so the form asks no play question and offers no absence. */
+  protected readonly playRecorded = computed(() => this.correcting() && !!this.match.data()?.result?.played);
+  /** A team match that never started cannot take a played result: no lineup was locked (D-2). */
+  protected readonly offerPlayed = computed(() => !this.correcting() || !this.team() || this.started());
+  /** The form stays as reviewed while a write is under way or its impact is shown. */
+  protected readonly locked = computed(() => this.state() !== 'ready' || !!this.impact());
+  protected readonly proposedSummary = computed(() => {
+    const body = this.resultBody();
+    return body ? this.summaryOf({ ...this.proposedResult(body), recordedAt: '' }) : '';
+  });
+  protected readonly replaced = computed(() => [...(this.match.data()?.replacedResults ?? [])].reverse());
+  private readonly correctionKey = computed(() => JSON.stringify([this.resultBody(), this.correctionReason().trim()]));
+  private correctionOperation: { readonly id: string; readonly revision: number; readonly body: string } | null = null;
+  /** Why the correction's impact cannot be reviewed now, or null. */
+  protected readonly correctBlocked = computed(() => {
+    const why = this.recordBlocked();
+    if (why) return why;
+    if (!this.correctionReason().trim()) return 'Give a reason for the correction.';
+    if (this.sameAsCurrent()) return 'Choose a different result: this is the current one.';
+    return null;
+  });
+  private readonly sameAsCurrent = computed(() => {
+    const result = this.match.data()?.result;
+    const body = this.resultBody();
+    if (!result || !body) return false;
+    const proposed = this.proposedResult(body);
+    return proposed.outcome === result.outcome && proposed.cause === result.cause && proposed.played === result.played && (proposed.reason ?? null) === (result.reason ?? null);
+  });
   /** Reused when the same result is sent again after a lost answer (match-results: A double submission). */
   private resultOperation: { readonly id: string; readonly revision: number; readonly body: string } | null = null;
   protected readonly resultSummary = computed(() => {
     const result = this.match.data()?.result;
-    if (!result) return null;
-    const text = resultText(result, this.names().first, this.names().second);
-    return result.cause === 'played' ? `${text} · played` : text;
+    return result ? this.summaryOf(result) : null;
   });
   /** The chosen cause as the API's command fields, or null while incomplete. */
   private readonly resultBody = computed((): Omit<RecordResult, 'operationId' | 'expectedRevision'> | null => {
-    const played = this.playTookPlace();
+    const played = this.playRecorded() ? true : this.playTookPlace();
     switch (this.cause()) {
       case 'played': return this.outcome() ? { cause: 'played', outcome: this.outcome() } : null;
       case 'concession': return this.conceding() && played !== null ? { cause: 'concession', entrant: this.conceding(), played } : null;
@@ -215,6 +251,100 @@ export class MatchPage {
       () => firstValueFrom(this.api.startMatch<MatchView>(this.organisation, this.tournamentId, this.matchId, { expectedRevision: match.revision })),
       () => 'Match started.',
     );
+  }
+
+  /** Opens the correction form with the current result chosen. */
+  protected startCorrection(): void {
+    const result = this.match.data()?.result;
+    if (!result) return;
+    const winner = result.outcome === 'first' ? 'first' : result.outcome === 'second' ? 'second' : null;
+    const loser = winner === 'first' ? 'second' : winner === 'second' ? 'first' : null;
+    const cause: CauseChoice = result.cause === 'singleAbsence' || result.cause === 'doubleAbsence' ? 'absence' : result.cause;
+    this.choose(cause);
+    this.outcome.set(result.cause === 'played' ? result.outcome : null);
+    this.conceding.set(result.cause === 'concession' ? loser : null);
+    this.absent.set(result.cause === 'doubleAbsence' ? 'both' : result.cause === 'singleAbsence' ? loser : null);
+    this.playTookPlace.set(result.cause === 'concession' || result.cause === 'noContest' ? result.played : null);
+    this.reason.set(result.reason ?? '');
+    this.correctionReason.set('');
+    this.review.set(null);
+    this.correcting.set(true);
+  }
+
+  protected cancelCorrection(): void {
+    this.correcting.set(false);
+    this.review.set(null);
+    this.choose(null);
+    this.correctionReason.set('');
+  }
+
+  protected editCorrection(): void {
+    this.review.set(null);
+  }
+
+  /** Standings' impact over the results it applied; it changes nothing (h1-safe-corrections D-3). */
+  /** Standings had not applied the match yet: reload it, then ask again. */
+  protected async refreshImpact(): Promise<void> {
+    this.review.set(null);
+    await this.match.refetch();
+    await this.reviewImpact();
+  }
+
+  protected async reviewImpact(): Promise<void> {
+    const body = this.resultBody();
+    if (!body || this.correctBlocked() || this.reviewing()) return;
+    const key = this.correctionKey();
+    const proposed = this.proposedResult(body);
+    this.reviewing.set(true);
+    this.failure.set(null);
+    try {
+      const view = await firstValueFrom(this.api.previewCorrection<CorrectionPreviewView>(this.organisation, this.tournamentId, {
+        match: this.matchId, matchRevision: this.match.data()!.revision, outcome: proposed.outcome, cause: proposed.cause,
+      }));
+      this.review.set({ key, view });
+    } catch (error) {
+      if (!this.access.problem()) this.failure.set({ heading: 'The impact could not be reviewed', text: 'The request failed. Nothing changed. Your correction is kept; try again.' });
+    } finally {
+      this.reviewing.set(false);
+    }
+  }
+
+  protected applyCorrection(): void {
+    const match = this.match.data()!;
+    const fields = this.resultBody();
+    if (!fields || !this.impact() || this.impact()!.updating) return;
+    const key = this.correctionKey();
+    if (this.correctionOperation?.revision !== match.revision || this.correctionOperation.body !== key) {
+      this.correctionOperation = { id: crypto.randomUUID(), revision: match.revision, body: key };
+    }
+    const body: CorrectResult = { operationId: this.correctionOperation.id, expectedRevision: match.revision, correctionReason: this.correctionReason().trim(), ...fields };
+    void this.run(
+      'The correction could not be saved',
+      () => firstValueFrom(this.api.correctResult<MatchView>(this.organisation, this.tournamentId, this.matchId, body)),
+      () => 'Result corrected. Standings updated.',
+      () => {
+        this.cancelCorrection();
+        this.correctionOperation = null;
+      },
+    );
+  }
+
+  /** The result a command would give, as the match view shows results. */
+  private proposedResult(body: Omit<RecordResult, 'operationId' | 'expectedRevision'>): Pick<ResultDetails, 'outcome' | 'cause' | 'played' | 'reason'> {
+    const winnerOf = (side: string | null | undefined): Outcome => (side === 'first' ? 'second' : 'first');
+    switch (body.cause) {
+      case 'played': return { outcome: body.outcome!, cause: 'played', played: true, reason: null };
+      case 'concession': return { outcome: winnerOf(body.entrant), cause: 'concession', played: !!body.played, reason: null };
+      case 'singleAbsence': return { outcome: winnerOf(body.entrant), cause: 'singleAbsence', played: false, reason: null };
+      case 'doubleAbsence': return { outcome: 'none', cause: 'doubleAbsence', played: false, reason: null };
+      default: return { outcome: 'none', cause: 'noContest', played: !!body.played, reason: body.reason ?? null };
+    }
+  }
+
+  /** A replaced result in words, as the Result panel shows the current one. */
+  protected summaryOf(result: ResultDetails): string {
+    const text = resultText(result, this.names().first, this.names().second);
+    return result.cause === 'played' ? `${text} · played` : text;
   }
 
   protected record(): void {

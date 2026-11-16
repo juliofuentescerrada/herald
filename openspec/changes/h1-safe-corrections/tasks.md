@@ -14,7 +14,7 @@
 
 ## 4. Admin application
 
-- [ ] 4.1 `matches` feature: "Correct result", the correction form, the impact panel, the Result history (D-5)
+- [x] 4.1 `matches` feature: "Correct result", the correction form, the impact panel, the Result history (D-5)
 - [ ] 4.2 Vitest for each Visual input state and `axe-core`; lint and boundary checks pass
 
 ## 5. End-to-end journey and seeds

@@ -18,6 +18,9 @@ export const splitBlocker = (code: string): [string, string] => {
 export const ruleText = (field: string, rule: string, required: number | null, first: string, second: string, unavailable: readonly string[] = []): string => {
   if (field === 'outcome') return 'Choose one of the outcomes offered.';
   if (field === 'reason') return rule === 'too-long' ? 'The reason can have at most 500 characters.' : 'A no contest needs a reason.';
+  if (field === 'correction-reason') return rule === 'too-long' ? 'The reason for the correction can have at most 500 characters.' : 'Give a reason for the correction.';
+  if (field === 'played' && rule === 'recorded') return 'Play was recorded: choose a played result, a concession after play or a no contest after play.';
+  if (field === 'resolution') return 'That is the current result: there is nothing to correct.';
   if (field === 'entrant' || field === 'played' || field === 'cause') return 'Complete the chosen cause’s answers.';
   const side = field.startsWith('first-') ? first : field.startsWith('second-') ? second : null;
   switch (rule) {
@@ -33,7 +36,8 @@ export const ruleText = (field: string, rule: string, required: number | null, f
     case 'unknown': return 'The frozen rosters have not arrived yet. Try again in a moment.';
     case 'started': return 'The match has started; its lineups are locked.';
     case 'individual': return 'An individual match has no lineup.';
-    case 'resolved': return 'This match already has a result. This result is read-only.';
+    case 'resolved': return 'This match already has a result. Use “Correct result” to change it.';
+    case 'not-resolved': return 'This match has no result yet: record one instead.';
     case 'not-started': return 'Start the match first: its lineups lock at start.';
     default: return 'Check the request and try again.';
   }
