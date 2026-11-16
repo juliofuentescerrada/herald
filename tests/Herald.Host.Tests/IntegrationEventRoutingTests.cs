@@ -27,4 +27,18 @@ public class IntegrationEventRoutingTests(PostgresFixture postgres)
         route.Uri.ShouldBe(new Uri(queue));
         runtime.Endpoints.EndpointFor(route.Uri)!.Mode.ShouldBe(EndpointMode.Durable);
     }
+
+    [Theory]
+    [InlineData(typeof(CompetitionFinalised))]
+    [InlineData(typeof(CompetitionReopened))]
+    public async Task A_finalisation_fact_goes_to_both_its_consumers_durable_local_queues(Type integrationEvent)
+    {
+        await using var host = new HostFactory(postgres.ConnectionString);
+        _ = host.CreateClient();
+        var runtime = host.Services.GetRequiredService<IWolverineRuntime>();
+
+        var routes = runtime.RoutingFor(integrationEvent).Routes.OfType<MessageRoute>().Select(route => route.Uri).ToList();
+
+        routes.ShouldBe([new Uri("local://tournaments/"), new Uri("local://standings/")], ignoreOrder: true);
+    }
 }

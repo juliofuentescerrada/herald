@@ -21,6 +21,7 @@ public partial class MatchTests
     private static int ResultsRevision(JsonElement schedule) => schedule.GetProperty("resultsRevision").GetInt32();
 
     [Fact]
+    [Trait("covers", "competition-finalisation: The tournament list after finalisation")]
     public async Task An_owner_finalises_current_reviewed_standings_once_and_a_retry_returns_the_final_competition()
     {
         var (league, _, tournament) = await WonAsync();
@@ -35,10 +36,11 @@ public partial class MatchTests
         final.GetProperty("finalised").GetBoolean().ShouldBeTrue();
         var revision = final.GetProperty("finals").EnumerateArray().ShouldHaveSingleItem();
         (revision.GetProperty("number").GetInt32(), revision.GetProperty("resultsRevision").GetInt32()).ShouldBe((1, 2));
-        var sent = api.Sent<CompetitionFinalised>().Where(message => message.TournamentId == tournament).ShouldHaveSingleItem();
+        var sent = api.Sent<CompetitionFinalised>().Where(message => message.TournamentId == tournament).Distinct().ShouldHaveSingleItem();
         (sent.ResultsRevision, sent.FinalRevision).ShouldBe((2, 1));
         var standings = await JsonAsync(await league.Client.GetAsync($"{league.Path}/standings", Cancellation));
         (Revision(standings), standings.GetProperty("final").GetProperty("number").GetInt32(), standings.GetProperty("noChampion").GetBoolean()).ShouldBe((2, 1, false));
+        (await JsonAsync(await league.Client.GetAsync(league.Path, Cancellation))).GetProperty("competition").GetString().ShouldBe("finalised");
     }
 
     [Fact]
@@ -114,10 +116,11 @@ public partial class MatchTests
         var finals = (await JsonAsync(again)).GetProperty("finals").EnumerateArray().ToList();
         finals.Select(final => (final.GetProperty("number").GetInt32(), final.GetProperty("resultsRevision").GetInt32())).ShouldBe([(2, 3), (1, 2)]);
         finals[1].GetProperty("reopenReason").GetString().ShouldBe("Result appeal upheld");
-        api.Sent<CompetitionReopened>().Where(message => message.TournamentId == tournament).ShouldHaveSingleItem().FinalRevision.ShouldBe(1);
+        api.Sent<CompetitionReopened>().Where(message => message.TournamentId == tournament).Distinct().ShouldHaveSingleItem().FinalRevision.ShouldBe(1);
         var standings = await JsonAsync(await league.Client.GetAsync($"{league.Path}/standings", Cancellation));
         standings.GetProperty("final").GetProperty("number").GetInt32().ShouldBe(2);
         standings.GetProperty("finals").EnumerateArray().Select(final => final.GetProperty("reopened").GetBoolean()).ShouldBe([false, true]);
+        (await JsonAsync(await league.Client.GetAsync(league.Path, Cancellation))).GetProperty("competition").GetString().ShouldBe("finalised");
     }
 
     [Fact]

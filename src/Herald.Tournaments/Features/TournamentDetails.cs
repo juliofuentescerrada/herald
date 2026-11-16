@@ -43,10 +43,17 @@ public sealed record TournamentDetails(
 
     public const string CompetitionRunning = "running";
 
+    public const string CompetitionFinalised = "finalised";
+
     // The only H1 profile (D-04): single round-robin, 3 / 1 / 0.
     public const string RoundRobinProfile = "singleRoundRobin-3-1-0";
 
-    public static string CompetitionOf(CompetitionState state) => state == CompetitionState.Running ? CompetitionRunning : CompetitionPreparation;
+    public static string CompetitionOf(CompetitionState state) => state switch
+    {
+        CompetitionState.Running => CompetitionRunning,
+        CompetitionState.Finalised => CompetitionFinalised,
+        _ => CompetitionPreparation,
+    };
 
     public static TournamentDetails Of(Tournament tournament, EntryCounts entries, StartReadiness readiness) => new(
         tournament.Id.Value,
@@ -159,8 +166,8 @@ internal static class TournamentResults
         tournament.Configuration.EntryKind == Domain.EntryKind.Team ? tournament.Configuration.MinimumRosterSize : null,
         tournament.Configuration.EntryKind == Domain.EntryKind.Team ? tournament.Configuration.MaximumRosterSize : null,
         tournament.Configuration.CheckIn == Domain.CheckIn.Mandatory ? Contract.CheckInPolicy.Mandatory : Contract.CheckInPolicy.Optional,
-        fieldLocked || tournament.Competition == CompetitionState.Running,
-        tournament.Competition == CompetitionState.Running);
+        fieldLocked || tournament.IsStarted,
+        tournament.IsStarted);
 
     public static bool IsDuplicateKey(this DbUpdateException exception) =>
         exception.InnerException is PostgresException { SqlState: PostgresErrorCodes.UniqueViolation };

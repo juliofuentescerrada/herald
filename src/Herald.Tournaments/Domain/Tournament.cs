@@ -102,6 +102,11 @@ public sealed class Tournament : AggregateRoot<TournamentId>
 
     public CompetitionState Competition { get; private set; }
 
+    // The highest final revision Competition announced; 0 before the first finalisation (h1-finalisation D-4).
+    public int FinalRevision { get; private set; }
+
+    public bool IsStarted => Competition != CompetitionState.Preparing;
+
     public Guid? StartedBy { get; private set; }
 
     public DateTimeOffset? StartedAt { get; private set; }
@@ -131,10 +136,35 @@ public sealed class Tournament : AggregateRoot<TournamentId>
         return conditions;
     }
 
+    // Idempotent on the final revision, whichever of a finalisation and its reopening arrives first (ADR 0016).
+    public bool ApplyFinalisation(int finalRevision)
+    {
+        if (finalRevision <= FinalRevision)
+        {
+            return false;
+        }
+
+        FinalRevision = finalRevision;
+        Competition = CompetitionState.Finalised;
+        return true;
+    }
+
+    public bool ApplyReopening(int finalRevision)
+    {
+        if (finalRevision < FinalRevision || (finalRevision == FinalRevision && Competition != CompetitionState.Finalised))
+        {
+            return false;
+        }
+
+        FinalRevision = finalRevision;
+        Competition = CompetitionState.Running;
+        return true;
+    }
+
     // Running, by the owner's action only, once every condition holds; no match starts and nothing undoes it (§5.1 row 6, A-3).
     public WriteResult Start(int expectedRevision, StartReadiness readiness, Guid actor, DateTimeOffset at)
     {
-        if (Competition == CompetitionState.Running)
+        if (IsStarted)
         {
             return WriteOutcome.Repeated;
         }
@@ -270,7 +300,7 @@ public sealed class Tournament : AggregateRoot<TournamentId>
             return new(WriteOutcome.Rejected, [.. missing.Select(field => new BrokenRule(field, "required"))]);
         }
 
-        if (Competition == CompetitionState.Running)
+        if (IsStarted)
         {
             return new(WriteOutcome.Rejected, [new("registration", "competition-started")]);
         }
@@ -339,7 +369,7 @@ public sealed class Tournament : AggregateRoot<TournamentId>
     // Start fixes the field and its rules (§5.1 row 6): what decides entries and rosters cannot change once running.
     private List<BrokenRule> LockedByStart(TournamentConfiguration configuration)
     {
-        if (Competition != CompetitionState.Running)
+        if (!IsStarted)
         {
             return [];
         }
