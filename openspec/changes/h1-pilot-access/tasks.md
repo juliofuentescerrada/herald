@@ -11,7 +11,7 @@
 
 ## 3. Admin application
 
-- [ ] 3.1 `organisations` feature: Applications page, grant dialog, revoke confirmation (D-5)
+- [x] 3.1 `organisations` feature: Applications page, grant dialog, revoke confirmation (D-5)
 - [ ] 3.2 Vitest for each Visual input state and `axe-core`; lint and boundary checks pass
 
 ## 4. End-to-end journey, procedure and seeds

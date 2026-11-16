@@ -38,6 +38,7 @@ Names are the exact current `IconName` values in the [typed registry](../../web/
 | `lock` | Registration closed | Explicit registration text; not a generic permission-denied icon for every surface |
 | `menu` | Mobile navigation menu (Tabler `IconMenu2`) | Visible `Menu`, expanded/controls state on the button |
 | `pencil` | Draft publication state | `Draft`; not a new edit-action treatment |
+| `plug-connected` | Applications destination: pilot applications acting for the organisation | `Applications`, navigation size |
 | `refresh` | Reload to recover unavailable/stale content | Describe what must reload and keep a labelled recovery action |
 | `trophy` | Tournaments destination or empty tournament list | Navigation label; empty illustration above the heading |
 | `users` | Entries destination or empty entries panel | `Entries` / `View entries`; empty illustration, without implying a team-only entrant kind |

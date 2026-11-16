@@ -42,6 +42,11 @@ export const routes: Routes = [
             loadComponent: () => import('./features/tournaments').then((m) => m.TournamentListPage),
           },
           {
+            path: 'applications',
+            title: 'Applications · Herald',
+            loadComponent: () => import('./features/applications').then((m) => m.ApplicationsPage),
+          },
+          {
             path: 'tournaments/new',
             title: 'Create tournament · Herald',
             canDeactivate: [confirmLeave],

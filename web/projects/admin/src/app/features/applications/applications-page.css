@@ -1,0 +1,27 @@
+.heading { margin-bottom: var(--herald-space-6); }
+h1 { font-size: 32px; margin: 0; }
+.summary { display: flex; flex-wrap: wrap; align-items: flex-start; justify-content: space-between; gap: var(--herald-space-4); margin-bottom: var(--herald-space-6); }
+.summary > div { flex: 1 1 320px; }
+.summary h2 { margin-top: 0; }
+herald-notice { display: block; margin-bottom: var(--herald-space-6); }
+.grants { list-style: none; margin: 0; padding: 0; background: var(--herald-color-surface-default); border: 1px solid var(--herald-color-border-default); }
+li { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--herald-space-4); padding: var(--herald-space-6); }
+li + li { border-top: 1px solid var(--herald-color-border-default); }
+li > div:first-child { flex: 1 1 240px; min-width: 0; overflow-wrap: anywhere; }
+.identity { display: flex; flex-wrap: wrap; align-items: center; gap: var(--herald-space-3); margin-bottom: var(--herald-space-2); }
+h3 { font-size: 20px; margin: 0; }
+.help { color: var(--herald-color-text-secondary); margin: 0 0 var(--herald-space-2); }
+.labels { display: flex; flex-wrap: wrap; gap: var(--herald-space-2); margin: 0 0 var(--herald-space-2); }
+.mono { font-family: ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace; font-variant-numeric: tabular-nums; }
+.row-actions { display: flex; flex-wrap: wrap; gap: var(--herald-space-3); }
+.field-error { color: var(--herald-color-feedback-danger); font-size: var(--herald-text-base); font-weight: 700; margin: 0; }
+.choice { border: 0; padding: 0; margin: var(--herald-space-6) 0 0; display: grid; gap: var(--herald-space-1); }
+.choice legend { font-weight: 700; font-size: var(--herald-text-lg); padding: 0; margin-bottom: var(--herald-space-2); }
+.options { display: grid; gap: var(--herald-space-1); }
+.nested { padding-left: var(--herald-space-6); }
+.choice label { display: inline-flex; align-items: center; gap: var(--herald-space-2); min-height: var(--herald-target-min); }
+herald-dialog herald-notice { margin: var(--herald-space-6) 0 0; }
+@media (max-width: 699px) {
+  h1 { font-size: 28px; }
+  .summary, li, .row-actions { flex-direction: column; align-items: stretch; }
+}
