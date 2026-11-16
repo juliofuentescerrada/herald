@@ -573,7 +573,10 @@ public sealed class Schedule : AggregateRoot<TournamentId>
     {
         if (Final is not { } final)
         {
-            return _finals.Count > 0 ? WriteOutcome.Repeated : WriteResult.Reject("competition", "not-finalised");
+            // Only the same owner's retry with the same reason is the reopening already applied; any other reopen is out of date.
+            return _finals.Count > 0 && _finals[^1].ReopenedBy == actor && _finals[^1].ReopenReason == reason?.Trim() ? WriteOutcome.Repeated
+                : expectedRevision != Revision ? WriteOutcome.Stale
+                : WriteResult.Reject("competition", "not-finalised");
         }
 
         if (expectedRevision != Revision)

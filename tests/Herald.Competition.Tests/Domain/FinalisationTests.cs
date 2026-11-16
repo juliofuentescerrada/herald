@@ -135,7 +135,9 @@ public class FinalisationTests
         _schedule.IsFinalised.ShouldBeFalse();
         _schedule.Finals.ShouldBe([new FinalRevision(1, reviewed, _owner, _at, "Result appeal upheld", _owner, _at)]);
         _schedule.DomainEvents.OfType<CompetitionReopened>().Single().ShouldBe(new CompetitionReopened(_schedule.Id, 1, reviewed, _owner, _at));
-        Reopen("Again").Outcome.ShouldBe(WriteOutcome.Repeated);
+        Reopen("Result appeal upheld").Outcome.ShouldBe(WriteOutcome.Repeated);
+        _schedule.Reopen("Scoring error", _schedule.Revision - 1, Guid.NewGuid(), _at).Outcome.ShouldBe(WriteOutcome.Stale);
+        Reopen("Scoring error").Broken.ShouldBe([new BrokenRule("competition", "not-finalised")]);
     }
 
     [Fact]

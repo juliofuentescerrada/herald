@@ -87,5 +87,5 @@ Captured at 1440 and 390 px by the test script (`test-results/screens/seeded-fin
 | `finalising` | Same status text; the button keeps the shared loading state | None |
 | `final` | "Final" label, final summary with "Reopen" on the right, "Final revisions" closed after the table | None |
 | `final-no-champion` | Same notice, below the final summary | None |
-| `reopen-confirm` | Same text and reason field; the cancel action reads "Keep it final" | Wording follows the other confirmations ("Keep as it is") |
+| `reopen-confirm` | Same text, reason field and "Keep as it is" | None |
 | `correct-finalised` | Same information notice and "Go to standings" in the Result panel; lifecycle labels show "Finalised" | None |

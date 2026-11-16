@@ -132,4 +132,39 @@ public partial class MatchTests
         (await other.PostAsJsonAsync($"{league.Path}/finalisation", new { reviewedRevision = 2, expectedRevision = 1 }, Cancellation)).StatusCode.ShouldBe(HttpStatusCode.NotFound);
         (await other.PostAsJsonAsync($"{league.Path}/reopening", new { reason = "Appeal", expectedRevision = 1 }, Cancellation)).StatusCode.ShouldBe(HttpStatusCode.NotFound);
     }
+
+    [Fact]
+    public async Task A_result_or_a_start_on_a_finalised_competition_is_rejected_until_it_is_reopened()
+    {
+        var (league, path, _) = await WonAsync();
+        (await SettledAsync(async () => await FinaliseAsync(league, ResultsRevision(await ScheduleAsync(league))))).StatusCode.ShouldBe(HttpStatusCode.OK);
+
+        var result = await ResultAsync(league, path, "second", 2);
+        var start = await league.Client.PostAsJsonAsync($"{path}/start", new { expectedRevision = 2 }, Cancellation);
+
+        result.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+        Errors(await JsonAsync(result), "competition").ShouldBe(["finalised"]);
+        start.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+        Errors(await JsonAsync(start), "competition").ShouldBe(["finalised"]);
+    }
+
+    [Fact]
+    [Trait("covers", "competition-finalisation: A correction after the review")]
+    public async Task A_correction_racing_a_finalisation_either_commits_first_and_makes_the_review_stale_or_is_rejected()
+    {
+        var (league, path, _) = await WonAsync();
+        var schedule = await ScheduleAsync(league);
+
+        var finalising = FinaliseAsync(league, ResultsRevision(schedule), Revision(schedule));
+        var correcting = CorrectAsync(league, path, new { operationId = Guid.NewGuid(), expectedRevision = 2, cause = "played", outcome = "draw", correctionReason = "Score sheet misread" });
+        var answers = await Task.WhenAll(finalising, correcting);
+
+        // Never both: a finalisation over results the owner did not review (D-2).
+        answers.Count(answer => answer.StatusCode == HttpStatusCode.OK).ShouldBe(1);
+        var after = await ScheduleAsync(league);
+        if (after.GetProperty("finalised").GetBoolean())
+        {
+            after.GetProperty("finals")[0].GetProperty("resultsRevision").GetInt32().ShouldBe(ResultsRevision(after));
+        }
+    }
 }

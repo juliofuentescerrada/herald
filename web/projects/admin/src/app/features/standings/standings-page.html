@@ -211,7 +211,7 @@
       }
       <div class="actions">
         <button herald-button variant="primary" type="submit" [loading]="busy()">{{ busy() ? 'Reopening…' : failure() ? 'Try again' : 'Reopen' }}</button>
-        <button herald-button type="button" data-herald-initial-focus [disabled]="busy()" (click)="closeDialog()">Keep it final</button>
+        <button herald-button type="button" data-herald-initial-focus [disabled]="busy()" (click)="closeDialog()">Keep as it is</button>
       </div>
     </form>
   </herald-dialog>
