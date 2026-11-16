@@ -1,3 +1,4 @@
+using Herald.BuildingBlocks;
 using Herald.ModuleHosting;
 using Herald.Standings.Domain;
 using Herald.Standings.Persistence;
@@ -35,6 +36,7 @@ public static class GetStandingsEndpoint
     [WolverineGet("/api/organisations/{organisationId}/tournaments/{tournamentId}/standings")]
     [EndpointGroupName(HeraldApi.Admin)]
     [EndpointName("getStandings")]
+    [OperationGroup(OperationGroup.Read)]
     [ProducesResponseType<StandingsView>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound, "application/problem+json")]
     public static async Task<IResult> Get(Guid organisationId, Guid tournamentId, StandingsDbContext db, CancellationToken cancellationToken)

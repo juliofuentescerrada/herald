@@ -1,3 +1,4 @@
+using Herald.BuildingBlocks;
 using Herald.ModuleHosting;
 using Herald.Registration.Domain;
 using Herald.Registration.Persistence;
@@ -18,6 +19,7 @@ public static class FindGuestsEndpoint
     [WolverineGet("/api/organisations/{organisationId}/guests")]
     [EndpointGroupName(HeraldApi.Admin)]
     [EndpointName("findGuests")]
+    [OperationGroup(OperationGroup.Read)]
     [ProducesResponseType<IReadOnlyList<GuestDetails>>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound, "application/problem+json")]
     public static async Task<IReadOnlyList<GuestDetails>> Get(

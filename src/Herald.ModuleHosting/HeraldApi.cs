@@ -56,6 +56,13 @@ public static class HeraldApi
                 {
                     chain.Metadata.RequireAuthorization(HeraldAuthentication.OrganiserPolicy);
                 }
+
+                // For the access step, which reads them from the endpoint to check an application's grant.
+                foreach (var attribute in chain.Method.Method.GetCustomAttributes()
+                    .Where(attribute => attribute is OperationGroupAttribute or PeopleOnlyAttribute))
+                {
+                    chain.Metadata.WithMetadata(attribute);
+                }
             });
         });
         // Development only for now, like /health: what Azure exposes is decided in M4.
@@ -83,6 +90,12 @@ public static class HeraldApi
                 return;
             }
 
+            if (found.Grant is { } grant && Refusal(http, grant) is { } refusal)
+            {
+                await NotGranted(http, refusal);
+                return;
+            }
+
             http.RequestServices.GetRequiredService<OrganisationContext>().Enter(organisationId, found.ActorId, found.Grant);
         }
         else if (caller?.Kind == CallerKind.Application && IsAdmin(http))
@@ -93,6 +106,28 @@ public static class HeraldApi
         }
 
         await next(http);
+    }
+
+    // Why an application's request falls outside its grant, or null when the grant allows it (design D-4). Never names the
+    // tournament: the refusal must not tell an application anything about one it was not granted.
+    private static string? Refusal(HttpContext http, Grant grant)
+    {
+        var metadata = http.GetEndpoint()?.Metadata;
+        if (metadata?.GetMetadata<OperationGroupAttribute>() is not { } declared || metadata.GetMetadata<PeopleOnlyAttribute>() is not null)
+        {
+            return "Applications cannot perform this operation.";
+        }
+
+        var group = JsonNamingPolicy.CamelCase.ConvertName(declared.Group.ToString());
+        if (!grant.Groups.Contains(declared.Group))
+        {
+            return $"The grant does not include the '{group}' operations.";
+        }
+
+        var outside = http.GetRouteValue("tournamentId") is string value
+            ? grant.Tournaments is { } tournaments && (!Guid.TryParse(value, out var tournament) || !tournaments.Contains(tournament))
+            : declared.AllTournaments && grant.Tournaments is not null;
+        return outside ? $"The grant does not cover this tournament for the '{group}' operations." : null;
     }
 
     private static bool IsAdmin(HttpContext http) =>

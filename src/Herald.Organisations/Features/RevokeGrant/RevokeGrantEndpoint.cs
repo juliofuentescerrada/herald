@@ -15,6 +15,7 @@ public static class RevokeGrantEndpoint
     [WolverinePost("/api/organisations/{organisationId}/applications/{grantId}/revocation")]
     [EndpointGroupName(HeraldApi.Admin)]
     [EndpointName("revokeGrant")]
+    [PeopleOnly]
     [ProducesResponseType<GrantDetails>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound, "application/problem+json")]
     public static async Task<IResult> Post(

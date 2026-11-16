@@ -30,6 +30,8 @@ namespace Internal.Generated.WolverineHandlers
         public override async System.Threading.Tasks.Task Handle(Microsoft.AspNetCore.Http.HttpContext httpContext)
         {
             // This service has been marked as requiring service location independent of Wolverine's ability to use constructor injection of everything else
+            var actorNames = Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService<Herald.ModuleHosting.IActorNames>(httpContext.RequestServices);
+            // This service has been marked as requiring service location independent of Wolverine's ability to use constructor injection of everything else
             var organisationContext = Microsoft.Extensions.DependencyInjection.ServiceProviderServiceExtensions.GetRequiredService<Herald.ModuleHosting.OrganisationContext>(httpContext.RequestServices);
             await using var competitionDbContext = new Herald.Competition.Persistence.CompetitionDbContext(_dbContextOptionsOfCompetitionDbContext, organisationContext);
             var messageContext = new Wolverine.Runtime.MessageContext(_wolverineRuntime);
@@ -95,7 +97,7 @@ namespace Internal.Generated.WolverineHandlers
                 if (jsonContinue == Wolverine.HandlerContinuation.Stop) return;
                 
                 // The actual HTTP request handler execution
-                var result = await Herald.Competition.Features.RecordLineup.RecordLineupEndpoint.Put(organisationId, tournamentId, matchId, side, command, organisationContext, competitionDbContext, messageContext, httpContext.RequestAborted).ConfigureAwait(false);
+                var result = await Herald.Competition.Features.RecordLineup.RecordLineupEndpoint.Put(organisationId, tournamentId, matchId, side, command, organisationContext, competitionDbContext, messageContext, actorNames, httpContext.RequestAborted).ConfigureAwait(false);
 
                 
                 // Added by EF Core Transaction Middleware

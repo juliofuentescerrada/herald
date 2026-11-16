@@ -51,6 +51,13 @@ public interface IOrganisationAccess
     Task<Access?> FindAccessAsync(Guid organisationId, Caller caller, CancellationToken cancellationToken);
 }
 
+// Implemented by the Organisations module: how history names an actor of the current organisation, a person by their display
+// name and an application as "Results bot (granted by Alex Morgan)" (pilot-access, API-10). Unknown actors are left out.
+public interface IActorNames
+{
+    Task<IReadOnlyDictionary<Guid, string>> NamesAsync(IReadOnlyCollection<Guid> actors, CancellationToken cancellationToken);
+}
+
 // The organisation the current request or message acts for; one per scope, entered once.
 public sealed class OrganisationContext
 {

@@ -1,3 +1,4 @@
+using Herald.BuildingBlocks;
 using Herald.Competition.Domain;
 using Herald.Competition.Persistence;
 using Herald.ModuleHosting;
@@ -20,15 +21,17 @@ public static class RecordResultEndpoint
     [WolverinePost("/api/organisations/{organisationId}/tournaments/{tournamentId}/matches/{matchId}/result")]
     [EndpointGroupName(HeraldApi.Admin)]
     [EndpointName("recordResult")]
+    [OperationGroup(OperationGroup.Results)]
     [ProducesResponseType<MatchView>(StatusCodes.Status200OK)]
     [ProducesResponseType<HttpValidationProblemDetails>(StatusCodes.Status400BadRequest, "application/problem+json")]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound, "application/problem+json")]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict, "application/problem+json")]
     public static async Task<IResult> Post(
-        Guid organisationId, Guid tournamentId, Guid matchId, RecordResult command, OrganisationContext context, CompetitionDbContext db, IMessageBus bus, CancellationToken cancellationToken)
+        Guid organisationId, Guid tournamentId, Guid matchId, RecordResult command, OrganisationContext context, CompetitionDbContext db, IMessageBus bus, IActorNames names,
+        CancellationToken cancellationToken)
     {
         var actor = context.ActorId ?? throw new InvalidOperationException($"No acting person in organisation {organisationId}.");
-        return await db.WriteAsync(bus, organisationId, tournamentId, matchId,
+        return await db.WriteAsync(bus, names, organisationId, tournamentId, matchId,
             (match, _) => command.Cause == Cause.Played
                 ? command.Outcome is { } outcome
                     ? match.RecordPlayed(command.OperationId, outcome, command.ExpectedRevision, actor, DateTimeOffset.UtcNow)

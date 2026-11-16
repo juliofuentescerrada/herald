@@ -1,3 +1,4 @@
+using Herald.BuildingBlocks;
 using Herald.ModuleHosting;
 using Herald.Registration.Domain;
 using Herald.Registration.Persistence;
@@ -18,6 +19,7 @@ public static class CreateGuestEndpoint
     [WolverinePut("/api/organisations/{organisationId}/guests/{guestId}")]
     [EndpointGroupName(HeraldApi.Admin)]
     [EndpointName("createGuest")]
+    [OperationGroup(OperationGroup.Entries)]
     [ProducesResponseType<GuestDetails>(StatusCodes.Status200OK)]
     [ProducesResponseType<HttpValidationProblemDetails>(StatusCodes.Status400BadRequest, "application/problem+json")]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound, "application/problem+json")]

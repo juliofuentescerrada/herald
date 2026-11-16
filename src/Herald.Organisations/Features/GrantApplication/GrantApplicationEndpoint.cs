@@ -23,6 +23,7 @@ public static class GrantApplicationEndpoint
     [WolverinePut("/api/organisations/{organisationId}/applications/{grantId}")]
     [EndpointGroupName(HeraldApi.Admin)]
     [EndpointName("grantApplication")]
+    [PeopleOnly]
     [ProducesResponseType<GrantDetails>(StatusCodes.Status200OK)]
     [ProducesResponseType<HttpValidationProblemDetails>(StatusCodes.Status400BadRequest, "application/problem+json")]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound, "application/problem+json")]

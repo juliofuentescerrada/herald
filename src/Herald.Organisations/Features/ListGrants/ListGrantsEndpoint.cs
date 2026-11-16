@@ -12,6 +12,7 @@ public static class ListGrantsEndpoint
     [WolverineGet("/api/organisations/{organisationId}/applications")]
     [EndpointGroupName(HeraldApi.Admin)]
     [EndpointName("listGrants")]
+    [PeopleOnly]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound, "application/problem+json")]
     public static async Task<IReadOnlyList<GrantDetails>> Get(Guid organisationId, OrganisationsDbContext db, CancellationToken cancellationToken) =>
         // shortcut: no paging, a pilot organisation has a handful of grants; add it with H5's application console.

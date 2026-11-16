@@ -1,3 +1,4 @@
+using Herald.BuildingBlocks;
 using Herald.ModuleHosting;
 using Herald.Registration.Domain;
 using Herald.Registration.Persistence;
@@ -15,6 +16,7 @@ public static class GetRosterEndpoint
     [WolverineGet("/api/organisations/{organisationId}/tournaments/{tournamentId}/entries/{entryId}/roster")]
     [EndpointGroupName(HeraldApi.Admin)]
     [EndpointName("getRoster")]
+    [OperationGroup(OperationGroup.Read)]
     [ProducesResponseType<RosterDetails>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound, "application/problem+json")]
     public static async Task<IResult> Get(Guid organisationId, Guid tournamentId, Guid entryId, RegistrationDbContext db, CancellationToken cancellationToken)

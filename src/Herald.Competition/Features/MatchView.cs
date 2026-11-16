@@ -1,5 +1,6 @@
 using Herald.Competition.Domain;
 using Herald.Competition.Persistence;
+using Herald.ModuleHosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
 using Wolverine;
@@ -15,7 +16,8 @@ public sealed record SideDetails(EntrantDetails Entrant, IReadOnlyList<PlayerDet
 
 // A match's effective result; appearances are named on the match view only (h1-operator-results D-2). The reason is a no contest's,
 // private to the organisation: admin API only.
-public sealed record ResultDetails(Outcome Outcome, Cause Cause, bool Played, string? Reason, DateTimeOffset RecordedAt);
+// RecordedBy names who recorded it, on the match view only: a person, or an application with the owner who granted it.
+public sealed record ResultDetails(Outcome Outcome, Cause Cause, bool Played, string? Reason, DateTimeOffset RecordedAt, string? RecordedBy = null);
 
 public sealed record MatchStartDetails(DateTimeOffset StartedAt, int? FirstLineup, int? SecondLineup);
 
@@ -35,6 +37,19 @@ public sealed record MatchView(
     IReadOnlyList<PlayerDetails> Appearances,
     IReadOnlyList<PlayerDetails> Unavailable)
 {
+    // With the name of who recorded the result, for the match's own read and writes.
+    public static async Task<MatchView> NamedAsync(Match match, Schedule schedule, IActorNames names, CancellationToken cancellationToken)
+    {
+        var view = Of(match, schedule);
+        if (match.Resolution is not { } resolution)
+        {
+            return view;
+        }
+
+        var known = await names.NamesAsync([resolution.RecordedBy], cancellationToken);
+        return view with { Result = view.Result! with { RecordedBy = known.GetValueOrDefault(resolution.RecordedBy) } };
+    }
+
     public static MatchView Of(Match match, Schedule schedule)
     {
         var names = schedule.StartedPairings?.Entrants.ToDictionary(entrant => entrant.EntryId, entrant => entrant.Name) ?? [];
@@ -86,7 +101,8 @@ internal static class MatchResults
     // Loads the match and its schedule, applies the write and saves it; the same 404 for another organisation's match.
     // A resolution also publishes the next results revision with it (h1-standings D-1).
     public static async Task<IResult> WriteAsync(
-        this CompetitionDbContext db, IMessageBus bus, Guid organisationId, Guid tournamentId, Guid matchId, Func<Match, Schedule, WriteResult> write, CancellationToken cancellationToken)
+        this CompetitionDbContext db, IMessageBus bus, IActorNames names, Guid organisationId, Guid tournamentId, Guid matchId, Func<Match, Schedule, WriteResult> write,
+        CancellationToken cancellationToken)
     {
         var tournament = new TournamentId(tournamentId);
         var id = new MatchId(matchId);
@@ -139,7 +155,7 @@ internal static class MatchResults
                     break;
             }
 
-            return Results.Ok(MatchView.Of(match, schedule));
+            return Results.Ok(await MatchView.NamedAsync(match, schedule, names, cancellationToken));
         }
     }
 }

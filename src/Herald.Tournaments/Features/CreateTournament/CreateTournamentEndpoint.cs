@@ -1,3 +1,4 @@
+using Herald.BuildingBlocks;
 using Herald.ModuleHosting;
 using Herald.Tournaments.Domain;
 using Herald.Tournaments.Persistence;
@@ -17,6 +18,7 @@ public static class CreateTournamentEndpoint
     [WolverinePost("/api/organisations/{organisationId}/tournaments")]
     [EndpointGroupName(HeraldApi.Admin)]
     [EndpointName("createTournament")]
+    [OperationGroup(OperationGroup.Setup, AllTournaments = true)]
     [ProducesResponseType<TournamentDetails>(StatusCodes.Status201Created)]
     [ProducesResponseType<HttpValidationProblemDetails>(StatusCodes.Status400BadRequest, "application/problem+json")]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound, "application/problem+json")]

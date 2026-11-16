@@ -1,3 +1,4 @@
+using Herald.BuildingBlocks;
 using Herald.ModuleHosting;
 using Herald.Registration.Domain;
 using Herald.Registration.Persistence;
@@ -17,6 +18,7 @@ public static class AdmitEntryEndpoint
     [WolverinePost("/api/organisations/{organisationId}/tournaments/{tournamentId}/entries/{entryId}/admission")]
     [EndpointGroupName(HeraldApi.Admin)]
     [EndpointName("admitEntry")]
+    [OperationGroup(OperationGroup.Entries)]
     [ProducesResponseType<FieldDetails>(StatusCodes.Status200OK)]
     [ProducesResponseType<HttpValidationProblemDetails>(StatusCodes.Status400BadRequest, "application/problem+json")]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound, "application/problem+json")]
