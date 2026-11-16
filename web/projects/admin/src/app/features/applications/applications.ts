@@ -9,7 +9,7 @@ export const groups: readonly { group: OperationGroup; label: string; covers: st
   { group: 'setup', label: 'Tournament setup', covers: 'create, configure, publish, registration window' },
   { group: 'entries', label: 'Entries', covers: 'guests, entries, admission, check-in, rosters' },
   { group: 'schedule', label: 'Schedule', covers: 'generate, publish and withdraw, start' },
-  { group: 'results', label: 'Results and corrections', covers: 'lineups, results, outcomes, departures' },
+  { group: 'results', label: 'Results and corrections', covers: 'lineups, results, outcomes, departures, corrections' },
   { group: 'finalisation', label: 'Finalisation', covers: 'finalise and reopen' },
 ];
 

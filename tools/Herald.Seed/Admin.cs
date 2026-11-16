@@ -137,6 +137,23 @@ public sealed class Admin(Seeding seeding, Persona persona)
         }));
     }
 
+    // Corrects the resolved match between two named entrants to a played draw, with the correction's reason (h1-safe-corrections).
+    public async Task CorrectToDrawAsync(Guid organisation, Guid tournament, string first, string second, string reason)
+    {
+        var schedule = await ReadAsync(await _client.GetAsync($"{Path(organisation, tournament)}/schedule"), "read a schedule");
+        var id = schedule.GetProperty("matches").EnumerateArray().Single(candidate =>
+            new[] { Name(candidate, "first"), Name(candidate, "second") }.Order().SequenceEqual(new[] { first, second }.Order())).GetProperty("matchId").GetGuid();
+        var path = $"{Path(organisation, tournament)}/matches/{id}";
+        await WriteAsync($"correct the result of {id}", async () => await _client.PostAsJsonAsync($"{path}/result/correction", new
+        {
+            operationId = Ids.For(id.ToString(), "correction"),
+            expectedRevision = (await ReadAsync(await _client.GetAsync(path), "read a match")).GetProperty("revision").GetInt32(),
+            cause = "played",
+            outcome = "draw",
+            correctionReason = reason,
+        }));
+    }
+
     // Records a side's lineup of the schedule's match at that position from its frozen roster's first players (h1-match-lineups).
     public async Task RecordLineupAsync(Guid organisation, Guid tournament, int index, string side, int players)
     {

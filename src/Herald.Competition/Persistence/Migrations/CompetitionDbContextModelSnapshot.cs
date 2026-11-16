@@ -42,6 +42,10 @@ namespace Herald.Competition.Persistence.Migrations
                     b.Property<Guid>("OrganisationId")
                         .HasColumnType("uuid");
 
+                    b.Property<string>("ReplacedResolutions")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
                     b.Property<string>("Resolution")
                         .HasColumnType("jsonb");
 
