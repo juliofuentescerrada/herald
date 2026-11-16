@@ -56,7 +56,12 @@ public sealed record Resolution(
     string? Reason = null,
     Resolution? Predecessor = null);
 
+// A resolution replaced by a correction, with who replaced it, when, why and by which operation (h1-safe-corrections D-1).
+public sealed record ReplacedResolution(Resolution Resolution, Guid ReplacedBy, DateTimeOffset ReplacedAt, string Reason, Guid OperationId);
+
 public sealed record MatchResolved(MatchId MatchId, Outcome Outcome, Cause Cause, Guid RecordedBy, DateTimeOffset RecordedAt) : IDomainEvent;
+
+public sealed record ResultCorrected(MatchId MatchId, Outcome Outcome, Cause Cause, Guid CorrectedBy, DateTimeOffset CorrectedAt) : IDomainEvent;
 
 public sealed record LineupRecorded(MatchId MatchId, Side Side, int Number, Guid RecordedBy, DateTimeOffset RecordedAt) : IDomainEvent;
 
@@ -67,6 +72,7 @@ public sealed class Match : AggregateRoot<MatchId>
 {
     private List<Lineup> _firstLineups = [];
     private List<Lineup> _secondLineups = [];
+    private List<ReplacedResolution> _replacedResolutions = [];
 
     // For EF Core, which sets the other properties after constructing.
     private Match(MatchId id)
@@ -112,6 +118,13 @@ public sealed class Match : AggregateRoot<MatchId>
     public MatchStart? Start { get; private set; }
 
     public Resolution? Resolution { get; private set; }
+
+    // Oldest first; the effective resolution is never among them.
+    public IReadOnlyList<ReplacedResolution> ReplacedResolutions
+    {
+        get => _replacedResolutions;
+        private set => _replacedResolutions = [.. value];
+    }
 
     public MatchState State => Resolution is not null ? MatchState.Resolved : Start is null ? MatchState.Scheduled : MatchState.InPlay;
 
@@ -298,10 +311,100 @@ public sealed class Match : AggregateRoot<MatchId>
             return WriteOutcome.Stale;
         }
 
+        // A played result is RecordPlayed's.
+        if (cause == Cause.Played)
+        {
+            return WriteResult.Reject("cause", "unknown");
+        }
+
+        var (broken, outcome, tookPlace, noContestReason, _) = Propose(cause, null, entrant, played, reason);
+        if (broken.Count > 0)
+        {
+            return new(WriteOutcome.Rejected, broken);
+        }
+
+        Resolution = new(outcome, cause, tookPlace, tookPlace ? Appearances() : [], actor, at, operationId, noContestReason);
+        Raise(new MatchResolved(Id, outcome, cause, actor, at));
+        Revision++;
+        return WriteOutcome.Applied;
+    }
+
+    // Replaces the effective resolution, keeping the replaced one with who, when and why (h1-safe-corrections D-1, D-2). The input is
+    // a result's: the outcome of a played one, the conceding or absent entrant, whether play took place and a no contest's reason.
+    public WriteResult Correct(
+        Guid operationId, Cause cause, Outcome? outcome, Side? entrant, bool? played, string? noContestReason, string? reason,
+        int expectedRevision, Guid actor, DateTimeOffset at)
+    {
+        var proposal = Propose(cause, outcome, entrant, played, noContestReason);
+        if (_replacedResolutions.FindIndex(replaced => replaced.OperationId == operationId) is var index and >= 0)
+        {
+            // A retry returns what that correction produced; the same operation with other content conflicts.
+            var produced = index + 1 < _replacedResolutions.Count ? _replacedResolutions[index + 1].Resolution : Resolution!;
+            return proposal.Broken.Count == 0 && Same(produced, proposal) ? WriteOutcome.Repeated : WriteOutcome.Stale;
+        }
+
+        if (Resolution is not { } current)
+        {
+            return WriteResult.Reject("match", "not-resolved");
+        }
+
+        if (expectedRevision != Revision)
+        {
+            return WriteOutcome.Stale;
+        }
+
+        reason = reason?.Trim();
+        List<BrokenRule> broken = [.. proposal.Broken];
+        if (string.IsNullOrEmpty(reason))
+        {
+            broken.Add(new("correction-reason", "required"));
+        }
+        else if (reason.Length > ReasonLength)
+        {
+            broken.Add(new("correction-reason", "too-long"));
+        }
+
+        // Recorded play is never erased (§8.1).
+        if (current.Played && !proposal.TookPlace)
+        {
+            broken.Add(new("played", "recorded"));
+        }
+
+        if (broken.Count == 0 && Same(current, proposal))
+        {
+            broken.Add(new("resolution", "unchanged"));
+        }
+
+        if (broken.Count > 0)
+        {
+            return new(WriteOutcome.Rejected, broken);
+        }
+
+        _replacedResolutions.Add(new(current, actor, at, reason!, operationId));
+        var appearances = current.Played ? current.Appearances : proposal.TookPlace ? Appearances() : [];
+        Resolution = new(proposal.Outcome, cause, proposal.TookPlace, appearances, actor, at, operationId, proposal.NoContestReason);
+        Raise(new ResultCorrected(Id, proposal.Outcome, cause, actor, at));
+        Revision++;
+        return WriteOutcome.Applied;
+    }
+
+    private sealed record Proposal(List<BrokenRule> Broken, Outcome Outcome, bool TookPlace, string? NoContestReason, Cause Cause);
+
+    private static bool Same(Resolution resolution, Proposal proposal) =>
+        (resolution.Outcome, resolution.Cause, resolution.Played, resolution.Reason) == (proposal.Outcome, proposal.Cause, proposal.TookPlace, proposal.NoContestReason);
+
+    // The §8.1 rules of a result against this match's start (h1-exceptional-outcomes D-1, D-2): the outcome a cause gives, whether
+    // play took place and the no contest's reason. The outcome is a played result's only.
+    private Proposal Propose(Cause cause, Outcome? outcome, Side? entrant, bool? played, string? reason)
+    {
         reason = string.IsNullOrWhiteSpace(reason) ? null : reason.Trim();
         List<BrokenRule> broken = [];
         switch (cause)
         {
+            // The API also binds integers to the enum: only a winner or a draw becomes a played result.
+            case Cause.Played when outcome is not { } won || !Enum.IsDefined(won) || won == Outcome.None:
+                broken.Add(new("outcome", outcome is null ? "required" : "unknown"));
+                break;
             case Cause.Concession or Cause.SingleAbsence when entrant is not { } side || !Enum.IsDefined(side):
                 broken.Add(new("entrant", "required"));
                 break;
@@ -311,14 +414,14 @@ public sealed class Match : AggregateRoot<MatchId>
             case Cause.NoContest when reason?.Length > ReasonLength:
                 broken.Add(new("reason", "too-long"));
                 break;
-            case Cause.Concession or Cause.SingleAbsence or Cause.DoubleAbsence or Cause.NoContest:
+            case Cause.Played or Cause.Concession or Cause.SingleAbsence or Cause.DoubleAbsence or Cause.NoContest:
                 break;
             default:
-                return WriteResult.Reject("cause", "unknown");
+                return new([new("cause", "unknown")], Outcome.None, false, null, cause);
         }
 
         var absence = cause is Cause.SingleAbsence or Cause.DoubleAbsence;
-        if (!absence && played is null)
+        if (cause is not (Cause.Played or Cause.SingleAbsence or Cause.DoubleAbsence) && played is null)
         {
             broken.Add(new("played", "required"));
         }
@@ -328,25 +431,20 @@ public sealed class Match : AggregateRoot<MatchId>
             broken.Add(new("match", "started"));
         }
 
-        var tookPlace = !absence && played == true;
+        var tookPlace = cause == Cause.Played || (!absence && played == true);
         if (tookPlace && IsTeamMatch && Start is null)
         {
             broken.Add(new("match", "not-started"));
         }
 
-        if (broken.Count > 0)
-        {
-            return new(WriteOutcome.Rejected, broken);
-        }
-
         // The other side of the conceding or absent entrant wins; a double absence and a no contest have no winner.
-        var outcome = cause is Cause.Concession or Cause.SingleAbsence
-            ? entrant == Side.First ? Outcome.Second : Outcome.First
-            : Outcome.None;
-        Resolution = new(outcome, cause, tookPlace, tookPlace ? Appearances() : [], actor, at, operationId, cause == Cause.NoContest ? reason : null);
-        Raise(new MatchResolved(Id, outcome, cause, actor, at));
-        Revision++;
-        return WriteOutcome.Applied;
+        var result = cause switch
+        {
+            Cause.Played => outcome ?? Outcome.None,
+            Cause.Concession or Cause.SingleAbsence => entrant == Side.First ? Outcome.Second : Outcome.First,
+            _ => Outcome.None,
+        };
+        return new(broken, result, tookPlace, cause == Cause.NoContest ? reason : null, cause);
     }
 
     // Resolves this match for the departing side's entrant (h1-round-operations D-2); false when nothing changes. The opponent's
