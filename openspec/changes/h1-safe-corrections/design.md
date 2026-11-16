@@ -59,3 +59,25 @@ Visual choices (G-/RU-): the correction is not destructive but changes points, s
 ## Risks / Trade-offs
 
 - [Preview computed on an older snapshot] → the preview carries its revision and the command checks the match revision; a mismatch is refused, never applied on stale information.
+
+## Implementation notes
+
+- **History storage (D-1):** `ReplacedResolutions` is a `jsonb` column on the match, read and written whole with it like its lineups, start and resolution, not a separate table. The history is only ever read with its match, so a table would add a mapping and a join for no query.
+- **Match revision in the results (D-3):** Standings could not tell which revision of a match it held, so `ResultsMatch` gains an optional `Revision` (additive, backwards compatible: earlier messages read as null). A snapshot kept before this change previews as "updating" until the tournament's next result.
+- **Same operation, other content:** answered as a revision conflict (409), the same answer as a stale revision; nothing changes.
+- **Results revision:** a correction raises the tournament's results revision once and publishes the new snapshot in the same transaction, like a first resolution.
+
+## Full run
+
+16 November 2026, on the slice's branch: `scripts/check all` passes (rules, spec coverage, format, build, Wolverine codegen and OpenAPI client current, 588 .NET tests, web lint, boundaries, 287 Vitest tests, SSR isolation, build); the e2e suite passes, 24 of 24 journeys; the `seeded-corrections` test script passes.
+
+## Comparison with the prototypes
+
+Captured at 1440 and 390 px (`test-script-screens`: `seeded-corrections`) against `correct-close-open-states.html` states `correct-impact` and `corrected`:
+
+- **Who:** the prototype names the actor ("Recorded by Alex Morgan", "replaced by Alex Morgan"). The admin application shows no person's name anywhere yet, so the page shows when and why; the actor is stored with each replaced resolution (D-1) and can be shown once names are available.
+- **Result panel while correcting:** the prototype replaces it with the form; the page keeps the read-only Result panel above the Correct result panel, so the current result stays visible beside its correction.
+- **Outcome choice:** the page reuses batch 2's outcome cards ("Winner") instead of the prototype's plain "Outcome" radios, so recording and correcting look the same.
+- **Now / After the correction:** plain labelled values instead of bordered boxes; "Edit correction" sits beside "Apply correction" instead of at the far right.
+- **Stale preview:** "Results changed after this match was loaded" without the new revision number, which Standings does not return in that case.
+- **Finalised match (`correct-finalised`):** not implemented here; it lands with `h1-finalisation` (D-4).
