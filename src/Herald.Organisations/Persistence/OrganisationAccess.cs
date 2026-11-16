@@ -11,7 +11,7 @@ internal sealed class OrganisationAccess(OrganisationsDbContext db) : IOrganisat
         caller.Kind switch
         {
             CallerKind.Person => await FindMemberAsync(organisationId, caller, cancellationToken) is { } personId ? new Access(personId) : null,
-            _ => null,
+            _ => await FindGrantAsync(organisationId, caller, cancellationToken) is { } grant ? new Access(grant.Id, grant) : null,
         };
 
     private async Task<Guid?> FindMemberAsync(Guid organisationId, Caller caller, CancellationToken cancellationToken) =>
@@ -21,4 +21,18 @@ internal sealed class OrganisationAccess(OrganisationsDbContext db) : IOrganisat
                 && db.Persons.Identified(caller).Any(person => person.Id == membership.PersonId))
             .Select(membership => (PersonId?)membership.PersonId)
             .SingleOrDefaultAsync(cancellationToken))?.Value;
+
+    private async Task<Grant?> FindGrantAsync(Guid organisationId, Caller caller, CancellationToken cancellationToken)
+    {
+        // Reviewed bypass, as above: the active grant of this application in this organisation, if any.
+        var grant = await db.ApplicationGrants.IgnoreQueryFilters().AsNoTracking()
+            .Where(g => EF.Property<Guid>(g, OrganisationScopedDbContext.OrganisationProperty) == organisationId
+                && EF.Property<Guid>(g, nameof(IdentityKey.DirectoryId)) == caller.DirectoryId
+                && EF.Property<Guid>(g, nameof(IdentityKey.ObjectId)) == caller.ObjectId
+                && g.RevokedAt == null)
+            .SingleOrDefaultAsync(cancellationToken);
+        return grant is null
+            ? null
+            : new Grant(grant.Id.Value, grant.Tournaments?.ToHashSet(), grant.Groups.ToHashSet());
+    }
 }

@@ -25,6 +25,57 @@ namespace Herald.Organisations.Persistence.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("Herald.Organisations.Domain.ApplicationGrant", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("DirectoryId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("GrantedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid>("GrantedBy")
+                        .HasColumnType("uuid");
+
+                    b.PrimitiveCollection<string[]>("Groups")
+                        .IsRequired()
+                        .HasColumnType("text[]");
+
+                    b.Property<string>("Name")
+                        .IsRequired()
+                        .HasMaxLength(80)
+                        .HasColumnType("character varying(80)");
+
+                    b.Property<Guid>("ObjectId")
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid>("OrganisationId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset?>("RevokedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("RevokedBy")
+                        .HasColumnType("uuid");
+
+                    b.PrimitiveCollection<Guid[]>("Tournaments")
+                        .HasColumnType("uuid[]");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GrantedBy");
+
+                    b.HasIndex("OrganisationId");
+
+                    b.HasIndex("OrganisationId", "DirectoryId", "ObjectId")
+                        .IsUnique()
+                        .HasFilter("\"RevokedAt\" IS NULL");
+
+                    b.ToTable("ApplicationGrants", "organisations");
+                });
+
             modelBuilder.Entity("Herald.Organisations.Domain.IdentityRelink", b =>
                 {
                     b.Property<Guid>("Id")
@@ -240,6 +291,15 @@ namespace Herald.Organisations.Persistence.Migrations
                         {
                             t.ExcludeFromMigrations();
                         });
+                });
+
+            modelBuilder.Entity("Herald.Organisations.Domain.ApplicationGrant", b =>
+                {
+                    b.HasOne("Herald.Organisations.Domain.Person", null)
+                        .WithMany()
+                        .HasForeignKey("GrantedBy")
+                        .OnDelete(DeleteBehavior.Restrict)
+                        .IsRequired();
                 });
 
             modelBuilder.Entity("Herald.Organisations.Domain.IdentityRelink", b =>
