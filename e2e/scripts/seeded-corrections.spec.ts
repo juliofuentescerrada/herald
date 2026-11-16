@@ -28,6 +28,9 @@ test('The seeded owner corrects a win to a draw after reviewing its impact and r
   await expect(points.getByRole('row').filter({ hasText: 'Odile Faure' })).toContainText('3 → 1');
   await expect(points.getByRole('row').filter({ hasText: 'Piers Galloway' })).toContainText('0 → 1');
   await screen(page, info, 'correction-impact');
+  await page.setViewportSize({ width: 390, height: 844 });
+  await screen(page, info, 'correction-impact-390');
+  await page.setViewportSize({ width: 1440, height: 900 });
 
   await page.getByRole('button', { name: 'Apply correction' }).click();
   await expect(page.getByText('Result corrected. Standings updated.')).toBeVisible();
@@ -35,4 +38,6 @@ test('The seeded owner corrects a win to a draw after reviewing its impact and r
   await result.getByText('Result history').click();
   await expect(result.getByRole('list', { name: 'Result history' })).toContainText('Odile Faure won · played');
   await screen(page, info, 'corrected-with-history');
+  await page.setViewportSize({ width: 390, height: 844 });
+  await screen(page, info, 'corrected-with-history-390');
 });

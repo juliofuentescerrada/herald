@@ -69,7 +69,7 @@ Visual choices (G-/RU-): the correction is not destructive but changes points, s
 
 ## Full run
 
-16 November 2026, on the slice's branch: `scripts/check all` passes (rules, spec coverage, format, build, Wolverine codegen and OpenAPI client current, 588 .NET tests, web lint, boundaries, 287 Vitest tests, SSR isolation, build); the e2e suite passes, 24 of 24 journeys; the `seeded-corrections` test script passes.
+16 November 2026, on the slice's branch: `scripts/check all` passes (rules, spec coverage, format, build, Wolverine codegen and OpenAPI client current, 588 .NET tests, web lint, boundaries, 287 admin Vitest tests, SSR isolation, build); the e2e suite passes, 24 of 24 journeys; the `seeded-corrections` test script passes.
 
 ## Comparison with the prototypes
 

@@ -275,12 +275,12 @@
           @if (offerPlayed()) {
             <label><input type="radio" name="cause" [checked]="cause() === 'played'" (change)="choose('played')" /> Played</label>
           }
-          <label><input type="radio" name="cause" [checked]="cause() === 'concession'" (change)="choose('concession')" /> Concession</label>
+          <label><input type="radio" name="cause" [checked]="cause() === 'concession'" (change)="choose('concession')" /> {{ playRecorded() ? 'Concession after play' : 'Concession' }}</label>
           <!-- An absence is recorded before the start; a match in play takes a concession or a no contest (A-1). -->
           @if (!started() && !playRecorded()) {
             <label><input type="radio" name="cause" [checked]="cause() === 'absence'" (change)="choose('absence')" /> Absence</label>
           }
-          <label><input type="radio" name="cause" [checked]="cause() === 'noContest'" (change)="choose('noContest')" /> No contest</label>
+          <label><input type="radio" name="cause" [checked]="cause() === 'noContest'" (change)="choose('noContest')" /> {{ playRecorded() ? 'No contest after play' : 'No contest' }}</label>
         </fieldset>
         @switch (cause()) {
           @case ('played') {
