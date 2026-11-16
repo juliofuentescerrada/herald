@@ -31,6 +31,8 @@ accesstoken
 refreshtoken
 describedby
 labelledby
+novalidate
+maxlength
 PKCE
 # Domain and product language
 handoff
