@@ -56,6 +56,24 @@ public sealed record TournamentRegistrationClosed(TournamentId TournamentId, Gui
 
 public sealed record CompetitionStarted(TournamentId TournamentId, int EligibleRevision, int ScheduleRevision, Guid StartedBy, DateTimeOffset StartedAt) : IDomainEvent;
 
+public sealed record TournamentCancelled(TournamentId TournamentId, bool AfterStart, Guid CancelledBy, DateTimeOffset CancelledAt) : IDomainEvent;
+
+public sealed record TournamentArchiveChanged(TournamentId TournamentId, bool Archived, Guid ChangedBy, DateTimeOffset ChangedAt) : IDomainEvent;
+
+// The dates "Change dates" can change; null is a date not selected (design D-5).
+public sealed record DateSelection(DateTime? RegistrationOpensAt = null, DateTime? RegistrationClosesAt = null, DateTime? PlannedStartAt = null);
+
+// One effective "Change dates", kept with its old and new values (ADR 0007): a notifiable fact (ADR 0017) with no consumer yet.
+public sealed record DatesChanged(
+    DateTime? OldRegistrationOpensAt,
+    DateTime? NewRegistrationOpensAt,
+    DateTime? OldRegistrationClosesAt,
+    DateTime? NewRegistrationClosesAt,
+    DateTime? OldPlannedStartAt,
+    DateTime? NewPlannedStartAt,
+    Guid ChangedBy,
+    DateTimeOffset ChangedAt);
+
 public sealed class Tournament : AggregateRoot<TournamentId>
 {
     // For EF Core, which sets the configuration after constructing.
@@ -105,7 +123,26 @@ public sealed class Tournament : AggregateRoot<TournamentId>
     // The highest final revision Competition announced; 0 before the first finalisation (h1-finalisation D-4).
     public int FinalRevision { get; private set; }
 
-    public bool IsStarted => Competition != CompetitionState.Preparing;
+    public bool IsStarted => StartedAt is not null;
+
+    public bool IsCancelled => Competition == CompetitionState.Cancelled;
+
+    // Beside the state: hides a finalised or cancelled tournament from the default list (design D-3).
+    public bool Archived { get; private set; }
+
+    public Guid? CancelledBy { get; private set; }
+
+    // Tournaments cannot name people, so the name the owner signed in with is kept for the notice (D-6).
+    public string? CancelledByName { get; private set; }
+
+    public DateTimeOffset? CancelledAt { get; private set; }
+
+    // Private to the organisation: no event carries it (A-1).
+    public string? CancellationReason { get; private set; }
+
+    public IReadOnlyList<DatesChanged> DateChanges { get; private set; } = [];
+
+    public const int ReasonMaxLength = 500;
 
     public Guid? StartedBy { get; private set; }
 
@@ -137,9 +174,10 @@ public sealed class Tournament : AggregateRoot<TournamentId>
     }
 
     // Idempotent on the final revision, whichever of a finalisation and its reopening arrives first (ADR 0016).
+    // A cancellation is final: a finalisation or reopening Competition accepted just before it arrived changes nothing (Q2).
     public bool ApplyFinalisation(int finalRevision)
     {
-        if (finalRevision <= FinalRevision)
+        if (finalRevision <= FinalRevision || IsCancelled)
         {
             return false;
         }
@@ -151,7 +189,7 @@ public sealed class Tournament : AggregateRoot<TournamentId>
 
     public bool ApplyReopening(int finalRevision)
     {
-        if (finalRevision < FinalRevision || (finalRevision == FinalRevision && Competition != CompetitionState.Finalised))
+        if (IsCancelled || finalRevision < FinalRevision || (finalRevision == FinalRevision && Competition != CompetitionState.Finalised))
         {
             return false;
         }
@@ -164,6 +202,11 @@ public sealed class Tournament : AggregateRoot<TournamentId>
     // Running, by the owner's action only, once every condition holds; no match starts and nothing undoes it (§5.1 row 6, A-3).
     public WriteResult Start(int expectedRevision, StartReadiness readiness, Guid actor, DateTimeOffset at)
     {
+        if (IsCancelled)
+        {
+            return Cancelled;
+        }
+
         if (IsStarted)
         {
             return WriteOutcome.Repeated;
@@ -213,6 +256,11 @@ public sealed class Tournament : AggregateRoot<TournamentId>
     public WriteResult Change(TournamentConfiguration configuration, int expectedRevision, Guid actor, DateTimeOffset at, EntryCounts entries = default)
     {
         configuration = configuration.Normalised();
+        if (IsCancelled)
+        {
+            return Cancelled;
+        }
+
         if (configuration == Configuration)
         {
             return WriteOutcome.Repeated;
@@ -228,6 +276,12 @@ public sealed class Tournament : AggregateRoot<TournamentId>
         {
             // A published tournament stays complete (R-5), and keeps its announced window while registration is open (RW-5).
             broken = Required(configuration, withRegistrationDates: Registration == RegistrationWindow.Open);
+        }
+
+        if (broken.Count == 0 && Publication == Publication.Published)
+        {
+            // A published tournament's dates change only through "Change dates" (D-5, Q3).
+            broken = DatesChangedIn(configuration);
         }
 
         if (broken.Count == 0)
@@ -280,6 +334,11 @@ public sealed class Tournament : AggregateRoot<TournamentId>
     // A published schedule must be withdrawn first (§5.1 row 2).
     public WriteResult OpenRegistration(int expectedRevision, Guid actor, DateTimeOffset at, bool schedulePublished = false)
     {
+        if (IsCancelled)
+        {
+            return Cancelled;
+        }
+
         if (Registration == RegistrationWindow.Open)
         {
             return WriteOutcome.Repeated;
@@ -318,6 +377,11 @@ public sealed class Tournament : AggregateRoot<TournamentId>
     // Closed and nothing else: no freeze, no pairing, no start (§5.1, RW-3).
     public WriteResult CloseRegistration(int expectedRevision, Guid actor, DateTimeOffset at)
     {
+        if (IsCancelled)
+        {
+            return Cancelled;
+        }
+
         if (Registration == RegistrationWindow.Closed)
         {
             return WriteOutcome.Repeated;
@@ -336,6 +400,156 @@ public sealed class Tournament : AggregateRoot<TournamentId>
         ChangeRegistration(RegistrationWindow.Closed, actor, at);
         Raise(new TournamentRegistrationClosed(Id, actor, at));
         return WriteOutcome.Applied;
+    }
+
+    // Final, with a private reason: registration closes and the other modules apply it from the event (§5.1, design D-1).
+    public WriteResult Cancel(string? reason, int expectedRevision, Guid actor, DateTimeOffset at, string? actorName = null)
+    {
+        if (IsCancelled)
+        {
+            return WriteOutcome.Repeated;
+        }
+
+        if (expectedRevision != Revision)
+        {
+            return WriteOutcome.Stale;
+        }
+
+        if (Publication != Publication.Published)
+        {
+            return new(WriteOutcome.Rejected, [new("tournament", "draft")]);
+        }
+
+        if (Competition == CompetitionState.Finalised)
+        {
+            return new(WriteOutcome.Rejected, [new("competition", "finalised")]);
+        }
+
+        reason = reason?.Trim();
+        if (string.IsNullOrEmpty(reason))
+        {
+            return new(WriteOutcome.Rejected, [new("reason", "required")]);
+        }
+
+        if (reason.Length > ReasonMaxLength)
+        {
+            return new(WriteOutcome.Rejected, [new("reason", "too-long")]);
+        }
+
+        if (Registration == RegistrationWindow.Open)
+        {
+            Registration = RegistrationWindow.Closed;
+            RegistrationChangedBy = actor;
+            RegistrationChangedAt = at;
+        }
+
+        Competition = CompetitionState.Cancelled;
+        CancelledBy = actor;
+        CancelledByName = actorName;
+        CancelledAt = at;
+        CancellationReason = reason;
+        Touch(actor, at);
+        Raise(new TournamentCancelled(Id, IsStarted, actor, at));
+        return WriteOutcome.Applied;
+    }
+
+    // Only a finalised or cancelled tournament leaves the default list; nothing else changes (§5.1, design D-3).
+    public WriteResult Archive(bool archived, int expectedRevision, Guid actor, DateTimeOffset at)
+    {
+        if (Archived == archived)
+        {
+            return WriteOutcome.Repeated;
+        }
+
+        if (expectedRevision != Revision)
+        {
+            return WriteOutcome.Stale;
+        }
+
+        if (Competition is not (CompetitionState.Finalised or CompetitionState.Cancelled))
+        {
+            return new(WriteOutcome.Rejected, [new("archive", "not-terminal")]);
+        }
+
+        Archived = archived;
+        Touch(actor, at);
+        Raise(new TournamentArchiveChanged(Id, archived, actor, at));
+        return WriteOutcome.Applied;
+    }
+
+    // A draft has no entries and no other module holds anything of it, so it is removed whole (design D-4).
+    public WriteResult CanDelete(int expectedRevision)
+    {
+        if (expectedRevision != Revision)
+        {
+            return WriteOutcome.Stale;
+        }
+
+        return Publication == Publication.Draft ? WriteOutcome.Applied : new WriteResult(WriteOutcome.Rejected, [new("tournament", "published")]);
+    }
+
+    // Only the selected dates change, keeping the window's order; before start only (§5.2, design D-5).
+    public WriteResult ChangeDates(DateSelection dates, int expectedRevision, Guid actor, DateTimeOffset at)
+    {
+        if (IsCancelled)
+        {
+            return Cancelled;
+        }
+
+        var current = Configuration;
+        var changed = (current with
+        {
+            RegistrationOpensAt = dates.RegistrationOpensAt ?? current.RegistrationOpensAt,
+            RegistrationClosesAt = dates.RegistrationClosesAt ?? current.RegistrationClosesAt,
+            PlannedStartAt = dates.PlannedStartAt ?? current.PlannedStartAt,
+        }).Normalised();
+        if (changed == current)
+        {
+            return WriteOutcome.Repeated;
+        }
+
+        if (expectedRevision != Revision)
+        {
+            return WriteOutcome.Stale;
+        }
+
+        if (Publication != Publication.Published)
+        {
+            return new(WriteOutcome.Rejected, [new("dates", "draft")]);
+        }
+
+        if (IsStarted)
+        {
+            return new(WriteOutcome.Rejected, [new("dates", "competition-started")]);
+        }
+
+        if (changed.Check() is { Count: > 0 } broken)
+        {
+            return new(WriteOutcome.Rejected, broken);
+        }
+
+        Configuration = changed;
+        DateChanges = [.. DateChanges, new(
+            current.RegistrationOpensAt, changed.RegistrationOpensAt,
+            current.RegistrationClosesAt, changed.RegistrationClosesAt,
+            current.PlannedStartAt, changed.PlannedStartAt,
+            actor, at)];
+        Touch(actor, at);
+        return WriteOutcome.Applied;
+    }
+
+    private static WriteResult Cancelled => new(WriteOutcome.Rejected, [new("tournament", "cancelled")]);
+
+    private List<BrokenRule> DatesChangedIn(TournamentConfiguration configuration)
+    {
+        var current = Configuration;
+        (string Field, bool Changed)[] dates =
+        [
+            ("registrationOpensAt", configuration.RegistrationOpensAt != current.RegistrationOpensAt),
+            ("registrationClosesAt", configuration.RegistrationClosesAt != current.RegistrationClosesAt),
+            ("plannedStartAt", configuration.PlannedStartAt != current.PlannedStartAt),
+        ];
+        return [.. dates.Where(date => date.Changed).Select(date => new BrokenRule(date.Field, "change-dates"))];
     }
 
     // Entries keep their slots and their kind: capacity cannot fall below the admitted, and kind and admission wait until none is active (EN-10).
