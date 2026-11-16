@@ -15,6 +15,9 @@ public static class TournamentsModule
         // Integration events this module consumes come through its durable local queue (ADR 0016).
         options.PublishMessage<TournamentFieldChanged>().ToLocalQueue(Queue);
         options.PublishMessage<TournamentScheduleChanged>().ToLocalQueue(Queue);
+        // Standings consumes these too; each module's handler is sticky to its own queue.
+        options.PublishMessage<CompetitionFinalised>().ToLocalQueue(Queue);
+        options.PublishMessage<CompetitionReopened>().ToLocalQueue(Queue);
         return options.AddHeraldModule<TournamentsDbContext>(TournamentsDbContext.Schema);
     }
 }

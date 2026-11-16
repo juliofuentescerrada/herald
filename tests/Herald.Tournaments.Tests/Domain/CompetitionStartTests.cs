@@ -141,4 +141,22 @@ public class CompetitionStartTests
     public void A_draft_cannot_start() =>
         Tournament.Draft(new TournamentId(Guid.NewGuid()), CompleteIndividual, _owner, _at).Start(1, _ready, _owner, _at)
             .Broken.ShouldBe([new BrokenRule("competition", "not-published")]);
+
+    [Fact]
+    public void A_finalised_competition_shows_as_finalised_stays_started_and_runs_again_on_reopening_whichever_event_arrives_first()
+    {
+        var tournament = Closed();
+        tournament.Start(4, _ready, _owner, _at);
+
+        tournament.ApplyFinalisation(1).ShouldBeTrue();
+        tournament.ApplyFinalisation(1).ShouldBeFalse();
+        (tournament.Competition, tournament.IsStarted).ShouldBe((CompetitionState.Finalised, true));
+        tournament.OpenRegistration(tournament.Revision, _owner, _at).Broken.ShouldContain(new BrokenRule("registration", "competition-started"));
+
+        tournament.ApplyReopening(1).ShouldBeTrue();
+        tournament.Competition.ShouldBe(CompetitionState.Running);
+        tournament.ApplyReopening(2).ShouldBeTrue();
+        tournament.ApplyFinalisation(2).ShouldBeFalse();
+        tournament.Competition.ShouldBe(CompetitionState.Running);
+    }
 }

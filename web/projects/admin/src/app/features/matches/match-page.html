@@ -180,7 +180,12 @@
       @if (resultSummary(); as summary) {
         <p><strong>{{ summary }}</strong></p>
         <p class="help">{{ m.replacedResults.length ? 'Corrected' : 'Recorded' }} <span class="when">{{ zoned(m.result!.recordedAt) }}</span></p>
-        @if (!correcting()) {
+        @if (finalised()) {
+          <herald-notice heading="The competition is finalised">
+            Results cannot change. Reopen the competition with a reason first, from the Standings page.
+            <span class="notice-action"><a herald-button routerLink="../../standings">Go to standings</a></span>
+          </herald-notice>
+        } @else if (!correcting()) {
           <div class="actions">
             <button herald-button type="button" [disabled]="state() !== 'ready'" (click)="startCorrection()">Correct result</button>
           </div>

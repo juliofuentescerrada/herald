@@ -221,6 +221,33 @@ public static class Scenarios
         await admin.RecordWinAsync(organisation, plate, Names.Players[12], Names.Players[13]);
         await admin.RecordWinAsync(organisation, plate, Names.Players[14], Names.Players[15]);
         await admin.CorrectToDrawAsync(organisation, plate, Names.Players[12], Names.Players[13], "Score sheet misread");
+
+        // Two individual leagues of four with every match resolved (h1-finalisation): Lantern Bowl running, for the finalisation
+        // script to review and finalise, and Lantern Cup finalised at its results revision.
+        foreach (var (key, title, finalise) in new[] { ("resolved-running", "Lantern Bowl", false), ("finalised", "Lantern Cup", true) })
+        {
+            var resolved = Ids.For("tournament", key);
+            await admin.CreateTournamentAsync(organisation, resolved, Configuration(clock, title, opens: -6, closes: -1, starts: 1, capacity: 4));
+            await admin.PublishAsync(organisation, resolved);
+            await admin.OpenRegistrationAsync(organisation, resolved);
+            foreach (var name in Names.Players[(finalise ? 4 : 0)..(finalise ? 8 : 4)])
+            {
+                await admin.EnterAsync(organisation, resolved, await admin.CreateGuestAsync(organisation, "player", name));
+            }
+
+            await admin.CloseRegistrationAsync(organisation, resolved);
+            await admin.PublishScheduleAsync(organisation, resolved);
+            await admin.StartCompetitionAsync(organisation, resolved);
+            foreach (var (index, outcome) in new[] { (0, "first"), (1, "draw"), (2, "second"), (3, "first"), (4, "first"), (5, "draw") })
+            {
+                await admin.RecordResultAsync(organisation, resolved, index, outcome: outcome);
+            }
+
+            if (finalise)
+            {
+                await admin.FinaliseAsync(organisation, resolved);
+            }
+        }
     }
 
     private static async Task SecondOrganisationAsync(Admin admin, Guid organisation, Clock clock)

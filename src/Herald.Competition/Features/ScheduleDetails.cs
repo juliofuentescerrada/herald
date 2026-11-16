@@ -48,6 +48,10 @@ public sealed record FieldChangeDetails(IReadOnlyList<EntrantDetails> Added, IRe
 // The withdrawal reason is the organisation's own, shown only to its owner (A-4).
 public sealed record PublicationDetails(int Number, PairingsDetails Pairings, DateTimeOffset PublishedAt, string? WithdrawalReason, DateTimeOffset? WithdrawnAt);
 
+// A final revision, newest first in the schedule; the reopening reason is the organisation's own (h1-finalisation D-3, A-2).
+public sealed record FinalRevisionDetails(
+    int Number, int ResultsRevision, DateTimeOffset FinalisedAt, string? FinalisedBy, string? ReopenReason, DateTimeOffset? ReopenedAt, string? ReopenedBy);
+
 // What every schedule write and the schedule read answer with. Blockers say why a draft cannot be generated now.
 // Once the competition started, the revision it started on, and whether a withdrawal crossed it (h1-competition-start D-4).
 public sealed record ScheduleDetails(
@@ -67,7 +71,10 @@ public sealed record ScheduleDetails(
     bool StartCrossedWithdrawal,
     IReadOnlyList<MatchSummary> Matches,
     OperationsDetails? Operations,
-    IReadOnlyList<CompetitorDetails> Entrants)
+    IReadOnlyList<CompetitorDetails> Entrants,
+    int ResultsRevision,
+    bool Finalised,
+    IReadOnlyList<FinalRevisionDetails> Finals)
 {
     public static ScheduleDetails Of(Schedule schedule, IReadOnlyList<Match> matches) => new(
         schedule.Id.Value,
@@ -86,7 +93,11 @@ public sealed record ScheduleDetails(
         schedule.StartCrossedWithdrawal,
         MatchesOf(schedule, matches),
         OperationsOf(schedule, matches),
-        CompetitorsOf(schedule));
+        CompetitorsOf(schedule),
+        schedule.ResultsRevision,
+        schedule.IsFinalised,
+        [.. schedule.Finals.Reverse().Select(final => new FinalRevisionDetails(
+            final.Number, final.ResultsRevision, final.FinalisedAt, final.FinalisedByName, final.ReopenReason, final.ReopenedAt, final.ReopenedByName))]);
 
     // Null until the competition's matches exist.
     private static OperationsDetails? OperationsOf(Schedule schedule, IReadOnlyList<Match> matches)
@@ -237,6 +248,7 @@ internal static class ScheduleResults
 
                     // Stored with the change by the transaction around the endpoint, sent after its commit.
                     await bus.PublishAsync(ScheduleDetails.Changed(organisationId, schedule));
+                    await PublishFactsAsync(bus, organisationId, schedule);
                     if (schedule.ResultsRevision != resultsRevision)
                     {
                         var matches = await db.Matches.Where(match => match.TournamentId == id).ToListAsync(cancellationToken);
@@ -246,6 +258,25 @@ internal static class ScheduleResults
             }
 
             return Results.Ok(await ScheduleDetails.OfAsync(db, schedule, cancellationToken));
+        }
+    }
+
+    // The notifiable facts of this write, as integration events (ADR 0017; h1-finalisation D-4).
+    private static async Task PublishFactsAsync(IMessageBus bus, Guid organisationId, Schedule schedule)
+    {
+        foreach (var fact in schedule.DomainEvents)
+        {
+            switch (fact)
+            {
+                case Domain.CompetitionFinalised finalised:
+                    await bus.PublishAsync(new Contracts.Competition.V1.CompetitionFinalised(
+                        organisationId, schedule.Id.Value, finalised.ResultsRevision, finalised.Number, finalised.FinalisedBy, finalised.FinalisedAt));
+                    break;
+                case Domain.CompetitionReopened reopened:
+                    await bus.PublishAsync(new Contracts.Competition.V1.CompetitionReopened(
+                        organisationId, schedule.Id.Value, reopened.ResultsRevision, reopened.Number, reopened.ReopenedBy, reopened.ReopenedAt));
+                    break;
+            }
         }
     }
 }

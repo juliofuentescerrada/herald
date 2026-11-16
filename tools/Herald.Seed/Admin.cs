@@ -154,6 +154,22 @@ public sealed class Admin(Seeding seeding, Persona persona)
         }));
     }
 
+    // Finalises the competition at its current results revision, which the settled seeding has already applied to the standings
+    // (h1-finalisation); a rerun repeats.
+    public async Task FinaliseAsync(Guid organisation, Guid tournament)
+    {
+        var schedule = $"{Path(organisation, tournament)}/schedule";
+        await WriteAsync($"finalise {tournament}", async () =>
+        {
+            var details = await ReadAsync(await _client.GetAsync(schedule), "read a schedule");
+            return await _client.PostAsJsonAsync($"{Path(organisation, tournament)}/finalisation", new
+            {
+                reviewedRevision = details.GetProperty("resultsRevision").GetInt32(),
+                expectedRevision = details.GetProperty("revision").GetInt32(),
+            });
+        });
+    }
+
     // Records a side's lineup of the schedule's match at that position from its frozen roster's first players (h1-match-lineups).
     public async Task RecordLineupAsync(Guid organisation, Guid tournament, int index, string side, int players)
     {

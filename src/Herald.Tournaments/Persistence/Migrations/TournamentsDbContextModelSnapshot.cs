@@ -47,6 +47,9 @@ namespace Herald.Tournaments.Persistence.Migrations
                     b.Property<Guid>("CreatedBy")
                         .HasColumnType("uuid");
 
+                    b.Property<int>("FinalRevision")
+                        .HasColumnType("integer");
+
                     b.Property<Guid>("OrganisationId")
                         .HasColumnType("uuid");
 

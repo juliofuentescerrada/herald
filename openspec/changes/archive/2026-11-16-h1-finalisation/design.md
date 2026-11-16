@@ -57,3 +57,35 @@ Visual choices (G-/RU-): the three revisions are text, so the barrier is explain
 ## Risks / Trade-offs
 
 - [Standings lag] → finalisation is offered only on applied standings; Competition's check is authoritative and the event carries the final results revision, so Standings never marks an older table final.
+
+## Implementation record
+
+### Decisions taken while implementing
+
+- **I-1 Two consumers of one fact.** `CompetitionFinalised` and `CompetitionReopened` are the first integration events two modules consume. Each module routes them to its own durable local queue and pins its handler there with Wolverine's `[StickyHandler]`, so each queue runs only its module's handler in its module's transaction; `IntegrationEventRoutingTests` checks both routes.
+- **I-2 Standings' row version.** Standings stores the final revisions with the results; a finalisation and its reopening handled at once must not overwrite each other, so the results row uses PostgreSQL's `xmin` as a row version (no column is added) and the handler retries. Tournaments keeps a `shortcut:` instead: Competition publishes a reopening only after its finalisation committed.
+- **I-3 Competition decides what the page shows.** The Standings page reads the finalised state, the final revisions and the results revision from Competition's schedule, which every write answers with; "updating" now compares Competition's results revision with the standings revision, so a correction (which does not change the resolved count) also reads as updating. Standings' `final` is set only once it has applied the final results revision.
+- **I-4 Actors' names.** Final revisions keep the finalising and reopening actors' names at the time, as corrections do, for "Finalised by …".
+- **I-5 Started includes finalised.** Every admin check of "running" that meant "started" (registration, configuration locks, the start panel) now reads "not preparing"; the lifecycle label "Finalised" has no icon, as no icon meaning is reviewed for it (`docs/ui/icons.md`).
+
+### Full run (task 6.2), 16 November 2026
+
+- `scripts/check all`: all checks passed (rules, spec coverage, format, build, Wolverine codegen current, 643 .NET tests, OpenAPI client current, lint, boundaries, 305 Vitest tests, SSR isolation, build).
+- End-to-end suite: 26 journeys passed, journey 25 included.
+- Test script `e2e/scripts/seeded-finalisation.spec.ts`: 2 scripts passed.
+
+### Comparison with the prototypes (task 6.3)
+
+Captured at 1440 and 390 px by the test script (`test-results/screens/seeded-finalisation/`), compared with `prototypes/frontend/correct-close-open-states.html`:
+
+| State | Difference | Resolution |
+|---|---|---|
+| `finalise-ready`, `reopened` | Same panel, text and revisions; the revisions are the seed's | None |
+| `finalise-unresolved` | Lists every unresolved match with its state; the links first rendered in the browser's link colour | Links use the primary text colour, as elsewhere |
+| `finalise-updating` | Same notice; the title shows "Updating", as the provisional page already did | Kept (h1-standings) |
+| `finalise-stale` | Same notice and "Review again"; the title also reads "Updating", since Competition's results are ahead of the standings at that moment | Kept: it is true, and it clears with "Review again" |
+| `finalising` | Same status text; the button keeps the shared loading state | None |
+| `final` | "Final" label, final summary with "Reopen" on the right, "Final revisions" closed after the table | None |
+| `final-no-champion` | Same notice, below the final summary | None |
+| `reopen-confirm` | Same text, reason field and "Keep as it is" | None |
+| `correct-finalised` | Same information notice and "Go to standings" in the Result panel; lifecycle labels show "Finalised" | None |

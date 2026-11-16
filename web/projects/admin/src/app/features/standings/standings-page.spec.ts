@@ -1,4 +1,4 @@
-import { HttpErrorResponse } from '@angular/common/http';
+import { HttpErrorResponse, HttpHeaders } from '@angular/common/http';
 import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter } from '@angular/router';
@@ -6,6 +6,7 @@ import { RouterTestingHarness } from '@angular/router/testing';
 import { HeraldHostAdminService, MatchSummary, ScheduleDetails, StandingsEntrant, StandingsRow, StandingsView, TournamentDetails } from '@herald/api-client/admin';
 import { provideTanStackQuery, QueryClient } from '@tanstack/angular-query-experimental';
 import axe from 'axe-core';
+import { Toasts } from '@herald/ui';
 import { Observable, of, throwError } from 'rxjs';
 import { AccessState, AppContext, QUERY_CLIENT, Session } from '../../platform';
 import { StandingsPage } from './standings-page';
@@ -55,14 +56,32 @@ const provisional: StandingsView = {
     ]),
     row(4, false, taylor, [1, 0, 0, 1, 0]),
   ],
+  final: null,
+  finals: [],
+  noChampion: false,
 };
 
-const empty: StandingsView = { tournamentId, revision: 1, resolvedMatches: 0, matches: 6, rows: [robin, jamie, sam, taylor].map((who) => row(1, true, who, [0, 0, 0, 0, 0])) };
+const empty: StandingsView = { tournamentId, revision: 1, resolvedMatches: 0, matches: 6, rows: [robin, jamie, sam, taylor].map((who) => row(1, true, who, [0, 0, 0, 0, 0])), final: null, finals: [], noChampion: false };
 
-const resolvedMatches = (count: number): ScheduleDetails =>
-  ({ matches: Array.from({ length: 6 }, (_, index) => ({ state: index < count ? 'resolved' : 'scheduled' }) as MatchSummary) }) as ScheduleDetails;
+const names = [[robin, sam], [jamie, taylor], [robin, jamie], [sam, taylor], [robin, taylor], [sam, jamie]];
+const resolvedMatches = (count: number, resultsRevision = count + 1, over: Partial<ScheduleDetails> = {}): ScheduleDetails =>
+  ({
+    revision: 9,
+    resultsRevision,
+    finalised: false,
+    finals: [],
+    matches: names.map(([first, second], index) => ({
+      matchId: `m-${index}`,
+      round: Math.floor(index / 2) + 1,
+      first: { entryId: first.entryId, name: first.name },
+      second: { entryId: second.entryId, name: second.name },
+      state: index < count ? 'resolved' : index === count ? 'inPlay' : 'scheduled',
+      result: null,
+    }) as MatchSummary),
+    ...over,
+  }) as ScheduleDetails;
 
-async function open(standings: () => Observable<StandingsView>, details: TournamentDetails = tournament(), schedule = resolvedMatches(4)) {
+async function open(standings: () => Observable<StandingsView>, details: TournamentDetails = tournament(), schedule = resolvedMatches(4), api: Record<string, unknown> = {}) {
   const client = new QueryClient();
   TestBed.configureTestingModule({
     providers: [
@@ -72,7 +91,7 @@ async function open(standings: () => Observable<StandingsView>, details: Tournam
       { provide: AppContext, useValue: { organisation: signal(organisation), home: signal(`/organisations/${organisation}`) } },
       { provide: Session, useValue: { account: signal({ username: 'ana' }) } },
       { provide: AccessState, useValue: { problem: signal(null) } },
-      { provide: HeraldHostAdminService, useValue: { getTournament: () => of(details), getSchedule: () => of(schedule), getStandings: standings } },
+      { provide: HeraldHostAdminService, useValue: { getTournament: () => of(details), getSchedule: () => of(schedule), getStandings: standings, ...api } },
     ],
   });
   const harness = await RouterTestingHarness.create(`/organisations/${organisation}/tournaments/${tournamentId}/standings`);
@@ -89,6 +108,7 @@ async function open(standings: () => Observable<StandingsView>, details: Tournam
     text: (selector: string) => page().querySelector(selector)?.textContent?.replace(/\s+/g, ' ').trim(),
     texts: (selector: string) => [...page().querySelectorAll(selector)].map((e) => e.textContent?.replace(/\s+/g, ' ').trim()),
     button: (text: string) => [...page().querySelectorAll<HTMLButtonElement>('button')].find((b) => b.textContent?.trim() === text)!,
+    toasts: () => TestBed.inject(Toasts).toasts().map((toast) => toast.text),
   };
 }
 
@@ -175,7 +195,7 @@ describe('The standings page', () => {
   });
 
   it('shows Updating while Competition knows more results than the standings', async () => {
-    const { page, text } = await open(() => of(provisional), tournament(), resolvedMatches(5));
+    const { page, text } = await open(() => of(provisional), tournament(), resolvedMatches(4, 6));
 
     expect(text('.title')).toContain('Updating');
     expect(text('.title')).not.toContain('Provisional');
@@ -200,5 +220,141 @@ describe('The standings page', () => {
     await vi.waitFor(() => expect(text('tbody tr:first-child herald-status-label')).toBe('Withdrawn'));
     expect(text('tbody tr:first-child td:last-child')).toBe('6');
     expect(await violations(page())).toEqual([]);
+  });
+});
+
+describe('Reviewing and finalising the standings', () => {
+  afterEach(() => TestBed.resetTestingModule());
+
+  const resolved: StandingsView = { ...provisional, revision: 7, resolvedMatches: 6 };
+  const final = (over: object = {}) => ({
+    number: 1, resultsRevision: 7, finalisedAt: '2026-11-29T17:10:00Z', finalisedBy: 'Alex Morgan', reopenReason: null, reopenedAt: null, reopenedBy: null, ...over,
+  });
+  const finalised = resolvedMatches(6, 7, { finalised: true, finals: [final()] });
+  const problem = (status: number, body: object) =>
+    new HttpErrorResponse({ status, error: body, headers: new HttpHeaders({ 'content-type': 'application/problem+json' }) });
+  const dialogButton = (text: string) => [...document.querySelectorAll<HTMLButtonElement>('[role=dialog] button')].find((b) => b.textContent?.trim() === text)!;
+
+  it('shows the three revisions and Finalise when every match is resolved and the standings are current', async () => {
+    const { page, text, button } = await open(() => of(resolved), tournament(), resolvedMatches(6, 7));
+
+    expect(text('#review-heading')).toBe('Review and finalise');
+    expect(text('.review')).toContain('All 6 matches are resolved.');
+    expect(text('.review .help')).toBe('Results revision 7 · standings revision 7 · you are reviewing revision 7');
+    expect(button('Finalise')).toBeTruthy();
+    expect(await violations(page())).toEqual([]);
+  });
+
+  it('lists the unresolved matches with links and offers no Finalise', async () => {
+    const { page, text, texts, button } = await open(() => of(provisional), tournament(), resolvedMatches(4, 5));
+
+    expect(text('.review p')).toBe('2 matches are unresolved. Resolve them before finalising.');
+    expect(texts('.unresolved a')).toEqual(['Round 3 · Robin Vale vs Taylor Finch', 'Round 3 · Sam Reed vs Jamie Brook']);
+    expect(texts('.unresolved herald-status-label')).toEqual(['In play', 'Scheduled']);
+    expect(button('Finalise')).toBeUndefined();
+    expect(await violations(page())).toEqual([]);
+  });
+
+  it('says the standings are updating and offers no Finalise',
+    { meta: { type: 'covers', description: 'standings: Updating standings' } }, async () => {
+      const { page, text, button } = await open(() => of(resolved), tournament(), resolvedMatches(6, 8));
+
+      expect(text('.review herald-notice')).toContain('Standings are updating');
+      expect(text('.review herald-notice')).toContain('Results revision 8 has not reached the standings yet (revision 7)');
+      expect(button('Finalise')).toBeUndefined();
+      expect(await violations(page())).toEqual([]);
+    });
+
+  it('finalises at the reviewed revision and shows the final competition', async () => {
+    let schedule = resolvedMatches(6, 7);
+    const finaliseCompetition = vi.fn(() => {
+      schedule = finalised;
+      return of(finalised);
+    });
+    const { page, button, text, toasts, settle } = await open(() => of(resolved), tournament(), schedule, { getSchedule: () => of(schedule), finaliseCompetition });
+
+    button('Finalise').click();
+    await vi.waitFor(() => expect(toasts()).toContain('Saturday Open finalised.'));
+    await settle();
+
+    expect(finaliseCompetition).toHaveBeenCalledWith(organisation, tournamentId, { reviewedRevision: 7, expectedRevision: 9 });
+    expect(text('.title herald-status-label')).toBe('Final');
+    expect(text('.final-summary')).toContain('Final revision 1 · results revision 7');
+    expect(text('.final-summary')).toContain('Finalised by Alex Morgan');
+    expect(button('Reopen')).toBeTruthy();
+    expect(text('.history summary')).toBe('Final revisions');
+    expect(text('.history li')).toContain('current');
+    expect(await violations(page())).toEqual([]);
+  });
+
+  it('shows Finalising while the request runs', async () => {
+    const { page, button, text, settle } = await open(() => of(resolved), tournament(), resolvedMatches(6, 7), { finaliseCompetition: () => new Observable<never>() });
+
+    button('Finalise').click();
+    await settle();
+
+    expect(text('.review [role="status"]')).toBe('Finalising. Please wait; do not submit again.');
+    expect(page().querySelector('.review button')?.textContent?.trim()).toBe('Finalising…');
+  });
+
+  it('asks for a new review when the standings changed since the review', async () => {
+    const changed = resolvedMatches(6, 8);
+    const finaliseCompetition = () => throwError(() => problem(400, { errors: { review: ['stale'] }, schedule: changed }));
+    const { page, button, text, settle } = await open(() => of(resolved), tournament(), resolvedMatches(6, 7), { finaliseCompetition });
+
+    button('Finalise').click();
+    await vi.waitFor(() => expect(text('.review herald-notice')).toContain('Standings changed since your review'));
+    await settle();
+
+    expect(text('.review herald-notice')).toContain('moved the results to revision 8 while you reviewed revision 7. Nothing was finalised.');
+    expect(button('Review again')).toBeTruthy();
+    expect(button('Finalise')).toBeUndefined();
+    expect(await violations(page())).toEqual([]);
+  });
+
+  it('says that no champion is declared when every entrant departed', async () => {
+    const departed: StandingsView = {
+      ...resolved,
+      rows: resolved.rows.map((row) => ({ ...row, entrant: { ...row.entrant, status: 'withdrawn' as const } })),
+      final: { number: 1, resultsRevision: 7, finalisedAt: '2026-11-29T17:10:00Z', reopened: false },
+      noChampion: true,
+    };
+    const { page, text } = await open(() => of(departed), tournament({ competition: 'finalised' }), finalised);
+
+    expect(text('.column > herald-notice')).toContain('No active entrant');
+    expect(text('.column > herald-notice')).toContain('no champion is declared');
+    expect(await violations(page())).toEqual([]);
+  });
+
+  it('reopens with a required reason and lists the earlier final revision', async () => {
+    const reopened = resolvedMatches(6, 7, { finals: [final({ reopenReason: 'Result appeal upheld', reopenedAt: '2026-11-30T09:05:00Z', reopenedBy: 'Alex Morgan' })] });
+    let schedule = finalised;
+    const reopenCompetition = vi.fn(() => {
+      schedule = reopened;
+      return of(reopened);
+    });
+    const { page, button, text, toasts, settle } = await open(() => of(resolved), tournament({ competition: 'finalised' }), schedule, { getSchedule: () => of(schedule), reopenCompetition });
+
+    button('Reopen').click();
+    await settle();
+    expect(document.querySelector('[role=dialog] h2')?.textContent).toContain('Reopen Saturday Open?');
+    expect(await violations(document.querySelector('[role=dialog]') as HTMLElement)).toEqual([]);
+    dialogButton('Reopen').click();
+    await settle();
+    expect(document.getElementById('reopen-reason-error')?.textContent?.trim()).toBe('Error: Enter a reason.');
+    expect(reopenCompetition).not.toHaveBeenCalled();
+
+    const reason = document.getElementById('reopen-reason') as HTMLTextAreaElement;
+    reason.value = 'Result appeal upheld';
+    reason.dispatchEvent(new Event('input'));
+    await settle();
+    dialogButton('Reopen').click();
+    await vi.waitFor(() => expect(toasts()).toContain('Saturday Open reopened.'));
+    await settle();
+
+    expect(reopenCompetition).toHaveBeenCalledWith(organisation, tournamentId, { reason: 'Result appeal upheld', expectedRevision: 9 });
+    expect(text('#review-heading')).toBe('Review and finalise');
+    expect(text('.history li')).toContain('Reason: Result appeal upheld');
+    expect(page().querySelector('.history')?.hasAttribute('open')).toBe(true);
   });
 });

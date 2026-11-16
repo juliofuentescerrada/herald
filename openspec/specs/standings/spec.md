@@ -1,7 +1,7 @@
 # standings Specification
 
 ## Purpose
-Each tournament's provisional standings, computed from the effective results Competition publishes: 3/1/0 points, shared positions on equal points, rests without points, each entrant's points explained, and the results revision they reflect.
+Each tournament's standings, provisional until the competition is finalised, computed from the effective results Competition publishes: 3/1/0 points, shared positions on equal points, rests without points, each entrant's points explained, and the results revision they reflect.
 ## Requirements
 ### Requirement: Standings know the effective results
 Competition SHALL publish a running competition's entrants, matches with their state, outcome, cause and whether play took place, and rests as a revisioned snapshot. Standings SHALL keep the snapshot with the highest revision and ignore older ones.
@@ -70,4 +70,22 @@ Standings SHALL answer, for a proposed resolution of one match, each affected en
 #### Scenario: Standings behind
 - **WHEN** the proposal is based on a match revision Standings has not applied yet
 - **THEN** the answer is "updating" with the revision Standings holds
+
+### Requirement: Final standings keep their revisions
+When the competition is finalised, the standings at its results revision SHALL become final and SHALL show the final revision; after a reopening they SHALL be provisional again and SHALL list the earlier final revisions. When every entrant has departed, final standings SHALL keep points, positions and flags and SHALL say that no champion is declared.
+
+#### Scenario: Final standings
+- **WHEN** a competition is finalised at results revision 12
+- **THEN** the standings are final, revision 12, final revision 1
+
+#### Scenario: No active entrant
+- **WHEN** a competition whose entrants all withdrew is finalised
+- **THEN** the final standings keep every entrant's points and flags and say that no champion is declared
+
+### Requirement: The admin application reviews and finalises the standings
+The Standings page of a fully resolved, running competition SHALL show the results revision, the standings revision and the reviewed revision with "Finalise" only when they agree; a stale review SHALL show that the standings changed with "Review again". A final competition SHALL show "Final", "Reopen" with a required reason and its final revisions.
+
+#### Scenario: Updating standings
+- **WHEN** Standings has not yet applied the latest results
+- **THEN** the page says the standings are updating and offers no "Finalise"
 

@@ -673,3 +673,58 @@ test('An owner corrects a recorded win to a draw with a reason, reviews the impa
   await expect(history).toContainText('Reason: Score sheet misread');
   await expectAccessible();
 });
+
+test('An owner reviews the standings of a fully resolved league, finalises it, sees them final, then reopens it with a reason, corrects a result and finalises again with the earlier final revision kept', async ({ page, signIn, expectAccessible }) => {
+  await signIn();
+  await runningLanternOpen(page);
+  await recordResult(page, 'Robin Vale', 'Taylor Finch', 'Robin Vale wins');
+  await recordResult(page, 'Sam Reed', 'Jamie Brook', 'Draw');
+  await recordResult(page, 'Robin Vale', 'Jamie Brook', 'Robin Vale wins');
+  await recordResult(page, 'Taylor Finch', 'Sam Reed', 'Sam Reed wins');
+  await recordResult(page, 'Robin Vale', 'Sam Reed', 'Robin Vale wins');
+  await recordResult(page, 'Jamie Brook', 'Taylor Finch', 'Jamie Brook wins');
+  const sections = page.getByRole('navigation', { name: 'Tournament sections' });
+
+  // The review barrier: Finalise is offered once the standings have applied the current results revision.
+  await sections.getByRole('link', { name: 'Standings' }).click();
+  const review = page.getByRole('region', { name: 'Review and finalise' });
+  await expect(review.getByText('All 6 matches are resolved.', { exact: false })).toBeVisible();
+  await expect(review.getByText(/^Results revision (\d+) · standings revision \1 · you are reviewing revision \1$/)).toBeVisible();
+  await expectAccessible();
+  await review.getByRole('button', { name: 'Finalise' }).click();
+
+  await expect(page.getByText('Lantern Open finalised.')).toBeVisible();
+  await expect(page.getByText('Final', { exact: true })).toBeVisible();
+  await expect(page.getByText(/^Final revision 1 · results revision \d+$/).first()).toBeVisible();
+  await expectAccessible();
+
+  // Reopening asks for a reason, then the competition runs again with final revision 1 listed.
+  await page.getByRole('button', { name: 'Reopen' }).click();
+  const dialog = page.getByRole('dialog', { name: 'Reopen Lantern Open?' });
+  await dialog.getByRole('textbox', { name: 'Reason (required)' }).fill('Result appeal upheld');
+  await expectAccessible();
+  await dialog.getByRole('button', { name: 'Reopen' }).click();
+  await expect(page.getByText('Lantern Open reopened.')).toBeVisible();
+  await expect(page.getByRole('list', { name: 'Final revisions' })).toContainText('Reason: Result appeal upheld');
+
+  await sections.getByRole('link', { name: 'Schedule' }).click();
+  await matchLink(page, 'Robin Vale', 'Sam Reed').click();
+  await page.getByRole('button', { name: 'Correct result' }).click();
+  const form = page.getByRole('region', { name: 'Correct result' });
+  await form.getByRole('radio', { name: 'Draw' }).check();
+  await form.getByRole('textbox', { name: 'Reason for the correction (required)' }).fill('Appeal upheld');
+  await form.getByRole('button', { name: 'Review impact' }).click();
+  await page.getByRole('region', { name: 'Impact of this correction' }).getByRole('button', { name: 'Apply correction' }).click();
+  await expect(page.getByText('Result corrected. Standings updated.')).toBeVisible();
+
+  // A new review of the corrected standings finalises again as final revision 2.
+  await sections.getByRole('link', { name: 'Standings' }).click();
+  await review.getByRole('button', { name: 'Finalise' }).click();
+  await expect(page.getByText('Lantern Open finalised.')).toBeVisible();
+  await expect(page.getByText(/^Final revision 2 · results revision \d+$/).first()).toBeVisible();
+  await page.getByText('Final revisions').click();
+  const revisions = page.getByRole('list', { name: 'Final revisions' });
+  await expect(revisions.getByRole('listitem')).toHaveCount(2);
+  await expect(revisions).toContainText('Reason: Result appeal upheld');
+  await expectAccessible();
+});

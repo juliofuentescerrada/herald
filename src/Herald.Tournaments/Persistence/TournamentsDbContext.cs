@@ -54,6 +54,7 @@ public sealed class TournamentsDbContext(DbContextOptions<TournamentsDbContext> 
         modelBuilder.Entity<Tournament>(tournament =>
         {
             tournament.Ignore(t => t.DomainEvents);
+            tournament.Ignore(t => t.IsStarted);
             tournament.Property(t => t.Id).HasConversion(id => id.Value, value => new TournamentId(value));
             tournament.Property(t => t.Publication).HasConversion<string>().HasMaxLength(20);
             tournament.Property(t => t.Registration).HasConversion<string>().HasMaxLength(20);

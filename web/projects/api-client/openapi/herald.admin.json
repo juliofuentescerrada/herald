@@ -2620,6 +2620,98 @@
         }
       }
     },
+    "/api/organisations/{organisationId}/tournaments/{tournamentId}/reopening": {
+      "post": {
+        "tags": [
+          "Herald.Competition.Features.ReopenCompetition.ReopenCompetitionEndpoint"
+        ],
+        "summary": "POST_api_organisations_organisationId_tournaments_tournamentId_reopening",
+        "description": "POST_api_organisations_organisationId_tournaments_tournamentId_reopening",
+        "operationId": "reopenCompetition",
+        "parameters": [
+          {
+            "name": "organisationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "tournamentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ReopenCompetition"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScheduleDetails"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/organisations/{organisationId}/tournaments/{tournamentId}/matches/{matchId}/result": {
       "post": {
         "tags": [
@@ -3198,6 +3290,98 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/GenerateDraft"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ScheduleDetails"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/organisations/{organisationId}/tournaments/{tournamentId}/finalisation": {
+      "post": {
+        "tags": [
+          "Herald.Competition.Features.FinaliseCompetition.FinaliseCompetitionEndpoint"
+        ],
+        "summary": "POST_api_organisations_organisationId_tournaments_tournamentId_finalisation",
+        "description": "POST_api_organisations_organisationId_tournaments_tournamentId_finalisation",
+        "operationId": "finaliseCompetition",
+        "parameters": [
+          {
+            "name": "organisationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "tournamentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/FinaliseCompetition"
               }
             }
           },
@@ -4429,6 +4613,100 @@
           }
         }
       },
+      "FinaliseCompetition": {
+        "required": [
+          "reviewedRevision",
+          "expectedRevision"
+        ],
+        "type": "object",
+        "properties": {
+          "reviewedRevision": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "expectedRevision": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "FinalRevisionDetails": {
+        "required": [
+          "number",
+          "resultsRevision",
+          "finalisedAt",
+          "finalisedBy",
+          "reopenReason",
+          "reopenedAt",
+          "reopenedBy"
+        ],
+        "type": "object",
+        "properties": {
+          "number": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "resultsRevision": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "finalisedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "finalisedBy": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "reopenReason": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "reopenedAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "reopenedBy": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "FinalRevisionView": {
+        "required": [
+          "number",
+          "resultsRevision",
+          "finalisedAt",
+          "reopened"
+        ],
+        "type": "object",
+        "properties": {
+          "number": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "resultsRevision": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "finalisedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "reopened": {
+            "type": "boolean"
+          }
+        }
+      },
       "GenerateDraft": {
         "required": [
           "operationId",
@@ -5311,6 +5589,25 @@
           "closed"
         ]
       },
+      "ReopenCompetition": {
+        "required": [
+          "reason",
+          "expectedRevision"
+        ],
+        "type": "object",
+        "properties": {
+          "reason": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "expectedRevision": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
       "ReplacedResultDetails": {
         "required": [
           "result",
@@ -5695,7 +5992,10 @@
           "startCrossedWithdrawal",
           "matches",
           "operations",
-          "entrants"
+          "entrants",
+          "resultsRevision",
+          "finalised",
+          "finals"
         ],
         "type": "object",
         "properties": {
@@ -5809,6 +6109,19 @@
             "type": "array",
             "items": {
               "$ref": "#/components/schemas/CompetitorDetails"
+            }
+          },
+          "resultsRevision": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "finalised": {
+            "type": "boolean"
+          },
+          "finals": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FinalRevisionDetails"
             }
           }
         }
@@ -6014,7 +6327,10 @@
           "revision",
           "resolvedMatches",
           "matches",
-          "rows"
+          "rows",
+          "final",
+          "finals",
+          "noChampion"
         ],
         "type": "object",
         "properties": {
@@ -6039,6 +6355,25 @@
             "items": {
               "$ref": "#/components/schemas/StandingsRow"
             }
+          },
+          "final": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/FinalRevisionView"
+              }
+            ]
+          },
+          "finals": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/FinalRevisionView"
+            }
+          },
+          "noChampion": {
+            "type": "boolean"
           }
         }
       },
@@ -6557,6 +6892,9 @@
       "name": "Herald.Competition.Features.SanctionPlayer.SanctionPlayerEndpoint"
     },
     {
+      "name": "Herald.Competition.Features.ReopenCompetition.ReopenCompetitionEndpoint"
+    },
+    {
       "name": "Herald.Competition.Features.RecordResult.RecordResultEndpoint"
     },
     {
@@ -6576,6 +6914,9 @@
     },
     {
       "name": "Herald.Competition.Features.GenerateDraft.GenerateDraftEndpoint"
+    },
+    {
+      "name": "Herald.Competition.Features.FinaliseCompetition.FinaliseCompetitionEndpoint"
     },
     {
       "name": "Herald.Competition.Features.DisqualifyEntrant.DisqualifyEntrantEndpoint"

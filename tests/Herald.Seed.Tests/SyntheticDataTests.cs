@@ -126,6 +126,24 @@ public class SyntheticDataTests(SeededDatabases databases)
     }
 
     [Fact]
+    public async Task The_seeded_finalisation_leagues_are_one_fully_resolved_and_running_and_one_finalised()
+    {
+        var database = await databases.NewDatabaseAsync();
+        await SeededDatabases.SeedAsync(database);
+
+        await using var reader = new Reader(database);
+        var running = await reader.GetAsync(Main, $"{Tournament("tournaments-by-state", "resolved-running")}/schedule");
+        var finalised = await reader.GetAsync(Main, $"{Tournament("tournaments-by-state", "finalised")}/schedule");
+        var standings = await reader.GetAsync(Main, $"{Tournament("tournaments-by-state", "finalised")}/standings");
+
+        running.GetProperty("matches").EnumerateArray().ShouldAllBe(match => match.GetProperty("state").GetString() == "resolved");
+        running.GetProperty("finalised").GetBoolean().ShouldBeFalse();
+        finalised.GetProperty("finalised").GetBoolean().ShouldBeTrue();
+        standings.GetProperty("final").GetProperty("number").GetInt32().ShouldBe(1);
+        (await reader.GetAsync(Main, Tournament("tournaments-by-state", "finalised"))).GetProperty("competition").GetString().ShouldBe("finalised");
+    }
+
+    [Fact]
     public async Task The_seeded_exceptional_league_has_one_match_of_each_cause()
     {
         var database = await databases.NewDatabaseAsync();

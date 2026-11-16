@@ -37,6 +37,9 @@ public sealed record Rest(int Round, Guid EntryId);
 // One revision of a running competition's effective results (h1-standings D-1).
 public sealed record ResultsSnapshot(int Revision, IReadOnlyList<Entrant> Entrants, IReadOnlyList<MatchResult> Matches, IReadOnlyList<Rest> Rests);
 
+// A finalisation Competition announced at a results revision; a reopening keeps it, marked (h1-finalisation D-4).
+public sealed record FinalRevision(int Number, int ResultsRevision, DateTimeOffset FinalisedAt, bool Reopened = false);
+
 // The latest results Standings knows for a tournament; the table is computed from them on read (D-2).
 public sealed class TournamentResults : AggregateRoot<TournamentId>
 {
@@ -47,9 +50,23 @@ public sealed class TournamentResults : AggregateRoot<TournamentId>
     private TournamentResults(TournamentId id, ResultsSnapshot snapshot)
         : base(id) => Snapshot = snapshot;
 
+    private List<FinalRevision> _finals = [];
+
     public ResultsSnapshot Snapshot { get; private set; }
 
     public int Revision { get; private set; }
+
+    public IReadOnlyList<FinalRevision> Finals
+    {
+        get => _finals;
+        private set => _finals = [.. value];
+    }
+
+    // The current final revision, once the results it was taken at are the ones applied here: an older table is never final.
+    public FinalRevision? Final => _finals.Count > 0 && _finals[^1] is { Reopened: false } final && final.ResultsRevision == Revision ? final : null;
+
+    // Final standings where every entrant departed declare no champion (h1-finalisation D-5).
+    public bool NoChampion => Final is not null && Snapshot.Entrants.All(entrant => entrant.Status != EntrantStatus.Active);
 
     public static TournamentResults Track(TournamentId id, ResultsSnapshot snapshot) => new(id, snapshot) { Revision = snapshot.Revision };
 
@@ -63,6 +80,37 @@ public sealed class TournamentResults : AggregateRoot<TournamentId>
 
         Snapshot = snapshot;
         Revision = snapshot.Revision;
+        return true;
+    }
+
+    // Idempotent on the final revision number, whichever of the finalisation and its reopening arrives first (ADR 0016).
+    public bool Finalise(int number, int resultsRevision, DateTimeOffset at)
+    {
+        if (_finals.Exists(final => final.Number == number))
+        {
+            return false;
+        }
+
+        _finals.Add(new(number, resultsRevision, at));
+        _finals.Sort((left, right) => left.Number.CompareTo(right.Number));
+        return true;
+    }
+
+    public bool Reopen(int number, int resultsRevision, DateTimeOffset at)
+    {
+        var index = _finals.FindIndex(final => final.Number == number);
+        if (index >= 0 && _finals[index].Reopened)
+        {
+            return false;
+        }
+
+        if (index < 0)
+        {
+            Finalise(number, resultsRevision, at);
+            index = _finals.FindIndex(final => final.Number == number);
+        }
+
+        _finals[index] = _finals[index] with { Reopened = true };
         return true;
     }
 

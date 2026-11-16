@@ -575,6 +575,15 @@ describe('Correcting a result on the match page', () => {
     expect(await violations(page())).toEqual([]);
   });
 
+  it('refuses a correction on a finalised competition and points to the Standings page', async () => {
+    const { page, button, text } = await open({ getMatch: () => of(won()), getTournament: () => of({ ...tournament, competition: 'finalised' }) });
+    await vi.waitFor(() => expect(text('herald-notice')).toContain('The competition is finalised'));
+
+    expect(button('Correct result')).toBeUndefined();
+    expect(page().querySelector('herald-notice a[href$="/standings"]')?.textContent?.trim()).toBe('Go to standings');
+    expect(await violations(page())).toEqual([]);
+  });
+
   it('opens the cause-first form with the current values and needs a different result and a reason', async () => {
     const { page, button, settle, text } = await open({ getMatch: () => of(won()) });
     await vi.waitFor(() => expect(button('Correct result')).toBeTruthy());

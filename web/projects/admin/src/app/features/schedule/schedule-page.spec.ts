@@ -94,6 +94,9 @@ const schedule = (over: Partial<ScheduleDetails> = {}): ScheduleDetails => ({
   matches: [],
   operations: null,
   entrants: [],
+  resultsRevision: 0,
+  finalised: false,
+  finals: [],
   ...over,
 });
 
