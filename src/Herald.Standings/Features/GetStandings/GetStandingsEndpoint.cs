@@ -27,8 +27,12 @@ public sealed record StandingsLine(int Round, StandingsEntrant? Opponent, LineRe
 
 public sealed record StandingsRow(int Position, bool Shared, StandingsEntrant Entrant, int Resolved, int Won, int Drawn, int Lost, int Points, IReadOnlyList<StandingsLine> Lines);
 
-// The provisional table and the results revision it reflects (h1-standings D-3).
-public sealed record StandingsView(Guid TournamentId, int Revision, int ResolvedMatches, int Matches, IReadOnlyList<StandingsRow> Rows);
+public sealed record FinalRevisionView(int Number, int ResultsRevision, DateTimeOffset FinalisedAt, bool Reopened);
+
+// The table and the results revision it reflects (h1-standings D-3). Final is set while the table is final at that revision;
+// Finals lists every final revision, newest first, and NoChampion says that every entrant departed (h1-finalisation D-4, D-5).
+public sealed record StandingsView(
+    Guid TournamentId, int Revision, int ResolvedMatches, int Matches, IReadOnlyList<StandingsRow> Rows, FinalRevisionView? Final, IReadOnlyList<FinalRevisionView> Finals, bool NoChampion);
 
 public static class GetStandingsEndpoint
 {
@@ -63,7 +67,10 @@ public static class GetStandingsEndpoint
                 row.Drawn,
                 row.Lost,
                 row.Points,
-                [.. row.Lines.Select(line => new StandingsLine(line.Round, line.Opponent is { } opponent ? EntrantOf(opponent) : null, ResultOf(line.Outcome), line.Cause, line.Points))]))]));
+                [.. row.Lines.Select(line => new StandingsLine(line.Round, line.Opponent is { } opponent ? EntrantOf(opponent) : null, ResultOf(line.Outcome), line.Cause, line.Points))]))],
+            results.Final is { } final ? FinalOf(final) : null,
+            [.. results.Finals.Reverse().Select(FinalOf)],
+            results.NoChampion));
     }
 
     private static LineResult? ResultOf(Outcome? outcome) => outcome switch
@@ -74,6 +81,8 @@ public static class GetStandingsEndpoint
         Outcome.None => LineResult.NoWinner,
         _ => null,
     };
+
+    private static FinalRevisionView FinalOf(FinalRevision final) => new(final.Number, final.ResultsRevision, final.FinalisedAt, final.Reopened);
 
     private static StandingsEntrant EntrantOf(Entrant entrant) => new(entrant.EntryId, entrant.Name, entrant.Status);
 }

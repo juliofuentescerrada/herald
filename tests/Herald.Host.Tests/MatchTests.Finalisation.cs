@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
+using Herald.Contracts.Competition.V1;
 using Shouldly;
 
 namespace Herald.Host.Tests;
@@ -22,7 +23,7 @@ public partial class MatchTests
     [Fact]
     public async Task An_owner_finalises_current_reviewed_standings_once_and_a_retry_returns_the_final_competition()
     {
-        var (league, _, _) = await WonAsync();
+        var (league, _, tournament) = await WonAsync();
         var schedule = await ScheduleAsync(league);
 
         var finalised = await SettledAsync(() => FinaliseAsync(league, ResultsRevision(schedule), Revision(schedule)));
@@ -34,6 +35,10 @@ public partial class MatchTests
         final.GetProperty("finalised").GetBoolean().ShouldBeTrue();
         var revision = final.GetProperty("finals").EnumerateArray().ShouldHaveSingleItem();
         (revision.GetProperty("number").GetInt32(), revision.GetProperty("resultsRevision").GetInt32()).ShouldBe((1, 2));
+        var sent = api.Sent<CompetitionFinalised>().Where(message => message.TournamentId == tournament).ShouldHaveSingleItem();
+        (sent.ResultsRevision, sent.FinalRevision).ShouldBe((2, 1));
+        var standings = await JsonAsync(await league.Client.GetAsync($"{league.Path}/standings", Cancellation));
+        (Revision(standings), standings.GetProperty("final").GetProperty("number").GetInt32(), standings.GetProperty("noChampion").GetBoolean()).ShouldBe((2, 1, false));
     }
 
     [Fact]
@@ -93,7 +98,7 @@ public partial class MatchTests
     [Trait("covers", "competition-finalisation: No reason")]
     public async Task An_owner_reopens_with_a_reason_corrects_and_finalises_again_keeping_the_earlier_final_revision()
     {
-        var (league, path, _) = await WonAsync();
+        var (league, path, tournament) = await WonAsync();
         (await SettledAsync(async () => await FinaliseAsync(league, ResultsRevision(await ScheduleAsync(league))))).StatusCode.ShouldBe(HttpStatusCode.OK);
 
         var unreasoned = await ReopenAsync(league, " ");
@@ -109,6 +114,10 @@ public partial class MatchTests
         var finals = (await JsonAsync(again)).GetProperty("finals").EnumerateArray().ToList();
         finals.Select(final => (final.GetProperty("number").GetInt32(), final.GetProperty("resultsRevision").GetInt32())).ShouldBe([(2, 3), (1, 2)]);
         finals[1].GetProperty("reopenReason").GetString().ShouldBe("Result appeal upheld");
+        api.Sent<CompetitionReopened>().Where(message => message.TournamentId == tournament).ShouldHaveSingleItem().FinalRevision.ShouldBe(1);
+        var standings = await JsonAsync(await league.Client.GetAsync($"{league.Path}/standings", Cancellation));
+        standings.GetProperty("final").GetProperty("number").GetInt32().ShouldBe(2);
+        standings.GetProperty("finals").EnumerateArray().Select(final => final.GetProperty("reopened").GetBoolean()).ShouldBe([false, true]);
     }
 
     [Fact]

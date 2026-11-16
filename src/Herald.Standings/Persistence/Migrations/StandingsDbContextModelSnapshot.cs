@@ -29,6 +29,10 @@ namespace Herald.Standings.Persistence.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
 
+                    b.Property<string>("Finals")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
                     b.Property<Guid>("OrganisationId")
                         .HasColumnType("uuid");
 
@@ -39,6 +43,12 @@ namespace Herald.Standings.Persistence.Migrations
                     b.Property<string>("Snapshot")
                         .IsRequired()
                         .HasColumnType("jsonb");
+
+                    b.Property<uint>("xmin")
+                        .IsConcurrencyToken()
+                        .ValueGeneratedOnAddOrUpdate()
+                        .HasColumnType("xid")
+                        .HasColumnName("xmin");
 
                     b.HasKey("Id");
 
