@@ -94,6 +94,24 @@ public class SyntheticDataTests(SeededDatabases databases)
     }
 
     [Fact]
+    public async Task The_seeded_corrections_league_has_a_win_corrected_to_a_draw_and_a_win_to_correct()
+    {
+        var database = await databases.NewDatabaseAsync();
+        await SeededDatabases.SeedAsync(database);
+
+        await using var reader = new Reader(database);
+        var path = Tournament("tournaments-by-state", "running-corrections");
+        var resolved = (await reader.GetAsync(Main, $"{path}/schedule")).GetProperty("matches").EnumerateArray()
+            .Where(match => match.GetProperty("state").GetString() == "resolved").ToList();
+        var corrected = await reader.GetAsync(Main, $"{path}/matches/{resolved.Single(match => match.GetProperty("result").GetProperty("outcome").GetString() == "draw").GetProperty("matchId").GetGuid()}");
+
+        resolved.Count.ShouldBe(2);
+        var replaced = corrected.GetProperty("replacedResults").EnumerateArray().ShouldHaveSingleItem();
+        replaced.GetProperty("correctionReason").GetString().ShouldBe("Score sheet misread");
+        replaced.GetProperty("result").GetProperty("cause").GetString().ShouldBe("played");
+    }
+
+    [Fact]
     public async Task The_seeded_exceptional_league_has_one_match_of_each_cause()
     {
         var database = await databases.NewDatabaseAsync();

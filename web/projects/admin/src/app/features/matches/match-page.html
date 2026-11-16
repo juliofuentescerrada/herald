@@ -41,7 +41,11 @@
 
     @if (state() === 'conflict') {
       <herald-notice tone="danger" heading="This match changed elsewhere">
-        Nothing changed with this request. Reload the match before trying again. Reloading discards unsaved lineup changes.
+        @if (correcting()) {
+          Nothing changed with this request. Reload the match and review the impact again; your correction and reason are kept.
+        } @else {
+          Nothing changed with this request. Reload the match before trying again. Reloading discards unsaved lineup changes.
+        }
         <span class="notice-action"><button herald-button type="button" (click)="reload()">Reload latest</button></span>
       </herald-notice>
     }
@@ -160,6 +164,7 @@
     }
 
     @if (!started()) { <ng-container [ngTemplateOutlet]="resultPanel" /> }
+
     <ng-template #resultPanel>
     <!-- The result: a choice with nothing preselected, then a read-only summary once resolved (h1-operator-results D-3). -->
     <section class="operation" aria-labelledby="result-heading" [attr.aria-busy]="state() === 'busy' || null">
@@ -168,73 +173,33 @@
         @if (m.result) {
           <herald-status-label tone="success">Resolved</herald-status-label>
         }
+        @if (m.replacedResults.length) {
+          <herald-status-label tone="info">Corrected</herald-status-label>
+        }
       </div>
       @if (resultSummary(); as summary) {
         <p><strong>{{ summary }}</strong></p>
-        <p class="help">Recorded <span class="when">{{ zoned(m.result!.recordedAt) }}</span>. This result is read-only.</p>
-      } @else {
-        <!-- What happened first, nothing selected; then only that cause's fields (h1-exceptional-outcomes D-3). -->
-        <fieldset class="choice options" [disabled]="state() !== 'ready'">
-          <legend>What happened?</legend>
-          <label><input type="radio" name="cause" [checked]="cause() === 'played'" (change)="choose('played')" /> Played</label>
-          <label><input type="radio" name="cause" [checked]="cause() === 'concession'" (change)="choose('concession')" /> Concession</label>
-          <!-- An absence is recorded before the start; a match in play takes a concession or a no contest (A-1). -->
-          @if (!started()) {
-            <label><input type="radio" name="cause" [checked]="cause() === 'absence'" (change)="choose('absence')" /> Absence</label>
-          }
-          <label><input type="radio" name="cause" [checked]="cause() === 'noContest'" (change)="choose('noContest')" /> No contest</label>
-        </fieldset>
-        @switch (cause()) {
-          @case ('played') {
-            @if (team() && !started()) {
-              <herald-notice heading="Start the match first">A played team result needs both lineups locked, and they lock at match start.</herald-notice>
-            } @else {
-              @if (!started()) {
-                <p class="help">This match has not started: recording a played result also starts it.</p>
+        <p class="help">{{ m.replacedResults.length ? 'Corrected' : 'Recorded' }} <span class="when">{{ zoned(m.result!.recordedAt) }}</span></p>
+        @if (!correcting()) {
+          <div class="actions">
+            <button herald-button type="button" [disabled]="state() !== 'ready'" (click)="startCorrection()">Correct result</button>
+          </div>
+        }
+        @if (replaced().length) {
+          <details class="history">
+            <summary>Result history</summary>
+            <ul aria-label="Result history">
+              @for (earlier of replaced(); track earlier.replacedAt) {
+                <li>
+                  <strong>{{ summaryOf(earlier.result) }}</strong>
+                  <p class="help">Recorded {{ zoned(earlier.result.recordedAt) }} · replaced {{ zoned(earlier.replacedAt) }} · Reason: {{ earlier.correctionReason }}</p>
+                </li>
               }
-              <fieldset class="choice outcomes" [disabled]="state() !== 'ready'">
-                <legend>Winner</legend>
-                <label class="outcome-choice"><input type="radio" name="outcome" [checked]="outcome() === 'first'" (change)="outcome.set('first')" /> {{ names().first }} wins @if (outcome() === 'first') { <span class="selection">Selected</span> }</label>
-                <label class="outcome-choice"><input type="radio" name="outcome" [checked]="outcome() === 'draw'" (change)="outcome.set('draw')" /> Draw @if (outcome() === 'draw') { <span class="selection">Selected</span> }</label>
-                <label class="outcome-choice"><input type="radio" name="outcome" [checked]="outcome() === 'second'" (change)="outcome.set('second')" /> {{ names().second }} wins @if (outcome() === 'second') { <span class="selection">Selected</span> }</label>
-              </fieldset>
-            }
-          }
-          @case ('concession') {
-            <fieldset class="choice options" [disabled]="state() !== 'ready'">
-              <legend>Who conceded?</legend>
-              <label><input type="radio" name="conceding" [checked]="conceding() === 'first'" (change)="conceding.set('first')" /> {{ names().first }}</label>
-              <label><input type="radio" name="conceding" [checked]="conceding() === 'second'" (change)="conceding.set('second')" /> {{ names().second }}</label>
-            </fieldset>
-          }
-          @case ('absence') {
-            <fieldset class="choice options" [disabled]="state() !== 'ready'">
-              <legend>Who was absent?</legend>
-              <label><input type="radio" name="absent" [checked]="absent() === 'first'" (change)="absent.set('first')" /> {{ names().first }}</label>
-              <label><input type="radio" name="absent" [checked]="absent() === 'second'" (change)="absent.set('second')" /> {{ names().second }}</label>
-              <label><input type="radio" name="absent" [checked]="absent() === 'both'" (change)="absent.set('both')" /> Both were absent</label>
-            </fieldset>
-            <p class="help">An absence records no play and withdraws no one.</p>
-          }
-          @case ('noContest') {
-            <div class="field reason">
-              <label for="reason">Reason (required)</label>
-              <textarea id="reason" #reasonInput rows="3" maxlength="500" [value]="reason()" [readOnly]="state() === 'busy'"
-                (input)="reason.set(reasonInput.value)" aria-describedby="reason-help"></textarea>
-              <p class="help" id="reason-help">Private to the organisation. At most 500 characters.</p>
-            </div>
-          }
+            </ul>
+          </details>
         }
-        @if (cause() === 'concession' || cause() === 'noContest') {
-          <fieldset class="choice options" [disabled]="state() !== 'ready'">
-            <legend>Did play take place?</legend>
-            <label><input type="radio" name="play" [checked]="playTookPlace() === true" (change)="playTookPlace.set(true)" /> Yes</label>
-            <label><input type="radio" name="play" [checked]="playTookPlace() === false" (change)="playTookPlace.set(false)" /> No</label>
-          </fieldset>
-          @if (playWithoutStart()) {
-            <herald-notice tone="danger" heading="Start the match first">An administrative outcome cannot record play on a team match that has not started. Choose “No”, or start the match.</herald-notice>
-          }
-        }
+      } @else {
+        <ng-container [ngTemplateOutlet]="causeFields" />
         @if (cause() !== 'played' || !team() || started()) {
         <div class="actions">
           <button herald-button variant="primary" type="button" [loading]="state() === 'busy'" [disabled]="!!recordBlocked() && state() !== 'busy'"
@@ -246,6 +211,132 @@
         }
       }
     </section>
+    @if (correcting() && m.result) {
+      <!-- Not destructive but it changes points: a two-step review, the impact being the confirmation (D-5, A-2). -->
+      <section class="operation" aria-labelledby="correct-heading" [attr.aria-busy]="state() === 'busy' || reviewing() || null">
+        <h2 id="correct-heading">Correct result</h2>
+        <p class="help">Current result: {{ resultSummary() }}.@if (playRecorded()) { Play was recorded, so the correction can be a played result, a concession after play or a no contest after play. }</p>
+        <ng-container [ngTemplateOutlet]="causeFields" />
+        <div class="field reason">
+          <label for="correction-reason">Reason for the correction (required)</label>
+          <textarea id="correction-reason" #correctionInput rows="3" maxlength="500" [value]="correctionReason()" [readOnly]="locked()"
+            (input)="correctionReason.set(correctionInput.value)" aria-describedby="correction-reason-help"></textarea>
+          <p class="help" id="correction-reason-help">Private to the organisation. At most 500 characters.</p>
+        </div>
+        @if (!impact()) {
+          <div class="actions">
+            <button herald-button variant="primary" type="button" [loading]="reviewing()" [disabled]="!!correctBlocked() && !reviewing()"
+              [attr.aria-describedby]="correctBlocked() ? 'correct-why' : null" (click)="reviewImpact()">Review impact</button>
+            <button herald-button type="button" [disabled]="state() !== 'ready'" (click)="cancelCorrection()">Cancel</button>
+            @if (correctBlocked(); as why) {
+              <p class="help" id="correct-why">{{ why }}</p>
+            }
+          </div>
+        }
+      </section>
+      @if (impact(); as preview) {
+        <section class="operation" aria-labelledby="impact-heading" [attr.aria-busy]="state() === 'busy' || null">
+          <h2 id="impact-heading">Impact of this correction</h2>
+          <div class="compare">
+            <div><h3>Now</h3><p>{{ resultSummary() }}</p></div>
+            <div><h3>After the correction</h3><p>{{ proposedSummary() }}{{ m.result!.played ? ' · appearances unchanged' : '' }}</p></div>
+          </div>
+          @if (preview.updating) {
+            <herald-notice tone="danger" heading="The standings are updating">
+              Results changed after this match was loaded. Nothing was applied. Review the impact again.
+              <span class="notice-action"><button herald-button type="button" [loading]="reviewing()" (click)="refreshImpact()">Review again</button></span>
+            </herald-notice>
+          } @else {
+            <div class="table-scroll">
+              <table aria-label="Points and positions">
+                <thead><tr><th scope="col">{{ team() ? 'Team' : 'Player' }}</th><th scope="col" class="num">Points</th><th scope="col" class="num">Position</th></tr></thead>
+                <tbody>
+                  @for (entrant of preview.entrants; track entrant.entryId) {
+                    <tr>
+                      <td>{{ entrant.name }}</td>
+                      <td class="num">{{ entrant.pointsBefore }} → {{ entrant.pointsAfter }}</td>
+                      <td class="num">{{ entrant.positionBefore }}{{ entrant.sharedBefore ? '=' : '' }} → {{ entrant.positionAfter }}{{ entrant.sharedAfter ? '=' : '' }}</td>
+                    </tr>
+                  }
+                </tbody>
+              </table>
+            </div>
+            <p class="help">Based on results revision {{ preview.revision }}. No published pairing depends on this result.</p>
+            <div class="actions">
+              <button herald-button variant="primary" type="button" [loading]="state() === 'busy'" [disabled]="state() === 'conflict'" (click)="applyCorrection()">Apply correction</button>
+              <button herald-button type="button" [disabled]="state() !== 'ready'" (click)="editCorrection()">Edit correction</button>
+            </div>
+          }
+        </section>
+      }
+    }
+
+    </ng-template>
+    <ng-template #causeFields>
+        <!-- What happened first, nothing selected; then only that cause's fields (h1-exceptional-outcomes D-3). -->
+        <fieldset class="choice options" [disabled]="locked()">
+          <legend>What happened?</legend>
+          @if (offerPlayed()) {
+            <label><input type="radio" name="cause" [checked]="cause() === 'played'" (change)="choose('played')" /> Played</label>
+          }
+          <label><input type="radio" name="cause" [checked]="cause() === 'concession'" (change)="choose('concession')" /> {{ playRecorded() ? 'Concession after play' : 'Concession' }}</label>
+          <!-- An absence is recorded before the start; a match in play takes a concession or a no contest (A-1). -->
+          @if (!started() && !playRecorded()) {
+            <label><input type="radio" name="cause" [checked]="cause() === 'absence'" (change)="choose('absence')" /> Absence</label>
+          }
+          <label><input type="radio" name="cause" [checked]="cause() === 'noContest'" (change)="choose('noContest')" /> {{ playRecorded() ? 'No contest after play' : 'No contest' }}</label>
+        </fieldset>
+        @switch (cause()) {
+          @case ('played') {
+            @if (team() && !started()) {
+              <herald-notice heading="Start the match first">A played team result needs both lineups locked, and they lock at match start.</herald-notice>
+            } @else {
+              @if (!started() && !correcting()) {
+                <p class="help">This match has not started: recording a played result also starts it.</p>
+              }
+              <fieldset class="choice outcomes" [disabled]="locked()">
+                <legend>Winner</legend>
+                <label class="outcome-choice"><input type="radio" name="outcome" [checked]="outcome() === 'first'" (change)="outcome.set('first')" /> {{ names().first }} wins @if (outcome() === 'first') { <span class="selection">Selected</span> }</label>
+                <label class="outcome-choice"><input type="radio" name="outcome" [checked]="outcome() === 'draw'" (change)="outcome.set('draw')" /> Draw @if (outcome() === 'draw') { <span class="selection">Selected</span> }</label>
+                <label class="outcome-choice"><input type="radio" name="outcome" [checked]="outcome() === 'second'" (change)="outcome.set('second')" /> {{ names().second }} wins @if (outcome() === 'second') { <span class="selection">Selected</span> }</label>
+              </fieldset>
+            }
+          }
+          @case ('concession') {
+            <fieldset class="choice options" [disabled]="locked()">
+              <legend>Who conceded?</legend>
+              <label><input type="radio" name="conceding" [checked]="conceding() === 'first'" (change)="conceding.set('first')" /> {{ names().first }}</label>
+              <label><input type="radio" name="conceding" [checked]="conceding() === 'second'" (change)="conceding.set('second')" /> {{ names().second }}</label>
+            </fieldset>
+          }
+          @case ('absence') {
+            <fieldset class="choice options" [disabled]="locked()">
+              <legend>Who was absent?</legend>
+              <label><input type="radio" name="absent" [checked]="absent() === 'first'" (change)="absent.set('first')" /> {{ names().first }}</label>
+              <label><input type="radio" name="absent" [checked]="absent() === 'second'" (change)="absent.set('second')" /> {{ names().second }}</label>
+              <label><input type="radio" name="absent" [checked]="absent() === 'both'" (change)="absent.set('both')" /> Both were absent</label>
+            </fieldset>
+            <p class="help">An absence records no play and withdraws no one.</p>
+          }
+          @case ('noContest') {
+            <div class="field reason">
+              <label for="reason">Reason (required)</label>
+              <textarea id="reason" #reasonInput rows="3" maxlength="500" [value]="reason()" [readOnly]="locked()"
+                (input)="reason.set(reasonInput.value)" aria-describedby="reason-help"></textarea>
+              <p class="help" id="reason-help">Private to the organisation. At most 500 characters.</p>
+            </div>
+          }
+        }
+        @if ((cause() === 'concession' || cause() === 'noContest') && !playRecorded()) {
+          <fieldset class="choice options" [disabled]="locked()">
+            <legend>Did play take place?</legend>
+            <label><input type="radio" name="play" [checked]="playTookPlace() === true" (change)="playTookPlace.set(true)" /> Yes</label>
+            <label><input type="radio" name="play" [checked]="playTookPlace() === false" (change)="playTookPlace.set(false)" /> No</label>
+          </fieldset>
+          @if (playWithoutStart()) {
+            <herald-notice tone="danger" heading="Start the match first">An administrative outcome cannot record play on a team match that has not started. Choose “No”, or start the match.</herald-notice>
+          }
+        }
     </ng-template>
   </div>
 }

@@ -25,8 +25,9 @@ public enum EntrantStatus
 // A withdrawn or disqualified entrant keeps its points and position and is flagged (h1-round-operations).
 public sealed record Entrant(Guid EntryId, string Name, EntrantStatus Status = EntrantStatus.Active);
 
-// A match as Competition reported it; Outcome and Cause are set once it is resolved, the only state that counts.
-public sealed record MatchResult(Guid MatchId, int Round, Guid First, Guid Second, Outcome? Outcome, string? Cause)
+// A match as Competition reported it; Outcome and Cause are set once it is resolved, the only state that counts. Revision is the
+// match's own, null in snapshots kept before h1-safe-corrections.
+public sealed record MatchResult(Guid MatchId, int Round, Guid First, Guid Second, Outcome? Outcome, string? Cause, int? Revision = null)
 {
     public bool IsResolved => Outcome is not null;
 }
@@ -66,4 +67,40 @@ public sealed class TournamentResults : AggregateRoot<TournamentId>
     }
 
     public Table Table() => Domain.Table.Of(Snapshot);
+
+    // The table with one match's resolution replaced, over the results applied here, changing nothing (h1-safe-corrections D-3).
+    // Null for a match these results do not hold; "updating" when they hold another revision of it than the one reviewed.
+    // shortcut: snapshots kept before match revisions crossed read as updating until the tournament's next result.
+    public CorrectionPreview? Preview(Guid matchId, int matchRevision, Outcome outcome, string cause)
+    {
+        if (Snapshot.Matches.FirstOrDefault(match => match.MatchId == matchId) is not { } held)
+        {
+            return null;
+        }
+
+        if (held.Revision != matchRevision)
+        {
+            return new(Revision, held.Revision, true, []);
+        }
+
+        var before = Table().Rows.ToDictionary(row => row.Entrant.EntryId);
+        var after = Domain.Table.Of(Snapshot with
+        {
+            Matches = [.. Snapshot.Matches.Select(match => match.MatchId == matchId ? match with { Outcome = outcome, Cause = cause } : match)],
+        });
+
+        // The match's entrants, and any other whose points or position change.
+        return new(Revision, held.Revision, false, [.. after.Rows
+            .Select(row => (Before: before[row.Entrant.EntryId], After: row))
+            .Where(pair => pair.After.Entrant.EntryId == held.First || pair.After.Entrant.EntryId == held.Second
+                || (pair.Before.Points, pair.Before.Position, pair.Before.Shared) != (pair.After.Points, pair.After.Position, pair.After.Shared))
+            .Select(pair => new PreviewLine(
+                pair.After.Entrant, pair.Before.Points, pair.After.Points, pair.Before.Position, pair.Before.Shared, pair.After.Position, pair.After.Shared))]);
+    }
 }
+
+// An entrant's points and position before and after a proposed correction.
+public sealed record PreviewLine(Entrant Entrant, int PointsBefore, int PointsAfter, int PositionBefore, bool SharedBefore, int PositionAfter, bool SharedAfter);
+
+// A correction's impact over results revision Revision, or Updating when these results hold another revision of the match.
+public sealed record CorrectionPreview(int Revision, int? MatchRevision, bool Updating, IReadOnlyList<PreviewLine> Entrants);

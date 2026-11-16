@@ -28,5 +28,6 @@ internal static class ResultsSnapshot
         Enum.Parse<ResultsMatchState>(match.State.ToString()),
         match.Resolution is { } resolution ? Enum.Parse<ResultOutcome>(resolution.Outcome.ToString()) : null,
         match.Resolution is { } cause ? JsonNamingPolicy.CamelCase.ConvertName(cause.Cause.ToString()) : null,
-        match.Resolution?.Played);
+        match.Resolution?.Played,
+        match.Revision);
 }
