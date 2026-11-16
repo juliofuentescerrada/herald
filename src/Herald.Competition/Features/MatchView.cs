@@ -17,6 +17,9 @@ public sealed record SideDetails(EntrantDetails Entrant, IReadOnlyList<PlayerDet
 // private to the organisation: admin API only.
 public sealed record ResultDetails(Outcome Outcome, Cause Cause, bool Played, string? Reason, DateTimeOffset RecordedAt);
 
+// A result replaced by a correction, with when it was replaced and why (h1-safe-corrections D-5); admin API only.
+public sealed record ReplacedResultDetails(ResultDetails Result, DateTimeOffset ReplacedAt, string CorrectionReason);
+
 public sealed record MatchStartDetails(DateTimeOffset StartedAt, int? FirstLineup, int? SecondLineup);
 
 // What every match write and the match read answer with. Blockers say why the match cannot start now; unavailable players are
@@ -32,6 +35,7 @@ public sealed record MatchView(
     MatchStartDetails? Start,
     IReadOnlyList<string> Blockers,
     ResultDetails? Result,
+    IReadOnlyList<ReplacedResultDetails> ReplacedResults,
     IReadOnlyList<PlayerDetails> Appearances,
     IReadOnlyList<PlayerDetails> Unavailable)
 {
@@ -64,14 +68,16 @@ public sealed record MatchView(
                 ? [.. match.StartBlockers(schedule.RosterOf(match.First), schedule.RosterOf(match.Second), schedule.UnavailablePlayers).Select(rule => $"{rule.Field}-{rule.Rule}")]
                 : [],
             ResultOf(match),
+            [.. match.ReplacedResolutions.Select(replaced => new ReplacedResultDetails(Of(replaced.Resolution), replaced.ReplacedAt, replaced.Reason))],
             [.. (match.Resolution?.Appearances ?? []).Select(Player)],
             match.IsTeamMatch
                 ? [.. schedule.Players.Where(player => player.IsUnavailable && (player.EntryId == match.First || player.EntryId == match.Second)).Select(player => Player(player.PlayerId))]
                 : []);
     }
 
-    public static ResultDetails? ResultOf(Match match) =>
-        match.Resolution is { } resolution ? new(resolution.Outcome, resolution.Cause, resolution.Played, resolution.Reason, resolution.RecordedAt) : null;
+    public static ResultDetails? ResultOf(Match match) => match.Resolution is { } resolution ? Of(resolution) : null;
+
+    private static ResultDetails Of(Resolution resolution) => new(resolution.Outcome, resolution.Cause, resolution.Played, resolution.Reason, resolution.RecordedAt);
 }
 
 internal static class MatchResults
@@ -98,9 +104,10 @@ internal static class MatchResults
                 return ScheduleResults.NotFound();
             }
 
-            var wasResolved = match.Resolution is not null;
+            // A first resolution or a correction (h1-safe-corrections D-1) changes the results.
+            var before = match.Resolution;
             var result = write(match, schedule);
-            var resolved = result.Outcome == WriteOutcome.Applied && !wasResolved && match.Resolution is not null;
+            var resolved = result.Outcome == WriteOutcome.Applied && !ReferenceEquals(before, match.Resolution);
             switch (result.Outcome)
             {
                 case WriteOutcome.Rejected:

@@ -5,7 +5,7 @@
 ## 2. Competition
 
 - [x] 2.1 `Match.Correct` with the allowed causes and the kept history (design D-1, D-2); domain tests for every `result-corrections` scenario
-- [ ] 2.2 Migration; feature `CorrectResult` with operation identity and expected revision; API tests against PostgreSQL, including repeats, conflicts and another organisation's 404s
+- [x] 2.2 Migration; feature `CorrectResult` with operation identity and expected revision; API tests against PostgreSQL, including repeats, conflicts and another organisation's 404s
 
 ## 3. Standings
 

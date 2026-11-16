@@ -61,6 +61,7 @@ public sealed class CompetitionDbContext(DbContextOptions<CompetitionDbContext> 
             Json(match.Property(m => m.SecondLineups));
             Json(match.Property(m => m.Start));
             Json(match.Property(m => m.Resolution));
+            Json(match.Property(m => m.ReplacedResolutions));
         });
     }
 
