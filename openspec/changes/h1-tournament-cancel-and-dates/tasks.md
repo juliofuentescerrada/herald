@@ -21,7 +21,7 @@
 
 ## 5. End-to-end journey and seeds
 
-- [ ] 5.1 `tools/Herald.Seed`: a cancelled running tournament, an archived finalised one and a draft
+- [x] 5.1 `tools/Herald.Seed`: a cancelled running tournament, an archived finalised one and a draft
 - [ ] 5.2 Journey 26; the suite passes
 - [ ] 5.3 Test script in `e2e/scripts/` (seeded data, `scriptPersona`) with a screenshot per step: dates preview, cancel confirmation, cancelled with voided matches, archived list
 
