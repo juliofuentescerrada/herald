@@ -208,7 +208,8 @@ export class LifecycleArea {
     if (this.draft()) return 'Draft · not published';
     if (this.cancellation()) return 'Cancelled';
     if (this.tournament().competition === 'finalised') return 'Finalised';
-    return this.started() ? 'Running' : 'Published · before start';
+    const startedAt = this.tournament().start.startedAt;
+    return startedAt ? `Running since ${instantText(startedAt, this.zone())} · ${this.zone()}` : 'Published · before start';
   });
 
   protected readonly cancelledText = computed(() => {

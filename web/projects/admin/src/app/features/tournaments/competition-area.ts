@@ -180,6 +180,7 @@ export class CompetitionArea {
   private readonly firstUnmet = computed(() => this.conditions().find((condition) => !condition.met) ?? null);
 
   protected readonly badge = computed<{ text: string; tone: StatusTone; icon?: IconName }>(() => {
+    if (this.tournament().competition === 'cancelled') return { text: 'Cancelled', tone: 'danger' };
     if (this.tournament().competition === 'finalised') return { text: 'Finalised', tone: 'success' };
     if (this.running()) return { text: 'Running', tone: 'info', icon: 'trophy' };
     if (this.state() === 'busy') return { text: 'Starting', tone: 'info', icon: 'hourglass' };

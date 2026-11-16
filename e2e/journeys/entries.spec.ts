@@ -728,3 +728,63 @@ test('An owner reviews the standings of a fully resolved league, finalises it, s
   await expect(revisions).toContainText('Reason: Result appeal upheld');
   await expectAccessible();
 });
+
+test('An owner postpones a published tournament’s planned start through the dates preview, cancels another running tournament with a reason, sees its unresolved matches voided and no champion, and archives it', async ({ page, signIn, expectAccessible }) => {
+  await signIn();
+  await runningLanternOpen(page);
+  await recordResult(page, 'Robin Vale', 'Taylor Finch', 'Robin Vale wins');
+  await recordResult(page, 'Sam Reed', 'Jamie Brook', 'Draw');
+
+  // Postponing: only the selected date changes, after a preview of the old and new values.
+  await openForEntries(page, 'Winter Open', { team: false, capacity: 8, admission: 'Automatic' });
+  await page.getByRole('link', { name: 'Back to configuration' }).click();
+  await page.getByRole('button', { name: 'Change dates' }).click();
+  const dates = page.getByRole('dialog', { name: 'Change dates' });
+  await dates.getByRole('checkbox', { name: 'Planned start' }).check();
+  await dates.getByLabel('New planned start').fill('2026-11-28T10:00');
+  await expect(dates.getByText('Planned start: 21 November 2026, 10:00 → 28 November 2026, 10:00')).toBeVisible();
+  await expectAccessible();
+  await dates.getByRole('button', { name: 'Save dates' }).click();
+  await expect(page.getByText('Dates changed.')).toBeVisible();
+  await expect(page.getByLabel('Planned start', { exact: true })).toHaveValue('2026-11-28T10:00');
+  await expect(page.getByLabel('Registration closure', { exact: true })).toHaveValue('2026-11-13T18:00');
+
+  // Cancelling the running league: the results stay, the four unresolved matches are voided.
+  await page.getByRole('link', { name: 'Tournaments', exact: true }).click();
+  await page.getByRole('link', { name: 'Edit configuration: Lantern Open' }).click();
+  await page.getByRole('button', { name: 'Cancel tournament' }).click();
+  const cancel = page.getByRole('dialog', { name: 'Cancel Lantern Open?' });
+  await expect(cancel.getByText('2 results recorded so far stay. 4 unresolved matches will be voided with no points.', { exact: false })).toBeVisible();
+  await cancel.getByRole('textbox', { name: 'Reason (required)' }).fill('Venue flooded');
+  await expectAccessible();
+  await cancel.getByRole('button', { name: 'Cancel tournament' }).click();
+  await expect(page.getByText('Lantern Open cancelled.')).toBeVisible();
+  await expect(page.getByText('This tournament is cancelled', { exact: true })).toBeVisible();
+  await expectAccessible();
+
+  // Competition voids the matches from the event, milliseconds after the write: reload until they are.
+  const sections = page.getByRole('navigation', { name: 'Tournament sections' });
+  await sections.getByRole('link', { name: 'Schedule' }).click();
+  await expect(page.getByRole('heading', { name: 'Schedule · Lantern Open' })).toBeVisible();
+  const voided = page.getByText('Voided: tournament cancelled · no points');
+  await expect(async () => {
+    await page.reload();
+    await expect(voided).toHaveCount(4, { timeout: 1_000 });
+  }).toPass();
+  await expect(page.getByText('Robin Vale won')).toBeVisible();
+  await expectAccessible();
+  await sections.getByRole('link', { name: 'Standings' }).click();
+  await expect(page.getByText('Cancelled · no champion or final ranking')).toBeVisible();
+  await expect(page.getByRole('button', { name: 'Finalise' })).toHaveCount(0);
+
+  // Archiving hides it from the list until "Show archived" is chosen.
+  await sections.getByRole('link', { name: 'Configuration' }).click();
+  await page.getByRole('button', { name: 'Archive' }).click();
+  await expect(page.getByText('Lantern Open archived. It is hidden from the list unless “Show archived” is chosen.')).toBeVisible();
+  await page.getByRole('link', { name: 'Back to tournaments' }).first().click();
+  await expect(page.getByRole('heading', { name: 'Winter Open' })).toBeVisible();
+  await expect(page.getByRole('heading', { name: 'Lantern Open' })).toHaveCount(0);
+  await page.getByRole('checkbox', { name: 'Show archived' }).check();
+  await expect(page.getByRole('heading', { name: 'Lantern Open' })).toBeVisible();
+  await expectAccessible();
+});
