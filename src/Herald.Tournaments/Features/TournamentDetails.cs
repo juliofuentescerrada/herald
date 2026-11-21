@@ -138,9 +138,12 @@ internal static class TournamentResults
                 {
                     await db.SaveChangesAsync(cancellationToken);
                 }
-                catch (DbUpdateConcurrencyException)
+                // The winner of the race may have logged the same revision first: its change log key says so too.
+                catch (Exception exception) when (exception is DbUpdateConcurrencyException
+                    || exception is DbUpdateException { InnerException: PostgresException { SqlState: PostgresErrorCodes.UniqueViolation, ConstraintName: "PK_ChangeLog" } })
                 {
-                    await db.Entry(tournament).ReloadAsync(cancellationToken);
+                    db.ChangeTracker.Clear();
+                    tournament = await db.Tournaments.SingleAsync(t => t.Id == tournament.Id, cancellationToken);
                     return Stale(tournament.Revision, await db.DetailsAsync(tournament, cancellationToken));
                 }
 

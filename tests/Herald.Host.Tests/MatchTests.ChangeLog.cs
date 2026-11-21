@@ -35,6 +35,26 @@ public partial class MatchTests
     }
 
     [Fact]
+    public async Task A_schedule_withdrawn_by_the_cancellation_is_logged_with_that_cause()
+    {
+        var league = await OpenAsync("individual");
+        await EnterAsync(league, "Robin Vale");
+        await EnterAsync(league, "Sam Reed");
+        await SettledAsync(() => league.Client.PostAsJsonAsync($"{league.Path}/registration/closure", new { expectedRevision = 3 }, Cancellation));
+        var drafting = Revision(await ScheduleAsync(league));
+        var draft = await JsonAsync(await SettledAsync(() => league.Client.PostAsJsonAsync(
+            $"{league.Path}/schedule/draft", new { operationId = Guid.NewGuid(), seeding = "admissionOrder", expectedRevision = drafting }, Cancellation)));
+        (await SettledAsync(() => league.Client.PostAsJsonAsync($"{league.Path}/schedule/publication", new { expectedRevision = Revision(draft) }, Cancellation)))
+            .StatusCode.ShouldBe(HttpStatusCode.OK);
+
+        (await CancelTournamentAsync(league)).StatusCode.ShouldBe(HttpStatusCode.OK);
+
+        var withdrawn = (await ChangeLogAsync(league)).Single(entry => Kind(entry) == "scheduleWithdrawn");
+        withdrawn.GetProperty("subjectRevision").GetInt32().ShouldBe(1);
+        withdrawn.GetProperty("cause").GetString().ShouldBe("tournament-cancelled");
+    }
+
+    [Fact]
     public async Task Admissions_and_schedule_publications_and_withdrawals_are_logged_with_who_and_no_reason()
     {
         var league = await OpenAsync("individual");

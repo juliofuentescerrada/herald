@@ -65,7 +65,7 @@ export const sentence = (item: ChangeLogItem): string => {
     case 'entryAdmitted': return `${item.alias} admitted${cause}`;
     case 'entryCancelled': return `${item.alias} cancelled${cause}`;
     case 'schedulePublished': return `Schedule revision ${item.subjectRevision} published`;
-    case 'scheduleWithdrawn': return `Schedule revision ${item.subjectRevision} withdrawn`;
+    case 'scheduleWithdrawn': return `Schedule revision ${item.subjectRevision} withdrawn${cause}`;
     case 'tournamentPublished': return 'Tournament published';
     case 'datesChanged': return `${item.changes.map(changeText).join('; ')}${item.timeZone ? ` · ${item.timeZone}` : ''}`;
     case 'materialChange':
@@ -77,8 +77,17 @@ export const sentence = (item: ChangeLogItem): string => {
   }
 };
 
-/** Where another module keeps the reason it does not share (Q1): the schedule's publication history or the final revisions. */
-export const reasonLink = (item: ChangeLogItem): { path: string; text: string } | null =>
-  item.kind === 'scheduleWithdrawn' ? { path: '../schedule', text: 'withdrawal reason in the publication history' }
-    : item.kind === 'competitionReopened' ? { path: '../standings', text: 'reopening reason with the final revisions' }
-      : null;
+/**
+ * Where another module keeps the reason it does not share (Q1): the entries, the schedule's publication history or the final
+ * revisions. A change caused by the cancellation has the cancellation's reason, on its own row.
+ */
+export const reasonLink = (item: ChangeLogItem): { path: string; text: string } | null => {
+  if (item.cause === 'tournament-cancelled') return null;
+  switch (item.kind) {
+    case 'entryAdmitted': return item.cause === 'operator' ? { path: '../entries', text: 'admission reason in the entries' } : null;
+    case 'entryCancelled': return { path: '../entries', text: 'details in the entries' };
+    case 'scheduleWithdrawn': return { path: '../schedule', text: 'withdrawal reason in the publication history' };
+    case 'competitionReopened': return { path: '../standings', text: 'reopening reason with the final revisions' };
+    default: return null;
+  }
+};

@@ -57,6 +57,7 @@ test('The seeded owner reads a populated change log, filters it by schedule, and
   await expect(async () => {
     await page.reload();
     await expect(log.getByText('cancelled · tournament cancelled')).toHaveCount(4, { timeout: 1_000 });
+    await expect(log.getByText('Schedule revision 2 withdrawn · tournament cancelled')).toBeVisible({ timeout: 1_000 });
   }).toPass();
   await expect(log.getByText('Tournament cancelled · Reason: Venue unavailable')).toBeVisible();
   await both(page, info, 'log-cancelled');

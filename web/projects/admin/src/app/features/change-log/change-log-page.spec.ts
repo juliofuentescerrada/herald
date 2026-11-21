@@ -17,7 +17,7 @@ const tournament = {
   id: tournamentId,
   revision: 6,
   publication: 'published',
-  configuration: { title: 'Saturday Open', timeZone: 'Europe/Madrid' },
+  configuration: { title: 'Saturday Open', timeZone: 'Europe/Madrid', visibility: 'public' },
 } as TournamentDetails;
 
 const item = (over: Partial<ChangeLogItem>): ChangeLogItem => ({
@@ -49,7 +49,7 @@ const populated: ChangeLogItem[] = [
   item({}),
 ];
 
-async function open(log: () => Observable<ChangeLogItem[]>) {
+async function open(log: () => Observable<ChangeLogItem[]>, details: TournamentDetails = tournament) {
   const client = new QueryClient();
   TestBed.configureTestingModule({
     providers: [
@@ -59,7 +59,7 @@ async function open(log: () => Observable<ChangeLogItem[]>) {
       { provide: AppContext, useValue: { organisation: signal(organisation), home: signal(`/organisations/${organisation}`) } },
       { provide: Session, useValue: { account: signal({ username: 'ana' }) } },
       { provide: AccessState, useValue: { problem: signal(null) } },
-      { provide: HeraldHostAdminService, useValue: { getTournament: () => of(tournament), getChangeLog: log } },
+      { provide: HeraldHostAdminService, useValue: { getTournament: () => of(details), getChangeLog: log } },
     ],
   });
   const harness = await RouterTestingHarness.create(`/organisations/${organisation}/tournaments/${tournamentId}/change-log`);
@@ -89,7 +89,7 @@ describe('The change log page', () => {
       'Planned start changed from 22 November 2026, 10:00 to 29 November 2026, 10:00 · Europe/Madrid',
       'Schedule revision 2 published',
       'Schedule revision 1 withdrawn · withdrawal reason in the publication history',
-      'Taylor Finch admitted',
+      'Taylor Finch admitted · admission reason in the entries',
       'Venue changed from Madrid to Valencia',
       'Tournament published',
     ]);
@@ -113,6 +113,13 @@ describe('The change log page', () => {
       expect(button('All').getAttribute('aria-pressed')).toBe('false');
       expect(await violations(page())).toEqual([]);
     });
+
+  it('labels no row Public on a private tournament, whose page visitors cannot read', async () => {
+    const { page } = await open(() => of(populated), { ...tournament, configuration: { ...tournament.configuration, visibility: 'private' } });
+
+    expect(page().querySelectorAll('.log li').length).toBe(7);
+    expect(page().querySelector('herald-status-label')).toBeNull();
+  });
 
   it('says changes appear from publication onwards when there are none', async () => {
     const { page, text } = await open(() => of([]));

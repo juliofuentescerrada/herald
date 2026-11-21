@@ -847,7 +847,8 @@ test('An owner reads a tournament’s change log with the admissions, the publis
 
   // Filtering keeps only the schedule's changes.
   await page.getByRole('button', { name: 'Schedule', exact: true }).click();
-  await expect(log.getByRole('listitem')).toHaveCount(1);
+  await expect(log.getByRole('listitem')).toHaveCount(2);
   await expect(log.getByText('Schedule revision 1 published')).toBeVisible();
+  await expect(log.getByText('Schedule revision 1 withdrawn · tournament cancelled')).toBeVisible();
   await expectAccessible();
 });

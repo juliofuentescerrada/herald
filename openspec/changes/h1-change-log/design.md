@@ -34,6 +34,10 @@ Registration publishes `EntryAdmitted` and `EntryCancelled` (with cause code: `o
 
 - **N-1** The entry fact events carry the entry's alias, and every fact event the acting person's display name (null for an automatic change), so the log can say "Taylor Finch admitted" and who did it: Tournaments holds neither. Neither is private free text (the alias is on the public page; the name is the organiser's own sign-in name), and no reason is carried (Q1). Finalisation and reopening keep their v1 contracts, so those rows show no name.
 - **N-2** The entry key is (kind, subject, subject revision) as the primary key: the tournament for its own facts, the schedule's and the final revisions; the entry and its revision for entries. Reopening is recorded but not public: visitors see the next final revision instead.
+- **N-3** Changes made by the cancellation's cascade (the entries it cancelled, the schedule it withdrew) are logged with the cause `tournament-cancelled` and the canceller's identifier but no name: the handlers act on an event, not for a signed-in person. The cancellation's own row names the owner and gives the reason.
+- **N-4** "Competition system and rules" is material (F-02) but the configuration has no such field yet; the first change that adds one logs it in `LogMaterialChanges`.
+- **N-5** `PublicChangeLogAsync` drops reasons and names and keeps the public kinds; it does not check the tournament's visibility, which `h1-public-read`'s endpoint gates (a private tournament has no public page). The admin page hides the "Public" label on a private tournament, since visitors read none of it.
+- **N-6** Two writes that lose a race may meet on the change log's key before the revision check: the loser answers 409 as before, not 500.
 
 ## Visual input
 

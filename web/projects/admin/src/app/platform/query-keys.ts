@@ -5,4 +5,5 @@ export const tournamentsKey = (organisation: string) => organisationKey(organisa
 export const tournamentKey = (organisation: string, id: string) => organisationKey(organisation, 'tournament', id);
 export const fieldKey = (organisation: string, id: string) => organisationKey(organisation, 'field', id);
 export const standingsKey = (organisation: string, id: string) => organisationKey(organisation, 'standings', id);
+export const changeLogKey = (organisation: string, id: string) => organisationKey(organisation, 'change-log', id);
 export const scheduleKey = (organisation: string, id: string) => organisationKey(organisation, 'schedule', id);

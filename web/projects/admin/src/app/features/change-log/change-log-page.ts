@@ -4,7 +4,7 @@ import { ChangeLogItem, HeraldHostAdminService, TournamentDetails } from '@heral
 import { Button, Icon, Notice, StatusLabel } from '@herald/ui';
 import { injectQuery } from '@tanstack/angular-query-experimental';
 import { firstValueFrom } from 'rxjs';
-import { AppContext, organisationKey, tournamentKey } from '../../platform';
+import { AppContext, changeLogKey, tournamentKey } from '../../platform';
 import { instantText, TournamentNav } from '../../shared';
 import { Group, groups, iconOf, inGroup, reasonLink, sentence } from './change-log';
 
@@ -30,7 +30,7 @@ export class ChangeLogPage {
     retry: false,
   }));
   protected readonly log = injectQuery(() => ({
-    queryKey: organisationKey(this.organisation, 'change-log', this.tournamentId),
+    queryKey: changeLogKey(this.organisation, this.tournamentId),
     queryFn: () => firstValueFrom(this.api.getChangeLog<ChangeLogItem[]>(this.organisation, this.tournamentId)),
     retry: false,
   }));
@@ -38,6 +38,8 @@ export class ChangeLogPage {
   protected readonly groups = groups;
   protected readonly group = signal<Group>('All');
   protected readonly shown = computed(() => (this.log.data() ?? []).filter((item) => inGroup(item, this.group())));
+  /** Visitors read nothing of a private tournament, so no row is public there (change-log D-1). */
+  protected readonly visible = computed(() => this.tournament.data()?.configuration.visibility !== 'private');
   private readonly zone = computed(() => this.tournament.data()?.configuration.timeZone ?? 'UTC');
 
   protected readonly sentence = sentence;

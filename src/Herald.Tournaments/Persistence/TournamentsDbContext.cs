@@ -37,7 +37,7 @@ public sealed class TournamentsDbContext(DbContextOptions<TournamentsDbContext> 
 
     // The part of a tournament's change log visitors may read, newest first, without reasons (change-log D-1).
     public async Task<IReadOnlyList<ChangeLogEntry>> PublicChangeLogAsync(TournamentId id, CancellationToken cancellationToken) =>
-        [.. (await ChangeLog.AsNoTracking().Where(entry => entry.TournamentId == id && entry.Public).OrderByDescending(entry => entry.At).ToListAsync(cancellationToken))
+        [.. (await ChangeLog.AsNoTracking().Where(entry => entry.TournamentId == id && entry.Public).OrderByDescending(entry => entry.At).ThenByDescending(entry => entry.SubjectRevision).ToListAsync(cancellationToken))
             .Select(entry => entry with { Reason = null, ActorId = null, ActorName = null })];
 
     // Whether Competition last reported a published schedule: it locks the field and reopening (D-4).
