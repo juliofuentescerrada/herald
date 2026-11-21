@@ -168,6 +168,20 @@ export interface ChangeLogItem {
   public: boolean;
 }
 
+export type Visibility = typeof Visibility[keyof typeof Visibility] | null;
+
+
+export const Visibility = {
+  public: 'public',
+  unlisted: 'unlisted',
+  private: 'private',
+} as const;
+
+export interface ChangeVisibility {
+  visibility: null | Visibility;
+  expectedRevision: number;
+}
+
 export type CheckIn = typeof CheckIn[keyof typeof CheckIn] | null;
 
 
@@ -363,15 +377,6 @@ export type LocationMode = typeof LocationMode[keyof typeof LocationMode] | null
 export const LocationMode = {
   onSite: 'onSite',
   online: 'online',
-} as const;
-
-export type Visibility = typeof Visibility[keyof typeof Visibility] | null;
-
-
-export const Visibility = {
-  public: 'public',
-  unlisted: 'unlisted',
-  private: 'private',
 } as const;
 
 export interface TournamentConfiguration {
@@ -818,6 +823,160 @@ export interface PublicationDetails {
   withdrawnAt: string | null;
 }
 
+export interface PublicChange {
+  kind: ChangeKind;
+  at: string;
+  changes: ChangedValue[];
+  /** @nullable */
+  timeZone: string | null;
+  /** @nullable */
+  cause: string | null;
+}
+
+export type StandingsLineResult = typeof StandingsLineResult[keyof typeof StandingsLineResult] | null;
+
+
+export const StandingsLineResult = {
+  won: 'won',
+  drawn: 'drawn',
+  lost: 'lost',
+  noWinner: 'noWinner',
+} as const;
+
+export interface PublicLine {
+  round: number;
+  /** @nullable */
+  opponent: string | null;
+  result: null | StandingsLineResult;
+  /** @nullable */
+  cause: string | null;
+  points: number;
+}
+
+export type ResultsMatchState = typeof ResultsMatchState[keyof typeof ResultsMatchState];
+
+
+export const ResultsMatchState = {
+  scheduled: 'scheduled',
+  inPlay: 'inPlay',
+  resolved: 'resolved',
+} as const;
+
+export type ResultOutcome = typeof ResultOutcome[keyof typeof ResultOutcome] | null;
+
+
+export const ResultOutcome = {
+  first: 'first',
+  second: 'second',
+  draw: 'draw',
+  none: 'none',
+} as const;
+
+export interface PublicMatch {
+  first: string;
+  second: string;
+  state: ResultsMatchState;
+  outcome: null | ResultOutcome;
+  /** @nullable */
+  cause: string | null;
+}
+
+export type RegistrationWindow = typeof RegistrationWindow[keyof typeof RegistrationWindow];
+
+
+export const RegistrationWindow = {
+  notOpen: 'notOpen',
+  open: 'open',
+  closed: 'closed',
+} as const;
+
+export interface PublicRound {
+  number: number;
+  matches: PublicMatch[];
+  /** @nullable */
+  rest: string | null;
+}
+
+export type StandingsEntrantStatus = typeof StandingsEntrantStatus[keyof typeof StandingsEntrantStatus];
+
+
+export const StandingsEntrantStatus = {
+  active: 'active',
+  withdrawn: 'withdrawn',
+  disqualified: 'disqualified',
+} as const;
+
+export interface PublicRemainingMatch {
+  round: number;
+  opponent: string;
+}
+
+export interface PublicStandingsRow {
+  position: number;
+  shared: boolean;
+  name: string;
+  status: StandingsEntrantStatus;
+  resolved: number;
+  won: number;
+  drawn: number;
+  lost: number;
+  points: number;
+  lines: PublicLine[];
+  remaining: PublicRemainingMatch[];
+}
+
+export interface PublicStandings {
+  final: boolean;
+  /** @nullable */
+  finalRevision: number | null;
+  revised: boolean;
+  resultsRevision: number;
+  updatedAt: string;
+  resolvedMatches: number;
+  matches: number;
+  noChampion: boolean;
+  rows: PublicStandingsRow[];
+}
+
+export interface PublicTournamentView {
+  id: string;
+  title: string;
+  organiser: string;
+  /** @nullable */
+  gameVariant: string | null;
+  entryKind: null | EntryKind;
+  /** @nullable */
+  minimumRosterSize: number | null;
+  /** @nullable */
+  maximumRosterSize: number | null;
+  /** @nullable */
+  activePlayersPerSide: number | null;
+  location: null | LocationMode;
+  /** @nullable */
+  venue: string | null;
+  /** @nullable */
+  registrationOpensAt: string | null;
+  /** @nullable */
+  registrationClosesAt: string | null;
+  /** @nullable */
+  plannedStartAt: string | null;
+  /** @nullable */
+  timeZone: string | null;
+  visibility: null | Visibility;
+  registration: RegistrationWindow;
+  competition: string;
+  /** @nullable */
+  cancelledAt: string | null;
+  rounds: PublicRound[];
+  standings: null | PublicStandings;
+  changes: PublicChange[];
+}
+
+export interface PublicPreview {
+  page: PublicTournamentView;
+  aliases: string[];
+}
+
 export interface PublishSchedule {
   expectedRevision: number;
 }
@@ -842,15 +1001,6 @@ export interface RecordResult {
   /** @nullable */
   reason?: string | null;
 }
-
-export type RegistrationWindow = typeof RegistrationWindow[keyof typeof RegistrationWindow];
-
-
-export const RegistrationWindow = {
-  notOpen: 'notOpen',
-  open: 'open',
-  closed: 'closed',
-} as const;
 
 export interface ReopenCompetition {
   /** @nullable */
@@ -1830,6 +1980,45 @@ export class HeraldHostAdminService {
   }
 
 /**
+ * GET_api_organisations_organisationId_tournaments_tournamentId_public_preview
+ * @summary GET_api_organisations_organisationId_tournaments_tournamentId_public_preview
+ */
+ getPublicPreview<TData = PublicPreview>(organisationId: string,
+    tournamentId: string, options?: HttpClientBodyOptions): Observable<TData>;
+ getPublicPreview<TData = PublicPreview>(organisationId: string,
+    tournamentId: string, options?: HttpClientEventOptions): Observable<HttpEvent<TData>>;
+ getPublicPreview<TData = PublicPreview>(organisationId: string,
+    tournamentId: string, options?: HttpClientResponseOptions): Observable<AngularHttpResponse<TData>>;
+  getPublicPreview<TData = PublicPreview>(
+    organisationId: string,
+    tournamentId: string, options?: HttpClientObserveOptions): Observable<TData | HttpEvent<TData> | AngularHttpResponse<TData>> {
+    if (options?.observe === 'events') {
+      return this.http.get<TData>(
+      `/api/organisations/${organisationId}/tournaments/${tournamentId}/public-preview`,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'events',
+      }
+    );
+    }
+
+    if (options?.observe === 'response') {
+      return this.http.get<TData>(
+      `/api/organisations/${organisationId}/tournaments/${tournamentId}/public-preview`,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'response',
+      }
+    );
+    }
+
+    return this.http.get<TData>(
+      `/api/organisations/${organisationId}/tournaments/${tournamentId}/public-preview`,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'body',
+      }
+    );
+  }
+
+/**
  * GET_api_organisations_organisationId_tournaments_tournamentId_change_log
  * @summary GET_api_organisations_organisationId_tournaments_tournamentId_change_log
  */
@@ -1908,6 +2097,52 @@ export class HeraldHostAdminService {
     return this.http.post<TData>(
       `/api/organisations/${organisationId}/tournaments/${tournamentId}/registration/closure`,
       closeRegistrationBody,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'body',
+      }
+    );
+  }
+
+/**
+ * POST_api_organisations_organisationId_tournaments_tournamentId_visibility
+ * @summary POST_api_organisations_organisationId_tournaments_tournamentId_visibility
+ */
+ changeVisibility<TData = TournamentDetails>(organisationId: string,
+    tournamentId: string,
+    changeVisibilityBody: ChangeVisibility, options?: HttpClientBodyOptions): Observable<TData>;
+ changeVisibility<TData = TournamentDetails>(organisationId: string,
+    tournamentId: string,
+    changeVisibilityBody: ChangeVisibility, options?: HttpClientEventOptions): Observable<HttpEvent<TData>>;
+ changeVisibility<TData = TournamentDetails>(organisationId: string,
+    tournamentId: string,
+    changeVisibilityBody: ChangeVisibility, options?: HttpClientResponseOptions): Observable<AngularHttpResponse<TData>>;
+  changeVisibility<TData = TournamentDetails>(
+    organisationId: string,
+    tournamentId: string,
+    changeVisibilityBody: ChangeVisibility, options?: HttpClientObserveOptions): Observable<TData | HttpEvent<TData> | AngularHttpResponse<TData>> {
+    if (options?.observe === 'events') {
+      return this.http.post<TData>(
+      `/api/organisations/${organisationId}/tournaments/${tournamentId}/visibility`,
+      changeVisibilityBody,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'events',
+      }
+    );
+    }
+
+    if (options?.observe === 'response') {
+      return this.http.post<TData>(
+      `/api/organisations/${organisationId}/tournaments/${tournamentId}/visibility`,
+      changeVisibilityBody,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'response',
+      }
+    );
+    }
+
+    return this.http.post<TData>(
+      `/api/organisations/${organisationId}/tournaments/${tournamentId}/visibility`,
+      changeVisibilityBody,{
         ...(options as Omit<NonNullable<typeof options>, 'observe'>),
         observe: 'body',
       }
@@ -3506,8 +3741,10 @@ export type PublishTournamentClientResult = NonNullable<TournamentDetails>
 export type OpenRegistrationClientResult = NonNullable<TournamentDetails>
 export type ListTournamentsClientResult = NonNullable<TournamentSummary[]>
 export type CreateTournamentClientResult = NonNullable<IResult | TournamentDetails>
+export type GetPublicPreviewClientResult = NonNullable<PublicPreview>
 export type GetChangeLogClientResult = NonNullable<ChangeLogItem[]>
 export type CloseRegistrationClientResult = NonNullable<TournamentDetails>
+export type ChangeVisibilityClientResult = NonNullable<TournamentDetails>
 export type ChangeDatesClientResult = NonNullable<TournamentDetails>
 export type CancelTournamentClientResult = NonNullable<TournamentDetails>
 export type ArchiveTournamentClientResult = NonNullable<TournamentDetails>

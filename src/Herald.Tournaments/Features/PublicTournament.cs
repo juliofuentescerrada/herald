@@ -12,12 +12,16 @@ public sealed record PublicMatch(string First, string Second, ResultsMatchState 
 
 public sealed record PublicRound(int Number, IReadOnlyList<PublicMatch> Matches, string? Rest);
 
+// A line of an entrant's explanation as Standings computed it: a resolved match or a rest (D-4). The page's own type: the contract's
+// name is taken in the admin document.
+public sealed record PublicLine(int Round, string? Opponent, StandingsLineResult? Result, string? Cause, int Points);
+
 // A match the entrant has still to play, for its explanation (D-4).
 public sealed record PublicRemainingMatch(int Round, string Opponent);
 
 public sealed record PublicStandingsRow(
     int Position, bool Shared, string Name, StandingsEntrantStatus Status, int Resolved, int Won, int Drawn, int Lost, int Points,
-    IReadOnlyList<StandingsLine> Lines, IReadOnlyList<PublicRemainingMatch> Remaining);
+    IReadOnlyList<PublicLine> Lines, IReadOnlyList<PublicRemainingMatch> Remaining);
 
 // Final while the table is final, with its final revision; Revised once an earlier final revision was reopened.
 public sealed record PublicStandings(
@@ -140,7 +144,8 @@ public static class PublicTournament
             // A tournament cancelled after start keeps its standings and has no champion (cancel-and-dates D-2).
             standings.NoChampion || cancelled,
             [.. standings.Rows.Select(row => new PublicStandingsRow(
-                row.Position, row.Shared, row.Name, row.Status, row.Resolved, row.Won, row.Drawn, row.Lost, row.Points, row.Lines,
+                row.Position, row.Shared, row.Name, row.Status, row.Resolved, row.Won, row.Drawn, row.Lost, row.Points,
+                [.. row.Lines.Select(line => new PublicLine(line.Round, line.Opponent, line.Result, line.Cause, line.Points))],
                 [.. unresolved.Where(match => match.First == row.EntryId || match.Second == row.EntryId)
                     .Select(match => new PublicRemainingMatch(match.Round, names.GetValueOrDefault(match.First == row.EntryId ? match.Second : match.First, "")))]))]);
     }

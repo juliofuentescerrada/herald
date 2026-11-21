@@ -1094,6 +1094,68 @@
         }
       }
     },
+    "/api/organisations/{organisationId}/tournaments/{tournamentId}/public-preview": {
+      "get": {
+        "tags": [
+          "Herald.Tournaments.Features.GetPublicPreview.GetPublicPreviewEndpoint"
+        ],
+        "summary": "GET_api_organisations_organisationId_tournaments_tournamentId_public_preview",
+        "description": "GET_api_organisations_organisationId_tournaments_tournamentId_public_preview",
+        "operationId": "getPublicPreview",
+        "parameters": [
+          {
+            "name": "organisationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "tournamentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicPreview"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/organisations/{organisationId}/tournaments/{tournamentId}/change-log": {
       "get": {
         "tags": [
@@ -1192,6 +1254,98 @@
             "application/json": {
               "schema": {
                 "$ref": "#/components/schemas/CloseRegistration"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TournamentDetails"
+                }
+              }
+            }
+          },
+          "400": {
+            "description": "Bad Request",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/HttpValidationProblemDetails"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "409": {
+            "description": "Conflict",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/organisations/{organisationId}/tournaments/{tournamentId}/visibility": {
+      "post": {
+        "tags": [
+          "Herald.Tournaments.Features.ChangeVisibility.ChangeVisibilityEndpoint"
+        ],
+        "summary": "POST_api_organisations_organisationId_tournaments_tournamentId_visibility",
+        "description": "POST_api_organisations_organisationId_tournaments_tournamentId_visibility",
+        "operationId": "changeVisibility",
+        "parameters": [
+          {
+            "name": "organisationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "tournamentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangeVisibility"
               }
             }
           },
@@ -4645,6 +4799,29 @@
           }
         }
       },
+      "ChangeVisibility": {
+        "required": [
+          "visibility",
+          "expectedRevision"
+        ],
+        "type": "object",
+        "properties": {
+          "visibility": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Visibility"
+              }
+            ]
+          },
+          "expectedRevision": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
       "CheckIn": {
         "enum": [
           "optional",
@@ -6216,6 +6393,462 @@
           }
         }
       },
+      "PublicChange": {
+        "required": [
+          "kind",
+          "at",
+          "changes",
+          "timeZone",
+          "cause"
+        ],
+        "type": "object",
+        "properties": {
+          "kind": {
+            "$ref": "#/components/schemas/ChangeKind"
+          },
+          "at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "changes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ChangedValue"
+            }
+          },
+          "timeZone": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "cause": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "PublicLine": {
+        "required": [
+          "round",
+          "opponent",
+          "result",
+          "cause",
+          "points"
+        ],
+        "type": "object",
+        "properties": {
+          "round": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "opponent": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "result": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/StandingsLineResult"
+              }
+            ]
+          },
+          "cause": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "points": {
+            "type": "integer",
+            "format": "int32"
+          }
+        }
+      },
+      "PublicMatch": {
+        "required": [
+          "first",
+          "second",
+          "state",
+          "outcome",
+          "cause"
+        ],
+        "type": "object",
+        "properties": {
+          "first": {
+            "type": "string"
+          },
+          "second": {
+            "type": "string"
+          },
+          "state": {
+            "$ref": "#/components/schemas/ResultsMatchState"
+          },
+          "outcome": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/ResultOutcome"
+              }
+            ]
+          },
+          "cause": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "PublicPreview": {
+        "required": [
+          "page",
+          "aliases"
+        ],
+        "type": "object",
+        "properties": {
+          "page": {
+            "$ref": "#/components/schemas/PublicTournamentView"
+          },
+          "aliases": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "PublicRemainingMatch": {
+        "required": [
+          "round",
+          "opponent"
+        ],
+        "type": "object",
+        "properties": {
+          "round": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "opponent": {
+            "type": "string"
+          }
+        }
+      },
+      "PublicRound": {
+        "required": [
+          "number",
+          "matches",
+          "rest"
+        ],
+        "type": "object",
+        "properties": {
+          "number": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "matches": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PublicMatch"
+            }
+          },
+          "rest": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "PublicStandings": {
+        "required": [
+          "final",
+          "finalRevision",
+          "revised",
+          "resultsRevision",
+          "updatedAt",
+          "resolvedMatches",
+          "matches",
+          "noChampion",
+          "rows"
+        ],
+        "type": "object",
+        "properties": {
+          "final": {
+            "type": "boolean"
+          },
+          "finalRevision": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "revised": {
+            "type": "boolean"
+          },
+          "resultsRevision": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "updatedAt": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "resolvedMatches": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "matches": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "noChampion": {
+            "type": "boolean"
+          },
+          "rows": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PublicStandingsRow"
+            }
+          }
+        }
+      },
+      "PublicStandingsRow": {
+        "required": [
+          "position",
+          "shared",
+          "name",
+          "status",
+          "resolved",
+          "won",
+          "drawn",
+          "lost",
+          "points",
+          "lines",
+          "remaining"
+        ],
+        "type": "object",
+        "properties": {
+          "position": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "shared": {
+            "type": "boolean"
+          },
+          "name": {
+            "type": "string"
+          },
+          "status": {
+            "$ref": "#/components/schemas/StandingsEntrantStatus"
+          },
+          "resolved": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "won": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "drawn": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "lost": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "points": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "lines": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PublicLine"
+            }
+          },
+          "remaining": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PublicRemainingMatch"
+            }
+          }
+        }
+      },
+      "PublicTournamentView": {
+        "required": [
+          "id",
+          "title",
+          "organiser",
+          "gameVariant",
+          "entryKind",
+          "minimumRosterSize",
+          "maximumRosterSize",
+          "activePlayersPerSide",
+          "location",
+          "venue",
+          "registrationOpensAt",
+          "registrationClosesAt",
+          "plannedStartAt",
+          "timeZone",
+          "visibility",
+          "registration",
+          "competition",
+          "cancelledAt",
+          "rounds",
+          "standings",
+          "changes"
+        ],
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "title": {
+            "type": "string"
+          },
+          "organiser": {
+            "type": "string"
+          },
+          "gameVariant": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "entryKind": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/EntryKind"
+              }
+            ]
+          },
+          "minimumRosterSize": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "maximumRosterSize": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "activePlayersPerSide": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "location": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/LocationMode"
+              }
+            ]
+          },
+          "venue": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "registrationOpensAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "registrationClosesAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "plannedStartAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "timeZone": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "visibility": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/Visibility"
+              }
+            ]
+          },
+          "registration": {
+            "$ref": "#/components/schemas/RegistrationWindow"
+          },
+          "competition": {
+            "type": "string"
+          },
+          "cancelledAt": {
+            "type": [
+              "null",
+              "string"
+            ],
+            "format": "date-time"
+          },
+          "rounds": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PublicRound"
+            }
+          },
+          "standings": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/PublicStandings"
+              }
+            ]
+          },
+          "changes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PublicChange"
+            }
+          }
+        }
+      },
       "PublishSchedule": {
         "required": [
           "expectedRevision"
@@ -6401,6 +7034,22 @@
             ]
           }
         }
+      },
+      "ResultOutcome": {
+        "enum": [
+          "first",
+          "second",
+          "draw",
+          "none",
+          null
+        ]
+      },
+      "ResultsMatchState": {
+        "enum": [
+          "scheduled",
+          "inPlay",
+          "resolved"
+        ]
       },
       "RosterChangeDetails": {
         "required": [
@@ -6964,6 +7613,13 @@
           }
         }
       },
+      "StandingsEntrantStatus": {
+        "enum": [
+          "active",
+          "withdrawn",
+          "disqualified"
+        ]
+      },
       "StandingsLine": {
         "required": [
           "round",
@@ -7009,6 +7665,15 @@
             "format": "int32"
           }
         }
+      },
+      "StandingsLineResult": {
+        "enum": [
+          "won",
+          "drawn",
+          "lost",
+          "noWinner",
+          null
+        ]
       },
       "StandingsRow": {
         "required": [
@@ -7616,10 +8281,16 @@
       "name": "Herald.Tournaments.Features.CreateTournament.CreateTournamentEndpoint"
     },
     {
+      "name": "Herald.Tournaments.Features.GetPublicPreview.GetPublicPreviewEndpoint"
+    },
+    {
       "name": "Herald.Tournaments.Features.GetChangeLog.GetChangeLogEndpoint"
     },
     {
       "name": "Herald.Tournaments.Features.CloseRegistration.CloseRegistrationEndpoint"
+    },
+    {
+      "name": "Herald.Tournaments.Features.ChangeVisibility.ChangeVisibilityEndpoint"
     },
     {
       "name": "Herald.Tournaments.Features.ChangeDates.ChangeDatesEndpoint"

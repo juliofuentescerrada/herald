@@ -7,7 +7,7 @@
 - [x] 2.1 Standings publishes `TournamentStandingsChanged` v1 through the outbox; tests for the `standings` scenario
 - [x] 2.2 Tournaments projections of schedule, results and standings; `ChangeVisibility`; migration (design D-1, D-3)
 - [x] 2.3 `GetPublicTournament` (public document) and `GetPublicPreview` (admin); API tests against PostgreSQL for every `public-tournament-page` scenario, including private, draft and unknown links and the absence of private fields
-- [ ] 2.4 Regenerate Wolverine code (`codegen write`) and the OpenAPI documents and clients (`pnpm api:generate`); CI drift checks pass
+- [x] 2.4 Regenerate Wolverine code (`codegen write`) and the OpenAPI documents and clients (`pnpm api:generate`); CI drift checks pass
 
 ## 3. Public and admin applications
 
