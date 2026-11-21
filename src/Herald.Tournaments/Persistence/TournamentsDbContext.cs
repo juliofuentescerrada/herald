@@ -54,6 +54,7 @@ public sealed class TournamentsDbContext(DbContextOptions<TournamentsDbContext> 
         modelBuilder.Entity<Tournament>(tournament =>
         {
             tournament.Ignore(t => t.DomainEvents);
+            tournament.Ignore(t => t.Logged);
             tournament.Ignore(t => t.IsStarted);
             tournament.Ignore(t => t.IsCancelled);
             tournament.Property(t => t.CancellationReason).HasMaxLength(Tournament.ReasonMaxLength);
