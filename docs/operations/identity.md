@@ -1,6 +1,6 @@
 # Identity: sign-in and organisation access
 
-Herald signs organisers in through the Microsoft Entra External ID directory it shares with Arcana ([ADR 0014](../adr/0014-identity-and-organisation-isolation.md)). The directory, its `signin` user flow and its e-mail one-time passcode are Arcana's, created by hand (Arcana's `docs/guides/deploy.md` and ADR 0034, in `../arcana`) and outside every OpenTofu state. Herald adds two application registrations of its own, also by hand. Nothing here goes into Arcana's or Steward's state.
+Herald signs organisers in through the Microsoft Entra External ID directory it shares with Arcana ([ADR 0014](../adr/0014-identity-and-organisation-isolation.md)). The directory is a platform resource of Steward, the shared platform: since 21 November 2026 it lives in Steward's `rg-identity` resource group, managed by hand by Steward's operator and outside every OpenTofu state ([Steward's operations guide](https://github.com/juliofuentescerrada/steward/blob/main/docs/m3/operations.md#directorio-de-usuarios-compartido), Steward ADR 0011). Its `signin` user flow and e-mail one-time passcode were created by Arcana and serve both applications (Arcana's `docs/guides/deploy.md` and ADR 0034, in `../arcana`). Herald adds two application registrations of its own, also by hand. Nothing here goes into Arcana's or Steward's state.
 
 The directory proves who someone is. Herald decides what they may do: the `Organiser` role lets a person use the admin application, and Herald's own memberships decide which organisations they see.
 
