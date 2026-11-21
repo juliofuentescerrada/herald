@@ -61,7 +61,9 @@
             <p class="help">Each team is one entrant; lineups are chosen per match.</p>
           }
         </div>
-        @if (current()) {
+        @if (s.cancelled) {
+          <!-- Cancelled: the schedule takes no write (h1-tournament-cancel-and-dates D-1). -->
+        } @else if (current()) {
           @if (!started()) {
             <div class="summary-action">
               <button herald-button type="button" [disabled]="state() !== 'ready'" (click)="askWithdraw($any($event.currentTarget))">Withdraw</button>
@@ -90,7 +92,8 @@
       @if (!dialogOpen() && failure(); as failed) {
         <herald-notice tone="danger" [heading]="failed.heading">{{ failed.text }}</herald-notice>
       }
-      @if (s.crossedChange; as change) {
+      <!-- A cancellation also cancels the entries, which is no field change to act on. -->
+      @if (!s.cancelled && s.crossedChange; as change) {
         <herald-notice tone="danger" heading="The field changed since publication">
           @if (change.removed.length) {
             No longer eligible: {{ names(change.removed) }}.
@@ -115,7 +118,15 @@
           Regenerate before publishing.
         </herald-notice>
       }
-      @if (started() && s.startCrossedWithdrawal && !current()) {
+      @if (s.cancelled) {
+        <herald-notice tone="danger" heading="This tournament is cancelled">
+          @if (started()) {
+            Results recorded before stay; unresolved matches were voided with no points. Nothing can change.
+          } @else {
+            The published schedule was withdrawn and is kept in the history. Nothing can change.
+          }
+        </herald-notice>
+      } @else if (started() && s.startCrossedWithdrawal && !current()) {
         <herald-notice tone="danger" heading="The competition started on revision {{ s.startedOnRevision }}, which was withdrawn">
           A withdrawal crossed the start. Nothing was repaired. Publish the current draft once to give the running competition its schedule.
         </herald-notice>
@@ -129,7 +140,7 @@
         </herald-notice>
       }
 
-      @if (!current() && !started()) {
+      @if (!current() && !started() && !s.cancelled) {
         <section class="operation" aria-labelledby="generate-heading">
           <h2 id="generate-heading">{{ draft() ? 'Regenerate the draft' : 'Before generating' }}</h2>
           @if (blockers().length) {
@@ -196,7 +207,7 @@
                       } @else { <p class="help">No result recorded</p> }
                     </div>
                     <div class="actions">
-                      <herald-status-label [tone]="stateTone[played.state]">{{ stateText[played.state] }}</herald-status-label>
+                      <herald-status-label [tone]="matchLabel(played).tone">{{ matchLabel(played).text }}</herald-status-label>
                       <a herald-button [routerLink]="['../matches', played.matchId]" [attr.aria-label]="'View match: ' + match.first.name + ' vs ' + match.second.name">View match</a>
                     </div>
                   </li>

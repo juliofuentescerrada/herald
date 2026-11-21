@@ -50,11 +50,14 @@ const registrationIcons: Record<string, IconName> = { notOpen: 'clock', open: 'd
 const competitionLabel = (competition: string): LifecycleLabel =>
   competition === 'running' ? { text: 'Running', icon: 'trophy', tone: 'info' }
     : competition === 'finalised' ? { text: 'Finalised', tone: 'success' }
+    : competition === 'cancelled' ? { text: 'Cancelled', tone: 'danger' }
     : { text: 'Preparing', icon: 'hourglass' };
 
 /** Publication, registration and competition are three facts, never one "Active" label; each icon follows its meaning (ui-icons D-1). */
-export const lifecycleLabels = (tournament: { publication: string; registration: string; competition: string }): LifecycleLabel[] => [
+export const lifecycleLabels = (tournament: { publication: string; registration: string; competition: string; archived?: boolean }): LifecycleLabel[] => [
   tournament.publication === 'published' ? { text: 'Published', icon: 'world' } : { text: 'Draft', icon: 'pencil' },
   { text: registrationText(tournament.registration), icon: registrationIcons[tournament.registration] },
   competitionLabel(tournament.competition),
+  // Archiving hides a finished tournament from the default list without changing its state (h1-tournament-cancel-and-dates D-3).
+  ...(tournament.archived ? [{ text: 'Archived' }] : []),
 ];

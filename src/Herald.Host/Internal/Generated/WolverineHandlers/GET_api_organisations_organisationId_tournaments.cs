@@ -58,9 +58,17 @@ namespace Internal.Generated.WolverineHandlers
                     return;
                 }
 
+                string archived_rawValue = httpContext.Request.Query["archived"];
+                bool archived = false;
+
+                if (bool.TryParse(archived_rawValue, out var archived_parsed))
+                {
+                    archived = archived_parsed;
+                }
+
                 
                 // The actual HTTP request handler execution
-                var tournamentSummaryIReadOnlyList_response = await Herald.Tournaments.Features.ListTournaments.ListTournamentsEndpoint.Get(organisationId, tournamentsDbContext, httpContext.RequestAborted).ConfigureAwait(false);
+                var tournamentSummaryIReadOnlyList_response = await Herald.Tournaments.Features.ListTournaments.ListTournamentsEndpoint.Get(organisationId, tournamentsDbContext, httpContext.RequestAborted, archived).ConfigureAwait(false);
 
                 
                 // Added by EF Core Transaction Middleware

@@ -29,7 +29,9 @@ const plural = (count: number, one: string, many: string): string => `${count} $
     <section class="area" aria-labelledby="competition-heading" [attr.aria-busy]="state() === 'busy'">
       <h2 id="competition-heading">Competition</h2>
       <p class="badge"><herald-status-label id="competition-state" [tone]="badge().tone" [icon]="badge().icon">{{ badge().text }}</herald-status-label></p>
-      @if (running()) {
+      @if (cancelledBeforeStart()) {
+        <p class="help">Cancelled before it started. Nothing can change.</p>
+      } @else if (running()) {
         <p>{{ startedText() }}</p>
         <p class="help">{{ fixedText() }}</p>
         @for (roster of crossed(); track roster.entryId) {
@@ -117,8 +119,9 @@ export class CompetitionArea {
   readonly reload = output<void>();
 
   protected readonly state = signal<'ready' | 'busy' | 'failed' | 'conflict'>('ready');
-  /** Started: running or finalised (h1-finalisation). */
-  protected readonly running = computed(() => this.tournament().competition !== 'preparation');
+  /** Started: running, finalised or cancelled after start. Started is a time, not a state (h1-tournament-cancel-and-dates I-1). */
+  protected readonly running = computed(() => this.tournament().start.startedAt != null);
+  protected readonly cancelledBeforeStart = computed(() => this.tournament().competition === 'cancelled' && !this.running());
   private readonly team = computed(() => this.tournament().configuration.entryKind === 'team');
   private readonly zone = computed(() => this.tournament().configuration.timeZone ?? 'UTC');
 
@@ -180,6 +183,7 @@ export class CompetitionArea {
   private readonly firstUnmet = computed(() => this.conditions().find((condition) => !condition.met) ?? null);
 
   protected readonly badge = computed<{ text: string; tone: StatusTone; icon?: IconName }>(() => {
+    if (this.tournament().competition === 'cancelled') return { text: 'Cancelled', tone: 'danger' };
     if (this.tournament().competition === 'finalised') return { text: 'Finalised', tone: 'success' };
     if (this.running()) return { text: 'Running', tone: 'info', icon: 'trophy' };
     if (this.state() === 'busy') return { text: 'Starting', tone: 'info', icon: 'hourglass' };

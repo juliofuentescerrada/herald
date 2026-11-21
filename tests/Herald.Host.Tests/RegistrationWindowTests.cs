@@ -150,21 +150,6 @@ public class RegistrationWindowTests(OrganisationApi api)
     }
 
     [Fact]
-    public async Task A_closed_registration_that_lost_a_date_cannot_reopen()
-    {
-        var (client, tournaments, id) = await TournamentAsync();
-        (await OpenAsync(client, tournaments, id, 2)).StatusCode.ShouldBe(HttpStatusCode.OK);
-        (await CloseAsync(client, tournaments, id, 3)).StatusCode.ShouldBe(HttpStatusCode.OK);
-        (await SaveAsync(client, tournaments, id, 4, _withoutClosure)).StatusCode.ShouldBe(HttpStatusCode.OK);
-
-        var response = await OpenAsync(client, tournaments, id, 5);
-
-        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
-        Errors(await JsonAsync(response), "registrationClosesAt").ShouldBe(["required"]);
-        (await ReadAsync(client, tournaments, id)).GetProperty("registration").GetString().ShouldBe("closed");
-    }
-
-    [Fact]
     public async Task A_registration_that_was_never_opened_cannot_be_closed()
     {
         var (client, tournaments, id) = await TournamentAsync();
@@ -195,7 +180,8 @@ public class RegistrationWindowTests(OrganisationApi api)
     public async Task Opening_from_an_older_revision_conflicts_and_registration_stays_not_open()
     {
         var (client, tournaments, id) = await TournamentAsync();
-        (await SaveAsync(client, tournaments, id, 2, _withoutClosure)).StatusCode.ShouldBe(HttpStatusCode.OK);
+        (await client.PostAsJsonAsync($"{tournaments}/{id}/dates", new { expectedRevision = 2, plannedStartAt = "2026-11-21T10:00:00" }, Cancellation))
+            .StatusCode.ShouldBe(HttpStatusCode.OK);
 
         var response = await OpenAsync(client, tournaments, id, 2);
 
@@ -218,11 +204,15 @@ public class RegistrationWindowTests(OrganisationApi api)
     }
 
     [Fact]
-    public async Task A_save_can_remove_a_registration_date_while_registration_is_not_open()
+    [Trait("covers", "registration-window: A closed registration lost a date")]
+    public async Task A_save_cannot_remove_a_registration_date_of_a_published_tournament()
     {
         var (client, tournaments, id) = await TournamentAsync();
 
-        (await SaveAsync(client, tournaments, id, 2, _withoutClosure)).StatusCode.ShouldBe(HttpStatusCode.OK);
+        var response = await SaveAsync(client, tournaments, id, 2, _withoutClosure);
+
+        response.StatusCode.ShouldBe(HttpStatusCode.BadRequest);
+        Errors(await JsonAsync(response), "registrationClosesAt").ShouldBe(["change-dates"]);
     }
 
     [Fact]

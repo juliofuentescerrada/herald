@@ -98,7 +98,7 @@ internal static class RosterResults
                 return FieldResults.NotFound();
             }
 
-            var result = write(field);
+            var result = field.IsTournamentCancelled ? Field.Cancelled : write(field);
             switch (result.Outcome)
             {
                 case WriteOutcome.Rejected:

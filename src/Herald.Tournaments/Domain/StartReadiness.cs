@@ -1,11 +1,13 @@
 namespace Herald.Tournaments.Domain;
 
-// Finalised and back to running as Competition announces it (h1-finalisation D-4).
+// Finalised and back to running as Competition announces it (h1-finalisation D-4); cancelled by the owner here, for good
+// (h1-tournament-cancel-and-dates D-1).
 public enum CompetitionState
 {
     Preparing,
     Running,
     Finalised,
+    Cancelled,
 }
 
 // An admitted team's roster outside the profile's bounds, as Registration last reported it.

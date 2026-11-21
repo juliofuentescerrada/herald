@@ -40,6 +40,8 @@ const tournament = (over: Partial<TournamentDetails> = {}): TournamentDetails =>
   checkedInEntries: 0,
   schedulePublished: false,
   start: { conditions: [], eligible: null, pending: null, rostersOutsideBounds: null, sharedMemberNames: [], publishedScheduleRevision: null, startedAt: null, startedOnScheduleRevision: null },
+  archived: false,
+  cancellation: null,
   ...over,
 });
 
@@ -156,6 +158,19 @@ describe('The entries page', () => {
     expect(page().querySelector('details.cancelled')).toBeNull();
     expect(page().querySelector('a.back')?.getAttribute('href')).toBe(`/organisations/${organisation}/tournaments/${tournamentId}`);
     expect(await violations(page())).toEqual([]);
+  });
+
+  it('says a cancelled tournament’s entries were cancelled with it and offers nothing', async () => {
+    const withTournament = { ...cancelled('Robin Vale'), cancellationCause: 'tournamentCancelled' as const };
+    const { button, text, page } = await open(
+      { getField: () => of(field([withTournament], { registration: 'closed' })) },
+      tournament({ registration: 'closed', competition: 'cancelled' }),
+    );
+    await vi.waitFor(() => expect(button('Add player')?.disabled).toBe(true));
+
+    expect(text('#add-reason')).toBe('The tournament is cancelled. Nothing can change.');
+    expect(page().textContent).toContain('This tournament is cancelled');
+    expect(page().textContent).toContain('Cancelled with the tournament');
   });
 
   it('says registration must be open to add entries when it is not open', async () => {

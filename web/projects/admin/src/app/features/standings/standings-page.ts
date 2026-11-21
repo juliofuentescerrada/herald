@@ -38,7 +38,13 @@ export class StandingsPage {
     retry: false,
   }));
   /** Started: running or finalised; standings exist from the start on. */
-  protected readonly running = computed(() => !!this.tournament.data() && this.tournament.data()!.competition !== 'preparation');
+  protected readonly running = computed(() => {
+    const t = this.tournament.data();
+    // A tournament cancelled before start never ran.
+    return !!t && t.competition !== 'preparation' && (t.competition !== 'cancelled' || t.start.startedAt != null);
+  });
+  /** Cancelled after start: the last results stay, with no champion and no final ranking (h1-tournament-cancel-and-dates D-2). */
+  protected readonly cancelled = computed(() => this.tournament.data()?.competition === 'cancelled');
   /** Competition's own view of the matches and results revision: when it is ahead of the standings, they are updating. */
   protected readonly schedule = injectQuery(() => ({
     queryKey: scheduleKey(this.organisation, this.tournamentId),
@@ -70,6 +76,8 @@ export class StandingsPage {
   /** Competition decides finalisation: its schedule says whether the competition is final and lists the final revisions. */
   protected readonly finalised = computed(() => this.schedule.data()?.finalised ?? false);
   protected readonly finals = computed(() => this.schedule.data()?.finals ?? []);
+  /** Matches voided by the cancellation: resolved with no points, never played. */
+  protected readonly voided = computed(() => this.schedule.data()?.matches.filter((match) => match.result?.cause === 'voidedCancelled').length ?? 0);
   protected readonly unresolved = computed(() => this.schedule.data()?.matches.filter((match) => match.state !== 'resolved') ?? []);
   protected readonly zone = computed(() => this.tournament.data()?.configuration.timeZone ?? 'UTC');
   protected readonly zoned = (instant: string | null | undefined) => (instant ? `${instantText(instant, this.zone())} · ${this.zone()}` : '');

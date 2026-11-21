@@ -31,10 +31,15 @@
 
   <!-- A published tournament shows its state, registration and entries before the form, stacked at every width. -->
   <div class="column">
+    @if (stored(); as current) {
+      <app-lifecycle-area [organisation]="organisation" [tournament]="current" [unsaved]="dirty()" (changed)="registrationChanged($event)" (deleted)="draftDeleted(current.id)" />
+    }
     @if (published()) {
-      <herald-notice heading="Published · configuration remains editable">
-        Competition is {{ stored()!.competition === 'preparation' ? 'preparing' : stored()!.competition }}. Saving configuration does not change registration.
-      </herald-notice>
+      @if (!cancelled()) {
+        <herald-notice heading="Published · configuration remains editable">
+          Competition is {{ stored()!.competition === 'preparation' ? 'preparing' : stored()!.competition }}. Saving configuration does not change registration.
+        </herald-notice>
+      }
       <app-registration-area
         [organisation]="organisation"
         [tournament]="stored()!"
@@ -152,9 +157,11 @@
         <p class="help" role="status">Saving. Please wait; do not submit again.</p>
       }
       <div class="actions">
-        <button herald-button variant="primary" type="submit" [loading]="state() === 'saving'">
-          {{ state() === 'saving' ? 'Saving…' : state() === 'failed' ? 'Try again' : published() ? 'Save changes' : 'Save draft' }}
-        </button>
+        @if (!cancelled()) {
+          <button herald-button variant="primary" type="submit" [loading]="state() === 'saving'">
+            {{ state() === 'saving' ? 'Saving…' : state() === 'failed' ? 'Try again' : published() ? 'Save changes' : 'Save draft' }}
+          </button>
+        }
         @if (!published()) {
           @if (reviewBlocked(); as why) {
             <button herald-button type="button" disabled aria-describedby="review-why">Review and publish</button>

@@ -248,6 +248,39 @@ public static class Scenarios
                 await admin.FinaliseAsync(organisation, resolved);
             }
         }
+
+        // Three individual leagues of four with four of six matches resolved (h1-tournament-cancel-and-dates): Lantern Spire running,
+        // for the cancellation script to cancel; Lantern Mast cancelled with its two other matches voided; and Lantern Urn, every match
+        // resolved, finalised and archived. Winter Draft Cup above is the draft to delete.
+        foreach (var (key, title, ending) in new[] { ("cancellable", "Lantern Spire", ""), ("cancelled", "Lantern Mast", "cancel"), ("archived", "Lantern Urn", "archive") })
+        {
+            var tournament = Ids.For("tournament", key);
+            await admin.CreateTournamentAsync(organisation, tournament, Configuration(clock, title, opens: -6, closes: -1, starts: 1, capacity: 4));
+            await admin.PublishAsync(organisation, tournament);
+            await admin.OpenRegistrationAsync(organisation, tournament);
+            foreach (var name in Names.Players[8..12])
+            {
+                await admin.EnterAsync(organisation, tournament, await admin.CreateGuestAsync(organisation, "player", name));
+            }
+
+            await admin.CloseRegistrationAsync(organisation, tournament);
+            await admin.PublishScheduleAsync(organisation, tournament);
+            await admin.StartCompetitionAsync(organisation, tournament);
+            foreach (var (index, outcome) in new[] { (0, "first"), (1, "draw"), (2, "second"), (3, "first"), (4, "first"), (5, "draw") }[..(ending == "archive" ? 6 : 4)])
+            {
+                await admin.RecordResultAsync(organisation, tournament, index, outcome: outcome);
+            }
+
+            if (ending == "cancel")
+            {
+                await admin.CancelTournamentAsync(organisation, tournament, "Venue flooded");
+            }
+            else if (ending == "archive")
+            {
+                await admin.FinaliseAsync(organisation, tournament);
+                await admin.ArchiveAsync(organisation, tournament);
+            }
+        }
     }
 
     private static async Task SecondOrganisationAsync(Admin admin, Guid organisation, Clock clock)

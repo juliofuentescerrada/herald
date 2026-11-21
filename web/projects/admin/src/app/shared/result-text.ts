@@ -1,7 +1,7 @@
 /** The fields of a match result the words need; shared code takes no API client types (boundaries). */
 interface Result {
   readonly outcome: 'first' | 'second' | 'draw' | 'none';
-  readonly cause: 'played' | 'concession' | 'singleAbsence' | 'doubleAbsence' | 'noContest';
+  readonly cause: 'played' | 'concession' | 'singleAbsence' | 'doubleAbsence' | 'noContest' | 'voidedCancelled';
   readonly played: boolean;
   readonly reason?: string | null;
 }
@@ -20,6 +20,7 @@ export const resultText = (result: Result, first: string, second: string): strin
     case 'singleAbsence': return `${loser} was absent · ${winner} wins · ${play}`;
     case 'doubleAbsence': return `Both were absent · 0 each · ${play}`;
     case 'noContest': return `No contest: ${result.reason ?? ''} · 0 each · ${play}`;
+    case 'voidedCancelled': return 'Voided: tournament cancelled · no points';
     default: return result.outcome === 'draw' ? 'Draw' : `${winner} won`;
   }
 };
