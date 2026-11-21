@@ -14,7 +14,7 @@
 
 ## 4. Admin application
 
-- [ ] 4.1 Change log page and its navigation entry (D-4)
+- [x] 4.1 Change log page and its navigation entry (D-4)
 - [ ] 4.2 Vitest for each Visual input state and `axe-core`; lint and boundary checks pass
 
 ## 5. End-to-end journey and seeds

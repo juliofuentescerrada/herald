@@ -26,6 +26,7 @@ Names are the exact current `IconName` values in the [typed registry](../../web/
 | `alert-triangle` | Attention required; default warning notice | Explain the condition, never colour alone |
 | `arrow-left` | Back to configuration/tournaments/public page; drawer back exception | Visible `Back to …`; metadata for text links, control for button-style links/back buttons |
 | `arrows-exchange` | Switch the working organisation | `Switch organisation`; context owns the switch |
+| `calendar` | Schedule change in the change log: a revision published or withdrawn | The sentence names the revision; metadata size |
 | `chevron-down` | Account/disclosure can be opened | A labelled button with `aria-expanded` |
 | `circle-check` | Checked in; default success feedback | `Checked in` or the confirmed outcome text; not universal tournament readiness |
 | `circle-dashed` | Check-in pending | Visible pending text |
@@ -35,13 +36,14 @@ Names are the exact current `IconName` values in the [typed registry](../../web/
 | `hourglass` | Competition preparing | `Preparing`; a new competition state needs its own reviewed mapping |
 | `info-circle` | Neutral explanatory feedback; default information notice/toast | The explanatory message |
 | `layout-dashboard` | Workspace Overview destination | `Overview`, navigation size |
+| `list-numbers` | Results change in the change log: final standings, revised, or reopened | The sentence names the final revision; metadata size |
 | `lock` | Registration closed | Explicit registration text; not a generic permission-denied icon for every surface |
 | `menu` | Mobile navigation menu (Tabler `IconMenu2`) | Visible `Menu`, expanded/controls state on the button |
 | `pencil` | Draft publication state | `Draft`; not a new edit-action treatment |
 | `plug-connected` | Applications destination: pilot applications acting for the organisation | `Applications`, navigation size |
 | `refresh` | Reload to recover unavailable/stale content | Describe what must reload and keep a labelled recovery action |
-| `trophy` | Tournaments destination or empty tournament list | Navigation label; empty illustration above the heading |
-| `users` | Entries destination or empty entries panel | `Entries` / `View entries`; empty illustration, without implying a team-only entrant kind |
+| `trophy` | Tournaments destination or empty tournament list; a tournament change in the change log | Navigation label; empty illustration above the heading; the change log sentence |
+| `users` | Entries destination or empty entries panel; an entry change in the change log | `Entries` / `View entries`; empty illustration, without implying a team-only entrant kind |
 | `wifi-off` | Offline condition | Text says requests cannot be sent and what happens to input |
 | `world` | Published publication state | `Published`; not a claim that a private tournament is publicly discoverable |
 | `x` | Close/dismiss, or the open mobile menu's close cue | Name the button, and keep text for consequential leaving actions |

@@ -1,0 +1,22 @@
+h1 { font-size: 32px; }
+.page-header { margin-bottom: var(--herald-space-6); }
+.title { display: flex; flex-wrap: wrap; align-items: center; gap: var(--herald-space-2) var(--herald-space-4); margin: var(--herald-space-4) 0 var(--herald-space-4); }
+.title h1 { margin: 0; }
+.back { display: inline-flex; align-items: center; gap: var(--herald-space-2); color: var(--herald-color-text-secondary); }
+.column { display: flex; flex-direction: column; gap: var(--herald-space-4); }
+.column herald-notice { display: flex; }
+.notice-action { display: block; margin-top: var(--herald-space-3); }
+.panel { padding: var(--herald-space-6); }
+.actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--herald-space-3); }
+.help { color: var(--herald-color-text-secondary); margin: 0; max-inline-size: 75ch; }
+
+/* The filter's pressed choice is the strongest; the others stay quiet (D-4). */
+.filter { display: flex; flex-wrap: wrap; gap: var(--herald-space-2); }
+.filter [aria-pressed='true'] { background: var(--herald-color-text-primary); color: var(--herald-color-surface-default); border-color: var(--herald-color-text-primary); }
+
+/* A read-only history: icon, sentence and who/when, the "Public" label on the right. */
+.log { list-style: none; margin: 0; padding: 0; background: var(--herald-color-surface-default); border: 1px solid var(--herald-color-border-default); }
+.log li { display: grid; grid-template-columns: auto 1fr auto; align-items: start; gap: var(--herald-space-3); padding: var(--herald-space-3) var(--herald-space-4); border-bottom: 1px solid var(--herald-color-border-default); }
+.log li:last-child { border-bottom: 0; }
+.log herald-icon { margin-top: 3px; color: var(--herald-color-text-secondary); }
+.log p { margin: 0 0 var(--herald-space-1); max-inline-size: 75ch; overflow-wrap: anywhere; }

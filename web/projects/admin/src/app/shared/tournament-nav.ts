@@ -16,9 +16,9 @@ import { ActivatedRoute, RouterLink } from '@angular/router';
   changeDetection: ChangeDetectionStrategy.OnPush,
 })
 export class TournamentNav {
-  readonly current = input.required<'Configuration' | 'Entries' | 'Schedule' | 'Standings'>();
+  readonly current = input.required<'Configuration' | 'Entries' | 'Schedule' | 'Standings' | 'Change log'>();
   private readonly organisation = inject(ActivatedRoute).snapshot.paramMap.get('organisationId')!;
   private readonly tournamentId = inject(ActivatedRoute).snapshot.paramMap.get('tournamentId')!;
   protected readonly base = computed(() => `/organisations/${this.organisation}/tournaments/${this.tournamentId}`);
-  protected readonly sections = [{ name: 'Configuration', path: '' }, { name: 'Entries', path: 'entries' }, { name: 'Schedule', path: 'schedule' }, { name: 'Standings', path: 'standings' }] as const;
+  protected readonly sections = [{ name: 'Configuration', path: '' }, { name: 'Entries', path: 'entries' }, { name: 'Schedule', path: 'schedule' }, { name: 'Standings', path: 'standings' }, { name: 'Change log', path: 'change-log' }] as const;
 }
