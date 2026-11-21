@@ -198,6 +198,11 @@ public sealed class Admin(Seeding seeding, Persona persona)
         await WriteAsync($"cancel tournament {tournament}", async () =>
             await _client.PostAsJsonAsync($"{Path(organisation, tournament)}/cancellation", new { reason, expectedRevision = await RevisionAsync(organisation, tournament) }));
 
+    // Public, unlisted or private from publication on (h1-public-read D-3); a rerun repeats.
+    public async Task ChangeVisibilityAsync(Guid organisation, Guid tournament, string visibility) =>
+        await WriteAsync($"change visibility of {tournament}", async () =>
+            await _client.PostAsJsonAsync($"{Path(organisation, tournament)}/visibility", new { visibility, expectedRevision = await RevisionAsync(organisation, tournament) }));
+
     // Hides a finalised or cancelled tournament from the default list (h1-tournament-cancel-and-dates D-3).
     public async Task ArchiveAsync(Guid organisation, Guid tournament) =>
         await WriteAsync($"archive tournament {tournament}", async () =>

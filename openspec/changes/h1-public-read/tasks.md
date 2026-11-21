@@ -17,7 +17,7 @@
 
 ## 4. End-to-end journey and seeds
 
-- [ ] 4.1 `tools/Herald.Seed`: a public running tournament, an unlisted finalised one and a private one
+- [x] 4.1 `tools/Herald.Seed`: a public running tournament, an unlisted finalised one and a private one
 - [ ] 4.2 Journey 28; the suite passes
 - [ ] 4.3 Test script in `e2e/scripts/` (seeded data, `scriptPersona`) with a screenshot per step: public page before start, running with standings, explanation, final, visibility change, not available
 
