@@ -788,3 +788,66 @@ test('An owner postpones a published tournament’s planned start through the da
   await expect(page.getByRole('heading', { name: 'Lantern Open' })).toBeVisible();
   await expectAccessible();
 });
+
+test('An owner reads a tournament’s change log with the admissions, the published schedule, a postponed start with its old and new times and the cancellation, each with who, when and why', async ({ page, signIn, expectAccessible }) => {
+  await signIn();
+  await createOrganisation(page);
+  await openForEntries(page, 'Winter Open', { team: false, capacity: 4, admission: 'Automatic' });
+  await addNew(page, 'player', 'Robin Vale');
+  await expect(page.getByRole('heading', { name: '1 of 4 individual entries' })).toBeVisible();
+  await addNew(page, 'player', 'Sam Reed');
+  await expect(page.getByRole('heading', { name: '2 of 4 individual entries' })).toBeVisible();
+
+  // A postponed start, then the schedule published.
+  await page.getByRole('link', { name: 'Back to configuration' }).click();
+  await page.getByRole('button', { name: 'Change dates' }).click();
+  const dates = page.getByRole('dialog', { name: 'Change dates' });
+  await dates.getByRole('checkbox', { name: 'Planned start' }).check();
+  await dates.getByLabel('New planned start').fill('2026-11-28T10:00');
+  await dates.getByRole('button', { name: 'Save dates' }).click();
+  await expect(page.getByText('Dates changed.')).toBeVisible();
+  await page.getByRole('region', { name: 'Registration' }).getByRole('button', { name: 'Close registration' }).click();
+  await expect(page.getByRole('region', { name: 'Registration' }).getByRole('button', { name: 'Open registration' })).toBeVisible();
+  await page.getByRole('navigation', { name: 'Tournament sections' }).getByRole('link', { name: 'Schedule' }).click();
+  await expect(page.getByRole('heading', { name: 'Schedule · Winter Open' })).toBeVisible();
+  const admissionOrder = page.getByRole('radio', { name: 'Admission order' });
+  await expect(async () => {
+    await page.reload();
+    await expect(admissionOrder).toBeVisible({ timeout: 1_000 });
+  }).toPass();
+  await admissionOrder.check();
+  await page.getByRole('button', { name: 'Generate draft' }).click();
+  await page.getByRole('button', { name: 'Publish' }).click();
+  await expect(page.getByText('Schedule published · revision 1.')).toBeVisible();
+
+  // The cancellation, with its reason.
+  await page.getByRole('link', { name: 'Back to configuration' }).click();
+  await page.getByRole('button', { name: 'Cancel tournament' }).click();
+  const cancel = page.getByRole('dialog', { name: 'Cancel Winter Open?' });
+  await cancel.getByRole('textbox', { name: 'Reason (required)' }).fill('Venue flooded');
+  await cancel.getByRole('button', { name: 'Cancel tournament' }).click();
+  await expect(page.getByText('Winter Open cancelled.')).toBeVisible();
+
+  // Registration's and Competition's facts reach the log through local queues: reload until the entries' cancellations are there.
+  await page.getByRole('navigation', { name: 'Tournament sections' }).getByRole('link', { name: 'Change log' }).click();
+  await expect(page.getByRole('heading', { name: 'Change log · Winter Open' })).toBeVisible();
+  const log = page.getByRole('list');
+  await expect(async () => {
+    await page.reload();
+    await expect(log.getByText('cancelled · tournament cancelled')).toHaveCount(2, { timeout: 1_000 });
+  }).toPass();
+  await expect(log.getByText('Tournament cancelled · Reason: Venue flooded')).toBeVisible();
+  await expect(log.getByText('Planned start changed from 21 November 2026, 10:00 to 28 November 2026, 10:00 · Europe/Madrid')).toBeVisible();
+  await expect(log.getByText('Schedule revision 1 published')).toBeVisible();
+  await expect(log.getByText('Robin Vale admitted')).toBeVisible();
+  await expect(log.getByText('Sam Reed admitted')).toBeVisible();
+  await expect(log.getByText('Tournament published')).toBeVisible();
+  await expect(log.getByText(/^Persona \w+ · \d+ November 2026, \d\d:\d\d$/).first()).toBeVisible();
+  await expectAccessible();
+
+  // Filtering keeps only the schedule's changes.
+  await page.getByRole('button', { name: 'Schedule', exact: true }).click();
+  await expect(log.getByRole('listitem')).toHaveCount(1);
+  await expect(log.getByText('Schedule revision 1 published')).toBeVisible();
+  await expectAccessible();
+});
