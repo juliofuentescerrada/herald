@@ -10,7 +10,7 @@
 ## 3. Registration and Competition
 
 - [x] 3.1 `EntryAdmitted`, `EntryCancelled`, `SchedulePublished`, `ScheduleWithdrawn` v1 through the outbox (D-3); tests
-- [ ] 3.2 Regenerate Wolverine code (`codegen write`) and the OpenAPI documents and client (`pnpm api:generate`); CI drift checks pass
+- [x] 3.2 Regenerate Wolverine code (`codegen write`) and the OpenAPI documents and client (`pnpm api:generate`); CI drift checks pass
 
 ## 4. Admin application
 
