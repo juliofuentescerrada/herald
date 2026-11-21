@@ -158,6 +158,11 @@ public sealed class Tournament : AggregateRoot<TournamentId>
 
     public int? StartedOnScheduleRevision { get; private set; }
 
+    // This change's own change log entries, saved in its transaction (change-log design D-2); not mapped.
+    public IReadOnlyList<ChangeLogEntry> Logged => _logged;
+
+    private readonly List<ChangeLogEntry> _logged = [];
+
     public int NextTermsRevision() => ++TermsRevision;
 
     // Each start condition with whether it holds, in the order the owner reads them (CP-04).
@@ -258,7 +263,8 @@ public sealed class Tournament : AggregateRoot<TournamentId>
     // A creation with the same identifier is a retry only when its content matches.
     public bool Repeats(TournamentConfiguration configuration) => Configuration == configuration.Normalised();
 
-    public WriteResult Change(TournamentConfiguration configuration, int expectedRevision, Guid actor, DateTimeOffset at, EntryCounts entries = default)
+    public WriteResult Change(
+        TournamentConfiguration configuration, int expectedRevision, Guid actor, DateTimeOffset at, EntryCounts entries = default, string? actorName = null)
     {
         configuration = configuration.Normalised();
         if (IsCancelled)
@@ -304,13 +310,20 @@ public sealed class Tournament : AggregateRoot<TournamentId>
             return new(WriteOutcome.Rejected, broken);
         }
 
+        var before = Configuration;
         Configuration = configuration;
         Touch(actor, at);
+        if (Publication == Publication.Published)
+        {
+            // Before publication nobody outside the organisation could see the tournament (change-log A-1).
+            LogMaterialChanges(before, actor, actorName, at);
+        }
+
         return WriteOutcome.Applied;
     }
 
     // Published and nothing else: registration and competition are untouched, and there is no way back (§5.1).
-    public WriteResult Publish(int expectedRevision, Guid actor, DateTimeOffset at)
+    public WriteResult Publish(int expectedRevision, Guid actor, DateTimeOffset at, string? actorName = null)
     {
         if (Publication == Publication.Published)
         {
@@ -331,6 +344,7 @@ public sealed class Tournament : AggregateRoot<TournamentId>
         PublishedBy = actor;
         PublishedAt = at;
         Touch(actor, at);
+        Log(ChangeKind.TournamentPublished, actor, actorName, at);
         Raise(new TournamentPublished(Id, actor, at));
         return WriteOutcome.Applied;
     }
@@ -455,6 +469,7 @@ public sealed class Tournament : AggregateRoot<TournamentId>
         CancellationReason = reason;
         Touch(actor, at);
         CancelledAtRevision = Revision;
+        Log(ChangeKind.TournamentCancelled, actor, actorName, at, reason: reason);
         Raise(new TournamentCancelled(Id, IsStarted, actor, at));
         return WriteOutcome.Applied;
     }
@@ -495,7 +510,7 @@ public sealed class Tournament : AggregateRoot<TournamentId>
     }
 
     // Only the selected dates change, keeping the window's order; before start only (§5.2, design D-5).
-    public WriteResult ChangeDates(DateSelection dates, int expectedRevision, Guid actor, DateTimeOffset at)
+    public WriteResult ChangeDates(DateSelection dates, int expectedRevision, Guid actor, DateTimeOffset at, string? actorName = null)
     {
         if (IsCancelled)
         {
@@ -542,8 +557,51 @@ public sealed class Tournament : AggregateRoot<TournamentId>
             current.PlannedStartAt, changed.PlannedStartAt,
             actor, at)];
         Touch(actor, at);
+        Log(ChangeKind.DatesChanged, actor, actorName, at, DateValues(current, changed), changed.TimeZone);
         return WriteOutcome.Applied;
     }
+
+    // Game or variant, participation structure and venue are material (F-02); capacity, title, admission and check-in are not
+    // (change-log A-2). Visibility has its own entry.
+    private void LogMaterialChanges(TournamentConfiguration before, Guid actor, string? actorName, DateTimeOffset at)
+    {
+        var after = Configuration;
+        (string Field, object? Old, object? New)[] fields =
+        [
+            ("gameVariant", before.GameVariant, after.GameVariant),
+            ("entryKind", before.EntryKind, after.EntryKind),
+            ("minimumRosterSize", before.MinimumRosterSize, after.MinimumRosterSize),
+            ("maximumRosterSize", before.MaximumRosterSize, after.MaximumRosterSize),
+            ("activePlayersPerSide", before.ActivePlayersPerSide, after.ActivePlayersPerSide),
+            ("location", before.Location, after.Location),
+            ("venue", before.Venue, after.Venue),
+        ];
+        if (Values(fields) is { Count: > 0 } material)
+        {
+            Log(ChangeKind.MaterialChange, actor, actorName, at, material);
+        }
+
+        if (Values([("visibility", before.Visibility, after.Visibility)]) is { Count: > 0 } visibility)
+        {
+            Log(ChangeKind.VisibilityChanged, actor, actorName, at, visibility);
+        }
+    }
+
+    private static List<ChangedValue> DateValues(TournamentConfiguration before, TournamentConfiguration after) =>
+        Values([
+            ("registrationOpensAt", Iso(before.RegistrationOpensAt), Iso(after.RegistrationOpensAt)),
+            ("registrationClosesAt", Iso(before.RegistrationClosesAt), Iso(after.RegistrationClosesAt)),
+            ("plannedStartAt", Iso(before.PlannedStartAt), Iso(after.PlannedStartAt)),
+        ]);
+
+    private static string? Iso(DateTime? value) => value?.ToString("yyyy-MM-ddTHH:mm:ss", System.Globalization.CultureInfo.InvariantCulture);
+
+    private static List<ChangedValue> Values(IEnumerable<(string Field, object? Old, object? New)> fields) =>
+        [.. fields.Where(field => !Equals(field.Old, field.New)).Select(field => new ChangedValue(field.Field, field.Old?.ToString(), field.New?.ToString()))];
+
+    // The tournament is the subject of its own facts, at the revision the change took effect.
+    private void Log(ChangeKind kind, Guid actor, string? actorName, DateTimeOffset at, IReadOnlyList<ChangedValue>? changes = null, string? timeZone = null, string? reason = null) =>
+        _logged.Add(new(Id, kind, Id.Value, Revision, actor, actorName, at) { Changes = changes ?? [], TimeZone = timeZone, Reason = reason });
 
     private static WriteResult Cancelled => new(WriteOutcome.Rejected, [new("tournament", "cancelled")]);
 

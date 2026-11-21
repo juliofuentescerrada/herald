@@ -281,6 +281,23 @@ public static class Scenarios
                 await admin.ArchiveAsync(organisation, tournament);
             }
         }
+
+        // A populated change log (h1-change-log): four admissions, a postponed start, a schedule published, withdrawn and published
+        // again. The change log script cancels it.
+        var logged = Ids.For("tournament", "change-log");
+        await admin.CreateTournamentAsync(organisation, logged, Configuration(clock, "Lantern Beacon", opens: -6, closes: 2, starts: 3, capacity: 4));
+        await admin.PublishAsync(organisation, logged);
+        await admin.OpenRegistrationAsync(organisation, logged);
+        foreach (var name in Names.Players[..4])
+        {
+            await admin.EnterAsync(organisation, logged, await admin.CreateGuestAsync(organisation, "player", name));
+        }
+
+        await admin.ChangePlannedStartAsync(organisation, logged, clock.At(10, 10));
+        await admin.CloseRegistrationAsync(organisation, logged);
+        await admin.PublishScheduleAsync(organisation, logged);
+        await admin.WithdrawScheduleAsync(organisation, logged, "Seeded in the wrong order");
+        await admin.PublishDraftAsync(organisation, logged);
     }
 
     private static async Task SecondOrganisationAsync(Admin admin, Guid organisation, Clock clock)

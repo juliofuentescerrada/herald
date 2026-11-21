@@ -35,7 +35,7 @@ public static class SaveTournamentEndpoint
 
         var actor = context.ActorId ?? throw new InvalidOperationException($"No acting person in organisation {organisationId}.");
         var entries = await db.EntryCountsAsync(id, cancellationToken);
-        var result = tournament.Change(command.Configuration ?? new TournamentConfiguration(""), command.ExpectedRevision, actor, DateTimeOffset.UtcNow, entries);
+        var result = tournament.Change(command.Configuration ?? new TournamentConfiguration(""), command.ExpectedRevision, actor, DateTimeOffset.UtcNow, entries, context.ActorName);
         return await db.SavedAsync(bus, organisationId, tournament, result, cancellationToken);
     }
 }

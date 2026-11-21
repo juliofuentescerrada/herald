@@ -250,7 +250,7 @@ internal static class ScheduleResults
 
                     // Stored with the change by the transaction around the endpoint, sent after its commit.
                     await bus.PublishAsync(ScheduleDetails.Changed(organisationId, schedule));
-                    await PublishFactsAsync(bus, organisationId, schedule);
+                    await PublishFactsAsync(bus, organisationId, schedule, db.ActorName);
                     if (schedule.ResultsRevision != resultsRevision)
                     {
                         var matches = await db.Matches.Where(match => match.TournamentId == id).ToListAsync(cancellationToken);
@@ -264,7 +264,7 @@ internal static class ScheduleResults
     }
 
     // The notifiable facts of this write, as integration events (ADR 0017; h1-finalisation D-4).
-    private static async Task PublishFactsAsync(IMessageBus bus, Guid organisationId, Schedule schedule)
+    private static async Task PublishFactsAsync(IMessageBus bus, Guid organisationId, Schedule schedule, string? actorName)
     {
         foreach (var fact in schedule.DomainEvents)
         {
@@ -277,6 +277,15 @@ internal static class ScheduleResults
                 case Domain.CompetitionReopened reopened:
                     await bus.PublishAsync(new Contracts.Competition.V1.CompetitionReopened(
                         organisationId, schedule.Id.Value, reopened.ResultsRevision, reopened.Number, reopened.ReopenedBy, reopened.ReopenedAt));
+                    break;
+                case Domain.SchedulePublished published:
+                    await bus.PublishAsync(new Contracts.Competition.V1.SchedulePublished(
+                        organisationId, schedule.Id.Value, published.Number, published.PublishedBy, actorName, published.PublishedAt));
+                    break;
+                // The reason stays in the publication history (Q1).
+                case Domain.ScheduleWithdrawn withdrawn:
+                    await bus.PublishAsync(new Contracts.Competition.V1.ScheduleWithdrawn(
+                        organisationId, schedule.Id.Value, withdrawn.Number, "operator", withdrawn.WithdrawnBy, actorName, withdrawn.WithdrawnAt));
                     break;
             }
         }

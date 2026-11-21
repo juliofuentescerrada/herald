@@ -36,7 +36,7 @@ public static class ChangeDatesEndpoint
 
         var actor = context.ActorId ?? throw new InvalidOperationException($"No acting person in organisation {organisationId}.");
         var result = tournament.ChangeDates(
-            new(command.RegistrationOpensAt, command.RegistrationClosesAt, command.PlannedStartAt), command.ExpectedRevision, actor, DateTimeOffset.UtcNow);
+            new(command.RegistrationOpensAt, command.RegistrationClosesAt, command.PlannedStartAt), command.ExpectedRevision, actor, DateTimeOffset.UtcNow, context.ActorName);
         return await db.SavedAsync(bus, organisationId, tournament, result, cancellationToken);
     }
 }

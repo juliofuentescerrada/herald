@@ -21,6 +21,25 @@ public sealed class TournamentsDbContext(DbContextOptions<TournamentsDbContext> 
 
     public DbSet<ScheduleState> Schedules => Set<ScheduleState>();
 
+    public DbSet<ChangeLogEntry> ChangeLog => Set<ChangeLogEntry>();
+
+    // Adds a fact once: a second delivery of the same kind, subject and subject revision is skipped (change-log D-1).
+    public async Task<bool> LogOnceAsync(ChangeLogEntry entry, CancellationToken cancellationToken)
+    {
+        if (await ChangeLog.AnyAsync(e => e.Kind == entry.Kind && e.Subject == entry.Subject && e.SubjectRevision == entry.SubjectRevision, cancellationToken))
+        {
+            return false;
+        }
+
+        ChangeLog.Add(entry);
+        return true;
+    }
+
+    // The part of a tournament's change log visitors may read, newest first, without reasons (change-log D-1).
+    public async Task<IReadOnlyList<ChangeLogEntry>> PublicChangeLogAsync(TournamentId id, CancellationToken cancellationToken) =>
+        [.. (await ChangeLog.AsNoTracking().Where(entry => entry.TournamentId == id && entry.Public).OrderByDescending(entry => entry.At).ThenByDescending(entry => entry.SubjectRevision).ToListAsync(cancellationToken))
+            .Select(entry => entry with { Reason = null, ActorId = null, ActorName = null })];
+
     // Whether Competition last reported a published schedule: it locks the field and reopening (D-4).
     public Task<bool> SchedulePublishedAsync(TournamentId id, CancellationToken cancellationToken) =>
         Schedules.AsNoTracking().AnyAsync(schedule => schedule.TournamentId == id && schedule.PublishedRevision != null, cancellationToken);
@@ -54,6 +73,7 @@ public sealed class TournamentsDbContext(DbContextOptions<TournamentsDbContext> 
         modelBuilder.Entity<Tournament>(tournament =>
         {
             tournament.Ignore(t => t.DomainEvents);
+            tournament.Ignore(t => t.Logged);
             tournament.Ignore(t => t.IsStarted);
             tournament.Ignore(t => t.IsCancelled);
             tournament.Property(t => t.CancellationReason).HasMaxLength(Tournament.ReasonMaxLength);
@@ -92,6 +112,22 @@ public sealed class TournamentsDbContext(DbContextOptions<TournamentsDbContext> 
             counts.Ignore(c => c.Counts);
             Json(counts.Property(c => c.RostersOutsideBounds));
             Json(counts.Property(c => c.SharedMemberNames));
+        });
+
+        OrganisationOwned<ChangeLogEntry>(modelBuilder);
+        modelBuilder.Entity<ChangeLogEntry>(entry =>
+        {
+            // The fact's identity is its key, so a repeated fact cannot be stored twice (D-1).
+            entry.HasKey(e => new { e.Kind, e.Subject, e.SubjectRevision });
+            entry.Property(e => e.Kind).HasConversion<string>().HasMaxLength(40);
+            entry.Property(e => e.TournamentId).HasConversion(id => id.Value, value => new TournamentId(value));
+            entry.HasIndex(e => new { e.TournamentId, e.At });
+            entry.Property(e => e.ActorName).HasMaxLength(200);
+            entry.Property(e => e.TimeZone).HasMaxLength(TournamentConfiguration.TimeZoneMaxLength);
+            entry.Property(e => e.Alias).HasMaxLength(200);
+            entry.Property(e => e.Cause).HasMaxLength(40);
+            entry.Property(e => e.Reason).HasMaxLength(Tournament.ReasonMaxLength);
+            Json(entry.Property(e => e.Changes));
         });
 
         modelBuilder.Entity<ScheduleState>(schedule =>

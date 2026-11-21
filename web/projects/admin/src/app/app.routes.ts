@@ -79,6 +79,11 @@ export const routes: Routes = [
             loadComponent: () => import('./features/standings').then((m) => m.StandingsPage),
           },
           {
+            path: 'tournaments/:tournamentId/change-log',
+            title: 'Change log · Herald',
+            loadComponent: () => import('./features/change-log').then((m) => m.ChangeLogPage),
+          },
+          {
             path: 'tournaments/:tournamentId/matches/:matchId',
             canDeactivate: [confirmLeave],
             title: 'Match · Herald',

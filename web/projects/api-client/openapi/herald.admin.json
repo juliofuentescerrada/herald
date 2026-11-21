@@ -1094,6 +1094,71 @@
         }
       }
     },
+    "/api/organisations/{organisationId}/tournaments/{tournamentId}/change-log": {
+      "get": {
+        "tags": [
+          "Herald.Tournaments.Features.GetChangeLog.GetChangeLogEndpoint"
+        ],
+        "summary": "GET_api_organisations_organisationId_tournaments_tournamentId_change_log",
+        "description": "GET_api_organisations_organisationId_tournaments_tournamentId_change_log",
+        "operationId": "getChangeLog",
+        "parameters": [
+          {
+            "name": "organisationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "tournamentId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/ChangeLogItem"
+                  }
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
     "/api/organisations/{organisationId}/tournaments/{tournamentId}/registration/closure": {
       "post": {
         "tags": [
@@ -4468,6 +4533,118 @@
           }
         }
       },
+      "ChangedValue": {
+        "required": [
+          "field",
+          "old",
+          "new"
+        ],
+        "type": "object",
+        "properties": {
+          "field": {
+            "type": "string"
+          },
+          "old": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "new": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        }
+      },
+      "ChangeKind": {
+        "enum": [
+          "entryAdmitted",
+          "entryCancelled",
+          "schedulePublished",
+          "scheduleWithdrawn",
+          "tournamentPublished",
+          "materialChange",
+          "datesChanged",
+          "visibilityChanged",
+          "tournamentCancelled",
+          "competitionFinalised",
+          "competitionReopened"
+        ]
+      },
+      "ChangeLogItem": {
+        "required": [
+          "kind",
+          "subject",
+          "subjectRevision",
+          "actorName",
+          "at",
+          "changes",
+          "timeZone",
+          "alias",
+          "cause",
+          "reason",
+          "public"
+        ],
+        "type": "object",
+        "properties": {
+          "kind": {
+            "$ref": "#/components/schemas/ChangeKind"
+          },
+          "subject": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "subjectRevision": {
+            "type": "integer",
+            "format": "int32"
+          },
+          "actorName": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "changes": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/ChangedValue"
+            }
+          },
+          "timeZone": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "alias": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "cause": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "reason": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "public": {
+            "type": "boolean"
+          }
+        }
+      },
       "CheckIn": {
         "enum": [
           "optional",
@@ -7437,6 +7614,9 @@
     },
     {
       "name": "Herald.Tournaments.Features.CreateTournament.CreateTournamentEndpoint"
+    },
+    {
+      "name": "Herald.Tournaments.Features.GetChangeLog.GetChangeLogEndpoint"
     },
     {
       "name": "Herald.Tournaments.Features.CloseRegistration.CloseRegistrationEndpoint"

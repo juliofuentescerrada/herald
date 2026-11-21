@@ -1,0 +1,60 @@
+<a class="back" routerLink=".."><herald-icon name="arrow-left" size="metadata" />Back to configuration</a>
+
+@if (tournament.isPending()) {
+  <p class="panel" role="status">Loading the change log…</p>
+} @else if (tournament.isError()) {
+  <section class="panel">
+    <herald-notice tone="danger" heading="Change log not available">
+      This tournament does not exist in this organisation, or could not be read.
+    </herald-notice>
+    <div class="actions">
+      <button herald-button variant="primary" type="button" [loading]="tournament.isFetching()" (click)="tournament.refetch()">Try again</button>
+      <a herald-button routerLink="../.."><herald-icon name="arrow-left" />Back to tournaments</a>
+    </div>
+  </section>
+} @else {
+  <header class="page-header">
+    <div class="title"><h1>Change log · {{ tournament.data()!.configuration.title }}</h1></div>
+  </header>
+  <app-tournament-nav current="Change log" />
+
+  <div class="column">
+    @if (log.isPending()) {
+      <p role="status">Loading the change log…</p>
+    } @else if (log.isError()) {
+      <herald-notice tone="danger" heading="The change log could not be loaded">
+        The request failed. Nothing changed.
+        <span class="notice-action"><button herald-button type="button" [loading]="log.isFetching()" (click)="log.refetch()">Try again</button></span>
+      </herald-notice>
+    } @else if (log.data()!.length === 0) {
+      <herald-notice heading="No changes yet">
+        Changes appear here from publication onwards: admissions, schedules, dates and other material changes, cancellation and final standings.
+      </herald-notice>
+    } @else {
+      <div class="filter" role="group" aria-label="Show changes of kind">
+        @for (g of groups; track g) {
+          <button herald-button type="button" [attr.aria-pressed]="group() === g" (click)="group.set(g)">{{ g }}</button>
+        }
+      </div>
+      @if (shown().length === 0) {
+        <p class="help" role="status">No {{ group().toLowerCase() }} changes yet.</p>
+      } @else {
+        <ul class="log">
+          @for (item of shown(); track item.kind + item.subject + item.subjectRevision) {
+            <li>
+              <herald-icon [name]="iconOf(item)" size="metadata" />
+              <div>
+                <p>{{ sentence(item) }}@if (reasonLink(item); as link) { · <a [routerLink]="link.path">{{ link.text }}</a>}</p>
+                <p class="help">{{ byline(item) }}</p>
+              </div>
+              @if (item.public && visible()) {
+                <herald-status-label>Public</herald-status-label>
+              }
+            </li>
+          }
+        </ul>
+      }
+      <p class="help">Herald records these changes; it does not send them. Tell your guests through your usual channels.</p>
+    }
+  </div>
+}

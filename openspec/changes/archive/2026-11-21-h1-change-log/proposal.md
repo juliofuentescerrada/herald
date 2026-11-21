@@ -2,6 +2,8 @@
 
 **Proposed in H1 batch 3's proposals pull request, 15 November 2026.** The rules come from the batch's decision session of the same day, recorded in the functional discovery (F-10, §5.2; §15 rows D-26 and D-27). It depends on `h1-tournament-cancel-and-dates`, whose facts it records. Merging the proposals pull request approves this change (ADR 0018); task 1.1 records that approval.
 
+**Approved for implementation on 16 November 2026**, when the maintainer merged the batch 3 proposals pull request (#74), with the review answers below (ADR 0018). The review asked for no change to this proposal.
+
 **Review answers, 15 November 2026 (#74):** the maintainer accepted Q1 and Q2 (other modules' reasons linked, not copied; results only as revised final standings) and the prototypes as they are.
 
 ## Why

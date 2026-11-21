@@ -34,6 +34,13 @@ public static class TournamentCancelledHandler
 
         await db.SaveChangesAsync(cancellationToken);
         await bus.PublishAsync(ScheduleDetails.Changed(message.OrganisationId, schedule));
+        // The publication the cancellation withdrew, as a fact with its cause and no reason (h1-change-log D-3).
+        foreach (var withdrawn in schedule.DomainEvents.OfType<ScheduleWithdrawn>())
+        {
+            await bus.PublishAsync(new Contracts.Competition.V1.ScheduleWithdrawn(
+                message.OrganisationId, message.TournamentId, withdrawn.Number, "tournament-cancelled", withdrawn.WithdrawnBy, null, withdrawn.WithdrawnAt));
+        }
+
         if (schedule.ResultsRevision != resultsRevision)
         {
             // The final results: Standings keeps them as they are, with no champion (D-2).

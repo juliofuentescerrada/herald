@@ -124,6 +124,50 @@ export interface ChangeDates {
   plannedStartAt?: string | null;
 }
 
+export interface ChangedValue {
+  field: string;
+  /** @nullable */
+  old: string | null;
+  /** @nullable */
+  new: string | null;
+}
+
+export type ChangeKind = typeof ChangeKind[keyof typeof ChangeKind];
+
+
+export const ChangeKind = {
+  entryAdmitted: 'entryAdmitted',
+  entryCancelled: 'entryCancelled',
+  schedulePublished: 'schedulePublished',
+  scheduleWithdrawn: 'scheduleWithdrawn',
+  tournamentPublished: 'tournamentPublished',
+  materialChange: 'materialChange',
+  datesChanged: 'datesChanged',
+  visibilityChanged: 'visibilityChanged',
+  tournamentCancelled: 'tournamentCancelled',
+  competitionFinalised: 'competitionFinalised',
+  competitionReopened: 'competitionReopened',
+} as const;
+
+export interface ChangeLogItem {
+  kind: ChangeKind;
+  subject: string;
+  subjectRevision: number;
+  /** @nullable */
+  actorName: string | null;
+  at: string;
+  changes: ChangedValue[];
+  /** @nullable */
+  timeZone: string | null;
+  /** @nullable */
+  alias: string | null;
+  /** @nullable */
+  cause: string | null;
+  /** @nullable */
+  reason: string | null;
+  public: boolean;
+}
+
 export type CheckIn = typeof CheckIn[keyof typeof CheckIn] | null;
 
 
@@ -1786,6 +1830,45 @@ export class HeraldHostAdminService {
   }
 
 /**
+ * GET_api_organisations_organisationId_tournaments_tournamentId_change_log
+ * @summary GET_api_organisations_organisationId_tournaments_tournamentId_change_log
+ */
+ getChangeLog<TData = ChangeLogItem[]>(organisationId: string,
+    tournamentId: string, options?: HttpClientBodyOptions): Observable<TData>;
+ getChangeLog<TData = ChangeLogItem[]>(organisationId: string,
+    tournamentId: string, options?: HttpClientEventOptions): Observable<HttpEvent<TData>>;
+ getChangeLog<TData = ChangeLogItem[]>(organisationId: string,
+    tournamentId: string, options?: HttpClientResponseOptions): Observable<AngularHttpResponse<TData>>;
+  getChangeLog<TData = ChangeLogItem[]>(
+    organisationId: string,
+    tournamentId: string, options?: HttpClientObserveOptions): Observable<TData | HttpEvent<TData> | AngularHttpResponse<TData>> {
+    if (options?.observe === 'events') {
+      return this.http.get<TData>(
+      `/api/organisations/${organisationId}/tournaments/${tournamentId}/change-log`,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'events',
+      }
+    );
+    }
+
+    if (options?.observe === 'response') {
+      return this.http.get<TData>(
+      `/api/organisations/${organisationId}/tournaments/${tournamentId}/change-log`,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'response',
+      }
+    );
+    }
+
+    return this.http.get<TData>(
+      `/api/organisations/${organisationId}/tournaments/${tournamentId}/change-log`,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'body',
+      }
+    );
+  }
+
+/**
  * POST_api_organisations_organisationId_tournaments_tournamentId_registration_closure
  * @summary POST_api_organisations_organisationId_tournaments_tournamentId_registration_closure
  */
@@ -3423,6 +3506,7 @@ export type PublishTournamentClientResult = NonNullable<TournamentDetails>
 export type OpenRegistrationClientResult = NonNullable<TournamentDetails>
 export type ListTournamentsClientResult = NonNullable<TournamentSummary[]>
 export type CreateTournamentClientResult = NonNullable<IResult | TournamentDetails>
+export type GetChangeLogClientResult = NonNullable<ChangeLogItem[]>
 export type CloseRegistrationClientResult = NonNullable<TournamentDetails>
 export type ChangeDatesClientResult = NonNullable<TournamentDetails>
 export type CancelTournamentClientResult = NonNullable<TournamentDetails>

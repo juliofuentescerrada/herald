@@ -91,11 +91,34 @@ public sealed class Admin(Seeding seeding, Persona persona)
             expectedRevision = (await ReadAsync(await _client.GetAsync(schedule), "read a schedule")).GetProperty("revision").GetInt32(),
             seeding = "admissionOrder",
         }));
+        await PublishDraftAsync(organisation, tournament);
+    }
+
+    // Publishes the current draft, such as the one a withdrawal returned.
+    public async Task PublishDraftAsync(Guid organisation, Guid tournament)
+    {
+        var schedule = $"{Path(organisation, tournament)}/schedule";
         await WriteAsync($"publish the schedule of {tournament}", async () => await _client.PostAsJsonAsync($"{schedule}/publication", new
         {
             expectedRevision = (await ReadAsync(await _client.GetAsync(schedule), "read a schedule")).GetProperty("revision").GetInt32(),
         }));
     }
+
+    // Withdraws the published schedule with a private reason; its pairings come back as the draft.
+    public async Task WithdrawScheduleAsync(Guid organisation, Guid tournament, string reason)
+    {
+        var schedule = $"{Path(organisation, tournament)}/schedule";
+        await WriteAsync($"withdraw the schedule of {tournament}", async () => await _client.PostAsJsonAsync($"{schedule}/withdrawal", new
+        {
+            reason,
+            expectedRevision = (await ReadAsync(await _client.GetAsync(schedule), "read a schedule")).GetProperty("revision").GetInt32(),
+        }));
+    }
+
+    // Moves the planned start of a published tournament through "Change dates" (h1-tournament-cancel-and-dates D-5).
+    public async Task ChangePlannedStartAsync(Guid organisation, Guid tournament, object plannedStartAt) =>
+        await WriteAsync($"change the dates of {tournament}", async () =>
+            await _client.PostAsJsonAsync($"{Path(organisation, tournament)}/dates", new { plannedStartAt, expectedRevision = await RevisionAsync(organisation, tournament) }));
 
     public async Task StartCompetitionAsync(Guid organisation, Guid tournament) =>
         await WriteAsync($"start the competition of {tournament}", async () =>

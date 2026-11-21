@@ -14,6 +14,9 @@ public abstract class OrganisationScopedDbContext(DbContextOptions options, Orga
     // A DbContext member, so EF Core reads it per query instead of baking it into the cached model.
     protected Guid CurrentOrganisationId => organisation.OrganisationId ?? Guid.Empty;
 
+    // The signed-in person's display name, for the fact events a write publishes (h1-change-log N-1); null for a message.
+    public string? ActorName => organisation.ActorName;
+
     protected void OrganisationOwned<TEntity>(ModelBuilder modelBuilder)
         where TEntity : class
     {
