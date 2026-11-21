@@ -6,15 +6,15 @@ using System.Collections.Generic;
 
 namespace Internal.Generated.WolverineHandlers
 {
-    // START: TournamentResultsChangedHandler401829342
+    // START: TournamentResultsChangedHandlerHandler1616089824
     [global::System.CodeDom.Compiler.GeneratedCode("JasperFx", "1.0.0")]
-    public sealed class TournamentResultsChangedHandler401829342 : Wolverine.Runtime.Handlers.MessageHandler
+    public sealed class TournamentResultsChangedHandlerHandler1616089824 : Wolverine.Runtime.Handlers.MessageHandler
     {
         private readonly Microsoft.EntityFrameworkCore.DbContextOptions<Herald.Standings.Persistence.StandingsDbContext> _dbContextOptionsOfStandingsDbContext;
         private readonly Microsoft.Extensions.DependencyInjection.IServiceScopeFactory _serviceScopeFactory;
         private readonly System.Collections.Generic.IEnumerable<Wolverine.EntityFrameworkCore.IDomainEventScraper> _domainEventScraperIEnumerable;
 
-        public TournamentResultsChangedHandler401829342(Microsoft.EntityFrameworkCore.DbContextOptions<Herald.Standings.Persistence.StandingsDbContext> dbContextOptionsOfStandingsDbContext, Microsoft.Extensions.DependencyInjection.IServiceScopeFactory serviceScopeFactory, System.Collections.Generic.IEnumerable<Wolverine.EntityFrameworkCore.IDomainEventScraper> domainEventScraperIEnumerable)
+        public TournamentResultsChangedHandlerHandler1616089824(Microsoft.EntityFrameworkCore.DbContextOptions<Herald.Standings.Persistence.StandingsDbContext> dbContextOptionsOfStandingsDbContext, Microsoft.Extensions.DependencyInjection.IServiceScopeFactory serviceScopeFactory, System.Collections.Generic.IEnumerable<Wolverine.EntityFrameworkCore.IDomainEventScraper> domainEventScraperIEnumerable)
         {
             _dbContextOptionsOfStandingsDbContext = dbContextOptionsOfStandingsDbContext;
             _serviceScopeFactory = serviceScopeFactory;
@@ -66,7 +66,7 @@ namespace Internal.Generated.WolverineHandlers
         }
     }
 
-    // END: TournamentResultsChangedHandler401829342
+    // END: TournamentResultsChangedHandlerHandler1616089824
     
     
 }

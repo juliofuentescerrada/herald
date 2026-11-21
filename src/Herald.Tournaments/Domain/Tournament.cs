@@ -498,6 +498,32 @@ public sealed class Tournament : AggregateRoot<TournamentId>
         return WriteOutcome.Applied;
     }
 
+    // In any state after publication, cancelled and archived included; before it, visibility is part of the configuration
+    // (§5.2, h1-public-read D-3). Logged as its own change.
+    public WriteResult ChangeVisibility(Visibility visibility, int expectedRevision, Guid actor, DateTimeOffset at, string? actorName = null)
+    {
+        if (Configuration.Visibility == visibility)
+        {
+            return WriteOutcome.Repeated;
+        }
+
+        if (expectedRevision != Revision)
+        {
+            return WriteOutcome.Stale;
+        }
+
+        if (Publication != Publication.Published)
+        {
+            return new(WriteOutcome.Rejected, [new("visibility", "not-published")]);
+        }
+
+        var before = Configuration.Visibility;
+        Configuration = Configuration with { Visibility = visibility };
+        Touch(actor, at);
+        Log(ChangeKind.VisibilityChanged, actor, actorName, at, Values([("visibility", before, visibility)]));
+        return WriteOutcome.Applied;
+    }
+
     // A draft has no entries and no other module holds anything of it, so it is removed whole (design D-4).
     public WriteResult CanDelete(int expectedRevision)
     {

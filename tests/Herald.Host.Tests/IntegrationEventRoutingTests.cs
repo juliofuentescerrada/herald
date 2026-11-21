@@ -1,5 +1,6 @@
 using Herald.Contracts.Competition.V1;
 using Herald.Contracts.Registration.V1;
+using Herald.Contracts.Standings.V1;
 using Herald.Contracts.Tournaments.V1;
 using Microsoft.Extensions.DependencyInjection;
 using Shouldly;
@@ -15,7 +16,7 @@ public class IntegrationEventRoutingTests(PostgresFixture postgres)
     [Theory]
     [InlineData(typeof(TournamentEntryTermsChanged), "local://registration/")]
     [InlineData(typeof(TournamentFieldChanged), "local://tournaments/")]
-    [InlineData(typeof(TournamentResultsChanged), "local://standings/")]
+    [InlineData(typeof(TournamentStandingsChanged), "local://tournaments/")]
     [InlineData(typeof(TournamentArchiveChanged), "local://competition/")]
     public async Task An_integration_event_goes_to_its_consumers_durable_local_queue(Type integrationEvent, string queue)
     {
@@ -30,9 +31,10 @@ public class IntegrationEventRoutingTests(PostgresFixture postgres)
     }
 
     [Theory]
+    [InlineData(typeof(TournamentResultsChanged))]
     [InlineData(typeof(CompetitionFinalised))]
     [InlineData(typeof(CompetitionReopened))]
-    public async Task A_finalisation_fact_goes_to_both_its_consumers_durable_local_queues(Type integrationEvent)
+    public async Task Results_and_finalisation_facts_go_to_both_their_consumers_durable_local_queues(Type integrationEvent)
     {
         await using var host = new HostFactory(postgres.ConnectionString);
         _ = host.CreateClient();

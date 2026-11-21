@@ -34,6 +34,10 @@ Each standing's explanation lists its resolved matches with opponent, outcome, c
 
 Public page (visual direction §8): the public shell's header; the title with lifecycle labels beside it; an overview panel (organiser, game, venue, dates with time zone, structure); then Rounds (each round with its state and matches, causes in words, rests), Standings (table with Position, Entrant, Points and, at 700 px and above, Resolved, Won, Drawn, Lost; a row opens its explanation), and Changes (public change log entries). The standings header says "Provisional · results revision 9 · updated 22 November 2026, 11:40 Europe/Madrid" or "Final · final revision 2 (revised after reopening)". Not available: a short page with the heading "This tournament is not available" and a link to the home page. Admin: a "Visibility" panel on the configuration page with the current value, "Change visibility" (secondary) and "View public page" (link, public or unlisted only).
 
+### D-6 The organiser's name
+
+Tournaments holds no organisation names. The public query asks Organisations for the name through `IOrganisationAccess` in `Herald.ModuleHosting`, which gains `FindNameAsync(organisationId)`. The visibility check and every other part of the page stay in Tournaments, and a name is never private. The maintainer chose this over a name projection on 21 November 2026.
+
 ## Visual input
 
 Prototypes: `prototypes/frontend/correct-close-open-states.html`.

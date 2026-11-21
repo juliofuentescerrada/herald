@@ -37,6 +37,7 @@ public static class TournamentScheduleChangedHandler
         state.Revision = message.Revision;
         state.PublishedRevision = message.PublishedRevision;
         state.EligibleRevision = message.EligibleRevision;
+        state.Published = message.Published;
         var published = message.PublishedRevision is not null;
         if (published != wasPublished
             && await db.Tournaments.SingleOrDefaultAsync(tournament => tournament.Id == id, cancellationToken) is { Publication: Publication.Published } tournament)

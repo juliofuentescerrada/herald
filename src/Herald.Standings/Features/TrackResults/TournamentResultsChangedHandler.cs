@@ -9,6 +9,8 @@ using Wolverine.Attributes;
 namespace Herald.Standings.Features.TrackResults;
 
 // Keeps the latest results of each tournament (h1-standings D-1) and publishes the table; an older snapshot changes nothing.
+// Tournaments keeps the same results on its own queue for the public page.
+[StickyHandler(StandingsModule.Queue)]
 public static class TournamentResultsChangedHandler
 {
     // The first report of a tournament arriving twice at once, or two snapshots applied together: tried again.

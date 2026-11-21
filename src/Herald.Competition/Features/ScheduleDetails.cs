@@ -165,8 +165,15 @@ public sealed record ScheduleDetails(
         Of(schedule, await db.Matches.AsNoTracking().Where(match => match.TournamentId == schedule.Id).ToListAsync(cancellationToken));
 
     // The snapshot Tournaments keeps to lock the field and, later, to check start (D-4).
+    // With the published pairings and aliases, for the public page (h1-public-read D-1).
     public static TournamentScheduleChanged Changed(Guid organisationId, Schedule schedule) =>
-        new(organisationId, schedule.Id.Value, schedule.Revision, schedule.Current?.Number, schedule.Current?.Pairings.EligibleRevision);
+        new(organisationId, schedule.Id.Value, schedule.Revision, schedule.Current?.Number, schedule.Current?.Pairings.EligibleRevision,
+            schedule.Current?.Pairings is { } pairings
+                ? new PublishedSchedule(
+                    [.. pairings.Entrants.Select(entrant => new ScheduleEntrant(entrant.EntryId, entrant.Name))],
+                    [.. pairings.Matches.Select(match => new SchedulePairing(match.Round, match.First, match.Second))],
+                    [.. pairings.Rests.Select(rest => new ScheduleRest(rest.Round, rest.EntryId))])
+                : null);
 
     private static PublicationDetails PublicationOf(Publication publication) =>
         new(publication.Number, PairingsOf(publication.Pairings), publication.PublishedAt, publication.WithdrawalReason, publication.WithdrawnAt);
