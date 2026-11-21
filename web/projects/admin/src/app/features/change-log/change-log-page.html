@@ -44,12 +44,7 @@
             <li>
               <herald-icon [name]="iconOf(item)" size="metadata" />
               <div>
-                <p>
-                  {{ sentence(item) }}
-                  @if (reasonLink(item); as link) {
-                    · <a [routerLink]="link.path">{{ link.text }}</a>
-                  }
-                </p>
+                <p>{{ sentence(item) }}@if (reasonLink(item); as link) { · <a [routerLink]="link.path">{{ link.text }}</a>}</p>
                 <p class="help">{{ byline(item) }}</p>
               </div>
               @if (item.public) {

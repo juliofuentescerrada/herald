@@ -21,7 +21,7 @@
 
 - [x] 5.1 `tools/Herald.Seed`: tournaments with a populated change log
 - [x] 5.2 Journey 27; the suite passes
-- [ ] 5.3 Test script in `e2e/scripts/` (seeded data, `scriptPersona`) with a screenshot per step: populated log, filter, a dates change, the cancellation
+- [x] 5.3 Test script in `e2e/scripts/` (seeded data, `scriptPersona`) with a screenshot per step: populated log, filter, a dates change, the cancellation
 
 ## 6. Validation and completion
 
