@@ -52,6 +52,9 @@ public interface IOrganisationAccess
 {
     // The caller's access to the organisation, or null when it has none: no membership, or no active grant.
     Task<Access?> FindAccessAsync(Guid organisationId, Caller caller, CancellationToken cancellationToken);
+
+    // The organisation's name, for the public tournament page (h1-public-read D-6); never private. Null for an unknown organisation.
+    Task<string?> FindNameAsync(Guid organisationId, CancellationToken cancellationToken);
 }
 
 // The organisation the current request or message acts for; one per scope, entered once.

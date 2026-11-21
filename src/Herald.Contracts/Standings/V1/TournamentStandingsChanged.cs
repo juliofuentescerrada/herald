@@ -8,9 +8,23 @@ public enum StandingsEntrantStatus
     Disqualified,
 }
 
+/// <summary>A resolved match's result for the entrant; NoWinner gives no points and is neither a win, a draw nor a loss.</summary>
+public enum StandingsLineResult
+{
+    Won,
+    Drawn,
+    Lost,
+    NoWinner,
+}
+
+/// <summary>A line of an entrant's explanation: a resolved match with the opponent's alias, result, cause and points, or a rest
+/// (Opponent, Result and Cause null).</summary>
+public sealed record StandingsLine(int Round, string? Opponent, StandingsLineResult? Result, string? Cause, int Points);
+
 /// <summary>A row of the table: entrants with equal points share their position.</summary>
 public sealed record StandingsTableRow(
-    int Position, bool Shared, Guid EntryId, string Name, StandingsEntrantStatus Status, int Resolved, int Won, int Drawn, int Lost, int Points);
+    int Position, bool Shared, Guid EntryId, string Name, StandingsEntrantStatus Status, int Resolved, int Won, int Drawn, int Lost, int Points,
+    IReadOnlyList<StandingsLine> Lines);
 
 /// <summary>A final revision taken at <paramref name="ResultsRevision"/>; a reopening keeps it, marked.</summary>
 public sealed record StandingsFinalRevision(int Number, int ResultsRevision, DateTimeOffset FinalisedAt, bool Reopened);

@@ -371,10 +371,10 @@ public class TournamentSetupTests(OrganisationApi api)
     }
 
     [Fact]
-    public async Task The_public_document_has_no_tournament_operation()
+    public async Task The_public_document_has_only_the_anonymous_tournament_page_and_no_organisation_operation()
     {
-        var document = await api.Anonymous().GetStringAsync("/openapi/public.json", Cancellation);
+        var document = JsonDocument.Parse(await api.Anonymous().GetStringAsync("/openapi/public.json", Cancellation)).RootElement;
 
-        document.ShouldNotContain("ournament");
+        document.GetProperty("paths").EnumerateObject().Select(path => path.Name).ShouldBe(["/api/public/tournaments/{tournamentId}"]);
     }
 }

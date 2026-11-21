@@ -10,6 +10,13 @@ internal sealed class OrganisationAccess(OrganisationsDbContext db) : IOrganisat
     public Task<Access?> FindAccessAsync(Guid organisationId, Caller caller, CancellationToken cancellationToken) =>
         caller.Kind == CallerKind.Person ? FindMemberAsync(organisationId, caller, cancellationToken) : FindGrantAsync(organisationId, caller, cancellationToken);
 
+    public async Task<string?> FindNameAsync(Guid organisationId, CancellationToken cancellationToken)
+    {
+        var id = new OrganisationId(organisationId);
+        return (await db.Organisations.AsNoTracking().Where(organisation => organisation.Id == id)
+            .Select(organisation => organisation.Name).SingleOrDefaultAsync(cancellationToken))?.Value;
+    }
+
     private async Task<Access?> FindMemberAsync(Guid organisationId, Caller caller, CancellationToken cancellationToken) =>
         // Reviewed bypass: this check runs before any organisation context exists.
         await db.Memberships.IgnoreQueryFilters()

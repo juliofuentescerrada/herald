@@ -24,11 +24,11 @@ The page model has no field for contacts, reasons, rosters or lineups, and the p
 
 ### D-3 Visibility changes
 
-`ChangeVisibility(visibility, expectedRevision)` in any state after publication (and as part of the configuration before it). The admin dialog for private → public or unlisted shows a preview built from the same public query's model, requested by the owner through an admin endpoint that skips the visibility check (`GET /api/admin/tournaments/{id}/public-preview`). The switch to private commits and the next anonymous request is refused; responses carry `Cache-Control: no-store`, so no shared cache holds them.
+`ChangeVisibility(visibility, expectedRevision)` in any state after publication (and as part of the configuration before it). The admin dialog for private → public or unlisted shows a preview built from the same public query's model, requested by the owner through an admin endpoint that skips the visibility check (`GET /api/organisations/{organisationId}/tournaments/{id}/public-preview`, under the organisation like every admin route). Its aliases are the page's own: before the schedule's publication the page names no entrant, so the preview lists none. The switch to private commits and the next anonymous request is refused; responses carry `Cache-Control: no-store`, so no shared cache holds them.
 
 ### D-4 Explanation
 
-Each standing's explanation lists its resolved matches with opponent, outcome, cause and points, its rest and its remaining matches, from the results projection, as the admin Standings page does.
+Each standing's explanation lists its resolved matches with opponent, outcome, cause and points, its rest and its remaining matches, from the results projection, as the admin Standings page does. Implementation: the resolved matches and the rest come with each row of `TournamentStandingsChanged`, so the 3/1/0 points stay in Standings alone (ADR 0001); the remaining matches come from the results projection.
 
 ### D-5 Screens
 
