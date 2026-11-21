@@ -170,7 +170,52 @@ public sealed record FieldDetails(
         {
             await bus.PublishAsync(await EligibleAsync(organisationId, field, db, cancellationToken));
         }
+
+        await PublishFactsAsync(bus, organisationId, field, db, cancellationToken);
     }
+
+    // The notifiable facts of this change, as fact events with the entry's alias and no reason (ADR 0017; h1-change-log D-3).
+    private static async Task PublishFactsAsync(IMessageBus bus, Guid organisationId, Field field, RegistrationDbContext db, CancellationToken cancellationToken)
+    {
+        var facts = field.DomainEvents.Where(fact => fact is Domain.EntryAdmitted or Domain.EntryCancelled).ToList();
+        if (facts.Count == 0)
+        {
+            return;
+        }
+
+        var guestIds = field.Entries.Select(entry => entry.GuestId).ToList();
+        var aliases = await db.Guests.AsNoTracking().Where(guest => guestIds.Contains(guest.Id)).ToDictionaryAsync(guest => guest.Id, guest => guest.Name, cancellationToken);
+        foreach (var fact in facts)
+        {
+            switch (fact)
+            {
+                case Domain.EntryAdmitted admitted when field.Find(admitted.EntryId) is { } entry:
+                    await bus.PublishAsync(new Contracts.Registration.V1.EntryAdmitted(
+                        organisationId, field.Id.Value, entry.Id.Value, entry.Revision, aliases.GetValueOrDefault(entry.GuestId, ""), AdmissionCause(admitted.Method),
+                        admitted.AdmittedBy, admitted.AdmittedBy is null ? null : db.ActorName, admitted.AdmittedAt));
+                    break;
+                case Domain.EntryCancelled cancelled when field.Find(cancelled.EntryId) is { } entry:
+                    await bus.PublishAsync(new Contracts.Registration.V1.EntryCancelled(
+                        organisationId, field.Id.Value, entry.Id.Value, entry.Revision, aliases.GetValueOrDefault(entry.GuestId, ""), CancellationCause(cancelled.Cause),
+                        cancelled.CancelledBy, db.ActorName, cancelled.CancelledAt));
+                    break;
+            }
+        }
+    }
+
+    private static string AdmissionCause(AdmissionMethod method) => method switch
+    {
+        AdmissionMethod.Automatic => "automatic",
+        AdmissionMethod.Owner => "operator",
+        _ => "promotion",
+    };
+
+    private static string CancellationCause(Domain.CancellationCause cause) => cause switch
+    {
+        Domain.CancellationCause.Owner => "operator",
+        Domain.CancellationCause.AbsentAtStart => "absent-at-start",
+        _ => "tournament-cancelled",
+    };
 }
 
 internal static class FieldResults
