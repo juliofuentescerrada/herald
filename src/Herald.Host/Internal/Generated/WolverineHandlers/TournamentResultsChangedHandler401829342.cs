@@ -47,7 +47,7 @@ namespace Internal.Generated.WolverineHandlers
                 Wolverine.Runtime.WolverineTracing.MessageActivity(context.Envelope)?.SetTag("handler.type", "Herald.Standings.Features.TrackResults.TournamentResultsChangedHandler");
                 
                 // The actual message execution
-                await Herald.Standings.Features.TrackResults.TournamentResultsChangedHandler.Handle(tournamentResultsChanged, organisationContext, standingsDbContext, cancellation).ConfigureAwait(false);
+                await Herald.Standings.Features.TrackResults.TournamentResultsChangedHandler.Handle(tournamentResultsChanged, organisationContext, standingsDbContext, context, cancellation).ConfigureAwait(false);
 
                 
                 // Added by EF Core Transaction Middleware

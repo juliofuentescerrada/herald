@@ -59,7 +59,8 @@ public sealed class OrganisationApi : IAsyncLifetime
         T result = default!;
         var session = await _host!.Services.GetRequiredService<IHost>().TrackActivity()
             .ExecuteAndWaitAsync((Func<Wolverine.IMessageContext, Task>)(async _ => result = await request()));
-        foreach (var message in session.Sent.MessagesOf<object>())
+        // A message no module consumes yet still counts: it was published through the outbox all the same.
+        foreach (var message in session.Sent.MessagesOf<object>().Concat(session.NoRoutes.MessagesOf<object>()))
         {
             _sent.Enqueue(message);
         }

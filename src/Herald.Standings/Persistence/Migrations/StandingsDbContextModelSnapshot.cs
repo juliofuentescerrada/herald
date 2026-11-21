@@ -44,6 +44,9 @@ namespace Herald.Standings.Persistence.Migrations
                         .IsRequired()
                         .HasColumnType("jsonb");
 
+                    b.Property<int>("TableRevision")
+                        .HasColumnType("integer");
+
                     b.Property<uint>("xmin")
                         .IsConcurrencyToken()
                         .ValueGeneratedOnAddOrUpdate()
