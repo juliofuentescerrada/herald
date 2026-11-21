@@ -56,7 +56,9 @@ Visual choices (G-/RU-): the public page reads top-down without an aside; status
 
 ## Risks / Trade-offs
 
-- [Projection lag on the public page] → the page shows the revision and time it reflects; the operator's pages remain authoritative.
+- [Projection lag on the public page] → the page shows the revision and time it reflects; the operator's pages remain authoritative. While the results projection is ahead of the standings one, an entrant's explanation can miss a match resolved in between (neither in its lines nor still to play) until the standings arrive.
+- [Tournaments started before this change] → their projections fill only when Competition or Standings next publish for them; until then their public page shows no rounds or standings. No deployed data predates it (M4 waits, ADR 0012).
+- [Preview then a schedule published elsewhere] → the preview lists the aliases the page names at that moment; a schedule published before the owner confirms adds aliases they did not see. The preview says so ("the page names entrants once the schedule is published").
 
 ## Full run (task 5.2)
 
@@ -73,3 +75,12 @@ The test script's captures (`public-before-start`, `public-running`, `public-exp
 - **Not available:** the link to the home page used the browser's blue in the first capture; it now takes the text colour.
 - **Visibility changes:** from public or unlisted, "Change visibility" asks to make the tournament private; from private, the preview offers public or unlisted. Switching between public and unlisted therefore passes through private. In H1 both open by link, so nothing a visitor reads differs (§5.2); a direct switch can come with H2's directory.
 - **Configuration form:** once published, its Visibility field is locked and points to "Change visibility", as the dates point to "Change dates", so a visibility change always passes its confirmation or preview.
+
+## herald-reviewer review (task 5.4)
+
+21 November 2026, on the slice's diff:
+
+- **SSR headers (should fix):** spreading `RESPONSE_INIT.headers`, a `Headers` object, dropped `Content-Type`. Fixed: the server route declares `Cache-Control: no-store`; journey 28 checks it and `text/html` from the real server.
+- **Visibility through the configuration save (should fix):** the save could still change a published tournament's visibility past the preview. Fixed: `Change` rejects it (`visibility/change-visibility`) as it rejects dates; domain test added.
+- **Standings spec wording:** the scenario now names the results revision and the table revision apart.
+- **No backfill, explanation gap, preview re-check:** accepted and recorded under Risks.

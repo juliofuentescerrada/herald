@@ -178,7 +178,6 @@ describe('The public tournament page', () => {
       expect(text('h1')).toBe('This tournament is not available');
       expect(page().querySelector('a')?.getAttribute('href')).toBe('/');
       expect(response.status).toBe(404);
-      expect((response.headers as Record<string, string>)['Cache-Control']).toBe('no-store');
       expect(await violations(page())).toEqual([]);
     });
 });

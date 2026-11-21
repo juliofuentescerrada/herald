@@ -39,4 +39,15 @@ public class VisibilityTests
         cancelled.ChangeVisibility(Visibility.Public, 3, _owner, _at).Outcome.ShouldBe(WriteOutcome.Applied);
         cancelled.ChangeVisibility(Visibility.Private, 3, _owner, _at).Outcome.ShouldBe(WriteOutcome.Stale);
     }
+
+    [Fact]
+    public void A_published_tournament_s_configuration_cannot_change_its_visibility_past_the_preview()
+    {
+        var tournament = Draft();
+        tournament.Change(CompleteIndividual with { Visibility = Visibility.Public }, 1, _owner, _at).Outcome.ShouldBe(WriteOutcome.Applied);
+        tournament.Publish(2, _owner, _at);
+
+        tournament.Change(CompleteIndividual, 3, _owner, _at).Broken.ShouldBe([new BrokenRule("visibility", "change-visibility")]);
+        tournament.Configuration.Visibility.ShouldBe(Visibility.Public);
+    }
 }

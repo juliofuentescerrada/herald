@@ -59,8 +59,6 @@ export class TournamentPage {
   protected readonly standingsHeader = standingsHeader;
 
   constructor() {
-    // The page is never kept by a shared cache either, so a switch to private leaves no copy to purge (D-3, Q2).
-    if (this.response) this.response.headers = { ...(this.response.headers as Record<string, string> | undefined), 'Cache-Control': 'no-store' };
     const title = inject(Title);
     effect(() => {
       if (this.page()) title.setTitle(`${this.page()!.title} · Herald`);

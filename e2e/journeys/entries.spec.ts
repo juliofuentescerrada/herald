@@ -866,7 +866,10 @@ test('A visitor opens a public tournament’s link, reads its rounds and standin
   const link = await visibility.getByRole('link', { name: 'View public page' }).getAttribute('href');
   expect(link).toMatch(new RegExp(`^${urls.public}/tournaments/[0-9a-f-]{36}$`));
   const visitor = await (await browser.newContext()).newPage();
-  await visitor.goto(link!);
+  const found = await visitor.goto(link!);
+  // No shared cache keeps the page, so a switch to private leaves no copy behind.
+  expect(found?.headers()['cache-control']).toBe('no-store');
+  expect(found?.headers()['content-type']).toContain('text/html');
   await expect(visitor.getByRole('heading', { name: 'Lantern Open', level: 1 })).toBeVisible();
   await expect(visitor.getByRole('group', { name: 'Tournament lifecycle' })).toContainText('Running');
   await expect(visitor.getByRole('heading', { name: 'Round 3' })).toBeVisible();
@@ -891,6 +894,7 @@ test('A visitor opens a public tournament’s link, reads its rounds and standin
 
   const hidden = await visitor.goto(link!);
   expect(hidden?.status()).toBe(404);
+  expect(hidden?.headers()['cache-control']).toBe('no-store');
   await expect(visitor.getByRole('heading', { name: 'This tournament is not available' })).toBeVisible();
   await expect(visitor.getByText('Lantern Open')).toHaveCount(0);
   await expectAccessible(visitor);

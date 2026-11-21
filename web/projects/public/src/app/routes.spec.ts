@@ -34,6 +34,7 @@ describe('Public routes', () => {
   it('prerender the home page and render anything else per request', () => {
     expect(serverRoutes[0]).toEqual({ path: '', renderMode: RenderMode.Prerender });
     expect(serverRoutes.at(-1)).toEqual({ path: '**', renderMode: RenderMode.Server });
+    expect(serverRoutes.find((r) => r.path === 'tournaments/:tournamentId')).toEqual({ path: 'tournaments/:tournamentId', renderMode: RenderMode.Server, headers: { 'Cache-Control': 'no-store' } });
   });
 
   it('render the fixtures in the modes they stand for, in development only', async () => {
