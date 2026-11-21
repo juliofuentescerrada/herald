@@ -43,5 +43,5 @@ export class ChangeLogPage {
   protected readonly sentence = sentence;
   protected readonly iconOf = iconOf;
   protected readonly reasonLink = reasonLink;
-  protected readonly byline = (item: ChangeLogItem) => [item.actorName, instantText(item.at, this.zone())].filter(Boolean).join(' · ');
+  protected readonly byline = (item: ChangeLogItem) => [item.actorName, instantText(item.at, this.zone()), this.zone()].filter(Boolean).join(' · ');
 }

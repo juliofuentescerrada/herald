@@ -19,4 +19,6 @@ h1 { font-size: 32px; }
 .log li { display: grid; grid-template-columns: auto 1fr auto; align-items: start; gap: var(--herald-space-3); padding: var(--herald-space-3) var(--herald-space-4); border-bottom: 1px solid var(--herald-color-border-default); }
 .log li:last-child { border-bottom: 0; }
 .log herald-icon { margin-top: 3px; color: var(--herald-color-text-secondary); }
+/* Links keep the text colour and underline of the house link style, not the browser's blue. */
+.log a { color: var(--herald-color-text-primary); }
 .log p { margin: 0 0 var(--herald-space-1); max-inline-size: 75ch; overflow-wrap: anywhere; }

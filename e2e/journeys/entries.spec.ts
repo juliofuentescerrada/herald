@@ -842,7 +842,7 @@ test('An owner reads a tournament’s change log with the admissions, the publis
   await expect(log.getByText('Robin Vale admitted')).toBeVisible();
   await expect(log.getByText('Sam Reed admitted')).toBeVisible();
   await expect(log.getByText('Tournament published')).toBeVisible();
-  await expect(log.getByText(/^Persona \w+ · \d+ November 2026, \d\d:\d\d$/).first()).toBeVisible();
+  await expect(log.getByText(/^Persona \w+ · \d+ November 2026, \d\d:\d\d · Europe\/Madrid$/).first()).toBeVisible();
   await expectAccessible();
 
   // Filtering keeps only the schedule's changes.

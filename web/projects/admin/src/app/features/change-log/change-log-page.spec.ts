@@ -93,7 +93,7 @@ describe('The change log page', () => {
       'Venue changed from Madrid to Valencia',
       'Tournament published',
     ]);
-    expect(texts('.log li p.help')[1]).toBe('Alex Morgan · 20 November 2026, 09:30');
+    expect(texts('.log li p.help')[1]).toBe('Alex Morgan · 20 November 2026, 09:30 · Europe/Madrid');
     expect(texts('.log li herald-status-label')).toEqual(['Public', 'Public', 'Public', 'Public']);
     expect(text('nav a[aria-current="page"]')).toBe('Change log');
     expect(page().querySelector<HTMLAnchorElement>('.log a')?.getAttribute('href')).toBe(`/organisations/${organisation}/tournaments/${tournamentId}/schedule`);

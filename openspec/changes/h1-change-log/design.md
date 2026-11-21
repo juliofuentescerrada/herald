@@ -53,3 +53,19 @@ Visual choices (G-/RU-): a read-only history page, so no primary action; the "Pu
 ## Risks / Trade-offs
 
 - [Consumer lag] → the log may show another module's fact a moment later; each row carries its own time, so the order stays right.
+
+## Full run (task 6.2)
+
+21 November 2026: `scripts/check all` passed (rules, spec coverage, format, build, Wolverine codegen and OpenAPI client current, 705 .NET tests, lint, boundaries, Vitest, SSR isolation, build); the e2e suite passed, 28 journeys including journey 27; the test script `seeded-change-log` passed on a fresh seed. The seed logs one retried `DbUpdateConcurrencyException` in Competition's `TournamentCompetitionStarted` handler, which this change does not touch; Wolverine's retry completes it.
+
+## Prototype comparison (task 6.3)
+
+The test script's captures (`log-populated`, `log-filtered`, `log-dates-change`, `log-cancelled`, each at 1440 and 390 px) against `correct-close-open-states.html` at the same widths; `log-empty` and `log-load-failed` are covered by Vitest, since a published tournament always has its publication logged.
+
+- **Kind icons:** the prototype draws a flag for tournament changes and a single person for entries; the page uses the registry's `trophy` and `users`, and adds `calendar` (schedule) and `list-numbers` (results) to the registry and `docs/ui/icons.md`.
+- **Lifecycle labels beside the title:** not repeated on the change log, as on Standings; the configuration page shows them.
+- **Filter:** separate buttons with a gap instead of a joined segmented strip; the pressed one is inverted as in the prototype. No segmented control exists in `ui` yet.
+- **List:** a bordered panel, as other admin lists, instead of rows on the page background. "Public" uses the neutral status label without the prototype's circle icon.
+- **Byline:** fixed after the first capture to add the reference time zone after the time, as the prototype does; the reason link now uses the text colour instead of the browser's blue.
+- **Finalisation and reopening rows** show no name: their v1 contracts carry none (N-1).
+
