@@ -28,7 +28,7 @@ public sealed record PublicStandings(
     bool Final, int? FinalRevision, bool Revised, int ResultsRevision, DateTimeOffset UpdatedAt, int ResolvedMatches, int Matches, bool NoChampion,
     IReadOnlyList<PublicStandingsRow> Rows);
 
-public sealed record PublicChange(ChangeKind Kind, DateTimeOffset At, IReadOnlyList<ChangedValue> Changes, string? TimeZone, string? Cause);
+public sealed record PublicChange(ChangeKind Kind, int SubjectRevision, DateTimeOffset At, IReadOnlyList<ChangedValue> Changes, string? TimeZone, string? Cause);
 
 public sealed record PublicTournamentView(
     Guid Id,
@@ -88,7 +88,7 @@ public static class PublicTournament
             tournament.CancelledAt,
             RoundsOf(results, schedule?.Published),
             standings is null ? null : StandingsOf(standings, results, tournament.IsCancelled),
-            [.. changes.Select(entry => new PublicChange(entry.Kind, entry.At, entry.Changes, entry.TimeZone, entry.Cause))]);
+            [.. changes.Select(entry => new PublicChange(entry.Kind, entry.SubjectRevision, entry.At, entry.Changes, entry.TimeZone, entry.Cause))]);
     }
 
     // The entrants the page names, for the owner's preview before it becomes public (D-3).

@@ -825,6 +825,7 @@ export interface PublicationDetails {
 
 export interface PublicChange {
   kind: ChangeKind;
+  subjectRevision: number;
   at: string;
   changes: ChangedValue[];
   /** @nullable */

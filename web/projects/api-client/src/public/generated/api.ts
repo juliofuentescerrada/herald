@@ -83,6 +83,7 @@ export interface ProblemDetails {
 
 export interface PublicChange {
   kind: ChangeKind;
+  subjectRevision: number;
   at: string;
   changes: ChangedValue[];
   /** @nullable */

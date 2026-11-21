@@ -11,7 +11,7 @@
 
 ## 3. Public and admin applications
 
-- [ ] 3.1 Public app: `/tournaments/:id` server-rendered page with Overview, Rounds, Standings and Changes, and the not-available page (D-5)
+- [x] 3.1 Public app: `/tournaments/:id` server-rendered page with Overview, Rounds, Standings and Changes, and the not-available page (D-5)
 - [ ] 3.2 Admin `tournaments` feature: Visibility panel, change dialog, preview
 - [ ] 3.3 Vitest for each Visual input state and `axe-core`; lint and boundary checks pass
 

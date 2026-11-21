@@ -3,6 +3,7 @@ import { fixtureRoutes } from './fixtures';
 
 export const routes: Routes = [
   { path: '', title: 'Herald · Tournaments for every game', loadComponent: () => import('./home-page').then((m) => m.HomePage) },
+  { path: 'tournaments/:tournamentId', title: 'Tournament · Herald', loadComponent: () => import('./features/tournaments').then((m) => m.TournamentPage) },
   ...fixtureRoutes,
   { path: '**', title: 'Page not found · Herald', loadComponent: () => import('./not-found-page').then((m) => m.NotFoundPage) },
 ];

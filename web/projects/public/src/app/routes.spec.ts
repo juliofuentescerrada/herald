@@ -26,7 +26,7 @@ async function open(url: string, response: ResponseInit | null = null, answer?: 
 describe('Public routes', () => {
   it('answer an unknown address with a not-found page and status 404', async () => {
     const response: ResponseInit = {};
-    const element = await open('/tournaments/private-cup', response);
+    const element = await open('/no-such-page', response);
     expect(element.querySelector('h1')?.textContent).toBe('Page not found');
     expect(response.status).toBe(404);
   });

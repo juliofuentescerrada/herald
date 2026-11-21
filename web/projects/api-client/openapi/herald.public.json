@@ -144,6 +144,7 @@
       "PublicChange": {
         "required": [
           "kind",
+          "subjectRevision",
           "at",
           "changes",
           "timeZone",
@@ -153,6 +154,10 @@
         "properties": {
           "kind": {
             "$ref": "#/components/schemas/ChangeKind"
+          },
+          "subjectRevision": {
+            "type": "integer",
+            "format": "int32"
           },
           "at": {
             "type": "string",
