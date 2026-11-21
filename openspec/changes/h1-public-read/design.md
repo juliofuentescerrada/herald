@@ -57,3 +57,19 @@ Visual choices (G-/RU-): the public page reads top-down without an aside; status
 ## Risks / Trade-offs
 
 - [Projection lag on the public page] → the page shows the revision and time it reflects; the operator's pages remain authoritative.
+
+## Full run (task 5.2)
+
+21 November 2026: `scripts/check all` passed (rules, spec coverage, format, build, Wolverine codegen and OpenAPI client current, .NET tests, lint, boundaries, Vitest, SSR isolation, build); the e2e suite passed, 29 journeys including journey 28; the test script `seeded-public-read` passed on a fresh seed after one fix to the script itself (it reloaded the last page visited instead of Lantern Gate's).
+
+## Prototype comparison (task 5.3)
+
+The test script's captures (`public-before-start`, `public-running`, `public-explained`, `public-final`, `public-not-available`, `visibility-panel` and `visibility-preview` at 1440 and 390 px, and `visibility-to-private`) against `correct-close-open-states.html` at the same widths. `public-schedule`, `public-revised` and `public-cancelled` are covered by Vitest, since no seeded tournament is in those states.
+
+- **Shell:** the public application's own graphite header with Home and Sign in, instead of the prototype's plain bar.
+- **Standings table:** keeps Resolved, Won, Drawn and Lost at 700 px and above (D-5), which the prototype omits; the narrow table keeps Position, Player and Points.
+- **Explanation:** lists the matches still to play ("Round 3 · vs Taylor Finch · to play") and the totals, as the admin Standings page does.
+- **Change icons:** `trophy` for the tournament's changes and `list-numbers` for final standings, the admin change log's groups; the prototype's flag is not in the registry.
+- **Not available:** the link to the home page used the browser's blue in the first capture; it now takes the text colour.
+- **Visibility changes:** from public or unlisted, "Change visibility" asks to make the tournament private; from private, the preview offers public or unlisted. Switching between public and unlisted therefore passes through private. In H1 both open by link, so nothing a visitor reads differs (§5.2); a direct switch can come with H2's directory.
+- **Configuration form:** once published, its Visibility field is locked and points to "Change visibility", as the dates point to "Change dates", so a visibility change always passes its confirmation or preview.

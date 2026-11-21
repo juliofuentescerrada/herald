@@ -44,6 +44,7 @@ test('A visitor reads the seeded public pages before start, running with an expl
 
   // Running: rounds with causes, provisional standings with the results revision and time.
   const gate = await visit('Lantern Gate');
+  const gateLink = visitor.url();
   await expect(visitor.getByText(/^Provisional · results revision \d+ · updated .* Europe\/Madrid$/)).toBeVisible();
   await both(visitor, info, 'public-running');
 
@@ -69,7 +70,7 @@ test('A visitor reads the seeded public pages before start, running with an expl
   await expect(page.getByText('Lantern Gate is private.')).toBeVisible();
 
   // The visitor's next request is refused, as for an unknown link.
-  await visitor.reload();
+  await visitor.goto(gateLink);
   await expect(visitor.getByRole('heading', { name: 'This tournament is not available' })).toBeVisible();
   await both(visitor, info, 'public-not-available');
 

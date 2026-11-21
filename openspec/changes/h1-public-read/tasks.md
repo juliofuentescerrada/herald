@@ -18,12 +18,12 @@
 ## 4. End-to-end journey and seeds
 
 - [x] 4.1 `tools/Herald.Seed`: a public running tournament, an unlisted finalised one and a private one
-- [ ] 4.2 Journey 28; the suite passes
-- [ ] 4.3 Test script in `e2e/scripts/` (seeded data, `scriptPersona`) with a screenshot per step: public page before start, running with standings, explanation, final, visibility change, not available
+- [x] 4.2 Journey 28; the suite passes
+- [x] 4.3 Test script in `e2e/scripts/` (seeded data, `scriptPersona`) with a screenshot per step: public page before start, running with standings, explanation, final, visibility change, not available
 
 ## 5. Validation and completion
 
-- [ ] 5.1 `covers` markers for every scenario this change adds; `node scripts/spec-coverage.mjs` passes
-- [ ] 5.2 Full run (`scripts/check all` and the e2e suite); record in design.md
-- [ ] 5.3 Capture the Visual input states at 1440 and 390 px, compare with the prototypes and record the differences in design.md
+- [x] 5.1 `covers` markers for every scenario this change adds; `node scripts/spec-coverage.mjs` passes
+- [x] 5.2 Full run (`scripts/check all` and the e2e suite); record in design.md
+- [x] 5.3 Capture the Visual input states at 1440 and 390 px, compare with the prototypes and record the differences in design.md
 - [ ] 5.4 Docs: visual direction §8 and §9.3 inventory, herald-reviewer review of the diff; sync the specs and archive the change in the slice's pull request

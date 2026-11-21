@@ -1,6 +1,7 @@
 /* One column at every width, capped at 1200 px inside the fluid gutter (visual direction §8.1, D-5). */
 .page { display: flex; flex-direction: column; gap: var(--herald-space-6); max-width: var(--herald-width-public); margin: 0 auto; padding: var(--herald-space-8) max(5vw, 24px); }
 .text { max-inline-size: calc(75ch + 2 * max(5vw, 24px)); margin: 0; }
+.text a { color: var(--herald-color-text-primary); }
 h1 { margin: 0; font-size: 40px; }
 h2 { margin: 0 0 var(--herald-space-3); font-size: 24px; }
 h3 { margin: var(--herald-space-4) 0 var(--herald-space-2); font-size: 18px; }
