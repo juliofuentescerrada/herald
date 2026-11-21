@@ -30,6 +30,11 @@ Registration publishes `EntryAdmitted` and `EntryCancelled` (with cause code: `o
 
 "Change log" page in the tournament navigation, after Standings. A filter (segmented: All, Entries, Schedule, Tournament, Results) above a list; each row has a kind icon, a sentence ("Planned start changed from 22 November 2026, 10:00 to 29 November 2026, 10:00 · Europe/Madrid"), who and when, and a "Public" label when it also appears on the public page. Empty: "Changes appear here from publication onwards."
 
+## Implementation notes
+
+- **N-1** The entry fact events carry the entry's alias, and every fact event the acting person's display name (null for an automatic change), so the log can say "Taylor Finch admitted" and who did it: Tournaments holds neither. Neither is private free text (the alias is on the public page; the name is the organiser's own sign-in name), and no reason is carried (Q1). Finalisation and reopening keep their v1 contracts, so those rows show no name.
+- **N-2** The entry key is (kind, subject, subject revision) as the primary key: the tournament for its own facts, the schedule's and the final revisions; the entry and its revision for entries. Reopening is recorded but not public: visitors see the next final revision instead.
+
 ## Visual input
 
 Prototypes: `prototypes/frontend/correct-close-open-states.html`.

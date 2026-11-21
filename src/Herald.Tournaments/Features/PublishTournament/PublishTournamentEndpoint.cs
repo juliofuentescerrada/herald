@@ -34,7 +34,7 @@ public static class PublishTournamentEndpoint
         }
 
         var actor = context.ActorId ?? throw new InvalidOperationException($"No acting person in organisation {organisationId}.");
-        var result = tournament.Publish(command.ExpectedRevision, actor, DateTimeOffset.UtcNow);
+        var result = tournament.Publish(command.ExpectedRevision, actor, DateTimeOffset.UtcNow, context.ActorName);
         return await db.SavedAsync(bus, organisationId, tournament, result, cancellationToken);
     }
 }

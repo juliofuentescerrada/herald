@@ -5,7 +5,7 @@
 ## 2. Tournaments
 
 - [x] 2.1 `ChangeLogEntry`, its own facts in the same transaction (design D-1, D-2); domain tests for the `change-log` scenarios
-- [ ] 2.2 Migration; consumers of the fact events; `GetChangeLog` and the public projection; API tests against PostgreSQL, including idempotent consumption and another organisation's 404s
+- [x] 2.2 Migration; consumers of the fact events; `GetChangeLog` and the public projection; API tests against PostgreSQL, including idempotent consumption and another organisation's 404s
 
 ## 3. Registration and Competition
 

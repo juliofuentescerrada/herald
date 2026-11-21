@@ -132,6 +132,8 @@ internal static class TournamentResults
                     tournament.NextTermsRevision();
                 }
 
+                // The change log entries commit with the change that made them (change-log D-2).
+                db.ChangeLog.AddRange(tournament.Logged);
                 try
                 {
                     await db.SaveChangesAsync(cancellationToken);

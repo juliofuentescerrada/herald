@@ -18,6 +18,11 @@ public static class TournamentsModule
         // Standings consumes these too; each module's handler is sticky to its own queue.
         options.PublishMessage<CompetitionFinalised>().ToLocalQueue(Queue);
         options.PublishMessage<CompetitionReopened>().ToLocalQueue(Queue);
+        // Fact events kept in the change log (h1-change-log D-3).
+        options.PublishMessage<EntryAdmitted>().ToLocalQueue(Queue);
+        options.PublishMessage<EntryCancelled>().ToLocalQueue(Queue);
+        options.PublishMessage<SchedulePublished>().ToLocalQueue(Queue);
+        options.PublishMessage<ScheduleWithdrawn>().ToLocalQueue(Queue);
         return options.AddHeraldModule<TournamentsDbContext>(TournamentsDbContext.Schema);
     }
 }
