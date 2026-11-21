@@ -1,5 +1,6 @@
 import type { Page } from '@playwright/test';
 import { createOrganisation, expect, test } from '../fixtures.ts';
+import { urls } from '../environment.ts';
 
 /** Creates, completes and publishes a tournament, opens its registration and goes to its entries. */
 const openForEntries = async (page: Page, title: string, terms: { team: boolean; capacity: number; admission: 'Automatic' | 'Manual'; checkIn?: 'Optional' | 'Mandatory'; rosters?: [minimum: number, maximum: number, active: number] }) => {
@@ -851,4 +852,50 @@ test('An owner reads a tournament’s change log with the admissions, the publis
   await expect(log.getByText('Schedule revision 1 published')).toBeVisible();
   await expect(log.getByText('Schedule revision 1 withdrawn · tournament cancelled')).toBeVisible();
   await expectAccessible();
+});
+
+test('A visitor opens a public tournament’s link, reads its rounds and standings with aliases only, and after the owner makes it private sees the same “not available” page as for an unknown link', async ({ page, browser, signIn, expectAccessible }) => {
+  await signIn();
+  await runningLanternOpen(page);
+  await recordResult(page, 'Robin Vale', 'Taylor Finch', 'Robin Vale wins');
+
+  // The configuration page links to the public page, which an anonymous visitor reads in a browser of their own.
+  await page.getByRole('link', { name: 'Back to configuration' }).click();
+  const visibility = page.getByRole('region', { name: 'Visibility' });
+  await expect(visibility.getByText('Public', { exact: true })).toBeVisible();
+  const link = await visibility.getByRole('link', { name: 'View public page' }).getAttribute('href');
+  expect(link).toMatch(new RegExp(`^${urls.public}/tournaments/[0-9a-f-]{36}$`));
+  const visitor = await (await browser.newContext()).newPage();
+  await visitor.goto(link!);
+  await expect(visitor.getByRole('heading', { name: 'Lantern Open', level: 1 })).toBeVisible();
+  await expect(visitor.getByRole('group', { name: 'Tournament lifecycle' })).toContainText('Running');
+  await expect(visitor.getByRole('heading', { name: 'Round 3' })).toBeVisible();
+  // Standings follow the results through local queues: the visitor reloads until the result is there.
+  await expect(async () => {
+    await visitor.reload();
+    await expect(visitor.getByText(/^Provisional · results revision \d+ · updated \d+ November 2026, \d\d:\d\d Europe\/Madrid$/)).toBeVisible({ timeout: 1_000 });
+    await expect(visitor.getByText('Robin Vale won')).toBeVisible({ timeout: 1_000 });
+  }).toPass();
+  const table = visitor.getByRole('table', { name: 'Standings' });
+  await expect(table.getByRole('row').nth(1)).toContainText('Robin Vale');
+  await expect(table.getByRole('row').nth(1)).toContainText('3');
+  await expect(visitor.getByText('Persona', { exact: false })).toHaveCount(0);
+  await expectAccessible(visitor);
+
+  // The owner makes it private after a confirmation; the visitor's next request is refused.
+  await visibility.getByRole('button', { name: 'Change visibility' }).click();
+  const confirm = page.getByRole('dialog', { name: 'Make Lantern Open private?' });
+  await confirm.getByRole('button', { name: 'Make private' }).click();
+  await expect(page.getByText('Lantern Open is private.')).toBeVisible();
+  await expect(visibility.getByRole('link', { name: 'View public page' })).toHaveCount(0);
+
+  const hidden = await visitor.goto(link!);
+  expect(hidden?.status()).toBe(404);
+  await expect(visitor.getByRole('heading', { name: 'This tournament is not available' })).toBeVisible();
+  await expect(visitor.getByText('Lantern Open')).toHaveCount(0);
+  await expectAccessible(visitor);
+  const unknown = await visitor.goto(`${urls.public}/tournaments/0198f000-0000-7000-8000-00000000dead`);
+  expect(unknown?.status()).toBe(404);
+  await expect(visitor.getByRole('heading', { name: 'This tournament is not available' })).toBeVisible();
+  await visitor.context().close();
 });
