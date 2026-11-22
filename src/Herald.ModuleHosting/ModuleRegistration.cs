@@ -19,6 +19,12 @@ public static class ModuleRegistration
             ModuleDatabase.Configure(database, services.GetRequiredService<NpgsqlDataSource>(), schema));
         options.Services.AddSingleton<IModuleMigration, ModuleMigration<TDbContext>>();
         options.Services.AddOrganisationContext();
+        if (typeof(TDbContext).IsSubclassOf(typeof(OrganisationScopedDbContext)))
+        {
+            // Each module answers for its own receipts (design D-2).
+            options.Services.AddScoped(typeof(IReceiptSource), typeof(ReceiptSource<>).MakeGenericType(typeof(TDbContext)));
+        }
+
         // The scope's instance, which the membership step has entered; generated code must not construct its own.
         options.CodeGeneration.AlwaysUseServiceLocationFor<OrganisationContext>();
         return options;

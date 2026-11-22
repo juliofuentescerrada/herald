@@ -38,6 +38,15 @@ Not applicable.
 
 - **A-1** Receipts store no request body, only its hash; the resource identifier and revision are enough to reread the state.
 
+## Implementation notes
+
+- **N-1** The receipt step is in two parts (`Herald.ModuleHosting/Receipts.cs`): the host's organisation step looks the receipt up before the endpoint, and `ReceiptPolicy` adds `Receipts.Record` to every organisation-scoped admin mutation's generated code after the handler and before the transaction's last save, so the receipt commits with the effect. A rejection's receipt commits in that same transaction, which holds no other change, rather than one of its own (D-1).
+- **N-2** A receipt keeps the response it answered with (status and body), so a repeat returns exactly the first response; it keeps no request body (A-1), only a SHA-256 of the operation, path, query and body bytes.
+- **N-3** Creating an organisation has no organisation to keep a receipt in; it stays idempotent through its client-chosen identifier, as before. It is the one admin mutation without receipts.
+- **N-4** An application reads only the receipts of its own operations; a person reads the organisation's. The receipt endpoint is in the `read` group.
+- **N-5** Two simultaneous requests with one identity: the second loses to the receipt's primary key, its transaction rolls back, and it answers with the first one's receipt.
+- **N-6** Deleting a draft removes the receipts of that tournament; the deletion's own receipt is recorded after, so a repeated deletion still answers 204. A creation's receipt takes its tournament from the body.
+
 ## Risks / Trade-offs
 
 - [One more row per mutation] → small, organisation-owned and indexed by operation identity; retention follows the tournament.

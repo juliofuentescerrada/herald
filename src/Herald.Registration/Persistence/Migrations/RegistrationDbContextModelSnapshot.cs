@@ -25,6 +25,61 @@ namespace Herald.Registration.Persistence.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("Herald.ModuleHosting.Receipt", b =>
+                {
+                    b.Property<Guid>("OperationId")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("uuid");
+
+                    b.Property<Guid?>("ActorId")
+                        .HasColumnType("uuid");
+
+                    b.Property<DateTimeOffset>("At")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("ContentHash")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Operation")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<Guid>("OrganisationId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Outcome")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("ProblemType")
+                        .HasColumnType("text");
+
+                    b.Property<string>("Resource")
+                        .IsRequired()
+                        .HasColumnType("text");
+
+                    b.Property<string>("Response")
+                        .HasColumnType("text");
+
+                    b.Property<int?>("Revision")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Status")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid?>("TournamentId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("OperationId");
+
+                    b.HasIndex("OrganisationId");
+
+                    b.HasIndex("TournamentId");
+
+                    b.ToTable("Receipt", "registration");
+                });
+
             modelBuilder.Entity("Herald.Registration.Domain.Entry", b =>
                 {
                     b.Property<Guid>("TournamentId")

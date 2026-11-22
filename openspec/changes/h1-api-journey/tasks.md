@@ -4,8 +4,8 @@
 
 ## 2. Receipts
 
-- [ ] 2.1 `Receipt`, the `Operation-Id` middleware and `IReceiptSource` in `Herald.ModuleHosting` (design D-1, D-2); tests
-- [ ] 2.2 Each module maps receipts; migrations; the receipt endpoint; API tests for every `operation-receipts` scenario, including another organisation's receipts and draft deletion
+- [x] 2.1 `Receipt`, the `Operation-Id` middleware and `IReceiptSource` in `Herald.ModuleHosting` (design D-1, D-2); tests
+- [x] 2.2 Each module maps receipts; migrations; the receipt endpoint; API tests for every `operation-receipts` scenario, including another organisation's receipts and draft deletion
 
 ## 3. Contract
 

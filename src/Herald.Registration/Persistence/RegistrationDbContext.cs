@@ -16,6 +16,8 @@ public sealed class RegistrationDbContext(DbContextOptions<RegistrationDbContext
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.MapModule(Schema);
+        modelBuilder.MapReceipts();
+        OrganisationOwned<Receipt>(modelBuilder);
 
         OrganisationOwned<Guest>(modelBuilder);
         modelBuilder.Entity<Guest>(guest =>

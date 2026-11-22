@@ -72,6 +72,8 @@ public sealed class TournamentsDbContext(DbContextOptions<TournamentsDbContext> 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.MapModule(Schema);
+        modelBuilder.MapReceipts();
+        OrganisationOwned<Receipt>(modelBuilder);
 
         OrganisationOwned<Tournament>(modelBuilder);
         modelBuilder.Entity<Tournament>(tournament =>

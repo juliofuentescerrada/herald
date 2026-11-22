@@ -50,6 +50,8 @@ public static class DeleteDraftEndpoint
             return TournamentResults.Stale(tournament.Revision);
         }
 
+        // Its receipts go with it, in the same transaction; the deletion's own is recorded after, so a repeat still answers.
+        await db.Set<Receipt>().Where(receipt => receipt.TournamentId == tournamentId).ExecuteDeleteAsync(cancellationToken);
         return Results.NoContent();
     }
 }

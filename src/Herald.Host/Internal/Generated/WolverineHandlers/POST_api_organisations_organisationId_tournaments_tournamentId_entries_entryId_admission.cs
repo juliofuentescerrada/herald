@@ -90,6 +90,7 @@ namespace Internal.Generated.WolverineHandlers
                 // The actual HTTP request handler execution
                 var result = await Herald.Registration.Features.AdmitEntry.AdmitEntryEndpoint.Post(organisationId, tournamentId, entryId, command, organisationContext, registrationDbContext, messageContext, httpContext.RequestAborted).ConfigureAwait(false);
 
+                Herald.ModuleHosting.Receipts.Record<Herald.Registration.Persistence.RegistrationDbContext>(result, registrationDbContext, httpContext);
                 
                 // Added by EF Core Transaction Middleware
                 var result_of_SaveChangesAsync = await registrationDbContext.SaveChangesAsync(httpContext.RequestAborted).ConfigureAwait(false);

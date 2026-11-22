@@ -97,6 +97,7 @@ namespace Internal.Generated.WolverineHandlers
                 // The actual HTTP request handler execution
                 var result = await Herald.Competition.Features.RecordLineup.RecordLineupEndpoint.Put(organisationId, tournamentId, matchId, side, command, organisationContext, competitionDbContext, messageContext, httpContext.RequestAborted).ConfigureAwait(false);
 
+                Herald.ModuleHosting.Receipts.Record<Herald.Competition.Persistence.CompetitionDbContext>(result, competitionDbContext, httpContext);
                 
                 // Added by EF Core Transaction Middleware
                 var result_of_SaveChangesAsync = await competitionDbContext.SaveChangesAsync(httpContext.RequestAborted).ConfigureAwait(false);
