@@ -28,7 +28,7 @@ Herald runs tournaments (league, knockout, single match) and is game-agnostic: g
 - The ponytail plugin (`.claude/settings.json`, pinned) steers code towards the simplest solution that works. Its minimalism never removes what the change's specifications, tests, ADRs or the rules of any `CLAUDE.md` (this one included) require: those win.
 - One maintained source per responsibility (ADR 0001): state a fact where it belongs and link to it elsewhere.
 - Licences: a dependency must be free for an open-source personal project (ADR 0009 records why MediatR and MassTransit were left out). `scripts/rules.mjs` checks every package against `docs/rules/licences.json`; a licence not on it is the maintainer's decision.
-- M4 waits for the shared platform (ADR 0012): never add Herald resources to Arcana's state.
+- M4 deploys onto Steward's shared platform (ADR 0012): never add Herald resources to Arcana's or Steward's state.
 
 ## Working economically
 

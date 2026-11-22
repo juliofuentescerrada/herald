@@ -28,8 +28,8 @@ When production arrives it is a third environment, and `main` becomes its stagin
 
 - **Fixed slots, not one environment per pull request.** Each slot has stable addresses whose redirect URIs are registered once in `herald-admin`. A GitHub Actions concurrency group per slot keeps one deployment at a time; the pull request that holds `preview` releases it when it closes. A second preview slot is added only if two slices ever need testing at once.
 - **Real identity, test personas.** Previews sign in through the shared directory. Test accounts per persona live in that directory and are assigned to Herald's applications (D-21): two owners of different organisations (isolation), and from H2 a player, a captain and a referee. Their passwords stay in the maintainer's password manager, never in the repository, the pipeline or a pull request. Their object identifiers are configuration of each environment. The agent never uses these accounts: it verifies through the end-to-end suite and its fake provider in CI.
-- **Resources per slot**, on the shared platform: Container Apps for the host, the public SSR runtime and the admin application, with a minimum of zero replicas; one database per slot (`herald_main`, `herald_preview`) on the shared PostgreSQL server; no Service Bus. Running without a broker becomes a configuration option of the host instead of a property of `E2E`, until a party outside the process needs the broker.
-- **Pipeline.** GitHub Actions with OIDC federation and OpenTofu (ADR 0012) builds the images, deploys the slot, recreates the database (for `preview`), applies the migrations and `db-apply`, seeds, and comments on the pull request with the addresses, the personas to use and the test script.
+- **Resources per slot**, on the shared platform: Container Apps for the host, the public SSR runtime and the admin application, with a minimum of zero replicas; a Container Apps job for reset and seeding; one managed identity, the only database role of its slot (a migrator, Steward ADR 0010), so `preview` cannot reach `herald_main`; one database per slot (`herald_main`, `herald_preview`) on the shared PostgreSQL server; one image repository per slot; no Service Bus. Running without a broker becomes a configuration option of the host instead of a property of `E2E`, until a party outside the process needs the broker.
+- **Pipeline.** GitHub Actions with OIDC federation and OpenTofu (ADR 0012) builds the images, deploys the slot, runs the slot's job, which (for `preview`) drops and recreates Herald's schemas in `herald_preview`, applies the migrations and `db-apply` and seeds, and comments on the pull request with the addresses, the personas to use and the test script. The database itself is never dropped: that would need server privileges Herald does not have. The job runs inside the shared environment as the slot's identity, because the delivery identity has no database role. Each slot is a GitHub environment (`main`, `preview`), whose name is the subject Steward federates, and holds the slot's configuration.
 
 ### Synthetic data
 
@@ -48,7 +48,7 @@ Previews add almost nothing to the base cost of the infrastructure, which the sh
 |---|---|
 | Container Apps | Minimum zero replicas: cost only while someone uses the slot, largely inside the consumption plan's monthly free grant |
 | Databases | Two databases on the shared server: storage only, no extra compute |
-| Registry | Images of the slots; a retention policy removes old tags |
+| Registry | Images of the slots, one repository per slot; Steward's purge keeps two tags per repository (the registry's Basic tier has no retention policy) |
 | Log Analytics | Ingestion from two lightly used environments, with sampling |
 | Service Bus | None until H4 or H5 |
 
