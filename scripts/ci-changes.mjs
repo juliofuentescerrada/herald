@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Classifies a change for CI (ci-path-filters D-1): `code=true` unless every changed file is documentation or harness.
+// Classifies a change for CI (ci-path-filters D-1): `code=true` unless every changed file is documentation, harness or infrastructure.
 // Both workflows use it, so the classification lives here only.
 //
 //   node scripts/ci-changes.mjs <base> <head>   prints code=true|false, the format of $GITHUB_OUTPUT
@@ -27,6 +27,9 @@ const documentation = [
 // Tested by the `rules` job itself (node --test scripts/*.test.mjs).
 const harness = [/^scripts\//, /^\.claude\/hooks\//, /^\.claude\/settings\.json$/, /^\.githooks\//, /^\.mcp\.json$/, /^cspell\.config\.yaml$/];
 
+// Planned by infra.yml, which a change to them triggers; no build or test of the code jobs reads them (m4-infra D-6).
+const infrastructure = [/^infra\//, /^\.github\/workflows\/infra\.yml$/];
+
 // Always code, inside the groups above:
 // - ADR 0017: NotifiableFactsTests reads its inventory;
 // - the classification itself: the `changes` job runs the change's own copy, so a change to it must not be able to
@@ -35,7 +38,7 @@ const alwaysCode = [/^docs\/adr\/0017-[^/]+\.md$/, /^scripts\/ci-changes(\.test)
 
 export function isCode(file) {
   if (alwaysCode.some((pattern) => pattern.test(file))) return true;
-  return ![...documentation, ...harness].some((pattern) => pattern.test(file));
+  return ![...documentation, ...harness, ...infrastructure].some((pattern) => pattern.test(file));
 }
 
 export const touchesCode = (files) => files.some(isCode);

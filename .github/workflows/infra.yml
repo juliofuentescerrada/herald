@@ -1,0 +1,71 @@
+name: Infra
+
+# A plan of infra/ on pull requests that change it (m4-infra D-6), on GitHub's hosted runners, signed in as
+# id-herald-delivery through its pull-request federated credential. The plan file is never uploaded.
+on:
+  pull_request:
+    types: [opened, synchronize, reopened, ready_for_review]
+    paths:
+      - infra/**
+      - .github/workflows/infra.yml
+
+permissions:
+  contents: read
+  id-token: write # the OIDC token Entra exchanges for an Azure token
+
+concurrency:
+  group: infra-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  ARM_USE_OIDC: true
+  ARM_CLIENT_ID: ${{ vars.AZURE_CLIENT_ID }}
+  ARM_TENANT_ID: ${{ vars.AZURE_TENANT_ID }}
+  ARM_SUBSCRIPTION_ID: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+  TF_VAR_databases_onboarded: ${{ vars.HERALD_DATABASES_ONBOARDED == 'true' }}
+
+jobs:
+  plan:
+    # Drafts run nothing (ci-path-filters D-3).
+    if: ${{ !github.event.pull_request.draft }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    defaults:
+      run:
+        working-directory: infra
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: opentofu/setup-opentofu@a1320f892987e89d278cc92dc5adc984fb93aca4 # v2.0.2
+        with:
+          tofu_version: 1.13.9
+          tofu_wrapper: false
+      # The directory's identifiers (D-4): an unset GitHub variable is an empty string, which OpenTofu would take as a
+      # value, so only the variables that are set become TF_VAR_s and the others stay null.
+      - name: Directory variables
+        env:
+          auth_authority: ${{ vars.HERALD_AUTH_AUTHORITY }}
+          auth_api_audience: ${{ vars.HERALD_AUTH_API_AUDIENCE }}
+          auth_api_scope: ${{ vars.HERALD_AUTH_API_SCOPE }}
+          auth_admin_client_id: ${{ vars.HERALD_AUTH_CLIENT_ID }}
+          persona_main_object_id: ${{ vars.HERALD_PERSONA_MAIN_OBJECT_ID }}
+          persona_rival_object_id: ${{ vars.HERALD_PERSONA_RIVAL_OBJECT_ID }}
+        run: |
+          for name in auth_authority auth_api_audience auth_api_scope auth_admin_client_id persona_main_object_id persona_rival_object_id; do
+            if [ -n "${!name}" ]; then echo "TF_VAR_$name=${!name}" >> "$GITHUB_ENV"; fi
+          done
+      - run: tofu fmt -check -recursive
+      - run: tofu init -input=false
+      - run: tofu validate
+      - run: tofu plan -input=false -no-color -out=tfplan
+      - name: Plan summary
+        run: |
+          {
+            echo "### tofu plan"
+            tofu show -no-color tfplan | grep -E '^(Plan:|No changes)' || true
+            echo '<details><summary>Full plan</summary>'
+            echo
+            echo '```'
+            tofu show -no-color tfplan
+            echo '```'
+            echo '</details>'
+          } >> "$GITHUB_STEP_SUMMARY"
