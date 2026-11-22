@@ -58,3 +58,14 @@ Not applicable.
 ## Risks / Trade-offs
 
 - [One more row per mutation] → small, organisation-owned and indexed by operation identity; retention follows the tournament.
+
+## Verification
+
+Full run on 22 November 2026, after the herald-reviewer's findings were resolved: `scripts/check all` passed (rules, spec coverage, format, build, Wolverine code and OpenAPI client current, .NET tests, web lint, boundaries, tests, SSR isolation and build); the end-to-end suite passed, 30 journeys with journey 30; the test scripts passed, 21 with `seeded-api-journey` (two screenshots and fourteen request and response captures).
+
+H1's exit criteria (roadmap) against batch 3, with this slice its last: UJ-01–03 and UJ-06–08 are covered by journeys 10–30, UJ-08 by journey 30; four entries produce six matches (journeys 22 and 30); results are retry-safe through operation identities and receipts for every organisation-scoped mutation; private data stays within its organisation and grant (organisation-isolation, pilot-access, receipts read per organisation and actor); final standings follow a review of the current results revision (finalisation). The criteria themselves do not change, so the roadmap is not edited (herald-docs); the batch's status is its issues.
+
+## Review
+
+The herald-reviewer reviewed the diff on 22 November 2026. Resolved: problem types recorded for untyped problems (N-10); a repeated creation's location (N-2); the actor on replay (N-4); another organisation's identity (N-5); the `Operation-Id` header in the documents (N-11); the admin application's identities after a rejection and the worked example's rule (N-10); a test for simultaneous repeats; the receipt path in the proposal, D-4's wording (N-9) and the team example's parameter names. Left for the maintainer: **Q3** the description lists business errors as problem types per response (N-7), while 400 rule codes (such as `match: not-started`) stay in each response's `errors` and are not listed per operation. Confirm, or list each operation's rule codes as well.
+
