@@ -69,3 +69,5 @@ H1's exit criteria (roadmap) against batch 3, with this slice its last: UJ-01–
 
 The herald-reviewer reviewed the diff on 22 November 2026. Resolved: problem types recorded for untyped problems (N-10); a repeated creation's location (N-2); the actor on replay (N-4); another organisation's identity (N-5); the `Operation-Id` header in the documents (N-11); the admin application's identities after a rejection and the worked example's rule (N-10); a test for simultaneous repeats; the receipt path in the proposal, D-4's wording (N-9) and the team example's parameter names. Left for the maintainer: **Q3** the description lists business errors as problem types per response (N-7), while 400 rule codes (such as `match: not-started`) stay in each response's `errors` and are not listed per operation. Confirm, or list each operation's rule codes as well.
 
+**Maintainer's confirmation, 22 November 2026 (#83):** Q3 as proposed (problem types per response; 400 rule codes stay in `errors`), rejections recorded and replayed (N-10), and journey 30's owner steps in the browser (N-9).
+
