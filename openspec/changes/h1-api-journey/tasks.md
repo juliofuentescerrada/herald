@@ -17,7 +17,7 @@
 
 - [x] 4.1 `docs/api/individual-league.md` and `docs/api/team-league.md`
 - [x] 4.2 Journey 30 (D-4); the suite passes
-- [ ] 4.3 Test script in `e2e/scripts/`: the journey's requests and responses as text captures, and a screenshot of the admin Standings page it compares with
+- [x] 4.3 Test script in `e2e/scripts/`: the journey's requests and responses as text captures, and a screenshot of the admin Standings page it compares with
 
 ## 5. Validation and completion
 
