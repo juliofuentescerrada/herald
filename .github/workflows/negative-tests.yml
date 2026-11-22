@@ -33,7 +33,7 @@ jobs:
             local label=$1 expected=$2 err outcome; shift 2
             if err=$("$@" -o none 2>&1 >/dev/null); then outcome=allowed
             else outcome="denied ($(grep -oE 'AuthorizationFailed|AuthorizationPermissionMismatch|AuthorizationFailure|Forbidden|403' <<<"$err" | head -1 || true))"
-              [[ $outcome == "denied ()" ]] && outcome="denied: $(grep -m1 -v '^\s*$' <<<"$err" | sed -E 's/[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}/<id>/g; s/[0-9]{1,3}(\.[0-9]{1,3}){3}/<ip>/g' | cut -c1-200)"; fi
+              [[ $outcome == "denied ()" ]] && outcome="denied: $(tr '\n' ' ' <<<"$err" | sed -E 's/[0-9a-f]{8}-([0-9a-f]{4}-){3}[0-9a-f]{12}/<id>/g; s/[0-9]{1,3}(\.[0-9]{1,3}){3}/<ip>/g' | cut -c1-200)"; fi
             echo "$label | expected $expected | $outcome"
           }
           rg=/subscriptions/$SUB/resourceGroups
