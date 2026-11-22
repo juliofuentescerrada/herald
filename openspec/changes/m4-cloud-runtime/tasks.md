@@ -1,6 +1,6 @@
 ## 1. Review gates
 
-- [ ] 1.1 Record in proposal.md that merging the M4 batch proposals pull request approved this change, with the review's answer to Q1 and any change it asked for (ADR 0018); verify with `openspec validate m4-cloud-runtime`
+- [x] 1.1 Record in proposal.md that merging the M4 batch proposals pull request approved this change, with the review's answer to Q1 and any change it asked for (ADR 0018); verify with `openspec validate m4-cloud-runtime`
 
 ## 2. Host
 
