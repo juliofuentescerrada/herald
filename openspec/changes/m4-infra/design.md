@@ -20,6 +20,9 @@ Archivist's `infra/` is the reference: `data` sources for the shared environment
 ## Implementation notes
 
 - **Names (22 November 2026):** the proposal and specification first put `-preview` after the function (`ca-herald-api-preview`); the decision session, ADR 0012 and Steward's `onboard-herald` design put it before (`ca-herald-preview-api`, `id-herald-preview-api`). Both artefacts were corrected to the decision before any resource existed.
+- **The static test** lives in `scripts/infra.test.mjs`, not `infra/infra.test.mjs` (D-6): CI's `rules` job runs `scripts/*.test.mjs`, so a test elsewhere would never run.
+- **Directory identifiers** are the same for both slots (one directory, one `herald-admin` and `herald-api`, the same personas), and one state plans both slots, so they are repository variables passed as `TF_VAR_`s rather than per-environment ones (D-4). Their names follow the AppHost's (`HERALD_AUTH_AUTHORITY`, `HERALD_AUTH_CLIENT_ID`, `HERALD_AUTH_API_SCOPE`, `HERALD_API_URL`, `HERALD_PUBLIC_URL`), which `m4-images`' admin start script should read too.
+- **No principal id in the outputs:** apply logs are public; Steward's operator reads the slot identities with `az identity show`.
 
 ## Questions for the review
 
