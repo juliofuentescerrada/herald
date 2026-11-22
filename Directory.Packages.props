@@ -7,6 +7,8 @@
     <PackageVersion Include="Aspire.Npgsql" Version="13.6.5" />
   </ItemGroup>
   <ItemGroup Label="Messaging and persistence">
+    <!-- Already the version Service Bus brings in; referenced for PostgreSQL's Entra tokens (m4-cloud-runtime D-2). -->
+    <PackageVersion Include="Azure.Identity" Version="1.17.0" />
     <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.14" />
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.14" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.14" />

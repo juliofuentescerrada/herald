@@ -21,7 +21,7 @@ if (endToEnd)
 }
 
 builder.AddServiceDefaults();
-builder.AddNpgsqlDataSource("herald");
+builder.AddNpgsqlDataSource("herald", configureDataSourceBuilder: dataSource => DatabaseAuthentication.Configure(dataSource, builder.Configuration));
 
 // Development only: elsewhere `db-apply` and the modules' migrations are deployment steps (m0-messaging design).
 var setUpDatabaseOnStartup = builder.Configuration.GetValue<bool>("Herald:Database:SetUpOnStartup");
