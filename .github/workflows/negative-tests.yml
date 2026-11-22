@@ -1,0 +1,72 @@
+name: Negative tests (temporary)
+
+# Steward's onboard-herald task 4.3: what id-herald-delivery may and may not do. Removed once recorded. The repository is
+# public, so commands print only their outcome, never Azure's messages (they carry object and subscription ids).
+on:
+  pull_request:
+  push:
+    branches: [chore/negative-tests-herald]
+
+permissions:
+  contents: read
+  id-token: write
+
+env:
+  CLIENT: ${{ vars.AZURE_CLIENT_ID }}
+  TENANT: ${{ vars.AZURE_TENANT_ID }}
+  SUB: ${{ vars.AZURE_SUBSCRIPTION_ID }}
+
+jobs:
+  grants:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    env:
+      TEST_SP: ${{ vars.TEST_SP_OID }}
+      TEST_USER: ${{ vars.TEST_USER_OID }}
+    steps:
+      - name: Sign in and check
+        run: |
+          token=$(curl -sfH "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=api://AzureADTokenExchange" | jq -r .value)
+          az login --service-principal -u "$CLIENT" --tenant "$TENANT" --federated-token "$token" -o none 2>/dev/null && echo "sign-in (pull_request): allowed" || { echo "sign-in (pull_request): denied"; exit 1; }
+          az account set -s "$SUB"
+          probe() { # $1 label, $2 expected, rest the command
+            local label=$1 expected=$2 err outcome; shift 2
+            if err=$("$@" -o none 2>&1 >/dev/null); then outcome=allowed
+            else outcome="denied ($(grep -oE 'AuthorizationFailed|AuthorizationPermissionMismatch|AuthorizationFailure|Forbidden|403' <<<"$err" | head -1 || echo other))"; fi
+            echo "$label | expected $expected | $outcome"
+          }
+          rg=/subscriptions/$SUB/resourceGroups
+          acr=$rg/rg-shared/providers/Microsoft.ContainerRegistry/registries/crjfcshared
+          probe "list blobs in container herald" allowed az storage blob list --account-name stjfcmanagement -c herald --auth-mode login
+          probe "list blobs in container steward" denied az storage blob list --account-name stjfcmanagement -c steward --auth-mode login
+          probe "tag cae-shared" denied az tag update --resource-id "$rg/rg-shared/providers/Microsoft.App/managedEnvironments/cae-shared" --operation merge --tags negative-test=1
+          probe "Owner on rg-herald to a service principal" denied az role assignment create --assignee-object-id "$TEST_SP" --assignee-principal-type ServicePrincipal --role Owner --scope "$rg/rg-herald"
+          probe "Contributor on rg-herald to a service principal" denied az role assignment create --assignee-object-id "$TEST_SP" --assignee-principal-type ServicePrincipal --role Contributor --scope "$rg/rg-herald"
+          probe "Contributor on crjfcshared to a service principal" denied az role assignment create --assignee-object-id "$TEST_SP" --assignee-principal-type ServicePrincipal --role Contributor --scope "$acr"
+          probe "AcrPull on crjfcshared to a user" denied az role assignment create --assignee-object-id "$TEST_USER" --assignee-principal-type User --role AcrPull --scope "$acr"
+          if id=$(az role assignment create --assignee-object-id "$TEST_SP" --assignee-principal-type ServicePrincipal --role AcrPull --scope "$acr" --query id -o tsv 2>/dev/null); then
+            echo "AcrPull on crjfcshared to a service principal (control) | expected allowed | allowed"
+            az role assignment delete --ids "$id" -o none 2>/dev/null && echo "delete that assignment | expected allowed | allowed" || echo "delete that assignment | expected allowed | denied"
+          else echo "AcrPull on crjfcshared to a service principal (control) | expected allowed | denied"; fi
+
+  environments:
+    if: github.event_name == 'pull_request'
+    strategy:
+      matrix:
+        slot: [main, preview]
+    environment: ${{ matrix.slot }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: Sign in from the environment
+        run: |
+          token=$(curl -sfH "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=api://AzureADTokenExchange" | jq -r .value)
+          az login --service-principal -u "$CLIENT" --tenant "$TENANT" --federated-token "$token" -o none 2>/dev/null && echo "sign-in (environment ${{ matrix.slot }}): allowed" || { echo "sign-in (environment ${{ matrix.slot }}): denied"; exit 1; }
+
+  branch:
+    if: github.event_name == 'push'
+    runs-on: ubuntu-latest
+    steps:
+      - name: Sign in from a branch, which is not federated
+        run: |
+          token=$(curl -sfH "Authorization: bearer $ACTIONS_ID_TOKEN_REQUEST_TOKEN" "$ACTIONS_ID_TOKEN_REQUEST_URL&audience=api://AzureADTokenExchange" | jq -r .value)
+          if az login --service-principal -u "$CLIENT" --tenant "$TENANT" --federated-token "$token" -o none 2>/dev/null; then echo "sign-in (branch): allowed"; exit 1; else echo "sign-in (branch): denied"; fi
