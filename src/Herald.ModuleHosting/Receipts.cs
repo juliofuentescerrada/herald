@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Routing;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using Npgsql;
 using Wolverine.Http;
 
 namespace Herald.ModuleHosting;
@@ -135,23 +136,39 @@ public static class Receipts
         var hash = Convert.ToHexString(SHA256.HashData([.. System.Text.Encoding.UTF8.GetBytes($"{operation}\n{request.Path}{request.QueryString}\n"), .. content]));
         if (await FindAsync(http, operationId) is { } receipt)
         {
-            return receipt.ContentHash == hash
-                ? Replay(receipt)
-                : Results.Problem(statusCode: StatusCodes.Status409Conflict, title: "Conflict", type: OperationReused,
-                    detail: "This operation identity was used for another request.");
+            // Another actor's operation is not repeated to an application, which reads only its own (N-4).
+            return receipt.ContentHash == hash && Visible(http, receipt) ? new Replay(receipt) : Reused();
         }
 
         http.RequestServices.GetRequiredService<PendingOperation>().Enter(operationId, operation, hash, BodyGuid(content, "tournamentId"));
         return null;
     }
 
-    // Two requests with one identity at once: the second loses to the receipt's key and its effect is rolled back with it.
-    internal static async Task<IResult?> AfterFailureAsync(HttpContext http) =>
-        http.RequestServices.GetRequiredService<PendingOperation>().OperationId is { } operationId
-        && !http.Response.HasStarted
-        && await FindAsync(http, operationId) is { } receipt
-            ? Replay(receipt)
-            : null;
+    // Two requests with one identity at once: the second loses to the receipt's key and its effect is rolled back with it. The
+    // identity of another organisation's operation also loses to the key, and answers as reused without saying more.
+    internal static async Task<IResult?> AfterFailureAsync(HttpContext http, DbUpdateException failure)
+    {
+        if (http.RequestServices.GetRequiredService<PendingOperation>().OperationId is not { } operationId || http.Response.HasStarted)
+        {
+            return null;
+        }
+
+        if (await FindAsync(http, operationId) is { } receipt)
+        {
+            return Visible(http, receipt) ? new Replay(receipt) : Reused();
+        }
+
+        return failure.InnerException is PostgresException { SqlState: PostgresErrorCodes.UniqueViolation, ConstraintName: ReceiptKey } ? Reused() : null;
+    }
+
+    private const string ReceiptKey = "PK_Receipt";
+
+    private static IResult Reused() => Results.Problem(statusCode: StatusCodes.Status409Conflict, title: "Conflict", type: OperationReused,
+        detail: "This operation identity was used for another request.");
+
+    // A person reads the organisation's receipts; an application only those of its own operations (N-4).
+    private static bool Visible(HttpContext http, Receipt receipt) =>
+        http.RequestServices.GetRequiredService<OrganisationContext>() is var context && (context.Grant is null || receipt.ActorId == context.ActorId);
 
     public static async Task<Receipt?> FindAsync(HttpContext http, Guid operationId)
     {
@@ -180,16 +197,30 @@ public static class Receipts
     [ProblemTypes(StatusCodes.Status404NotFound, NotFound)]
     public static async Task<IResult> ReadAsync(Guid organisationId, Guid operationId, HttpContext http)
     {
-        var context = http.RequestServices.GetRequiredService<OrganisationContext>();
-        return await FindAsync(http, operationId) is { } receipt && (context.Grant is null || receipt.ActorId == context.ActorId)
+        return await FindAsync(http, operationId) is { } receipt && Visible(http, receipt)
             ? Results.Ok(new ReceiptView(receipt.OperationId, receipt.Operation, receipt.Outcome, receipt.Revision, receipt.Resource, receipt.ProblemType, receipt.At))
             : Results.Problem(statusCode: StatusCodes.Status404NotFound, title: "Not found", type: NotFound,
                 detail: "Nothing was applied with this operation identity; the request may be sent again with it.");
     }
 
-    private static IResult Replay(Receipt receipt) => receipt.Response is { } response
-        ? Results.Text(response, receipt.Status >= 400 ? "application/problem+json" : "application/json", statusCode: receipt.Status)
-        : Results.StatusCode(receipt.Status);
+    // The first response again: its status, its body and, for a creation, its location.
+    private sealed class Replay(Receipt receipt) : IResult
+    {
+        public async Task ExecuteAsync(HttpContext http)
+        {
+            http.Response.StatusCode = receipt.Status;
+            if (receipt.Status == StatusCodes.Status201Created)
+            {
+                http.Response.Headers.Location = receipt.Resource;
+            }
+
+            if (receipt.Response is { } response)
+            {
+                http.Response.ContentType = receipt.Status >= 400 ? "application/problem+json" : "application/json";
+                await http.Response.WriteAsync(response, http.RequestAborted);
+            }
+        }
+    }
 
     private static Guid? BodyGuid(byte[] content, string name)
     {
@@ -235,7 +266,8 @@ public static class Receipts
             Response = json,
             Revision = rejected ? null : RevisionOf(json),
             Resource = (result.GetType().GetProperty("Location")?.GetValue(result) as string) ?? http.Request.Path.Value!,
-            ProblemType = rejected ? (value as ProblemDetails)?.Type ?? "validation" : null,
+            // A problem without a type is `about:blank` (RFC 9457).
+            ProblemType = !rejected ? null : value is HttpValidationProblemDetails ? "validation" : (value as ProblemDetails)?.Type ?? "about:blank",
             TournamentId = Guid.TryParse(http.GetRouteValue("tournamentId") as string, out var tournament) ? tournament : pending.TournamentId,
             At = DateTimeOffset.UtcNow,
         });

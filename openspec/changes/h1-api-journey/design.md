@@ -28,7 +28,7 @@ A test reads the admin OpenAPI document and fails on a property named `id` witho
 
 ### D-4 The journey
 
-Journey 30 is a Playwright test with only the `request` fixture: it obtains an application token from the fake provider, follows `docs/api/individual-league.md` (create, publish, open, enter four players, close, generate and publish the schedule, start, record six results, finalise), drops one response on purpose and recovers it through the receipt, then reads the standings and compares them with the admin page's.
+Journey 30 is a Playwright test whose client uses only the `request` fixture (the owner's part is in the browser, N-9): it obtains an application token from the fake provider, follows `docs/api/individual-league.md` (create, publish, open, enter four players, close, generate and publish the schedule, start, record six results, finalise), drops one response on purpose and recovers it through the receipt, then reads the standings and compares them with the admin page's.
 
 ## Visual input
 
@@ -41,16 +41,19 @@ Not applicable.
 ## Implementation notes
 
 - **N-1** The receipt step is in two parts (`Herald.ModuleHosting/Receipts.cs`): the host's organisation step looks the receipt up before the endpoint, and `ReceiptPolicy` adds `Receipts.Record` to every organisation-scoped admin mutation's generated code after the handler and before the transaction's last save, so the receipt commits with the effect. A rejection's receipt commits in that same transaction, which holds no other change, rather than one of its own (D-1).
-- **N-2** A receipt keeps the response it answered with (status and body), so a repeat returns exactly the first response; it keeps no request body (A-1), only a SHA-256 of the operation, path, query and body bytes.
+- **N-2** A receipt keeps the response it answered with (status, body and, for a creation, its location), so a repeat returns the first response; it keeps no request body (A-1), only a SHA-256 of the operation, path, query and body bytes.
 - **N-3** Creating an organisation has no organisation to keep a receipt in; it stays idempotent through its client-chosen identifier, as before. It is the one admin mutation without receipts.
-- **N-4** An application reads only the receipts of its own operations; a person reads the organisation's. The receipt endpoint is in the `read` group.
-- **N-5** Two simultaneous requests with one identity: the second loses to the receipt's primary key, its transaction rolls back, and it answers with the first one's receipt.
+- **N-4** An application reads only the receipts of its own operations, and a repeat of another actor's operation answers it as reused; a person reads the organisation's. The receipt endpoint is in the `read` group.
+- **N-5** Two simultaneous requests with one identity: the second loses to the receipt's primary key, its transaction rolls back, and it answers with the first one's receipt. An identity another organisation used loses to the same key and answers `operation-reused`, revealing nothing more.
 - **N-6** Deleting a draft removes the receipts of that tournament; the deletion's own receipt is recorded after, so a repeated deletion still answers 204. A creation's receipt takes its tournament from the body.
 
 - **N-7** Business errors are problem types, listed per response as `x-problem-types` in the OpenAPI documents: each endpoint declares its own with `[ProblemTypes]`, and the documents add those every organisation-scoped endpoint shares (`organisation-not-available`, `operation-not-granted`, `operation-reused`). Validation rules stay in the 400 response's `errors`.
 - **N-8** The identifier review (D-3) found two gaps, both fixed compatibly: creating a tournament or an organisation with a reused identifier and other content answered a 409 without a type; they now answer `tournament-identifier-reused` and `organisation-identifier-reused`. The entry kind travels in a tournament's `configuration` and a field's `terms`; no identifier needed renaming.
 
 - **N-9** Journey 30 has the owner create the organisation, grant the client every group and read the final Standings page in the browser, because those are a person's (organisation creation and grants are people-only); the league itself runs through the `request` fixture with the pilot application's client-credentials token, following `docs/api/individual-league.md`. Writing it found that the admin client's identity header must reuse an `operationId` the body carries (`operation.ts`).
+
+- **N-10** A rejection is recorded and repeated like any outcome, so the admin application keys a body-carried identity on its content: a withdrawal or disqualification on the schedule revision and reason (as results and corrections already do), and a generation starts a new identity after a rejection. The worked example says a rejected operation is retried with a new identity. A rejection without a problem type records `about:blank`; a validation problem records `validation`.
+- **N-11** The OpenAPI documents describe the optional `Operation-Id` header on every organisation-scoped mutation; the generated Angular client does not expose header parameters, so the admin application sends it from its interceptor.
 
 ## Risks / Trade-offs
 

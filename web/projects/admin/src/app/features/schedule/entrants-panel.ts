@@ -45,7 +45,7 @@ export class EntrantsPanel {
   protected readonly reason = signal('');
   protected readonly reasonError = signal<string | null>(null);
   /** The departure being confirmed, and its operation identity, reused if the same confirmation is sent again (D-2). */
-  protected readonly departure = signal<{ readonly entryId: string; readonly kind: Departure; readonly operationId: string } | null>(null);
+  protected readonly departure = signal<{ readonly entryId: string; readonly kind: Departure; readonly operationId: string; readonly key?: string } | null>(null);
   protected readonly rosterOf = signal<string | null>(null);
   protected readonly playerAction = signal<{ readonly playerId: string; readonly kind: PlayerAction } | null>(null);
 
@@ -94,7 +94,12 @@ export class EntrantsPanel {
       this.reasonError.set(ruleText('reason', 'required'));
       return;
     }
-    const body = { operationId: departure.operationId, expectedRevision: this.schedule().revision, reason };
+    // One identity per content: a retry after a lost response repeats it, while a new revision or reason is a new operation, so a
+    // rejected attempt is never replayed as reused (operation-receipts).
+    const key = `${this.schedule().revision}|${reason}`;
+    const operationId = departure.key === undefined || departure.key === key ? departure.operationId : crypto.randomUUID();
+    this.departure.set({ ...departure, operationId, key });
+    const body = { operationId, expectedRevision: this.schedule().revision, reason };
     const write = departure.kind === 'withdraw'
       ? this.api.withdrawEntrant<ScheduleDetails>(this.organisation(), this.tournamentId(), entrant.entryId, body)
       : this.api.disqualifyEntrant<ScheduleDetails>(this.organisation(), this.tournamentId(), entrant.entryId, body);

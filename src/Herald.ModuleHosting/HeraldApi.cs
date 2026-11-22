@@ -173,9 +173,9 @@ public static class HeraldApi
         {
             await next(http);
         }
-        catch (DbUpdateException)
+        catch (DbUpdateException failure)
         {
-            if (await Receipts.AfterFailureAsync(http) is not { } replay)
+            if (await Receipts.AfterFailureAsync(http, failure) is not { } replay)
             {
                 throw;
             }

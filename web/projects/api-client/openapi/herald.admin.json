@@ -31,6 +31,15 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          {
+            "name": "Operation-Id",
+            "in": "header",
+            "description": "The operation's identity, a UUID the client chooses: the same identity and request return the first outcome. A command that carries `operationId` in its body sends the same value.",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
           }
         ],
         "responses": {
@@ -144,6 +153,15 @@
             "name": "grantId",
             "in": "path",
             "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Operation-Id",
+            "in": "header",
+            "description": "The operation's identity, a UUID the client chooses: the same identity and request return the first outcome. A command that carries `operationId` in its body sends the same value.",
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -389,6 +407,15 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          {
+            "name": "Operation-Id",
+            "in": "header",
+            "description": "The operation's identity, a UUID the client chooses: the same identity and request return the first outcome. A command that carries `operationId` in its body sends the same value.",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
           }
         ],
         "requestBody": {
@@ -491,6 +518,15 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          {
+            "name": "Operation-Id",
+            "in": "header",
+            "description": "The operation's identity, a UUID the client chooses: the same identity and request return the first outcome. A command that carries `operationId` in its body sends the same value.",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
           }
         ],
         "requestBody": {
@@ -589,6 +625,15 @@
             "name": "tournamentId",
             "in": "path",
             "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Operation-Id",
+            "in": "header",
+            "description": "The operation's identity, a UUID the client chooses: the same identity and request return the first outcome. A command that carries `operationId` in its body sends the same value.",
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -767,6 +812,15 @@
               "type": "integer",
               "format": "int32"
             }
+          },
+          {
+            "name": "Operation-Id",
+            "in": "header",
+            "description": "The operation's identity, a UUID the client chooses: the same identity and request return the first outcome. A command that carries `operationId` in its body sends the same value.",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
           }
         ],
         "responses": {
@@ -858,6 +912,15 @@
             "name": "tournamentId",
             "in": "path",
             "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Operation-Id",
+            "in": "header",
+            "description": "The operation's identity, a UUID the client chooses: the same identity and request return the first outcome. A command that carries `operationId` in its body sends the same value.",
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -960,6 +1023,15 @@
             "name": "tournamentId",
             "in": "path",
             "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Operation-Id",
+            "in": "header",
+            "description": "The operation's identity, a UUID the client chooses: the same identity and request return the first outcome. A command that carries `operationId` in its body sends the same value.",
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -1121,6 +1193,15 @@
             "name": "organisationId",
             "in": "path",
             "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Operation-Id",
+            "in": "header",
+            "description": "The operation's identity, a UUID the client chooses: the same identity and request return the first outcome. A command that carries `operationId` in its body sends the same value.",
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -1376,6 +1457,15 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          {
+            "name": "Operation-Id",
+            "in": "header",
+            "description": "The operation's identity, a UUID the client chooses: the same identity and request return the first outcome. A command that carries `operationId` in its body sends the same value.",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
           }
         ],
         "requestBody": {
@@ -1474,6 +1564,15 @@
             "name": "tournamentId",
             "in": "path",
             "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Operation-Id",
+            "in": "header",
+            "description": "The operation's identity, a UUID the client chooses: the same identity and request return the first outcome. A command that carries `operationId` in its body sends the same value.",
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -1580,6 +1679,15 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          {
+            "name": "Operation-Id",
+            "in": "header",
+            "description": "The operation's identity, a UUID the client chooses: the same identity and request return the first outcome. A command that carries `operationId` in its body sends the same value.",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
           }
         ],
         "requestBody": {
@@ -1682,6 +1790,15 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          {
+            "name": "Operation-Id",
+            "in": "header",
+            "description": "The operation's identity, a UUID the client chooses: the same identity and request return the first outcome. A command that carries `operationId` in its body sends the same value.",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
           }
         ],
         "requestBody": {
@@ -1780,6 +1897,15 @@
             "name": "tournamentId",
             "in": "path",
             "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Operation-Id",
+            "in": "header",
+            "description": "The operation's identity, a UUID the client chooses: the same identity and request return the first outcome. A command that carries `operationId` in its body sends the same value.",
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -1903,6 +2029,15 @@
               "type": "integer",
               "format": "int32"
             }
+          },
+          {
+            "name": "Operation-Id",
+            "in": "header",
+            "description": "The operation's identity, a UUID the client chooses: the same identity and request return the first outcome. A command that carries `operationId` in its body sends the same value.",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
           }
         ],
         "responses": {
@@ -1998,6 +2133,15 @@
             "name": "entryId",
             "in": "path",
             "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Operation-Id",
+            "in": "header",
+            "description": "The operation's identity, a UUID the client chooses: the same identity and request return the first outcome. A command that carries `operationId` in its body sends the same value.",
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -2130,6 +2274,15 @@
               "type": "integer",
               "format": "int32"
             }
+          },
+          {
+            "name": "Operation-Id",
+            "in": "header",
+            "description": "The operation's identity, a UUID the client chooses: the same identity and request return the first outcome. A command that carries `operationId` in its body sends the same value.",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
           }
         ],
         "responses": {
@@ -2234,6 +2387,15 @@
             "name": "guestId",
             "in": "path",
             "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Operation-Id",
+            "in": "header",
+            "description": "The operation's identity, a UUID the client chooses: the same identity and request return the first outcome. A command that carries `operationId` in its body sends the same value.",
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -2345,6 +2507,15 @@
             "name": "entryId",
             "in": "path",
             "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Operation-Id",
+            "in": "header",
+            "description": "The operation's identity, a UUID the client chooses: the same identity and request return the first outcome. A command that carries `operationId` in its body sends the same value.",
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -2689,6 +2860,15 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          {
+            "name": "Operation-Id",
+            "in": "header",
+            "description": "The operation's identity, a UUID the client chooses: the same identity and request return the first outcome. A command that carries `operationId` in its body sends the same value.",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
           }
         ],
         "requestBody": {
@@ -2786,6 +2966,15 @@
             "name": "guestId",
             "in": "path",
             "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Operation-Id",
+            "in": "header",
+            "description": "The operation's identity, a UUID the client chooses: the same identity and request return the first outcome. A command that carries `operationId` in its body sends the same value.",
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -2902,6 +3091,15 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          {
+            "name": "Operation-Id",
+            "in": "header",
+            "description": "The operation's identity, a UUID the client chooses: the same identity and request return the first outcome. A command that carries `operationId` in its body sends the same value.",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
           }
         ],
         "requestBody": {
@@ -3013,6 +3211,15 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          {
+            "name": "Operation-Id",
+            "in": "header",
+            "description": "The operation's identity, a UUID the client chooses: the same identity and request return the first outcome. A command that carries `operationId` in its body sends the same value.",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
           }
         ],
         "requestBody": {
@@ -3111,6 +3318,15 @@
             "name": "tournamentId",
             "in": "path",
             "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Operation-Id",
+            "in": "header",
+            "description": "The operation's identity, a UUID the client chooses: the same identity and request return the first outcome. A command that carries `operationId` in its body sends the same value.",
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -3235,6 +3451,15 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          {
+            "name": "Operation-Id",
+            "in": "header",
+            "description": "The operation's identity, a UUID the client chooses: the same identity and request return the first outcome. A command that carries `operationId` in its body sends the same value.",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
           }
         ],
         "requestBody": {
@@ -3346,6 +3571,15 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          {
+            "name": "Operation-Id",
+            "in": "header",
+            "description": "The operation's identity, a UUID the client chooses: the same identity and request return the first outcome. A command that carries `operationId` in its body sends the same value.",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
           }
         ],
         "requestBody": {
@@ -3453,6 +3687,15 @@
             "name": "matchId",
             "in": "path",
             "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Operation-Id",
+            "in": "header",
+            "description": "The operation's identity, a UUID the client chooses: the same identity and request return the first outcome. A command that carries `operationId` in its body sends the same value.",
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -3577,6 +3820,15 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          {
+            "name": "Operation-Id",
+            "in": "header",
+            "description": "The operation's identity, a UUID the client chooses: the same identity and request return the first outcome. A command that carries `operationId` in its body sends the same value.",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
           }
         ],
         "requestBody": {
@@ -3675,6 +3927,15 @@
             "name": "tournamentId",
             "in": "path",
             "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Operation-Id",
+            "in": "header",
+            "description": "The operation's identity, a UUID the client chooses: the same identity and request return the first outcome. A command that carries `operationId` in its body sends the same value.",
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -3786,6 +4047,15 @@
             "name": "matchId",
             "in": "path",
             "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Operation-Id",
+            "in": "header",
+            "description": "The operation's identity, a UUID the client chooses: the same identity and request return the first outcome. A command that carries `operationId` in its body sends the same value.",
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -3909,6 +4179,15 @@
             "schema": {
               "type": "string"
             }
+          },
+          {
+            "name": "Operation-Id",
+            "in": "header",
+            "description": "The operation's identity, a UUID the client chooses: the same identity and request return the first outcome. A command that carries `operationId` in its body sends the same value.",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
           }
         ],
         "requestBody": {
@@ -4007,6 +4286,15 @@
             "name": "tournamentId",
             "in": "path",
             "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Operation-Id",
+            "in": "header",
+            "description": "The operation's identity, a UUID the client chooses: the same identity and request return the first outcome. A command that carries `operationId` in its body sends the same value.",
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -4127,6 +4415,15 @@
             "name": "playerId",
             "in": "path",
             "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Operation-Id",
+            "in": "header",
+            "description": "The operation's identity, a UUID the client chooses: the same identity and request return the first outcome. A command that carries `operationId` in its body sends the same value.",
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -4378,6 +4675,15 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          {
+            "name": "Operation-Id",
+            "in": "header",
+            "description": "The operation's identity, a UUID the client chooses: the same identity and request return the first outcome. A command that carries `operationId` in its body sends the same value.",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
           }
         ],
         "requestBody": {
@@ -4476,6 +4782,15 @@
             "name": "tournamentId",
             "in": "path",
             "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Operation-Id",
+            "in": "header",
+            "description": "The operation's identity, a UUID the client chooses: the same identity and request return the first outcome. A command that carries `operationId` in its body sends the same value.",
             "schema": {
               "type": "string",
               "format": "uuid"
@@ -4591,6 +4906,15 @@
               "type": "string",
               "format": "uuid"
             }
+          },
+          {
+            "name": "Operation-Id",
+            "in": "header",
+            "description": "The operation's identity, a UUID the client chooses: the same identity and request return the first outcome. A command that carries `operationId` in its body sends the same value.",
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
           }
         ],
         "requestBody": {
@@ -4698,6 +5022,15 @@
             "name": "matchId",
             "in": "path",
             "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "Operation-Id",
+            "in": "header",
+            "description": "The operation's identity, a UUID the client chooses: the same identity and request return the first outcome. A command that carries `operationId` in its body sends the same value.",
             "schema": {
               "type": "string",
               "format": "uuid"

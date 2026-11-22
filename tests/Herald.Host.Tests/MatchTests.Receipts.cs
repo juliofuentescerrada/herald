@@ -177,4 +177,44 @@ public partial class MatchTests
         (await ReceiptAsync(bot.Client, league, owners)).StatusCode.ShouldBe(HttpStatusCode.NotFound);
         (await ReceiptAsync(league.Client, league, bots)).StatusCode.ShouldBe(HttpStatusCode.OK);
     }
+    [Fact]
+    public async Task Two_simultaneous_requests_with_one_identity_apply_once_and_answer_alike()
+    {
+        var league = await OpenAsync("individual");
+        var (guest, entry, operation) = (await GuestAsync(league, "Robin Vale", "player"), Guid.NewGuid(), Guid.NewGuid());
+        var path = $"{league.Path}/entries/{entry}";
+
+        var answers = await SettledAsync(async () =>
+        {
+            var both = await Task.WhenAll(
+                WithOperationAsync(league.Client, HttpMethod.Put, path, new { guestId = guest }, operation),
+                WithOperationAsync(league.Client, HttpMethod.Put, path, new { guestId = guest }, operation));
+            both.ShouldAllBe(response => response.StatusCode == HttpStatusCode.OK);
+            (await both[1].Content.ReadAsStringAsync(Cancellation)).ShouldBe(await both[0].Content.ReadAsStringAsync(Cancellation));
+            return both[0];
+        });
+
+        answers.StatusCode.ShouldBe(HttpStatusCode.OK);
+        var field = await JsonAsync(await league.Client.GetAsync($"{league.Path}/entries", Cancellation));
+        field.GetProperty("entries").GetArrayLength().ShouldBe(1);
+    }
+
+    [Fact]
+    public async Task A_repeated_creation_answers_with_its_location_and_another_organisations_identity_reads_as_reused()
+    {
+        var league = await OpenAsync("individual");
+        var (tournament, operation) = (Guid.NewGuid(), Guid.NewGuid());
+        var body = new { tournamentId = tournament, configuration = Configuration("individual") };
+        var created = await WithOperationAsync(league.Client, HttpMethod.Post, $"{league.Organisation}/tournaments", body, operation);
+
+        var repeated = await WithOperationAsync(league.Client, HttpMethod.Post, $"{league.Organisation}/tournaments", body, operation);
+        var other = await OpenAsync("individual");
+        var elsewhere = await WithOperationAsync(other.Client, HttpMethod.Post, $"{other.Organisation}/tournaments", body, operation);
+
+        created.StatusCode.ShouldBe(HttpStatusCode.Created);
+        repeated.StatusCode.ShouldBe(HttpStatusCode.Created);
+        repeated.Headers.Location.ShouldBe(created.Headers.Location);
+        elsewhere.StatusCode.ShouldBe(HttpStatusCode.Conflict);
+        (await TypeAsync(elsewhere)).ShouldBe(Receipts.OperationReused);
+    }
 }

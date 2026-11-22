@@ -210,6 +210,8 @@ export class SchedulePage {
       this.close();
     } catch (error) {
       this.state.set('ready');
+      // A rejected generation is final for its identity: the next attempt is a new operation; a lost response keeps it.
+      if (error instanceof HttpErrorResponse && error.status >= 400) this.generation = null;
       this.fail(heading, error);
     }
   }

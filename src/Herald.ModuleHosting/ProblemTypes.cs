@@ -26,6 +26,20 @@ internal sealed class ProblemTypesTransformer : IOpenApiOperationTransformer
         var scoped = description.RelativePath?.StartsWith("api/organisations/{organisationId}", StringComparison.Ordinal) == true;
         var mutation = description.HttpMethod is { } method && !HttpMethods.IsGet(method);
         var declared = description.ActionDescriptor.EndpointMetadata.OfType<ProblemTypesAttribute>().ToList();
+        if (scoped && mutation)
+        {
+            // Every organisation-scoped mutation takes an operation identity and keeps its receipt (operation-receipts).
+            operation.Parameters ??= [];
+            operation.Parameters.Add(new OpenApiParameter
+            {
+                Name = Receipts.Header,
+                In = ParameterLocation.Header,
+                Description = "The operation's identity, a UUID the client chooses: the same identity and request return the first outcome. "
+                    + "A command that carries `operationId` in its body sends the same value.",
+                Schema = new OpenApiSchema { Type = JsonSchemaType.String, Format = "uuid" },
+            });
+        }
+
         foreach (var (code, response) in operation.Responses ?? [])
         {
             var status = int.Parse(code, CultureInfo.InvariantCulture);

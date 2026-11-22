@@ -12,7 +12,7 @@ Every path below starts with `/api/organisations/{organisationId}`; `{t}` is the
 
 ## Operation identities and receipts
 
-Every mutation takes an `Operation-Id` header, a UUID the client chooses per operation:
+Every mutation takes an `Operation-Id` header (described on each operation of the admin document), a UUID the client chooses per operation:
 
 - The same identity with the same request returns the first response, with no second effect.
 - The same identity with another request is `409 operation-reused`, and nothing changes.
@@ -25,7 +25,7 @@ A client that lost a response reads `GET /receipts/{operationId}`:
   "resource": "/api/organisations/…/tournaments/…/matches/…/result", "problemType": null, "at": "…" }
 ```
 
-`applied` carries the resulting revision and resource; `rejected` carries the problem type. `404 not-found` means nothing was applied: sending the same request with the same identity applies it once. An application reads the receipts of its own operations. Receipts are kept while the tournament exists.
+`applied` carries the resulting revision and resource; `rejected` carries the problem type. A rejection is final for its identity too: repeating it answers the same rejection, so after rereading, send the corrected request with a new `Operation-Id`. `404 not-found` means nothing was applied: sending the same request with the same identity applies it once. An application reads the receipts of its own operations. Receipts are kept while the tournament exists.
 
 ## Expected revisions and other modules
 
