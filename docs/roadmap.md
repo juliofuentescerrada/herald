@@ -189,7 +189,13 @@ Goal: `main` deploys on merge and a slice pull request deploys to `preview`, bot
 | `m4-infra` | The rest of `infra/` (OpenTofu): slot identities, Application Insights on `log-shared`, the container apps and job of each slot with a minimum of zero replicas, `budget-herald`; `infra.yml` plans on pull requests | none |
 | `m4-deploy` | `deploy.yml`: `main` on merge and `preview` per slice pull request, the job's schema reset, migrations and seeding, the pull request comment, redirect URIs and personas, and the measured cost | `m4-cloud-runtime`, `m4-images`, `m4-infra`, Steward's group 5 |
 
-Technical decisions for the decision session, recorded in each change's `design.md` or in ADRs 0012 and 0019 (none is a product rule of §15): where the public SSR runtime and the admin application run; whether migrations run at the host's start or only in the job; the budget amount and telemetry sampling; how a pull request takes and releases `preview`; a custom domain or Container Apps' default addresses.
+Technical decisions, recorded in each change's `design.md` or in ADRs 0012 and 0019 (none is a product rule of §15). The decision session of 22 November 2026 closed them:
+
+- **Web runtime:** two container apps per slot, the public SSR runtime in a Node container that serves its own static files and the admin application in an unprivileged nginx container, both with a minimum of zero replicas, as ADR 0019 says.
+- **Migrations:** only in the job, already settled: outside Development, `db-apply` and the modules' migrations are deployment steps (`m0-messaging`).
+- **Cost:** `budget-herald` at 10 EUR a month, alerting at 80 % and 100 % actual and 100 % forecast; traces sampled at 25 %, logs and metrics unsampled; both reviewed against the cost `m4-deploy` measures.
+- **Taking `preview`:** a `preview` label on a slice pull request deploys it and each push redeploys it; the workflow refuses while another open pull request has the label; removing the label or closing the pull request releases the slot.
+- **Addresses:** Container Apps' default addresses on `cae-shared`, with managed TLS; a custom domain waits for production.
 Acceptance journey: a merge to `main` deploys and keeps its data; a slice pull request deploys to `preview` with seeded scenarios and the owner persona signs in; a second deployment of each needs no operator; a `preview` reset needs no server privileges and cannot reach `herald_main`; the measured monthly cost of both slots is recorded beside the base cost (M4's exit criteria in the milestone table above).
 
 ## Ideas outside the plan
