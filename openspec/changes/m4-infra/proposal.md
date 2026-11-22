@@ -2,6 +2,8 @@
 
 **Proposed in the M4 batch's proposals pull request, 22 November 2026.** The technical decisions come from the batch's decision session of the same day ([M4 batch](../../../docs/roadmap.md#batch-main-and-preview-on-azure), ADRs 0012 and 0019) and Steward's onboarding of Herald (`onboard-herald`, groups 1–4; #86). Merging the proposals pull request approves this change (ADR 0018); task 1.1 records that approval.
 
+**Approved for implementation on 22 November 2026**, when the maintainer merged the M4 batch proposals pull request (#95). Review answer: Q1 accepted, a second AcrPull-only identity per slot for the web apps. The review asked for no other change.
+
 ## Why
 
 Steward has onboarded Herald: `rg-herald` (created by `infra/bootstrap.sh`), `id-herald-delivery` with its federations and grants, and the `herald` state container. Herald's own resources do not exist yet, and Steward's group 5 (the slot databases) needs the object ids of the slot identities that this change creates.
