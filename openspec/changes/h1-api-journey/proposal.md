@@ -2,6 +2,8 @@
 
 **Proposed in H1 batch 3's proposals pull request, 15 November 2026.** The rules come from the batch's decision session of the same day, recorded in the functional discovery (§13.1, UJ-08, F-11; §15 rows D-02, D-12 and D-15). The pilot grants it relies on are split out to `h1-pilot-access` (its Q1). It depends on `h1-finalisation`, `h1-change-log`, `h1-public-read` and `h1-pilot-access`. Merging the proposals pull request approves this change (ADR 0018); task 1.1 records that approval.
 
+**Approved for implementation on 16 November 2026**, when the maintainer merged the batch 3 proposals pull request (#74), with the review answers below (ADR 0018). The review asked for no change to this proposal.
+
 **Review answers, 15 November 2026 (#74):** the maintainer accepted Q1 and Q2 (no `received` in H1, `not-found` safe to retry; the `Operation-Id` header).
 
 ## Why
