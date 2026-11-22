@@ -3,7 +3,7 @@
 - Status: Proposed
 - Date: 2026-11-06
 - Consolidated: 2026-11-07
-- Revised: 2026-11-13 (H2, H3, H4 and H5 functional extensions linked into the maintained source map; status remains Proposed)
+- Revised: 2026-11-13 (H2, H3, H4, H5 and H6 functional extensions linked into the maintained source map; status remains Proposed)
 
 ## Context
 
@@ -25,6 +25,7 @@ Keep one maintained source for each responsibility:
 | `docs/herald-h3-functional-discovery.md` | Detailed H3 functional extension, target journeys and acceptance; decision status stays in the baseline ledger |
 | `docs/herald-h4-functional-discovery.md` | Detailed H4 Swiss/connected-consumer extension and target acceptance; status stays in the baseline ledger |
 | `docs/herald-h5-functional-discovery.md` | Detailed H5 combined-stage/live/ecosystem extension and target acceptance; status stays in the baseline ledger |
+| `docs/herald-h6-functional-discovery.md` | Detailed H6 advanced-team/game-submission extension and target acceptance; status stays in the baseline ledger |
 | `docs/roadmap.md` | Delivery sequence and current change status |
 | `docs/adr/` | Technical decisions, rationale and follow-ups |
 | `docs/herald-visual-direction.md` | Visual contracts, canonical mockup references and screen/state coverage |
