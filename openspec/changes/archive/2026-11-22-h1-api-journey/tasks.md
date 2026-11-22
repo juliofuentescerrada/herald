@@ -23,4 +23,4 @@
 
 - [x] 5.1 `covers` markers for every scenario this change adds; `node scripts/spec-coverage.mjs` passes
 - [x] 5.2 Full run (`scripts/check all` and the e2e suite); record in design.md
-- [ ] 5.3 Docs: roadmap H1 exit criteria checked against the batch, herald-reviewer review of the diff; sync the specs and archive the change in the slice's pull request
+- [x] 5.3 Docs: roadmap H1 exit criteria checked against the batch, herald-reviewer review of the diff; sync the specs and archive the change in the slice's pull request

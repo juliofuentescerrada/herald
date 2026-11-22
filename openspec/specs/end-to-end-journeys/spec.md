@@ -56,6 +56,8 @@ The suite SHALL cover these journeys, each as one test named as a sentence:
 26. An owner postpones a published tournament's planned start through the dates preview, cancels another running tournament with a reason, sees its unresolved matches voided and no champion, and archives it.
 27. An owner reads a tournament's change log with the admissions, the published schedule, a postponed start with its old and new times and the cancellation, each with who, when and why.
 28. A visitor opens a public tournament's link, reads its rounds and standings with aliases only, and after the owner makes it private sees the same "not available" page as for an unknown link.
+29. An owner grants a pilot application access to one tournament's result operations, sees the grant listed, and revokes it.
+30. An independent client runs a four-player league through the API, repeats a result after losing the response and gets the original receipt, and reads the same final standings as the admin application.
 
 #### Scenario: Each journey checks what the person sees
 - **WHEN** a journey runs
