@@ -17,12 +17,16 @@ public sealed record CreatedOrganisation(Guid Id, string Name);
 
 public static class CreateOrganisationEndpoint
 {
+    // The identifier of another organisation, created with another name (API-07).
+    public const string IdentifierReused = "organisation-identifier-reused";
+
     [WolverinePost("/api/organisations")]
     [EndpointGroupName(HeraldApi.Admin)]
     [EndpointName("createOrganisation")]
     [ProducesResponseType<CreatedOrganisation>(StatusCodes.Status201Created)]
     [ProducesResponseType<HttpValidationProblemDetails>(StatusCodes.Status400BadRequest, "application/problem+json")]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict, "application/problem+json")]
+    [ProblemTypes(StatusCodes.Status409Conflict, IdentifierReused)]
     public static async Task<IResult> Post(
         CreateOrganisation command, ClaimsPrincipal user, OrganisationsDbContext db, OrganisationContext context, CancellationToken cancellationToken)
     {
@@ -62,7 +66,7 @@ public static class CreateOrganisationEndpoint
             // A conflict says nothing about the organisation that holds the identifier.
             return existing.Repeats(name, person.Id)
                 ? Created(existing)
-                : Results.Problem(statusCode: StatusCodes.Status409Conflict, title: "Conflict");
+                : Results.Problem(statusCode: StatusCodes.Status409Conflict, title: "Conflict", type: IdentifierReused);
         }
 
         // The owner membership is organisation-owned: creation acts for the new organisation.

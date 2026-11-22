@@ -74,6 +74,7 @@ namespace Internal.Generated.WolverineHandlers
                 // The actual HTTP request handler execution
                 var result = await Herald.Organisations.Features.RevokeGrant.RevokeGrantEndpoint.Post(organisationId, grantId, organisationContext, organisationsDbContext, httpContext.RequestAborted).ConfigureAwait(false);
 
+                Herald.ModuleHosting.Receipts.Record<Herald.Organisations.Persistence.OrganisationsDbContext>(result, organisationsDbContext, httpContext);
                 
                 // Added by EF Core Transaction Middleware
                 var result_of_SaveChangesAsync = await organisationsDbContext.SaveChangesAsync(httpContext.RequestAborted).ConfigureAwait(false);

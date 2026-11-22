@@ -22,6 +22,7 @@ public static class LiftSanctionEndpoint
     [ProducesResponseType<HttpValidationProblemDetails>(StatusCodes.Status400BadRequest, "application/problem+json")]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound, "application/problem+json")]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict, "application/problem+json")]
+    [ProblemTypes(StatusCodes.Status409Conflict, ScheduleResults.RevisionConflict)]
     public static async Task<IResult> Post(
         Guid organisationId, Guid tournamentId, Guid entryId, Guid playerId, LiftSanction command, OrganisationContext context, CompetitionDbContext db, IMessageBus bus, CancellationToken cancellationToken)
     {

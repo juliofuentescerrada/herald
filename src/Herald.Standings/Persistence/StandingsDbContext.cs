@@ -18,6 +18,8 @@ public sealed class StandingsDbContext(DbContextOptions<StandingsDbContext> opti
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.MapModule(Schema);
+        modelBuilder.MapReceipts();
+        OrganisationOwned<Receipt>(modelBuilder);
 
         OrganisationOwned<TournamentResults>(modelBuilder);
         modelBuilder.Entity<TournamentResults>(results =>

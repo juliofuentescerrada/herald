@@ -22,6 +22,7 @@ public static class DeleteDraftEndpoint
     [ProducesResponseType<HttpValidationProblemDetails>(StatusCodes.Status400BadRequest, "application/problem+json")]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound, "application/problem+json")]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict, "application/problem+json")]
+    [ProblemTypes(StatusCodes.Status409Conflict, TournamentResults.RevisionConflict)]
     public static async Task<IResult> Delete(
         Guid organisationId, Guid tournamentId, [FromQuery] int expectedRevision, TournamentsDbContext db, CancellationToken cancellationToken)
     {
@@ -50,6 +51,8 @@ public static class DeleteDraftEndpoint
             return TournamentResults.Stale(tournament.Revision);
         }
 
+        // Its receipts go with it, in the same transaction; the deletion's own is recorded after, so a repeat still answers.
+        await db.Set<Receipt>().Where(receipt => receipt.TournamentId == tournamentId).ExecuteDeleteAsync(cancellationToken);
         return Results.NoContent();
     }
 }

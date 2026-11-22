@@ -94,6 +94,7 @@ namespace Internal.Generated.WolverineHandlers
                 // The actual HTTP request handler execution
                 var result = await Herald.Registration.Features.UndoCheckIn.UndoCheckInEndpoint.Delete(organisationId, tournamentId, entryId, expectedRevision, organisationContext, registrationDbContext, messageContext, httpContext.RequestAborted).ConfigureAwait(false);
 
+                Herald.ModuleHosting.Receipts.Record<Herald.Registration.Persistence.RegistrationDbContext>(result, registrationDbContext, httpContext);
                 
                 // Added by EF Core Transaction Middleware
                 var result_of_SaveChangesAsync = await registrationDbContext.SaveChangesAsync(httpContext.RequestAborted).ConfigureAwait(false);

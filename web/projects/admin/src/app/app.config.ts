@@ -1,6 +1,7 @@
 import { ApplicationConfig, inject, provideBrowserGlobalErrorListeners } from '@angular/core';
 import { Dialogs } from '@herald/ui';
 import { provideHttpClient, withInterceptors } from '@angular/common/http';
+import { operationIdentity } from '@herald/api-client/admin';
 import { provideRouter } from '@angular/router';
 import { provideTanStackQuery } from '@tanstack/angular-query-experimental';
 import { routes } from './app.routes';
@@ -11,7 +12,7 @@ export const appConfig = (auth: AuthConfig): ApplicationConfig => ({
     provideBrowserGlobalErrorListeners(),
     { provide: AUTH_CONFIG, useValue: auth },
     provideRouter(routes),
-    provideHttpClient(withInterceptors([apiToken, accessErrors])),
+    provideHttpClient(withInterceptors([apiToken, operationIdentity, accessErrors])),
     provideTanStackQuery(QUERY_CLIENT),
     provideAppContext(),
     {

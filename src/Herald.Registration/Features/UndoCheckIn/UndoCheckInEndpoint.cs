@@ -21,6 +21,7 @@ public static class UndoCheckInEndpoint
     [ProducesResponseType<HttpValidationProblemDetails>(StatusCodes.Status400BadRequest, "application/problem+json")]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound, "application/problem+json")]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict, "application/problem+json")]
+    [ProblemTypes(StatusCodes.Status409Conflict, FieldResults.CheckInRevisionConflict)]
     public static async Task<IResult> Delete(
         Guid organisationId,
         Guid tournamentId,

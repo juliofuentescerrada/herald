@@ -24,6 +24,8 @@ public sealed class OrganisationsDbContext(DbContextOptions<OrganisationsDbConte
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.MapModule(Schema);
+        modelBuilder.MapReceipts();
+        OrganisationOwned<Receipt>(modelBuilder);
 
         modelBuilder.Entity<Person>(person =>
         {

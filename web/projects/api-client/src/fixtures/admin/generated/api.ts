@@ -49,6 +49,27 @@ export interface ProblemDetails {
   instance?: string | null;
 }
 
+export type ReceiptOutcome = typeof ReceiptOutcome[keyof typeof ReceiptOutcome];
+
+
+export const ReceiptOutcome = {
+  applied: 'applied',
+  rejected: 'rejected',
+  received: 'received',
+} as const;
+
+export interface ReceiptView {
+  operationId: string;
+  operation: string;
+  outcome: ReceiptOutcome;
+  /** @nullable */
+  revision: number | null;
+  resource: string;
+  /** @nullable */
+  problemType: string | null;
+  at: string;
+}
+
 export interface ReviseFixtureItem {
   name: string;
   /** @nullable */
@@ -160,6 +181,42 @@ export class HeraldApiFixturesAdminService {
     );
   }
 
+ readReceipt<TData = ReceiptView>(organisationId: string,
+    operationId: string, options?: HttpClientBodyOptions): Observable<TData>;
+ readReceipt<TData = ReceiptView>(organisationId: string,
+    operationId: string, options?: HttpClientEventOptions): Observable<HttpEvent<TData>>;
+ readReceipt<TData = ReceiptView>(organisationId: string,
+    operationId: string, options?: HttpClientResponseOptions): Observable<AngularHttpResponse<TData>>;
+  readReceipt<TData = ReceiptView>(
+    organisationId: string,
+    operationId: string, options?: HttpClientObserveOptions): Observable<TData | HttpEvent<TData> | AngularHttpResponse<TData>> {
+    if (options?.observe === 'events') {
+      return this.http.get<TData>(
+      `/api/organisations/${organisationId}/receipts/${operationId}`,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'events',
+      }
+    );
+    }
+
+    if (options?.observe === 'response') {
+      return this.http.get<TData>(
+      `/api/organisations/${organisationId}/receipts/${operationId}`,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'response',
+      }
+    );
+    }
+
+    return this.http.get<TData>(
+      `/api/organisations/${organisationId}/receipts/${operationId}`,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'body',
+      }
+    );
+  }
+
 };
 
 export type ReviseFixtureItemClientResult = NonNullable<FixtureItemRevised | FixtureRevisionAccepted>
+export type ReadReceiptClientResult = NonNullable<ReceiptView>

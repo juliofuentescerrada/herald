@@ -15,6 +15,9 @@ public sealed record CreateTournament(Guid TournamentId, TournamentConfiguration
 
 public static class CreateTournamentEndpoint
 {
+    // The identifier of another tournament, created with other content (API-07).
+    public const string IdentifierReused = "tournament-identifier-reused";
+
     [WolverinePost("/api/organisations/{organisationId}/tournaments")]
     [EndpointGroupName(HeraldApi.Admin)]
     [EndpointName("createTournament")]
@@ -23,6 +26,7 @@ public static class CreateTournamentEndpoint
     [ProducesResponseType<HttpValidationProblemDetails>(StatusCodes.Status400BadRequest, "application/problem+json")]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound, "application/problem+json")]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict, "application/problem+json")]
+    [ProblemTypes(StatusCodes.Status409Conflict, IdentifierReused)]
     public static async Task<IResult> Post(
         Guid organisationId, CreateTournament command, OrganisationContext context, TournamentsDbContext db, CancellationToken cancellationToken)
     {
@@ -65,5 +69,5 @@ public static class CreateTournamentEndpoint
     private static IResult Created(Guid organisationId, Tournament tournament) => Results.Created(
         $"/api/organisations/{organisationId}/tournaments/{tournament.Id.Value}", TournamentDetails.Of(tournament, EntryCounts.None, StartReadiness.Unknown));
 
-    private static IResult Conflict() => Results.Problem(statusCode: StatusCodes.Status409Conflict, title: "Conflict");
+    private static IResult Conflict() => Results.Problem(statusCode: StatusCodes.Status409Conflict, title: "Conflict", type: IdentifierReused);
 }

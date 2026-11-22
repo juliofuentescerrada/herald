@@ -19,6 +19,8 @@ public sealed class CompetitionDbContext(DbContextOptions<CompetitionDbContext> 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.MapModule(Schema);
+        modelBuilder.MapReceipts();
+        OrganisationOwned<Receipt>(modelBuilder);
 
         OrganisationOwned<Schedule>(modelBuilder);
         modelBuilder.Entity<Schedule>(schedule =>
