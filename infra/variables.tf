@@ -32,6 +32,12 @@ variable "persona_main_object_id" {
   default     = null
 }
 
+variable "databases_onboarded" {
+  description = "True once Steward's operator has created herald_main and herald_preview (onboard-herald group 5): the plan imports them. Never set it back to false: the databases are protected from destruction."
+  type        = bool
+  default     = false
+}
+
 variable "persona_rival_object_id" {
   description = "Object id of the second owner persona, of another organisation (isolation)."
   type        = string
