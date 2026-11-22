@@ -40,12 +40,17 @@ builder.UseWolverine(options =>
     options.CodeGeneration.TypeLoadMode = builder.Environment.IsDevelopment() ? TypeLoadMode.Dynamic : TypeLoadMode.Static;
 
     // The AppHost declares the topology; Herald's host creates no topics, subscriptions or queues.
-    // The end-to-end suite runs without a broker: local queues and the PostgreSQL outbox still work.
-    if (!endToEnd)
+    // Without a broker (the end-to-end suite, the deployed slots: ADR 0019) local queues and the PostgreSQL outbox still work.
+    var broker = builder.Configuration.GetValue("Herald:Messaging:Broker", HeraldMessaging.AzureServiceBus);
+    if (broker == HeraldMessaging.AzureServiceBus)
     {
         options.UseAzureServiceBus(builder.Configuration.GetConnectionString("messaging")
                 ?? throw new InvalidOperationException("The 'messaging' connection string is missing."))
             .SystemQueuesAreEnabled(false);
+    }
+    else if (broker != HeraldMessaging.NoBroker)
+    {
+        throw new InvalidOperationException($"Herald:Messaging:Broker is '{broker}'; expected '{HeraldMessaging.AzureServiceBus}' or '{HeraldMessaging.NoBroker}'.");
     }
 
     options

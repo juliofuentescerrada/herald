@@ -13,6 +13,10 @@ public static class HeraldMessaging
     // and snapshot consumers are idempotent beyond any window.
     public static readonly TimeSpan DeduplicationWindow = TimeSpan.FromMinutes(5);
 
+    // Values of Herald:Messaging:Broker (m4-cloud-runtime D-1).
+    public const string AzureServiceBus = "AzureServiceBus";
+    public const string NoBroker = "None";
+
     public static WolverineOptions UseHeraldMessaging(this WolverineOptions options, bool createTablesOnStartup)
     {
         options.PersistMessagesWithPostgresqlUsingDataSourceFromContainer(schemaName: ModuleDatabase.MessageStoreSchema);
