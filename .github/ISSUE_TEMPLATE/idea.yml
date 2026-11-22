@@ -1,0 +1,22 @@
+name: Idea
+description: A feature idea to keep for later. Not planned, not a commitment, not an OpenSpec change.
+title: "Idea: "
+labels: ["idea"]
+body:
+  - type: textarea
+    id: idea
+    attributes:
+      label: Idea
+      description: What it is and who it is for.
+    validations:
+      required: true
+  - type: textarea
+    id: why
+    attributes:
+      label: Why
+      description: The problem it solves or the opportunity it opens.
+  - type: input
+    id: horizon
+    attributes:
+      label: Tentative horizon
+      placeholder: After H7, fits H3, undecided…

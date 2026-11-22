@@ -44,6 +44,18 @@ The suite SHALL cover these journeys, each as one test named as a sentence:
 14. An owner enters teams in a team tournament with manual admission, is warned of a possible duplicate team and enters the existing one, and admits a pending team.
 15. An owner builds a team's roster to its minimum, is stopped from adding a player who is on another team's roster, and sees the team's roster complete.
 16. An owner checks in two admitted players, undoes one of the check-ins, and sees the entries page count 1 of 2 checked in.
+17. An owner marks a pending player absent, generates a schedule for five players with one rest each, publishes it, withdraws it with a reason and publishes it again.
+18. An owner sees a team tournament's start blocked by an incomplete roster, completes the roster, starts the competition and is stopped from adding a player to the frozen roster.
+19. An owner records a team match's lineups from seven-player frozen rosters, is stopped from starting with four starters on one side, completes the lineup and starts the match, which locks both lineups.
+20. An owner records a win in an individual match, which starts and resolves it in one step, records a draw in another, and sees both results on the schedule.
+21. An owner records a concession before play, a double absence and a no contest with its reason, and sees each cause on the schedule with no score and no appearances.
+22. An owner records the results of a four-player league and reads its standings, with two players sharing a position and one player's points traced to its results.
+23. An owner withdraws a player during the competition with a reason, sees the player's unplayed matches resolved as absences and the player flagged in the standings, and sees round 1 completed in the operations summary.
+24. An owner corrects a recorded win to a draw with a reason, reviews the impact on points and standings before confirming, and sees the corrected result with its earlier version in the match history.
+25. An owner reviews the standings of a fully resolved league, finalises it, sees them final, then reopens it with a reason, corrects a result and finalises again with the earlier final revision kept.
+26. An owner postpones a published tournament's planned start through the dates preview, cancels another running tournament with a reason, sees its unresolved matches voided and no champion, and archives it.
+27. An owner reads a tournament's change log with the admissions, the published schedule, a postponed start with its old and new times and the cancellation, each with who, when and why.
+28. A visitor opens a public tournament's link, reads its rounds and standings with aliases only, and after the owner makes it private sees the same "not available" page as for an unknown link.
 
 #### Scenario: Each journey checks what the person sees
 - **WHEN** a journey runs

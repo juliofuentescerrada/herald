@@ -1,0 +1,155 @@
+@if (tournament.isPending()) {
+  <main class="page"><p role="status">Loading the tournament…</p></main>
+} @else if (notAvailable()) {
+  <main class="page text">
+    <h1>This tournament is not available</h1>
+    <p>The link may be wrong, or the organiser has not made the tournament available.</p>
+    <p><a routerLink="/">Go to the home page</a></p>
+  </main>
+} @else if (tournament.isError()) {
+  <main class="page">
+    <herald-notice tone="danger" heading="The tournament could not be loaded">Try again in a moment.</herald-notice>
+  </main>
+} @else {
+  @let tournament = page()!;
+  <main class="page">
+    <header class="title">
+      <h1>{{ tournament.title }}</h1>
+      <div class="labels" role="group" aria-label="Tournament lifecycle">
+        @for (label of labels(); track label.text) {
+          <herald-status-label [tone]="label.tone ?? 'neutral'" [icon]="label.icon">{{ label.text }}</herald-status-label>
+        }
+      </div>
+    </header>
+
+    @if (cancelled() && tournament.cancelledAt) {
+      <herald-notice tone="danger" heading="This tournament was cancelled">
+        Cancelled on {{ zoned(tournament.cancelledAt) }}.@if (tournament.standings) { Results recorded before stay; no champion is declared.}
+      </herald-notice>
+    }
+
+    <section class="panel" aria-labelledby="overview">
+      <h2 id="overview">Overview</h2>
+      <dl class="facts">
+        <dt>Organiser</dt><dd>{{ tournament.organiser }}</dd>
+        <dt>Game</dt><dd>{{ tournament.gameVariant ?? 'Not set' }}</dd>
+        <dt>Venue</dt><dd>{{ venueText(tournament) }}</dd>
+        @if (tournament.registrationOpensAt) {
+          <dt>Registration</dt><dd>{{ localText(tournament.registrationOpensAt) }} to {{ localText(tournament.registrationClosesAt) }} · {{ tournament.timeZone }}</dd>
+        }
+        <dt>Planned start</dt><dd>{{ tournament.plannedStartAt ? localText(tournament.plannedStartAt) + ' · ' + tournament.timeZone : 'Not set' }}</dd>
+        <dt>Format</dt><dd>{{ formatText(tournament) }}</dd>
+      </dl>
+    </section>
+
+    @if (tournament.rounds.length) {
+      <section class="panel" aria-labelledby="rounds">
+        <h2 id="rounds">Rounds</h2>
+        @for (round of tournament.rounds; track round.number) {
+          <section class="round" [attr.aria-labelledby]="'round-' + round.number">
+            <h3 [id]="'round-' + round.number">Round {{ round.number }}</h3>
+            <ul class="matches">
+              @for (match of round.matches; track $index) {
+                @let state = matchState(match);
+                <li>
+                  <span class="pair">{{ match.first }} <span class="vs">vs</span> {{ match.second }}</span>
+                  <herald-status-label [tone]="state.tone ?? 'neutral'">{{ state.text }}</herald-status-label>
+                  @if (outcomeText(match); as outcome) {
+                    <p class="outcome">{{ outcome }}</p>
+                  }
+                </li>
+              }
+              @if (round.rest) {
+                <li><span class="pair">{{ round.rest }}</span><span class="help">Rest · no match this round</span></li>
+              }
+            </ul>
+          </section>
+        }
+      </section>
+    }
+
+    @if (tournament.standings; as standings) {
+      <section class="panel" aria-labelledby="standings">
+        <h2 id="standings">Standings</h2>
+        <p><strong>{{ standingsHeader(standings, tournament.timeZone, cancelled()) }}</strong></p>
+        <p class="help">
+          {{ standings.resolvedMatches }} of {{ standings.matches }} {{ standings.matches === 1 ? 'match' : 'matches' }} resolved · 3 points a win, 1 a draw ·
+          equal points share a position · choose a name for its explanation
+        </p>
+        @if (standings.noChampion && !cancelled()) {
+          <herald-notice heading="No active entrant">Every entrant withdrew or was disqualified. Points and positions stay; no champion is declared.</herald-notice>
+        }
+        <table aria-label="Standings">
+          <thead>
+            <tr>
+              <th scope="col">Position</th>
+              <th scope="col">{{ teams() ? 'Team' : 'Player' }}</th>
+              <th scope="col" class="num wide">Resolved</th>
+              <th scope="col" class="num wide">Won</th>
+              <th scope="col" class="num wide">Drawn</th>
+              <th scope="col" class="num wide">Lost</th>
+              <th scope="col" class="pts">Points</th>
+            </tr>
+          </thead>
+          <tbody>
+            @for (row of standings.rows; track row.name; let index = $index) {
+              <tr>
+                <td>
+                  <span aria-hidden="true">{{ row.position }}{{ row.shared ? '=' : '' }}</span>
+                  <span class="visually-hidden">Position {{ row.position }}{{ row.shared ? ', shared' : '' }}</span>
+                </td>
+                <td>
+                  <button type="button" class="link" [attr.aria-expanded]="open().has(row.name)" [attr.aria-controls]="'explain-' + index" (click)="toggle(row.name)">
+                    {{ row.name }}
+                  </button>
+                  @if (row.status !== 'active') {
+                    <herald-status-label tone="danger" icon="alert-triangle">{{ row.status === 'withdrawn' ? 'Withdrawn' : 'Disqualified' }}</herald-status-label>
+                  }
+                </td>
+                <td class="num wide">{{ row.resolved }}</td>
+                <td class="num wide">{{ row.won }}</td>
+                <td class="num wide">{{ row.drawn }}</td>
+                <td class="num wide">{{ row.lost }}</td>
+                <td class="pts">{{ row.points }}</td>
+              </tr>
+              @if (open().has(row.name)) {
+                <tr class="explain" [id]="'explain-' + index">
+                  <td colspan="7">
+                    <ul>
+                      @for (line of row.lines; track line.round) {
+                        <li>{{ lineText(line) }}</li>
+                      }
+                      @for (match of row.remaining; track match.round) {
+                        <li>Round {{ match.round }} · vs {{ match.opponent }} · to play</li>
+                      }
+                    </ul>
+                    <p class="help">Resolved {{ row.resolved }} · won {{ row.won }} · drawn {{ row.drawn }} · lost {{ row.lost }} · total {{ pointsText(row.points) }}</p>
+                  </td>
+                </tr>
+              }
+            }
+          </tbody>
+        </table>
+      </section>
+    }
+
+    <section class="panel" aria-labelledby="changes">
+      <h2 id="changes">Changes</h2>
+      @if (tournament.changes.length) {
+        <ul class="changes">
+          @for (change of tournament.changes; track $index) {
+            <li>
+              <herald-icon [name]="changeIcon(change)" size="metadata" />
+              <div>
+                <p>{{ changeText(change) }}</p>
+                <p class="help">{{ zoned(change.at) }}</p>
+              </div>
+            </li>
+          }
+        </ul>
+      } @else {
+        <p class="help">No public changes yet.</p>
+      }
+    </section>
+  </main>
+}

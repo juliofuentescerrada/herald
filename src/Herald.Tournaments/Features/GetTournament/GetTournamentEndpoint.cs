@@ -1,3 +1,4 @@
+using Herald.BuildingBlocks;
 using Herald.ModuleHosting;
 using Herald.Tournaments.Domain;
 using Herald.Tournaments.Persistence;
@@ -14,6 +15,7 @@ public static class GetTournamentEndpoint
     [WolverineGet("/api/organisations/{organisationId}/tournaments/{tournamentId}")]
     [EndpointGroupName(HeraldApi.Admin)]
     [EndpointName("getTournament")]
+    [OperationGroup(OperationGroup.Read)]
     [ProducesResponseType<TournamentDetails>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound, "application/problem+json")]
     public static async Task<IResult> Get(Guid organisationId, Guid tournamentId, TournamentsDbContext db, CancellationToken cancellationToken)
@@ -21,7 +23,7 @@ public static class GetTournamentEndpoint
         // The organisation filter hides another organisation's tournament: it is as absent as a missing one.
         var id = new TournamentId(tournamentId);
         return await db.Tournaments.AsNoTracking().SingleOrDefaultAsync(tournament => tournament.Id == id, cancellationToken) is { } tournament
-            ? Results.Ok(TournamentDetails.Of(tournament, await db.EntryCountsAsync(id, cancellationToken)))
+            ? Results.Ok(await db.DetailsAsync(tournament, cancellationToken))
             : TournamentResults.NotFound();
     }
 }

@@ -2,7 +2,7 @@
 
 Each milestone ends with something that works end to end. From M0 on, every milestone is one or more OpenSpec changes (`/opsx:propose`), and its design notes and measurements go in the change's `design.md`.
 
-## Current state — 11 November 2026
+## Current state
 
 | Work | State | Next gate |
 | --- | --- | --- |
@@ -19,6 +19,8 @@ Each milestone ends with something that works end to end. From M0 on, every mile
 | `h1-team-rosters` | Implemented, merged (#18) and archived: team rosters of guest players within the tournament's bounds (D-17, TM-02, TM-03, TM-05), one team per player among active entries, derived readiness, roster history; the roster bounds travel in the entry terms (optional members, contract version 1); the roster drawer in the admin entries page; journey 15 added to `e2e/` (fifteen journeys); run through Aspire by the maintainer on 11 November 2026 | Freeze at start and lineups come with competition; check-in is a later slice |
 | `h1-check-in` | Implemented, merged (#28) and archived: the owner checks in admitted entries, individual or team, and undoes a check-in (F-05), pending or confirmed only, with its own revision and history; the field counts carry the checked-in count (optional member, contract version 1); confirmed check-ins lock the check-in policy; check-in in the admin entries page; journey 16 added to `e2e/` (sixteen journeys); run through Aspire by the maintainer on 12 November 2026 | No check-in window or absent state in H1; the start slice reviews absences |
 | `ui-icons` | Implemented on 12 November 2026, pull request pending: Tabler icons in the admin rail navigation, status labels, back and entries links and empty panels, with a 32 px empty-state size in `ui`; actions keep text only; before/after captures instead of new mockups; the admin bundle grows by 3.67 kB | Archive in a separate pull request after the merge |
+| `style-guide-and-ui-audit` | Implemented and archived in #59, accepted 14 November 2026: [maintained UI guidance](ui/style-guide.md), organiser/participant and H2 public-portal experience patterns, component intent, extensible icon/component inventories and a local Refactoring UI skill shared by the agent entry points; `interface-guidance` and `agent-harness` specifications synced | Apply the guidance to new designs; the dated audit's production remediation and future H2 implementation remain separate work |
+| `tournament-administration-ux` | Approved and implemented in #69, pending merge: tournament section links, lifecycle emphasis, schedule/result composition, unsaved lineup protection, local recovery and responsive rows | Review the synthetic test-script captures and the explicit acceptance limits in its archived design |
 | Delivery process | [ADR 0018](adr/0018-deliver-in-batches-tested-on-a-deployed-preview.md) accepted on 13 November 2026 (`batch-delivery`): from H1's remaining slices, batches implemented by the agent in cloud sessions, at most two slices in progress, tested by the maintainer locally until M4 and then on a preview per pull request; progress tracked in GitHub Issues, by milestone and on the project board ([delivery tracking](operations/delivery-tracking.md)) | The maintainer runs `scripts/github-setup` and creates the board; the [H1 batch map](#h1-batches--accepted-13-november-2026) is accepted; the first batch starts by hand, then the next-slice scheduled task |
 | Preview environments and synthetic data | [ADR 0019](adr/0019-preview-environments-and-synthetic-data.md) proposed on 12 November 2026: fixed `main` and `preview` slots with real sign-in and persona accounts, a database per slot, no broker until needed; synthetic data seeded through the host in process | `dev-synthetic-data` implemented, merged (#23) and archived: `tools/Herald.Seed` seeds through the endpoints, Aspire seeds as the maintainer (run on 12 November 2026); slots and pipeline in M4 |
 | `harness-engineering` | Implemented, merged (#24, #25, #26) and archived: rules checked after each edit, before each commit and in CI (`docs/rules/`); scenario-to-test traceability with a baseline that only shrinks; `scripts/bootstrap`; declared permissions; the `herald-reviewer` subagent; per-turn harness metrics; Aspire's MCP server; executable test scripts with screenshots in CI | Recalibrate the loop guard from the first slices' metrics; shrink the baseline as slices touch each specification |
@@ -91,14 +93,14 @@ Delivered slices already cover AT-12 (`h1-organisation-access`) and the publicat
 
 ### Batch 1: start and pair
 
-Goal: an owner starts a league and publishes its round-robin schedule.
+Goal: an owner publishes a league's round-robin schedule and starts it.
 
 | Slice | Delivers | Main module | Depends on |
 |---|---|---|---|
-| `h1-competition-start` | Start readiness, the absence review, roster freeze and competition start (F-05) | Tournaments, Registration | none |
-| `h1-round-robin-pairings` | A draft schedule, publication as a revision, rest rounds, draft regeneration (F-06) | Competition | `h1-competition-start` |
+| `h1-round-robin-pairings` | The absence review, a draft schedule from the eligible field, publication as a revision and its withdrawal, rest rounds, draft regeneration (F-05, F-06) | Competition, Registration | none |
+| `h1-competition-start` | Start readiness against the current publication, roster freeze and competition start (F-05, CP-04) | Tournaments, Registration | `h1-round-robin-pairings` |
 
-Decision rows: D-29 (absences at start), D-23 (frozen-roster eligibility), D-18 and D-25 (team start).
+Decision rows: D-29 (absences at start), D-23 (frozen roster), D-18 and D-17 (team start). The decision session of 13 November 2026 closed them ([§15](herald-functional-discovery.md#15-decision-register-and-development-gates)) and confirmed §5.1's order: pairings are published before start, so the slices run in that order. D-25 (§8.1) moved to batch 2.
 Acceptance journey: four individual entries yield six published matches; five yield ten with one rest round each; four teams yield six matches (AT-01 and AT-04, pairing part); starting fails with fewer than two eligible entrants (AT-02, start part); a published pre-start schedule changes only by withdrawal, review and republication (AT-03, pairing part).
 
 ### Batch 2: play and score
@@ -113,7 +115,7 @@ Goal: rounds are played and the standings explain themselves.
 | `h1-standings` | Standings from effective results, explained points and tiebreakers, rest rounds without points, shared positions (F-09) | Standings | `h1-operator-results` |
 | `h1-round-operations` | The operations queue, round completion, withdrawals and sanctions during competition (F-08, D-05) | Competition | `h1-exceptional-outcomes` |
 
-Decision rows: D-05 (withdrawal and disqualification), D-23 (lineups and eligibility changes), the exceptional outcomes of §8.1.
+Decision rows: D-05 (withdrawal and disqualification), D-23 (lineups and eligibility changes), the exceptional outcomes of §8.1 (D-25). The decision session of 15 November 2026 closed them ([§15](herald-functional-discovery.md#15-decision-register-and-development-gates)): the §8.1 table as written; withdrawal and disqualification with a private reason, resolving the entrant's unplayed encounters as single absences; lineups locked at match start; player withdrawal and sanction until lifted; individual results start and resolve in one operation; no score in H1.
 Acceptance journey: AT-01 in full (six matches and explainable final standings), AT-04 (a seven-player roster fields five starters; a team of four cannot play), AT-05 (eligibility changes after the freeze), AT-06 (no-show and withdrawal in play).
 
 ### Batch 3: correct, close and open
@@ -123,15 +125,16 @@ Goal: the tournament is corrected safely, finalised, announced, read by link and
 | Slice | Delivers | Main module | Depends on |
 |---|---|---|---|
 | `h1-safe-corrections` | Corrections with a revision and an impact preview (UJ-06, D-07) | Competition, Standings | batch 2 |
-| `h1-tournament-cancel-and-dates` | Cancellation, archiving and postponed dates (AT-09, AT-11, D-27) | Tournaments | batch 2 |
-| `h1-finalisation` | Review and finalisation, and history (F-09, D-24) | Standings | `h1-safe-corrections` |
+| `h1-tournament-cancel-and-dates` | Cancellation, archiving and postponed dates (AT-09, AT-11, D-27) | Tournaments, Competition | `h1-finalisation` |
+| `h1-finalisation` | Review and finalisation, and history (F-09, D-24) | Competition, Standings | `h1-safe-corrections` |
 | `h1-change-log` | An operator-visible change log: admissions, cancellations, published pairings, material changes (F-10, D-26) | Tournaments | `h1-tournament-cancel-and-dates` |
-| `h1-public-read` | The public or unlisted page with rounds and standings (UJ-07, D-09, D-27) | Tournaments, public web | `h1-tournament-cancel-and-dates` |
-| `h1-api-journey` | A complete league without Angular: receipts, revision-aware reads, idempotency (UJ-08, F-11) | across modules | `h1-finalisation`, `h1-change-log`, `h1-public-read` |
+| `h1-public-read` | The public or unlisted page with rounds and standings (UJ-07, D-09, D-27) | Tournaments, public web | `h1-tournament-cancel-and-dates`, `h1-change-log` |
+| `h1-pilot-access` | Pilot server applications under owner-recorded grants (D-12, D-14); proposed as a split of `h1-api-journey` | Organisations, host | batch 2 |
+| `h1-api-journey` | A complete league without Angular: receipts, revision-aware reads, idempotency (UJ-08, F-11) | across modules | `h1-finalisation`, `h1-change-log`, `h1-public-read`, `h1-pilot-access` |
 
-Cancelling after the start voids unresolved pairings, which is Competition's state. Competition does so on Tournaments' cancellation event, so `h1-tournament-cancel-and-dates` changes only Tournaments' model; if its proposal needs to change Competition's, it runs after `h1-safe-corrections` instead of beside it.
+Cancelling after the start voids unresolved pairings, which is Competition's state. Competition does so on Tournaments' cancellation event; its proposal needs a cancelled state in Competition's model, so it runs after `h1-finalisation`, which also changes that model, instead of beside `h1-safe-corrections`. The batch's proposals (pull request of 15 November 2026) also move finalisation to Competition and split `h1-pilot-access` out of `h1-api-journey`; the review of 15 November 2026 (#74) confirmed them.
 
-Decision rows: D-07 (corrections), D-24 (finalisation barrier), D-26 (H1 announcements, a new proposal), D-27 (visibility, cancellation, dates), D-09 (public identity), D-02, D-12 and D-15 (the API's result and identity contract), D-14 (pilot).
+Decision rows: D-07 (corrections), D-24 (finalisation barrier), D-26 (H1 announcements, a new proposal), D-27 (visibility, cancellation, dates), D-09 (public identity), D-02, D-12 and D-15 (the API's result and identity contract), D-14 (pilot). The decision session of 15 November 2026 closed them ([§15](herald-functional-discovery.md#15-decision-register-and-development-gates)): any effective resolution corrected with reason and impact preview; finalisation behind the full §9.3 barrier, with reasoned reopening; §5.1's cancellation and archive rows as written and deletion of a never-published draft; dates changed only before start, per date; visibility changeable in any state; the change log of F-10 as written; the public page from publication, alias-only; delegated user tokens plus pilot server applications under an owner-recorded grant; queryable receipts and API-06's identifiers as the public contract.
 Acceptance journey: AT-07 to AT-11, AT-13 and AT-14; with it, H1's exit criteria below.
 
 ### Review answers
@@ -170,6 +173,10 @@ Delivery order: H1, then M4, then H2 (decided 12 November 2026). M4 comes first 
 Next: M0's three changes are implemented and archived, and H1's slices up to team rosters are merged; the remaining H1 slices follow in batches under ADR 0018, after their decision gates. Accept each remaining Proposed ADR when its relevant decisions are settled; do not make a blanket status change because documentation is consolidated. M4 waits for the shared platform repository, which will take the costly shared resources out of Arcana's state; it is not designed yet. Because M4 now precedes H2, the platform has to be designed while H1 finishes; otherwise ADR 0012's reviewed pilot environment is planned instead of bypassing the platform boundary.
 
 H0 remains the product decision gate described in the functional baseline. It does not require solving H2–H7 or every M0 implementation detail. No H1 screen proposal is ready solely because a concept image or wireframe now exists: confirm the rule/interaction decisions and relevant states for that slice.
+
+## Ideas outside the plan
+
+Feature ideas not yet planned are kept as GitHub issues labelled `idea` (template `.github/ISSUE_TEMPLATE/idea.yml`). They are not commitments: review them when the target delivery above is complete, or earlier if one fits a horizon being refined, and turn one into an OpenSpec change or close it with its reason.
 
 ## Proposed roadmap refinements
 

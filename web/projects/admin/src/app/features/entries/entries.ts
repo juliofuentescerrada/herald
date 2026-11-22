@@ -1,10 +1,8 @@
 import { EntryDetails, EntryTerms, FieldDetails, RosterReadiness } from '@herald/api-client/admin';
 import { organisationKey } from '../../platform';
 
-/** The same keys as the tournaments feature uses, so a write here refreshes its tournament and list. */
-export const tournamentKey = (organisation: string, id: string) => organisationKey(organisation, 'tournament', id);
-export const tournamentsKey = (organisation: string) => organisationKey(organisation, 'tournaments');
-export const fieldKey = (organisation: string, id: string) => organisationKey(organisation, 'field', id);
+/** Shared with the tournaments and schedule features, so a write here refreshes their reads. */
+export { fieldKey, tournamentKey, tournamentsKey } from '../../platform';
 export const guestsKey = (organisation: string) => organisationKey(organisation, 'guests');
 export const rosterKey = (organisation: string, tournament: string, entry: string) => organisationKey(organisation, 'roster', tournament, entry);
 
@@ -47,12 +45,17 @@ export const cancellationEffect = (field: FieldDetails, entry: EntryDetails): st
 export const ruleText = (field: string, rule: string): string => {
   switch (`${field}/${rule}`) {
     case 'registration/not-open': return 'Registration is not open, so entries cannot be added.';
+    case 'tournament/cancelled': return 'The tournament is cancelled. Nothing can change.';
     case 'guest/kind': return 'This guest is of the other kind from the tournament’s entries.';
     case 'guest/already-entered': return 'This guest already has an active entry in this tournament.';
     case 'field/mismatch': return 'The field has a mismatch to resolve first.';
     case 'capacity/full': return 'No slot is free.';
     case 'entry/cancelled': return 'This entry was cancelled.';
     case 'entry/not-admitted': return 'Only an admitted entry can check in.';
+    case 'entry/not-pending': return 'Only an entry still pending a mandatory check-in can be marked absent.';
+    case 'field/schedule-published': return 'The schedule is published. Withdraw it to change the field.';
+    case 'field/competition-started': return 'The competition has started.';
+    case 'roster/frozen': return 'The roster froze when the competition started.';
     case 'reason/required': return 'Enter a private reason.';
     case 'reason/too-long': return 'Use at most 500 characters.';
     case 'name/required': return 'Enter a name.';

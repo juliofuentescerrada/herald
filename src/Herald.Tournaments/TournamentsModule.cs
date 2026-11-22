@@ -1,4 +1,6 @@
+using Herald.Contracts.Competition.V1;
 using Herald.Contracts.Registration.V1;
+using Herald.Contracts.Standings.V1;
 using Herald.ModuleHosting;
 using Herald.Tournaments.Persistence;
 using Wolverine;
@@ -13,6 +15,18 @@ public static class TournamentsModule
     {
         // Integration events this module consumes come through its durable local queue (ADR 0016).
         options.PublishMessage<TournamentFieldChanged>().ToLocalQueue(Queue);
+        options.PublishMessage<TournamentScheduleChanged>().ToLocalQueue(Queue);
+        // Standings consumes these too; each module's handler is sticky to its own queue.
+        options.PublishMessage<CompetitionFinalised>().ToLocalQueue(Queue);
+        options.PublishMessage<CompetitionReopened>().ToLocalQueue(Queue);
+        // Projections for the public page (h1-public-read D-1); Standings consumes the results too.
+        options.PublishMessage<TournamentResultsChanged>().ToLocalQueue(Queue);
+        options.PublishMessage<TournamentStandingsChanged>().ToLocalQueue(Queue);
+        // Fact events kept in the change log (h1-change-log D-3).
+        options.PublishMessage<EntryAdmitted>().ToLocalQueue(Queue);
+        options.PublishMessage<EntryCancelled>().ToLocalQueue(Queue);
+        options.PublishMessage<SchedulePublished>().ToLocalQueue(Queue);
+        options.PublishMessage<ScheduleWithdrawn>().ToLocalQueue(Queue);
         return options.AddHeraldModule<TournamentsDbContext>(TournamentsDbContext.Schema);
     }
 }

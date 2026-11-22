@@ -7,6 +7,10 @@ description: Herald's rules for screens, UI states, layout and mockups. Use when
 
 `docs/herald-visual-direction.md` is the source for visual contracts and screen/state coverage (ADR 0001). Read the sections you need, not the whole file: §4 typography, space and geometry; §5 shared component contracts; §7 administration composition (§7.2 layout); §8 public and participant composition; §9 visual references, journeys and state coverage; §10 accessibility.
 
+For every UI proposal, mockup, implementation and review, load the repository-owned `refactoring-ui` skill and start at `docs/ui/style-guide.md`. Use `docs/ui/components.md` for intent, alternatives and supported APIs and `docs/ui/icons.md` for icon meaning and placement. These apply to agents producing mockups as well as those writing Angular. Do not infer usage solely from the catalogue's state examples.
+
+Read `docs/ui/experience-patterns.md` and state the audience/acting context and relevant XP patterns. Organiser, visitor and participant/representative flows share foundations but have different navigation, hierarchy and density. Include H2 public/participant target states in relevant proposals without presenting them as implemented or treating the supplied UX aspirations as settled product policy. The D-30–38 statuses and the existing visual-input process still apply.
+
 ## When proposing a change
 
 In a batch (ADR 0018), the agent does not ask for mockups: it generates navigable prototypes of every affected screen and state in `prototypes/frontend/`, following the layout rules below and visual direction §4 and §7.2, and the maintainer reviews them in the batch's proposals pull request. The steps below apply to work outside a batch.
@@ -36,3 +40,7 @@ When asking for new mockups, put the current layout rules in the prompt (visual 
 ## When implementing
 
 Screenshots committed to the repository or attached to a pull request come from the E2E environment's synthetic personas (`e2e/`, the test scripts), never from a local Aspire run, which seeds as the maintainer with real identifiers (private-data-guard D-4). Compare the implemented screens with their mockups or prototypes by screenshot, record the differences and their resolution in the change's `design.md`, and keep feedback placement, confirmations and layout as visual direction §4, §5, §7.2 and §8.1 set them.
+
+## When auditing existing screens
+
+Use the G-/RU- criteria and handoff in `docs/ui/style-guide.md`. Inventory every current route, access/shell state and overlay, and distinguish production pages from development fixtures and future prototypes. For each finding, record the rule, concrete failure, file/line or capture, severity, correction and verification status in the owning change. Check the catalogue too: an example can teach the wrong intent even when its visual states work. Source inspection and automated inventory checks never stand in for keyboard, browser, screen-reader or composed E2E checks that have not run.

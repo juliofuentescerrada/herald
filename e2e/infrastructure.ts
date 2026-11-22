@@ -1,7 +1,7 @@
 // The suite's first webServer: Playwright starts webServers before globalSetup, and the host needs these first.
 // Playwright stops it with SIGTERM at the end; testcontainers' reaper removes the containers if it dies instead.
 import { GenericContainer, Wait, type StartedTestContainer } from 'testcontainers';
-import { databasePassword, ports, tenantId } from './environment.ts';
+import { audience, databasePassword, pilotApplication, ports, tenantId } from './environment.ts';
 
 const provider = new GenericContainer(
   'ghcr.io/navikt/mock-oauth2-server@sha256:647dd8c78a54f0e6fcd58d79c884e612f8f998a0662276f3e1db22e464a50192',
@@ -9,7 +9,24 @@ const provider = new GenericContainer(
   .withExposedPorts({ container: 8080, host: ports.provider })
   .withEnvironment({
     // TLS because MSAL refuses an authority that is not https; the login form carries each persona's claims.
-    JSON_CONFIG: JSON.stringify({ interactiveLogin: true, httpServer: { type: 'NettyWrapper', ssl: {} } }),
+    // A client-credentials request from the pilot application gets its directory claims; people still sign in through the form.
+    JSON_CONFIG: JSON.stringify({
+      interactiveLogin: true,
+      httpServer: { type: 'NettyWrapper', ssl: {} },
+      tokenCallbacks: [
+        {
+          issuerId: tenantId,
+          tokenExpiry: 3600,
+          requestMappings: [
+            {
+              requestParam: 'client_id',
+              match: pilotApplication.clientId,
+              claims: { tid: tenantId, oid: pilotApplication.oid, roles: pilotApplication.roles, aud: audience },
+            },
+          ],
+        },
+      ],
+    }),
     JAVA_TOOL_OPTIONS: '-Xmx256m',
   })
   .withWaitStrategy(Wait.forHttp(`/${tenantId}/.well-known/openid-configuration`, 8080).usingTls().allowInsecure());

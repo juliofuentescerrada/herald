@@ -25,10 +25,90 @@ namespace Herald.Tournaments.Persistence.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("Herald.Tournaments.Domain.ChangeLogEntry", b =>
+                {
+                    b.Property<string>("Kind")
+                        .HasMaxLength(40)
+                        .HasColumnType("character varying(40)");
+
+                    b.Property<Guid>("Subject")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("SubjectRevision")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid?>("ActorId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ActorName")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<string>("Alias")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
+
+                    b.Property<DateTimeOffset>("At")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<string>("Cause")
+                        .HasMaxLength(40)
+                        .HasColumnType("character varying(40)");
+
+                    b.Property<string>("Changes")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<Guid>("OrganisationId")
+                        .HasColumnType("uuid");
+
+                    b.Property<bool>("Public")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("Reason")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<string>("TimeZone")
+                        .HasMaxLength(64)
+                        .HasColumnType("character varying(64)");
+
+                    b.Property<Guid>("TournamentId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Kind", "Subject", "SubjectRevision");
+
+                    b.HasIndex("OrganisationId");
+
+                    b.HasIndex("TournamentId", "At");
+
+                    b.ToTable("ChangeLog", "tournaments");
+                });
+
             modelBuilder.Entity("Herald.Tournaments.Domain.Tournament", b =>
                 {
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
+
+                    b.Property<bool>("Archived")
+                        .HasColumnType("boolean");
+
+                    b.Property<string>("CancellationReason")
+                        .HasMaxLength(500)
+                        .HasColumnType("character varying(500)");
+
+                    b.Property<DateTimeOffset?>("CancelledAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("CancelledAtRevision")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid?>("CancelledBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("CancelledByName")
+                        .HasMaxLength(200)
+                        .HasColumnType("character varying(200)");
 
                     b.Property<DateTimeOffset>("ChangedAt")
                         .HasColumnType("timestamp with time zone");
@@ -36,11 +116,25 @@ namespace Herald.Tournaments.Persistence.Migrations
                     b.Property<Guid>("ChangedBy")
                         .HasColumnType("uuid");
 
+                    b.Property<string>("Competition")
+                        .IsRequired()
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
                     b.Property<DateTimeOffset>("CreatedAt")
                         .HasColumnType("timestamp with time zone");
 
                     b.Property<Guid>("CreatedBy")
                         .HasColumnType("uuid");
+
+                    b.Property<string>("DateChanges")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("jsonb")
+                        .HasDefaultValueSql("'[]'::jsonb");
+
+                    b.Property<int>("FinalRevision")
+                        .HasColumnType("integer");
 
                     b.Property<Guid>("OrganisationId")
                         .HasColumnType("uuid");
@@ -68,6 +162,22 @@ namespace Herald.Tournaments.Persistence.Migrations
                         .HasColumnType("uuid");
 
                     b.Property<int>("Revision")
+                        .IsConcurrencyToken()
+                        .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset?>("StartedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("StartedBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<int?>("StartedOnEligibleRevision")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("StartedOnScheduleRevision")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("TermsRevision")
                         .IsConcurrencyToken()
                         .HasColumnType("integer");
 
@@ -154,8 +264,23 @@ namespace Herald.Tournaments.Persistence.Migrations
                     b.Property<int>("CheckedIn")
                         .HasColumnType("integer");
 
+                    b.Property<int?>("Eligible")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("EligibleRevision")
+                        .HasColumnType("integer");
+
+                    b.Property<int?>("Pending")
+                        .HasColumnType("integer");
+
                     b.Property<int>("Revision")
                         .HasColumnType("integer");
+
+                    b.Property<string>("RostersOutsideBounds")
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("SharedMemberNames")
+                        .HasColumnType("jsonb");
 
                     b.Property<int>("Waiting")
                         .HasColumnType("integer");
@@ -163,6 +288,64 @@ namespace Herald.Tournaments.Persistence.Migrations
                     b.HasKey("TournamentId");
 
                     b.ToTable("FieldCounts", "tournaments");
+                });
+
+            modelBuilder.Entity("Herald.Tournaments.Persistence.ResultsState", b =>
+                {
+                    b.Property<Guid>("TournamentId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Results")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<int>("Revision")
+                        .IsConcurrencyToken()
+                        .HasColumnType("integer");
+
+                    b.HasKey("TournamentId");
+
+                    b.ToTable("Results", "tournaments");
+                });
+
+            modelBuilder.Entity("Herald.Tournaments.Persistence.ScheduleState", b =>
+                {
+                    b.Property<Guid>("TournamentId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int?>("EligibleRevision")
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Published")
+                        .HasColumnType("jsonb");
+
+                    b.Property<int?>("PublishedRevision")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Revision")
+                        .HasColumnType("integer");
+
+                    b.HasKey("TournamentId");
+
+                    b.ToTable("Schedules", "tournaments");
+                });
+
+            modelBuilder.Entity("Herald.Tournaments.Persistence.StandingsState", b =>
+                {
+                    b.Property<Guid>("TournamentId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Revision")
+                        .IsConcurrencyToken()
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Standings")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.HasKey("TournamentId");
+
+                    b.ToTable("Standings", "tournaments");
                 });
 
             modelBuilder.Entity("Wolverine.EntityFrameworkCore.Internals.IncomingMessage", b =>

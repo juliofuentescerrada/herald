@@ -42,6 +42,11 @@ export const routes: Routes = [
             loadComponent: () => import('./features/tournaments').then((m) => m.TournamentListPage),
           },
           {
+            path: 'applications',
+            title: 'Applications · Herald',
+            loadComponent: () => import('./features/applications').then((m) => m.ApplicationsPage),
+          },
+          {
             path: 'tournaments/new',
             title: 'Create tournament · Herald',
             canDeactivate: [confirmLeave],
@@ -62,6 +67,27 @@ export const routes: Routes = [
             path: 'tournaments/:tournamentId/entries',
             title: 'Entries · Herald',
             loadComponent: () => import('./features/entries').then((m) => m.EntriesPage),
+          },
+          {
+            path: 'tournaments/:tournamentId/schedule',
+            title: 'Schedule · Herald',
+            loadComponent: () => import('./features/schedule').then((m) => m.SchedulePage),
+          },
+          {
+            path: 'tournaments/:tournamentId/standings',
+            title: 'Standings · Herald',
+            loadComponent: () => import('./features/standings').then((m) => m.StandingsPage),
+          },
+          {
+            path: 'tournaments/:tournamentId/change-log',
+            title: 'Change log · Herald',
+            loadComponent: () => import('./features/change-log').then((m) => m.ChangeLogPage),
+          },
+          {
+            path: 'tournaments/:tournamentId/matches/:matchId',
+            canDeactivate: [confirmLeave],
+            title: 'Match · Herald',
+            loadComponent: () => import('./features/matches').then((m) => m.MatchPage),
           },
           notFound,
         ],

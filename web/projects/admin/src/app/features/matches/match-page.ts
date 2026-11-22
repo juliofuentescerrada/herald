@@ -1,0 +1,472 @@
+import { NgTemplateOutlet } from '@angular/common';
+import { TournamentNav } from '../../shared';
+import { HttpErrorResponse } from '@angular/common/http';
+import { ChangeDetectionStrategy, Component, computed, inject, signal, TemplateRef, viewChild, ViewContainerRef } from '@angular/core';
+import { ActivatedRoute, RouterLink } from '@angular/router';
+import { CorrectionPreviewView, CorrectResult, HeraldHostAdminService, HttpValidationProblemDetails, MatchView, Outcome, problemOf, RecordResult, ResultDetails, SideDetails, TournamentDetails } from '@herald/api-client/admin';
+import { Button, Dialog, DialogContext, DialogRef, Dialogs, Icon, Notice, StatusLabel, Toasts } from '@herald/ui';
+import { injectQuery } from '@tanstack/angular-query-experimental';
+import { firstValueFrom } from 'rxjs';
+import { AccessState, AppContext, QUERY_CLIENT } from '../../platform';
+import { instantText, lifecycleLabels, resultText } from '../../shared';
+import { matchKey, possessive, ruleText, scheduleKey, splitBlocker, standingsKey, tournamentKey } from './matches';
+
+type SideName = 'first' | 'second';
+
+/** The causes the Result panel offers; an absence of one side or both is one choice (h1-exceptional-outcomes D-3). */
+type CauseChoice = 'played' | 'concession' | 'absence' | 'noContest';
+
+interface Failure {
+  readonly heading: string;
+  readonly text: string;
+}
+
+/** A match of a running competition: its lineups, for a team match, and its start (match-lineups). */
+@Component({
+  selector: 'app-match-page',
+  imports: [NgTemplateOutlet, TournamentNav, Button, Dialog, Icon, Notice, RouterLink, StatusLabel],
+  templateUrl: './match-page.html',
+  styleUrl: './match-page.css',
+  changeDetection: ChangeDetectionStrategy.OnPush,
+  host: { '(window:beforeunload)': 'beforeUnload($event)' },
+})
+export class MatchPage {
+  private readonly api = inject(HeraldHostAdminService);
+  private readonly queries = inject(QUERY_CLIENT);
+  private readonly access = inject(AccessState);
+  private readonly organisation = inject(AppContext).organisation()!;
+  private readonly route = inject(ActivatedRoute).snapshot.paramMap;
+  private readonly tournamentId = this.route.get('tournamentId')!;
+  private readonly matchId = this.route.get('matchId')!;
+  private readonly dialogs = inject(Dialogs);
+  private readonly toasts = inject(Toasts);
+  private readonly viewContainerRef = inject(ViewContainerRef);
+  private readonly startDialog = viewChild.required<TemplateRef<DialogContext>>('startDialog');
+  private open: DialogRef | null = null;
+
+  protected readonly tournament = injectQuery(() => ({
+    queryKey: tournamentKey(this.organisation, this.tournamentId),
+    queryFn: () => firstValueFrom(this.api.getTournament<TournamentDetails>(this.organisation, this.tournamentId)),
+    retry: false,
+  }));
+  protected readonly match = injectQuery(() => ({
+    queryKey: matchKey(this.organisation, this.tournamentId, this.matchId),
+    queryFn: () => firstValueFrom(this.api.getMatch<MatchView>(this.organisation, this.tournamentId, this.matchId)),
+    retry: false,
+  }));
+
+  protected readonly state = signal<'ready' | 'busy' | 'conflict'>('ready');
+  protected readonly failure = signal<Failure | null>(null);
+  /** The owner's unsaved choice per side; null shows the current lineup. */
+  protected readonly chosen = signal<Record<SideName, readonly string[] | null>>({ first: null, second: null });
+
+  /** A finalised competition takes no result write until it is reopened (h1-finalisation D-2). */
+  protected readonly finalised = computed(() => this.tournament.data()?.competition === 'finalised');
+  protected readonly labels = computed(() => (this.tournament.data() ? lifecycleLabels(this.tournament.data()!) : []));
+  protected readonly zone = computed(() => this.tournament.data()?.configuration.timeZone ?? 'UTC');
+  protected readonly team = computed(() => this.match.data()?.activePlayers != null);
+  /** Started, in play or resolved: its lineups are locked (h1-match-lineups D-3). */
+  protected readonly started = computed(() => !!this.match.data()?.start);
+  protected readonly scheduled = computed(() => this.match.data()?.state === 'scheduled');
+  protected readonly stateText = { scheduled: 'Scheduled', inPlay: 'In play', resolved: 'Resolved' } as const;
+  protected readonly stateTone = { scheduled: 'neutral', inPlay: 'info', resolved: 'success' } as const;
+  /** Nothing is preselected: the owner chooses what happened, then that cause's fields (§8.1, D-3). */
+  protected readonly cause = signal<CauseChoice | null>(null);
+  protected readonly outcome = signal<Outcome | null>(null);
+  protected readonly conceding = signal<SideName | null>(null);
+  protected readonly absent = signal<SideName | 'both' | null>(null);
+  protected readonly playTookPlace = signal<boolean | null>(null);
+  protected readonly reason = signal('');
+  /** A team match not yet in play cannot record play (D-2). */
+  protected readonly playWithoutStart = computed(() => this.team() && !this.started() && this.cause() !== 'played' && this.cause() !== 'absence' && this.playTookPlace() === true);
+  /** Correcting a resolved match: the cause-first form with the current values, a reason, then the impact (h1-safe-corrections D-5). */
+  protected readonly correcting = signal(false);
+  protected readonly correctionReason = signal('');
+  /** The impact Standings computed for the form and match revision as they were; editing the form or a newer match leaves the review. */
+  private readonly review = signal<{ readonly key: string; readonly revision: number; readonly view: CorrectionPreviewView } | null>(null);
+  protected readonly reviewing = signal(false);
+  protected readonly impact = computed(() => {
+    const review = this.review();
+    return review && review.key === this.correctionKey() && review.revision === this.match.data()?.revision ? review.view : null;
+  });
+  /** Play was recorded: the correction keeps it (§8.1), so the form asks no play question and offers no absence. */
+  protected readonly playRecorded = computed(() => this.correcting() && !!this.match.data()?.result?.played);
+  /** A team match that never started cannot take a played result: no lineup was locked (D-2). */
+  protected readonly offerPlayed = computed(() => !this.correcting() || !this.team() || this.started());
+  /** The form stays as reviewed while a write is under way or its impact is shown. */
+  protected readonly locked = computed(() => this.state() !== 'ready' || !!this.impact());
+  protected readonly proposedSummary = computed(() => {
+    const body = this.resultBody();
+    return body ? this.summaryOf({ ...this.proposedResult(body), recordedAt: '' }) : '';
+  });
+  protected readonly replaced = computed(() => [...(this.match.data()?.replacedResults ?? [])].reverse());
+  private readonly correctionKey = computed(() => JSON.stringify([this.resultBody(), this.correctionReason().trim()]));
+  private correctionOperation: { readonly id: string; readonly revision: number; readonly body: string } | null = null;
+  /** Why the correction's impact cannot be reviewed now, or null. */
+  protected readonly correctBlocked = computed(() => {
+    const why = this.recordBlocked();
+    if (why) return why;
+    if (!this.correctionReason().trim()) return 'Give a reason for the correction.';
+    if (this.sameAsCurrent()) return 'Choose a different result: this is the current one.';
+    return null;
+  });
+  private readonly sameAsCurrent = computed(() => {
+    const result = this.match.data()?.result;
+    const body = this.resultBody();
+    if (!result || !body) return false;
+    const proposed = this.proposedResult(body);
+    return proposed.outcome === result.outcome && proposed.cause === result.cause && proposed.played === result.played && (proposed.reason ?? null) === (result.reason ?? null);
+  });
+  /** Reused when the same result is sent again after a lost answer (match-results: A double submission). */
+  private resultOperation: { readonly id: string; readonly revision: number; readonly body: string } | null = null;
+  protected readonly resultSummary = computed(() => {
+    const result = this.match.data()?.result;
+    return result ? this.summaryOf(result) : null;
+  });
+  /** The chosen cause as the API's command fields, or null while incomplete. */
+  private readonly resultBody = computed((): Omit<RecordResult, 'operationId' | 'expectedRevision'> | null => {
+    const played = this.playRecorded() ? true : this.playTookPlace();
+    switch (this.cause()) {
+      case 'played': return this.outcome() ? { cause: 'played', outcome: this.outcome() } : null;
+      case 'concession': return this.conceding() && played !== null ? { cause: 'concession', entrant: this.conceding(), played } : null;
+      case 'absence': {
+        if (this.started()) return null;
+        const absent = this.absent();
+        return absent === 'both' ? { cause: 'doubleAbsence' } : absent ? { cause: 'singleAbsence', entrant: absent } : null;
+      }
+      case 'noContest': return this.reason().trim() && played !== null ? { cause: 'noContest', played, reason: this.reason().trim() } : null;
+      default: return null;
+    }
+  });
+  /** Why a result cannot be recorded now, or null. */
+  protected readonly recordBlocked = computed(() => {
+    if (this.state() === 'busy') return 'Request in progress. Please wait; do not submit again.';
+    if (this.state() === 'conflict') return 'Reload the latest version first.';
+    if (this.playWithoutStart()) return 'Start the match first, or choose “No”.';
+    // The match started in another tab after the owner chose an absence (A-1).
+    if (this.cause() === 'absence' && this.started()) return 'A started match takes a concession or a no contest.';
+    if (this.resultBody()) return null;
+    switch (this.cause()) {
+      case 'played': return 'Choose the outcome first.';
+      case 'concession': return this.conceding() ? 'Choose whether play took place.' : 'Choose who conceded.';
+      case 'absence': return 'Choose who was absent.';
+      case 'noContest': return this.reason().trim() ? 'Choose whether play took place.' : 'A no contest needs a reason.';
+      default: return 'Choose what happened first.';
+    }
+  });
+  protected readonly names = computed(() => ({ first: this.match.data()?.first.entrant.name ?? '', second: this.match.data()?.second.entrant.name ?? '' }));
+  /** Withdrawn or sanctioned players of either frozen roster: they cannot be chosen for a lineup. */
+  protected readonly unavailableIds = computed(() => new Set(this.match.data()?.unavailable.map((player) => player.playerId) ?? []));
+  protected readonly tooFewEligible = computed(() => this.match.data()?.blockers.some((code) => code.endsWith('-too-few-eligible')) ?? false);
+  protected readonly rostersUnknown = computed(() => this.team() && (!this.match.data()?.first.roster || !this.match.data()?.second.roster));
+  /** Why the match cannot start now, in words; the first one describes the disabled button. */
+  protected readonly blockers = computed(() => {
+    const match = this.match.data();
+    if (!match) return [];
+    const unavailable = new Set(match.unavailable.map((player) => player.playerId));
+    return match.blockers.map((code) => {
+      const [field, rule] = splitBlocker(code);
+      // An unavailable starter is named from the side's current lineup (h1-round-operations D-3).
+      const lineup = (field.startsWith('first') ? match.first : match.second).lineups.at(-1)?.players ?? [];
+      const named = lineup.filter((player) => unavailable.has(player.playerId)).map((player) => player.name);
+      return ruleText(field, rule, match.activePlayers, this.names().first, this.names().second, named);
+    });
+  });
+  protected readonly startBlocked = computed(() => {
+    if (this.state() === 'busy') return 'Request in progress. Please wait; do not submit again.';
+    if (this.state() === 'conflict') return 'Reload the latest version first.';
+    if (this.dirty()) return 'Save or discard the lineup changes first.';
+    return this.blockers()[0] ?? null;
+  });
+  protected readonly dirty = computed(() => this.lineupDirty('first') || this.lineupDirty('second'));
+
+  private lineupDirty(side: SideName): boolean {
+    const chosen = this.chosen()[side];
+    if (chosen === null) return false;
+    const saved = this.match.data()?.[side].lineups.at(-1)?.players.map((player) => player.playerId) ?? [];
+    return JSON.stringify([...chosen].sort()) !== JSON.stringify([...saved].sort());
+  }
+
+  constructor() {
+    this.access.keepDraft(() => this.correcting() && this.correctionReason().trim() ? `Reason for the correction: ${this.correctionReason().trim()}` : this.dirty() ? this.sides().filter((side) => side.dirty).map((side) =>
+      `${side.entrant}: ${side.roster.filter((player) => side.selected.has(player.playerId)).map((player) => player.name).join(', ')}`,
+    ).join('\n') : '');
+  }
+
+  protected beforeUnload(event: BeforeUnloadEvent): void {
+    if (this.dirty() || (this.correcting() && this.correctionReason().trim())) event.preventDefault();
+  }
+
+  protected async retryLoad(): Promise<void> {
+    await Promise.all([this.match.refetch(), this.tournament.refetch()]);
+  }
+
+  protected readonly sides = computed(() => {
+    const match = this.match.data();
+    if (!match) return [];
+    return (['first', 'second'] as const).map((name) => this.sideOf(name, match[name]));
+  });
+
+  protected readonly zoned = (instant: string | null | undefined) => (instant ? `${instantText(instant, this.zone())} · ${this.zone()}` : '');
+
+  protected toggle(side: SideName, playerId: string, checked: boolean): void {
+    const current = this.selection(side);
+    const next = checked ? [...current, playerId] : current.filter((id) => id !== playerId);
+    this.chosen.update((chosen) => ({ ...chosen, [side]: next }));
+    this.failure.set(null);
+  }
+
+  protected discard(side: SideName): void {
+    this.chosen.update((chosen) => ({ ...chosen, [side]: null }));
+  }
+
+  protected save(side: SideName): void {
+    const match = this.match.data()!;
+    const players = [...this.selection(side)];
+    void this.run(
+      `${possessive(this.names()[side])} lineup was not saved`,
+      () => firstValueFrom(this.api.recordLineup<MatchView>(this.organisation, this.tournamentId, this.matchId, side, { expectedRevision: match.revision, players })),
+      () => `${possessive(this.names()[side])} lineup saved.`,
+      () => this.discard(side),
+    );
+  }
+
+  protected askStart(trigger: HTMLElement): void {
+    if (this.startBlocked()) return;
+    // An individual match starts at once; a team match asks first because it locks both lineups (A-2).
+    if (!this.team()) {
+      this.start();
+      return;
+    }
+    this.failure.set(null);
+    const open = this.dialogs.open(this.startDialog(), { trigger, viewContainerRef: this.viewContainerRef });
+    this.open = open;
+    void open.closed.then(() => {
+      if (this.open === open) this.open = null;
+    });
+  }
+
+  protected start(): void {
+    const match = this.match.data()!;
+    void this.run(
+      'The match did not start',
+      () => firstValueFrom(this.api.startMatch<MatchView>(this.organisation, this.tournamentId, this.matchId, { expectedRevision: match.revision })),
+      () => 'Match started.',
+    );
+  }
+
+  /** Opens the correction form with the current result chosen. */
+  protected startCorrection(): void {
+    const result = this.match.data()?.result;
+    // A voided match belongs to a cancelled tournament, which takes no correction.
+    if (!result || result.cause === 'voidedCancelled') return;
+    const winner = result.outcome === 'first' ? 'first' : result.outcome === 'second' ? 'second' : null;
+    const loser = winner === 'first' ? 'second' : winner === 'second' ? 'first' : null;
+    const cause: CauseChoice = result.cause === 'singleAbsence' || result.cause === 'doubleAbsence' ? 'absence' : result.cause;
+    this.choose(cause);
+    this.outcome.set(result.cause === 'played' ? result.outcome : null);
+    this.conceding.set(result.cause === 'concession' ? loser : null);
+    this.absent.set(result.cause === 'doubleAbsence' ? 'both' : result.cause === 'singleAbsence' ? loser : null);
+    this.playTookPlace.set(result.cause === 'concession' || result.cause === 'noContest' ? result.played : null);
+    this.reason.set(result.reason ?? '');
+    this.correctionReason.set('');
+    this.review.set(null);
+    this.correcting.set(true);
+  }
+
+  protected cancelCorrection(): void {
+    this.correcting.set(false);
+    this.review.set(null);
+    this.choose(null);
+    this.correctionReason.set('');
+  }
+
+  protected editCorrection(): void {
+    this.review.set(null);
+  }
+
+  /** Standings' impact over the results it applied; it changes nothing (h1-safe-corrections D-3). */
+  /** Standings had not applied the match yet: reload it, then ask again. */
+  protected async refreshImpact(): Promise<void> {
+    this.review.set(null);
+    await this.match.refetch();
+    await this.reviewImpact();
+  }
+
+  protected async reviewImpact(): Promise<void> {
+    const body = this.resultBody();
+    if (!body || this.correctBlocked() || this.reviewing()) return;
+    const key = this.correctionKey();
+    const revision = this.match.data()!.revision;
+    const proposed = this.proposedResult(body);
+    this.reviewing.set(true);
+    this.failure.set(null);
+    try {
+      const view = await firstValueFrom(this.api.previewCorrection<CorrectionPreviewView>(this.organisation, this.tournamentId, {
+        match: this.matchId, matchRevision: revision, outcome: proposed.outcome, cause: proposed.cause,
+      }));
+      this.review.set({ key, revision, view });
+    } catch {
+      if (!this.access.problem()) this.failure.set({ heading: 'The impact could not be reviewed', text: 'The request failed. Nothing changed. Your correction is kept; try again.' });
+    } finally {
+      this.reviewing.set(false);
+    }
+  }
+
+  protected applyCorrection(): void {
+    const fields = this.resultBody();
+    const review = this.review();
+    if (!fields || !review || !this.impact() || this.impact()!.updating || this.correctBlocked()) return;
+    const key = this.correctionKey();
+    if (this.correctionOperation?.revision !== review.revision || this.correctionOperation.body !== key) {
+      this.correctionOperation = { id: crypto.randomUUID(), revision: review.revision, body: key };
+    }
+    // The revision the owner reviewed, so a match that moved on is refused rather than corrected unseen (design Risks).
+    const body: CorrectResult = { operationId: this.correctionOperation.id, expectedRevision: review.revision, correctionReason: this.correctionReason().trim(), ...fields };
+    void this.run(
+      'The correction could not be saved',
+      () => firstValueFrom(this.api.correctResult<MatchView>(this.organisation, this.tournamentId, this.matchId, body)),
+      () => 'Result corrected. Standings updated.',
+      () => {
+        this.cancelCorrection();
+        this.correctionOperation = null;
+      },
+    );
+  }
+
+  /** The result a command would give, as the match view shows results. */
+  private proposedResult(body: Omit<RecordResult, 'operationId' | 'expectedRevision'>): Pick<ResultDetails, 'outcome' | 'cause' | 'played' | 'reason'> {
+    const winnerOf = (side: string | null | undefined): Outcome => (side === 'first' ? 'second' : 'first');
+    switch (body.cause) {
+      case 'played': return { outcome: body.outcome!, cause: 'played', played: true, reason: null };
+      case 'concession': return { outcome: winnerOf(body.entrant), cause: 'concession', played: !!body.played, reason: null };
+      case 'singleAbsence': return { outcome: winnerOf(body.entrant), cause: 'singleAbsence', played: false, reason: null };
+      case 'doubleAbsence': return { outcome: 'none', cause: 'doubleAbsence', played: false, reason: null };
+      default: return { outcome: 'none', cause: 'noContest', played: !!body.played, reason: body.reason ?? null };
+    }
+  }
+
+  /** A replaced result in words, as the Result panel shows the current one. */
+  protected summaryOf(result: ResultDetails): string {
+    const text = resultText(result, this.names().first, this.names().second);
+    return result.cause === 'played' ? `${text} · played` : text;
+  }
+
+  protected record(): void {
+    const match = this.match.data()!;
+    const fields = this.resultBody();
+    if (!fields || this.recordBlocked()) return;
+    const key = JSON.stringify(fields);
+    if (this.resultOperation?.revision !== match.revision || this.resultOperation.body !== key) {
+      this.resultOperation = { id: crypto.randomUUID(), revision: match.revision, body: key };
+    }
+    const body: RecordResult = { operationId: this.resultOperation.id, expectedRevision: match.revision, ...fields };
+    void this.run(
+      'The result was not recorded',
+      () => firstValueFrom(this.api.recordResult<MatchView>(this.organisation, this.tournamentId, this.matchId, body)),
+      () => 'Result recorded.',
+      () => {
+        this.choose(null);
+        this.resultOperation = null;
+      },
+    );
+  }
+
+  /** A new cause clears the previous cause's fields, so only the chosen cause's answers are sent. */
+  protected choose(cause: CauseChoice | null): void {
+    this.cause.set(cause);
+    this.outcome.set(null);
+    this.conceding.set(null);
+    this.absent.set(null);
+    this.playTookPlace.set(null);
+    this.reason.set('');
+    this.failure.set(null);
+  }
+
+  protected close(): void {
+    this.open?.close();
+  }
+
+  protected async reload(): Promise<void> {
+    this.chosen.set({ first: null, second: null });
+    await this.retryLoad();
+    if (this.match.isError() || this.tournament.isError()) return;
+    this.state.set('ready');
+    this.failure.set(null);
+  }
+
+  private selection(side: SideName): readonly string[] {
+    const chosen = this.chosen()[side];
+    if (chosen) return chosen;
+    const lineups = this.match.data()?.[side].lineups ?? [];
+    return lineups.at(-1)?.players.map((player) => player.playerId) ?? [];
+  }
+
+  private sideOf(name: SideName, side: SideDetails) {
+    const selected = this.selection(name);
+    const lineup = side.lineups.at(-1) ?? null;
+    const required = this.match.data()!.activePlayers ?? 0;
+    const locked = this.started() ? side.lineups.find((each) => each.number === this.match.data()!.start?.[name === 'first' ? 'firstLineup' : 'secondLineup']) ?? null : null;
+    const lockedIds = new Set(locked?.players.map((player) => player.playerId));
+    return {
+      name,
+      entrant: side.entrant.name,
+      roster: side.roster ?? [],
+      selected: new Set(selected),
+      count: selected.length,
+      required,
+      complete: selected.length === required,
+      dirty: this.lineupDirty(name),
+      lineup,
+      locked,
+      reserves: locked ? (side.roster ?? []).filter((player) => !lockedIds.has(player.playerId)) : [],
+      history: [...side.lineups].reverse(),
+    };
+  }
+
+  /** One write at a time; its answer is the match as it now is. */
+  private async run(heading: string, write: () => Promise<MatchView>, done: () => string, after?: () => void): Promise<void> {
+    if (this.state() !== 'ready') return;
+    this.state.set('busy');
+    this.failure.set(null);
+    try {
+      const answer = await write();
+      this.state.set('ready');
+      this.queries.setQueryData(matchKey(this.organisation, this.tournamentId, this.matchId), answer);
+      void this.queries.invalidateQueries({ queryKey: scheduleKey(this.organisation, this.tournamentId) });
+      void this.queries.invalidateQueries({ queryKey: standingsKey(this.organisation, this.tournamentId) });
+      after?.();
+      this.toasts.show(done());
+      this.close();
+    } catch (error) {
+      this.state.set('ready');
+      this.close();
+      this.fail(heading, error);
+    }
+  }
+
+  private fail(heading: string, error: unknown): void {
+    // Lost access shows its own state; nothing to add here.
+    if (this.access.problem()) return;
+    const status = error instanceof HttpErrorResponse ? error.status : 0;
+    if (status === 409 && problemOf<{ type?: string }>(error)?.type === 'match-revision-conflict') {
+      this.state.set('conflict');
+      return;
+    }
+    const [field, rules] = Object.entries((status === 400 ? problemOf<HttpValidationProblemDetails>(error)?.errors : null) ?? {})[0] ?? [];
+    if (field) {
+      const match = this.match.data();
+      // A player outside the frozen roster comes back named by identifier: say who it is.
+      const player = field.startsWith('player-')
+        ? [...(match?.first.roster ?? []), ...(match?.second.roster ?? [])].find((each) => `player-${each.playerId}` === field)?.name
+        : undefined;
+      const text = player
+        ? rules[0] === 'unavailable' ? `${player} is withdrawn or sanctioned and cannot be chosen.` : `${player} is not on that team’s frozen roster.`
+        : ruleText(field, rules[0], match?.activePlayers ?? null, this.names().first, this.names().second);
+      this.failure.set({ heading, text: `${text} Nothing changed.` });
+      void this.match.refetch();
+    } else {
+      this.failure.set({ heading, text: 'The request failed. Nothing changed. Try again.' });
+    }
+  }
+}

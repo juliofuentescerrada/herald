@@ -30,19 +30,34 @@ public static class TournamentEntryTermsChangedHandler
             message.EntryKind == Contract.EntryKind.Team ? Domain.EntryKind.Team : Domain.EntryKind.Individual,
             message.Admission == Contract.Admission.Manual ? Domain.Admission.Manual : Domain.Admission.Automatic,
             message.MinimumRosterSize,
-            message.MaximumRosterSize);
+            message.MaximumRosterSize,
+            message.CheckIn == Contract.CheckInPolicy.Mandatory ? Domain.CheckInPolicy.Mandatory : Domain.CheckInPolicy.Optional,
+            message.FieldLocked,
+            message.CompetitionStarted);
         var now = DateTimeOffset.UtcNow;
 
+        // A new field publishes its first eligible snapshot too.
+        var eligibleRevision = -1;
+        var startsNow = message.CompetitionStarted;
         if (await db.Fields.SingleOrDefaultAsync(field => field.Id == id, cancellationToken) is not { } field)
         {
             field = Field.Track(id, terms, message.Revision, now);
             db.Fields.Add(field);
         }
-        else if (!field.ApplyTerms(terms, message.Revision, now))
+        else
         {
-            return;
+            eligibleRevision = field.EligibleRevision;
+            startsNow = message.CompetitionStarted && !field.Terms.CompetitionStarted;
+            if (!field.ApplyTerms(terms, message.Revision, now))
+            {
+                return;
+            }
         }
 
-        await bus.PublishAsync(Features.FieldDetails.Changed(message.OrganisationId, field));
+        await Features.FieldDetails.PublishAsync(bus, message.OrganisationId, field, eligibleRevision, db, cancellationToken);
+        if (startsNow && field.Terms.EntryKind == Domain.EntryKind.Team)
+        {
+            await bus.PublishAsync(await Features.FieldDetails.FrozenRostersAsync(message.OrganisationId, field, db, cancellationToken));
+        }
     }
 }

@@ -1,0 +1,57 @@
+h1 { font-size: 32px; }
+/* The title with its status label beside it; it wraps below the title when there is no room. */
+.page-header { margin-bottom: var(--herald-space-6); }
+.title { display: flex; flex-wrap: wrap; align-items: center; gap: var(--herald-space-2) var(--herald-space-4); margin: var(--herald-space-4) 0 var(--herald-space-4); }
+.title h1 { margin: 0; }
+.back { display: inline-flex; align-items: center; gap: var(--herald-space-2); color: var(--herald-color-text-secondary); }
+.column { display: flex; flex-direction: column; gap: var(--herald-space-4); }
+.column herald-notice { display: flex; }
+.notice-action { display: block; margin-top: var(--herald-space-3); }
+.panel { padding: var(--herald-space-6); }
+.actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--herald-space-3); }
+.help { color: var(--herald-color-text-secondary); margin: 0; max-inline-size: 75ch; }
+.summary p { margin: 0 0 var(--herald-space-1); }
+
+/* A real table for tabular data; numbers right-aligned in tabular figures, points strongest, the rest muted (D-4). */
+table { width: 100%; border-collapse: collapse; background: var(--herald-color-surface-default); border: 1px solid var(--herald-color-border-default); }
+th, td { padding: var(--herald-space-3) var(--herald-space-4); border-bottom: 1px solid var(--herald-color-border-default); text-align: left; }
+th { color: var(--herald-color-text-secondary); font-weight: 700; }
+.num { text-align: right; font-variant-numeric: tabular-nums; color: var(--herald-color-text-secondary); }
+.pts { text-align: right; font-variant-numeric: tabular-nums; font-weight: 700; }
+button.link { background: none; border: 0; padding: 0; min-height: var(--herald-target-min); font: inherit; color: var(--herald-color-text-primary); text-decoration: underline; text-align: left; cursor: pointer; overflow-wrap: anywhere; }
+.explain td { background: var(--herald-color-neutral-surface); }
+.explain ul { margin: 0 0 var(--herald-space-2); padding-left: var(--herald-space-6); }
+
+/* At narrow widths the table keeps Position, Entrant and Points; the explanation gives the rest (D-4). */
+@media (max-width: 699px) {
+  .wide { display: none; }
+  th, td { padding: var(--herald-space-2) var(--herald-space-3); }
+}
+/* The shared position in words for screen readers; the visible "2=" is hidden from them. */
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+/* The review barrier and the final summary sit above the table; the summary's action is on the right of its text (§7.2). */
+.review, .final-summary { padding: var(--herald-space-6); background: var(--herald-color-surface-default); border: 1px solid var(--herald-color-border-default); }
+.review h2 { margin: 0 0 var(--herald-space-3); }
+.review p { margin: 0 0 var(--herald-space-2); max-inline-size: 75ch; }
+.review herald-notice { display: flex; }
+.review .actions { margin-top: var(--herald-space-4); }
+.final-summary { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--herald-space-4); }
+.final-summary p { margin: 0 0 var(--herald-space-1); }
+.unresolved { list-style: none; margin: 0; padding: 0; }
+.unresolved a { color: var(--herald-color-text-primary); }
+.unresolved li { display: flex; flex-wrap: wrap; align-items: center; gap: var(--herald-space-2) var(--herald-space-4); padding: var(--herald-space-2) 0; border-top: 1px solid var(--herald-color-border-default); }
+
+/* Final revisions: read-only history after the table. */
+.history summary { display: inline-flex; align-items: center; min-height: var(--herald-target-min); font-weight: 700; cursor: pointer; }
+.history summary::after { content: '+' / ''; margin-left: var(--herald-space-2); }
+.history[open] summary::after { content: '−' / ''; }
+.history ul { list-style: none; margin: 0; padding: 0; }
+.history li { padding: var(--herald-space-2) 0; border-top: 1px solid var(--herald-color-border-default); }
+.history li p { margin: 0; }
+
+/* The reopening reason in its confirmation. */
+.field { display: flex; flex-direction: column; gap: var(--herald-space-1); margin-top: var(--herald-space-4); }
+.field label { color: var(--herald-color-text-secondary); }
+.field-error { display: flex; align-items: flex-start; gap: var(--herald-space-2); color: var(--herald-color-feedback-danger); font-weight: 700; margin: 0; }
+form .actions { margin-top: var(--herald-space-4); }

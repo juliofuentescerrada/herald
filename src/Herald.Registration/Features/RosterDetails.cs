@@ -2,6 +2,7 @@ using Herald.Registration.Domain;
 using Herald.Registration.Persistence;
 using Microsoft.AspNetCore.Http;
 using Microsoft.EntityFrameworkCore;
+using Wolverine;
 
 namespace Herald.Registration.Features;
 
@@ -14,6 +15,7 @@ public sealed record RosterMemberDetails(Guid GuestId, string Name, DateTimeOffs
 public sealed record RosterChangeDetails(int RosterRevision, Guid GuestId, string Name, RosterChangeKind Kind, Guid ChangedBy, DateTimeOffset ChangedAt);
 
 // What roster writes and the roster read answer with: members in the order added, history oldest first.
+// Once the competition started, the frozen revision and when it froze (h1-competition-start D-3).
 public sealed record RosterDetails(
     Guid EntryId,
     string TeamName,
@@ -23,7 +25,9 @@ public sealed record RosterDetails(
     int? MaximumRosterSize,
     RosterReadiness Readiness,
     IReadOnlyList<RosterMemberDetails> Members,
-    IReadOnlyList<RosterChangeDetails> History)
+    IReadOnlyList<RosterChangeDetails> History,
+    int? FrozenRevision,
+    DateTimeOffset? FrozenAt)
 {
     public static async Task<RosterDetails> OfAsync(Field field, Entry entry, RegistrationDbContext db, CancellationToken cancellationToken)
     {
@@ -53,7 +57,9 @@ public sealed record RosterDetails(
             field.ReadinessOf(entry)!.Value,
             [.. entry.Members.OrderBy(member => member.AddedAt).Select(member => new RosterMemberDetails(member.GuestId.Value, NameOf(member.GuestId), member.AddedAt, DuplicateOf(member.GuestId)))],
             [.. entry.RosterChanges.OrderBy(change => change.RosterRevision)
-                .Select(change => new RosterChangeDetails(change.RosterRevision, change.GuestId.Value, NameOf(change.GuestId), change.Kind, change.ChangedBy, change.ChangedAt))]);
+                .Select(change => new RosterChangeDetails(change.RosterRevision, change.GuestId.Value, NameOf(change.GuestId), change.Kind, change.ChangedBy, change.ChangedAt))],
+            entry.FrozenRosterRevision,
+            entry.RosterFrozenAt);
     }
 }
 
@@ -76,6 +82,8 @@ internal static class RosterResults
     // organisation is as absent as a missing one; an individual tournament has no rosters.
     public static async Task<IResult> WriteAsync(
         this RegistrationDbContext db,
+        IMessageBus bus,
+        Guid organisationId,
         Guid tournamentId,
         EntryId entryId,
         GuestId player,
@@ -90,7 +98,7 @@ internal static class RosterResults
                 return FieldResults.NotFound();
             }
 
-            var result = write(field);
+            var result = field.IsTournamentCancelled ? Field.Cancelled : write(field);
             switch (result.Outcome)
             {
                 case WriteOutcome.Rejected:
@@ -117,6 +125,8 @@ internal static class RosterResults
                         continue;
                     }
 
+                    // A roster change can move a team in or out of its bounds, which start readiness reads (h1-competition-start D-2).
+                    await bus.PublishAsync(await FieldDetails.ChangedAsync(organisationId, field, db, cancellationToken));
                     break;
             }
 

@@ -18,6 +18,14 @@ export const urls = {
   public: `http://localhost:${ports.public}`,
 } as const;
 
+// A pilot server application (ADR 0015, h1-pilot-access): the provider issues its client-credentials token with these claims,
+// as the directory does for an application assigned the PilotApplication role. Its object id is what an owner grants.
+export const pilotApplication = {
+  clientId: 'herald-pilot-e2e',
+  oid: '0198f5ee-0000-7000-8000-0000000e2e0a',
+  roles: ['PilotApplication'],
+} as const;
+
 // The persona the test scripts sign in as: Herald.Seed seeds its organisations before they run (harness-engineering D-14).
 export const scriptPersona = {
   oid: '0198f5ee-0000-7000-8000-0000000e2e01',

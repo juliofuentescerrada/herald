@@ -38,6 +38,10 @@ const tournament = (over: Partial<TournamentDetails> = {}): TournamentDetails =>
   admittedEntries: 0,
   waitingEntries: 0,
   checkedInEntries: 0,
+  schedulePublished: false,
+  start: { conditions: [], eligible: null, pending: null, rostersOutsideBounds: null, sharedMemberNames: [], publishedScheduleRevision: null, startedAt: null, startedOnScheduleRevision: null },
+  archived: false,
+  cancellation: null,
   ...over,
 });
 
@@ -69,6 +73,7 @@ const field = (entries: EntryDetails[], terms: Partial<FieldDetails['terms']> = 
   admitted: entries.filter((e) => e.state === 'admitted').length,
   waiting: entries.filter((e) => e.state === 'waiting').length,
   checkedIn: 0,
+  pending: 0,
   overCapacityBy: 0,
   kindMismatch: false,
   entries,
@@ -148,11 +153,24 @@ describe('The entries page', () => {
     expect(texts('herald-status-label')).toEqual(['Published', 'Registration open', 'Preparing']);
     expect(texts('.summary .help')).toEqual(['Automatic admission · 0 waiting for a slot', 'Check-in optional', 'Entry terms updated 11 November 2026, 10:10 · Europe/Madrid']);
     expect(text('#empty-heading')).toBe('No entries yet');
-    expect(texts('.group h2')).toEqual(['Admitted · 0', 'Waiting · 0']);
+    expect(texts('.group h2')).toEqual([]);
     // No history, no cancelled group.
     expect(page().querySelector('details.cancelled')).toBeNull();
     expect(page().querySelector('a.back')?.getAttribute('href')).toBe(`/organisations/${organisation}/tournaments/${tournamentId}`);
     expect(await violations(page())).toEqual([]);
+  });
+
+  it('says a cancelled tournament’s entries were cancelled with it and offers nothing', async () => {
+    const withTournament = { ...cancelled('Robin Vale'), cancellationCause: 'tournamentCancelled' as const };
+    const { button, text, page } = await open(
+      { getField: () => of(field([withTournament], { registration: 'closed' })) },
+      tournament({ registration: 'closed', competition: 'cancelled' }),
+    );
+    await vi.waitFor(() => expect(button('Add player')?.disabled).toBe(true));
+
+    expect(text('#add-reason')).toBe('The tournament is cancelled. Nothing can change.');
+    expect(page().textContent).toContain('This tournament is cancelled');
+    expect(page().textContent).toContain('Cancelled with the tournament');
   });
 
   it('says registration must be open to add entries when it is not open', async () => {
@@ -504,6 +522,8 @@ describe('The roster of a team entry', () => {
       readiness,
       members,
       history: members.map((m, index) => ({ rosterRevision: index + 1, guestId: m.guestId, name: m.name, kind: 'added' as const, changedBy: 'p-owner', changedAt: m.addedAt })),
+      frozenRevision: null,
+      frozenAt: null,
       ...over,
     };
   };
@@ -769,6 +789,30 @@ describe('The roster of a team entry', () => {
     expect(harness.text('.history summary')).toBe('History · 2');
   });
 
+  it('shows a roster frozen at start read only with its revision and when it froze', async () => {
+    const harness = await page(() => of(roster(3, { frozenRevision: 3, frozenAt: '2026-11-21T09:05:00Z' })));
+    await openRoster(harness);
+    await vi.waitFor(() => expect(harness.texts('herald-notice strong')).toContain('Frozen at start'));
+    expect(harness.text('.drawer-notice herald-notice')).toContain('froze on revision 3, 21 November 2026, 10:05 · Europe/Madrid');
+    expect(document.querySelector('[aria-label^="Remove: "]')).toBeNull();
+    expect(harness.button('Add player')).toBeUndefined();
+  });
+
+  it('keeps a waiting team’s roster read only once the competition started', async () => {
+    const harness = await page(() => of(roster(2, { entryState: 'waiting' })), {
+      getField: () => of(teams([team('Team A', 4, 'complete'), team('River Falcons', 2, 'incomplete')], { fieldLocked: true, competitionStarted: true })),
+    });
+    await openRoster(harness);
+    await vi.waitFor(() => expect(harness.text('.drawer-notice herald-notice')).toContain('The competition has started; this team’s roster cannot change.'));
+    expect(harness.button('Add player')).toBeUndefined();
+  });
+
+  it('reports a frozen roster outside its bounds', async () => {
+    const harness = await page(() => of(roster(2, { frozenRevision: 3, frozenAt: '2026-11-21T09:05:00Z' })));
+    await openRoster(harness);
+    await vi.waitFor(() => expect(harness.texts('herald-notice strong')).toContain('The frozen roster is outside its bounds'));
+  });
+
   it('waits for the tournament’s roster sizes before any roster change', async () => {
     const harness = await page(() => of(roster(2, { minimumRosterSize: null, maximumRosterSize: null, readiness: 'awaitingTerms' })));
     await openRoster(harness);
@@ -980,5 +1024,59 @@ describe('Check-in on the entries page', () => {
     // Roster first, then check-in, then cancelling.
     expect([...falcons.querySelectorAll('button')].map((b) => b.textContent?.trim())).toEqual(['Roster', 'Undo check-in', 'Cancel entry']);
     expect(await violations(page())).toEqual([]);
+  });
+
+  describe('absence review and the field lock (h1-round-robin-pairings)', () => {
+    const closed = (entries: EntryDetails[], over: Partial<FieldDetails> = {}, terms: Partial<FieldDetails['terms']> = {}) =>
+      field(entries, { registration: 'closed', checkIn: 'mandatory', ...terms }, over);
+    const pendingSam = () => closed([entry('Robin Vale', { checkIn: 'confirmed', checkInRevision: 1 }), entry('Sam Reed', { checkIn: 'pending', checkInRevision: 0 })], { pending: 1 });
+
+    it('marks a pending entry absent after confirming, with its cause in the cancelled history',
+      { meta: { type: 'covers', description: 'entrant-check-in: The owner marks a pending entry absent' } }, async () => {
+        const absent = closed([entry('Robin Vale', { checkIn: 'confirmed', checkInRevision: 1 }), entry('Sam Reed', { state: 'cancelled', cancelledAt: '2026-11-21T08:41:00Z', cancellationCause: 'absentAtStart' })]);
+        const markAbsent = vi.fn(() => of(absent));
+        const { page, button, text, texts, heading, toasts, settle } = await open({ getField: () => of(pendingSam()), markAbsent }, tournament({ registration: 'closed' }));
+        await vi.waitFor(() => expect(text('herald-notice')).toContain('1 entry is pending check-in'));
+        expect(button('Mark absent')).toBeTruthy();
+        expect(await violations(page())).toEqual([]);
+
+        button('Mark absent')!.click();
+        await settle();
+        expect(heading()).toBe('Mark Sam Reed absent?');
+        [...document.querySelectorAll<HTMLButtonElement>('[role=dialog] button')].find((b) => b.textContent?.trim() === 'Mark absent')!.click();
+        await vi.waitFor(() => expect(toasts()).toContain('Sam Reed marked absent.'));
+
+        expect(markAbsent).toHaveBeenCalledWith(organisation, tournamentId, 'e-Sam-Reed', { expectedRevision: 1 });
+        expect(texts('details.cancelled herald-status-label')).toContain('Absent at start');
+        expect(text('details.cancelled li')).toContain('Marked absent');
+      });
+
+    it('offers no absence review under an optional policy', async () => {
+      const { button, text } = await open({ getField: () => of(closed([entry('Robin Vale'), entry('Sam Reed')], {}, { checkIn: 'optional' })) }, tournament({ registration: 'closed' }));
+      await vi.waitFor(() => expect(text('#summary-heading')).toBe('2 of 2 individual entries'));
+      expect(button('Mark absent')).toBeUndefined();
+    });
+
+    it('disables check-in and cancelling while the schedule is published, with the reason and a way to the schedule',
+      { meta: { type: 'covers', description: 'entrant-check-in: Undo after publication' } }, async () => {
+        const locked = closed([entry('Robin Vale', { checkIn: 'confirmed', checkInRevision: 1 })], {}, { fieldLocked: true });
+        const { page, button, text } = await open({ getField: () => of(locked) }, tournament({ registration: 'closed', schedulePublished: true }));
+        await vi.waitFor(() => expect(text('herald-notice')).toContain('Field locked by the published schedule'));
+        expect(button('Undo check-in')?.disabled).toBe(true);
+        expect(button('Cancel entry')?.disabled).toBe(true);
+        expect(page().querySelector('herald-notice a')?.getAttribute('href')).toBe(`/organisations/${organisation}/tournaments/${tournamentId}/schedule`);
+        expect(await violations(page())).toEqual([]);
+      });
+
+    it('hides a running competition’s entry actions and says why once', async () => {
+      const started = closed([entry('Robin Vale', { checkIn: 'confirmed', checkInRevision: 1 })], {}, { fieldLocked: true, competitionStarted: true });
+      const { button, text } = await open({ getField: () => of(started) }, tournament({ registration: 'closed', schedulePublished: true, competition: 'running' }));
+      await vi.waitFor(() => expect(text('herald-notice')).toContain('Running · entries are read-only'));
+      expect(text('herald-notice')).toContain('Leaving now is a competitive withdrawal');
+      // Final, unlike the published schedule's lock: the actions are gone, not disabled.
+      expect(button('Undo check-in')).toBeUndefined();
+      expect(button('Cancel entry')).toBeUndefined();
+      expect(button('Add player')).toBeUndefined();
+    });
   });
 });

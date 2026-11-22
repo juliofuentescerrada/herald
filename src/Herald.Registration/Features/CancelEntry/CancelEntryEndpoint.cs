@@ -1,3 +1,4 @@
+using Herald.BuildingBlocks;
 using Herald.ModuleHosting;
 using Herald.Registration.Domain;
 using Herald.Registration.Persistence;
@@ -18,7 +19,9 @@ public static class CancelEntryEndpoint
     [WolverinePost("/api/organisations/{organisationId}/tournaments/{tournamentId}/entries/{entryId}/cancellation")]
     [EndpointGroupName(HeraldApi.Admin)]
     [EndpointName("cancelEntry")]
+    [OperationGroup(OperationGroup.Entries)]
     [ProducesResponseType<FieldDetails>(StatusCodes.Status200OK)]
+    [ProducesResponseType<HttpValidationProblemDetails>(StatusCodes.Status400BadRequest, "application/problem+json")]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound, "application/problem+json")]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict, "application/problem+json")]
     public static async Task<IResult> Post(

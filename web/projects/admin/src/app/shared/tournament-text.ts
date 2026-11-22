@@ -1,4 +1,4 @@
-import type { IconName } from '@herald/ui';
+import type { IconName, StatusTone } from '@herald/ui';
 
 /** How the admin application writes a tournament's facts, shared by the features that show a tournament. */
 
@@ -41,13 +41,23 @@ export const registrationText = (registration: string): string => registrationWo
 export interface LifecycleLabel {
   readonly text: string;
   readonly icon?: IconName;
+  readonly tone?: StatusTone;
 }
 
 const registrationIcons: Record<string, IconName> = { notOpen: 'clock', open: 'door-enter', closed: 'lock' };
 
+/** A finalised competition has no reviewed icon meaning yet, so its label keeps its text only (ui-icons D-1, h1-finalisation). */
+const competitionLabel = (competition: string): LifecycleLabel =>
+  competition === 'running' ? { text: 'Running', icon: 'trophy', tone: 'info' }
+    : competition === 'finalised' ? { text: 'Finalised', tone: 'success' }
+    : competition === 'cancelled' ? { text: 'Cancelled', tone: 'danger' }
+    : { text: 'Preparing', icon: 'hourglass' };
+
 /** Publication, registration and competition are three facts, never one "Active" label; each icon follows its meaning (ui-icons D-1). */
-export const lifecycleLabels = (tournament: { publication: string; registration: string; competition: string }): LifecycleLabel[] => [
+export const lifecycleLabels = (tournament: { publication: string; registration: string; competition: string; archived?: boolean }): LifecycleLabel[] => [
   tournament.publication === 'published' ? { text: 'Published', icon: 'world' } : { text: 'Draft', icon: 'pencil' },
   { text: registrationText(tournament.registration), icon: registrationIcons[tournament.registration] },
-  tournament.competition === 'preparation' ? { text: 'Preparing', icon: 'hourglass' } : { text: tournament.competition },
+  competitionLabel(tournament.competition),
+  // Archiving hides a finished tournament from the default list without changing its state (h1-tournament-cancel-and-dates D-3).
+  ...(tournament.archived ? [{ text: 'Archived' }] : []),
 ];

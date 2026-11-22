@@ -2,9 +2,7 @@
 
 ## Purpose
 An organisation's owner opens, closes and reopens the registration of a published tournament by hand; the announced dates are an announcement, not a trigger.
-
 ## Requirements
-
 ### Requirement: An owner opens the registration of a published tournament
 An organisation's owner SHALL be able to open the registration of a tournament of that organisation that is published and whose registration is not open. Opening SHALL require the registration opening and registration closure dates to be present, and SHALL be rejected naming each missing one. Opening SHALL be an explicit action: the announced dates SHALL NOT open registration by themselves, and the current time SHALL NOT prevent the action. Opening SHALL make registration open, record the acting person and time, and change nothing else in the tournament: publication, competition and configuration stay as they were. Existing entries SHALL keep their state, except that with automatic admission free slots SHALL admit entries waiting with "capacity full" (guest entries). A draft's registration SHALL NOT be opened.
 
@@ -44,8 +42,8 @@ An owner SHALL be able to close an open registration and reopen a closed one. Cl
 - **THEN** registration is open
 
 #### Scenario: A closed registration lost a date
-- **WHEN** an owner reopens a closed registration after its registration opening was removed
-- **THEN** the action is rejected naming the registration opening and registration is still closed
+- **WHEN** an owner saves the configuration of a published tournament without its registration opening
+- **THEN** the save is rejected pointing to "Change dates", which moves or sets a date but never removes one, and registration stays as it was
 
 #### Scenario: Registration was never opened
 - **WHEN** an owner closes the registration of a tournament whose registration is not open
@@ -108,3 +106,11 @@ The published tournament page SHALL show a registration area with the registrati
 #### Scenario: A draft has no registration area
 - **WHEN** an owner opens a draft
 - **THEN** the page shows no registration action
+
+### Requirement: Reopening waits for a withdrawn schedule
+Reopening registration SHALL be rejected while the tournament's schedule is published, stating that the schedule must be withdrawn first. The configuration page SHALL show reopening disabled with that reason.
+
+#### Scenario: Reopening a published schedule's tournament
+- **WHEN** an owner reopens the registration of a tournament whose schedule is published
+- **THEN** the action is rejected naming the schedule and registration is still closed
+

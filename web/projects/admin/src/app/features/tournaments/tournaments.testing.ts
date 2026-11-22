@@ -3,7 +3,7 @@ import { signal } from '@angular/core';
 import { TestBed } from '@angular/core/testing';
 import { provideRouter, Router } from '@angular/router';
 import { RouterTestingHarness } from '@angular/router/testing';
-import { HeraldHostAdminService, TournamentConfiguration, TournamentDetails } from '@herald/api-client/admin';
+import { CompetitionDetails, HeraldHostAdminService, TournamentConfiguration, TournamentDetails } from '@herald/api-client/admin';
 import { provideTanStackQuery, QueryClient } from '@tanstack/angular-query-experimental';
 import { of } from 'rxjs';
 import { AppContext, CONFIRM, Confirmation, confirmLeave, QUERY_CLIENT, Session } from '../../platform';
@@ -38,6 +38,33 @@ export const configuration = (over: Partial<TournamentConfiguration> = {}): Tour
 
 export const team = { entryKind: 'team', minimumRosterSize: 3, maximumRosterSize: 5, activePlayersPerSide: 3 } as const;
 
+/** Registration open, nothing reported yet. */
+export const notReady: CompetitionDetails = {
+  conditions: [
+    { rule: 'registration-closed', met: false },
+    { rule: 'no-pending-check-in', met: false },
+    { rule: 'two-eligible', met: false },
+    { rule: 'schedule-current', met: false },
+  ],
+  eligible: null,
+  pending: null,
+  rostersOutsideBounds: null,
+  sharedMemberNames: [],
+  publishedScheduleRevision: null,
+  startedAt: null,
+  startedOnScheduleRevision: null,
+};
+
+/** Four eligible players and schedule revision 1, built from the current field. */
+export const ready: CompetitionDetails = {
+  ...notReady,
+  conditions: notReady.conditions.map((condition) => ({ ...condition, met: true })),
+  eligible: 4,
+  pending: 0,
+  rostersOutsideBounds: [],
+  publishedScheduleRevision: 1,
+};
+
 export const details = (over: Partial<TournamentDetails> = {}, config: Partial<TournamentConfiguration> = {}): TournamentDetails => ({
   id: tournamentId,
   revision: 1,
@@ -52,6 +79,10 @@ export const details = (over: Partial<TournamentDetails> = {}, config: Partial<T
   admittedEntries: 0,
   waitingEntries: 0,
   checkedInEntries: 0,
+  schedulePublished: false,
+  start: notReady,
+  archived: false,
+  cancellation: null,
   ...over,
 });
 

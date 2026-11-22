@@ -27,7 +27,8 @@ public sealed record EntryDetails(
     RosterReadiness? RosterReadiness = null,
     CheckInState? CheckIn = null,
     int? CheckInRevision = null,
-    DateTimeOffset? CheckInChangedAt = null);
+    DateTimeOffset? CheckInChangedAt = null,
+    CancellationCause? CancellationCause = null);
 
 public enum CheckInState
 {
@@ -44,6 +45,7 @@ public sealed record FieldDetails(
     int Admitted,
     int Waiting,
     int CheckedIn,
+    int Pending,
     int OverCapacityBy,
     bool KindMismatch,
     IReadOnlyList<EntryDetails> Entries)
@@ -74,7 +76,8 @@ public sealed record FieldDetails(
             field.ReadinessOf(entry),
             entry.HasCheckIn ? entry.IsCheckedIn ? CheckInState.Confirmed : CheckInState.Pending : null,
             entry.HasCheckIn ? entry.CheckInRevision : null,
-            entry.CheckInChanges is [.., var last] ? last.ChangedAt : null);
+            entry.CheckInChanges is [.., var last] ? last.ChangedAt : null,
+            entry.CancellationCause);
 
         var admitted = field.Entries.Where(entry => entry.State == EntryState.Admitted).OrderBy(entry => entry.AdmittedAt).ThenBy(entry => entry.Sequence);
         var cancelled = field.Entries.Where(entry => entry.State == EntryState.Cancelled).OrderByDescending(entry => entry.CancelledAt);
@@ -86,14 +89,133 @@ public sealed record FieldDetails(
             field.Admitted,
             field.Waiting,
             field.CheckedIn,
+            field.Pending,
             field.OverCapacityBy,
             field.HasKindMismatch,
             [.. admitted.Concat(queue).Concat(cancelled).Select(Of)]);
     }
 
-    // The counts Tournaments keeps for its own rules and reads (design D-2).
-    public static TournamentFieldChanged Changed(Guid organisationId, Field field) =>
-        new(organisationId, field.Id.Value, field.Revision, field.Admitted, field.Waiting, field.CheckedIn);
+    // The counts Tournaments keeps for its own rules and reads (design D-2), with what start readiness needs
+    // (h1-competition-start D-2): rosters outside their bounds and member names shared across admitted teams.
+    public static async Task<TournamentFieldChanged> ChangedAsync(Guid organisationId, Field field, RegistrationDbContext db, CancellationToken cancellationToken)
+    {
+        var teams = field.Entries.Where(entry => entry.State == EntryState.Admitted && entry.GuestKind == GuestKind.Team).ToList();
+        var guestIds = teams.Select(team => team.GuestId).Concat(teams.SelectMany(team => team.Members.Select(member => member.GuestId))).Distinct().ToList();
+        var guests = guestIds.Count == 0 ? [] : await db.Guests.AsNoTracking()
+            .Where(guest => guestIds.Contains(guest.Id))
+            .ToDictionaryAsync(guest => guest.Id, cancellationToken);
+        string NameOf(GuestId id) => guests.TryGetValue(id, out var guest) ? guest.Name : "";
+
+        var shared = teams
+            .SelectMany(team => team.Members.Where(member => guests.ContainsKey(member.GuestId)).Select(member => (Team: team, Guest: guests[member.GuestId])))
+            .GroupBy(held => held.Guest.NormalisedName)
+            .Where(name => name.Select(held => held.Guest.Id).Distinct().Count() > 1 && name.Select(held => held.Team.Id).Distinct().Count() > 1)
+            .Select(name => new SharedMemberName(name.First().Guest.Name, [.. name.Select(held => NameOf(held.Team.GuestId)).Distinct()]))
+            .ToList();
+        return new(
+            organisationId,
+            field.Id.Value,
+            field.Revision,
+            field.Admitted,
+            field.Waiting,
+            field.CheckedIn,
+            field.EligibleRevision,
+            field.Eligible.Count,
+            field.Pending,
+            [.. field.RostersOutsideBounds.Select(team => new RosterOutsideBounds(team.Id.Value, NameOf(team.GuestId), team.Members.Count))],
+            shared);
+    }
+
+    // The eligible entrants Competition drafts from (h1-round-robin-pairings D-2).
+    public static async Task<TournamentEligibleFieldChanged> EligibleAsync(Guid organisationId, Field field, RegistrationDbContext db, CancellationToken cancellationToken)
+    {
+        var eligible = field.Eligible;
+        var pending = field.PendingEntries;
+        var guestIds = eligible.Select(entry => entry.Entry.GuestId).Concat(pending.Select(entry => entry.GuestId)).ToList();
+        var names = await db.Guests.AsNoTracking()
+            .Where(guest => guestIds.Contains(guest.Id))
+            .ToDictionaryAsync(guest => guest.Id, guest => guest.Name, cancellationToken);
+        return new(
+            organisationId,
+            field.Id.Value,
+            field.EligibleRevision,
+            field.Terms.Registration == RegistrationState.Closed,
+            [.. pending.Select(entry => new PendingEntrant(entry.Id.Value, names.GetValueOrDefault(entry.GuestId, "")))],
+            [.. eligible.Select(entry => new EligibleEntrant(entry.Entry.Id.Value, names.GetValueOrDefault(entry.Entry.GuestId, ""), entry.AdmissionOrder))]);
+    }
+
+    // The rosters frozen at start, for Competition's lineups (h1-match-lineups D-4); the field's revision orders them.
+    public static async Task<TournamentFrozenRostersChanged> FrozenRostersAsync(Guid organisationId, Field field, RegistrationDbContext db, CancellationToken cancellationToken)
+    {
+        var teams = field.Entries.Where(entry => entry.FrozenRosterRevision is not null).ToList();
+        var guestIds = teams.SelectMany(team => team.Members.Select(member => member.GuestId)).ToList();
+        var names = await db.Guests.AsNoTracking()
+            .Where(guest => guestIds.Contains(guest.Id))
+            .ToDictionaryAsync(guest => guest.Id, guest => guest.Name, cancellationToken);
+        return new(
+            organisationId,
+            field.Id.Value,
+            field.Revision,
+            [.. teams.Select(team => new FrozenRoster(
+                team.Id.Value,
+                team.FrozenRosterRevision!.Value,
+                [.. team.Members.Select(member => new FrozenRosterMember(member.GuestId.Value, names.GetValueOrDefault(member.GuestId, "")))]))]);
+    }
+
+    // Both snapshots, in the transaction of the change; the eligible one only when it changed.
+    public static async Task PublishAsync(IMessageBus bus, Guid organisationId, Field field, int eligibleRevisionBefore, RegistrationDbContext db, CancellationToken cancellationToken)
+    {
+        await bus.PublishAsync(await ChangedAsync(organisationId, field, db, cancellationToken));
+        if (field.EligibleRevision != eligibleRevisionBefore)
+        {
+            await bus.PublishAsync(await EligibleAsync(organisationId, field, db, cancellationToken));
+        }
+
+        await PublishFactsAsync(bus, organisationId, field, db, cancellationToken);
+    }
+
+    // The notifiable facts of this change, as fact events with the entry's alias and no reason (ADR 0017; h1-change-log D-3).
+    private static async Task PublishFactsAsync(IMessageBus bus, Guid organisationId, Field field, RegistrationDbContext db, CancellationToken cancellationToken)
+    {
+        var facts = field.DomainEvents.Where(fact => fact is Domain.EntryAdmitted or Domain.EntryCancelled).ToList();
+        if (facts.Count == 0)
+        {
+            return;
+        }
+
+        var guestIds = field.Entries.Select(entry => entry.GuestId).ToList();
+        var aliases = await db.Guests.AsNoTracking().Where(guest => guestIds.Contains(guest.Id)).ToDictionaryAsync(guest => guest.Id, guest => guest.Name, cancellationToken);
+        foreach (var fact in facts)
+        {
+            switch (fact)
+            {
+                case Domain.EntryAdmitted admitted when field.Find(admitted.EntryId) is { } entry:
+                    await bus.PublishAsync(new Contracts.Registration.V1.EntryAdmitted(
+                        organisationId, field.Id.Value, entry.Id.Value, entry.Revision, aliases.GetValueOrDefault(entry.GuestId, ""), AdmissionCause(admitted.Method),
+                        admitted.AdmittedBy, admitted.AdmittedBy is null ? null : db.ActorName, admitted.AdmittedAt));
+                    break;
+                case Domain.EntryCancelled cancelled when field.Find(cancelled.EntryId) is { } entry:
+                    await bus.PublishAsync(new Contracts.Registration.V1.EntryCancelled(
+                        organisationId, field.Id.Value, entry.Id.Value, entry.Revision, aliases.GetValueOrDefault(entry.GuestId, ""), CancellationCause(cancelled.Cause),
+                        cancelled.CancelledBy, db.ActorName, cancelled.CancelledAt));
+                    break;
+            }
+        }
+    }
+
+    private static string AdmissionCause(AdmissionMethod method) => method switch
+    {
+        AdmissionMethod.Automatic => "automatic",
+        AdmissionMethod.Owner => "operator",
+        _ => "promotion",
+    };
+
+    private static string CancellationCause(Domain.CancellationCause cause) => cause switch
+    {
+        Domain.CancellationCause.Owner => "operator",
+        Domain.CancellationCause.AbsentAtStart => "absent-at-start",
+        _ => "tournament-cancelled",
+    };
 }
 
 internal static class FieldResults
@@ -130,7 +252,8 @@ internal static class FieldResults
                 return NotFound();
             }
 
-            var result = write(field);
+            var eligibleRevision = field.EligibleRevision;
+            var result = field.IsTournamentCancelled ? Field.Cancelled : write(field);
             switch (result.Outcome)
             {
                 case WriteOutcome.Rejected:
@@ -153,7 +276,7 @@ internal static class FieldResults
                     }
 
                     // Stored with the change by the transaction around the endpoint, sent after its commit.
-                    await bus.PublishAsync(FieldDetails.Changed(organisationId, field));
+                    await FieldDetails.PublishAsync(bus, organisationId, field, eligibleRevision, db, cancellationToken);
                     break;
             }
 

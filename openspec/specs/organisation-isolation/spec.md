@@ -2,7 +2,6 @@
 
 ## Purpose
 Organisation-scoped requests resolve membership before any handler, answer the same not-found for missing and forbidden organisations, and persistence scopes organisation-owned data to the request's organisation.
-
 ## Requirements
 ### Requirement: Organisation-scoped requests resolve membership first
 An endpoint acting on an organisation SHALL take the organisation from its route and SHALL resolve the caller's membership in it before any handler runs. Without a current membership the response SHALL be the same 404 problem as for an organisation that does not exist, with no organisation name, tournament or other private detail. Every request SHALL be checked; a membership seen earlier SHALL grant nothing later.
@@ -40,4 +39,11 @@ The change SHALL run a bounded experiment with PostgreSQL row-level security on 
 #### Scenario: The experiment concludes
 - **WHEN** the experiment has run
 - **THEN** the design records adopted or rejected, the measured behaviour with pooled connections, Wolverine handlers and migrations, and the reason
+
+### Requirement: Applications resolve their organisation through a grant
+For a caller with the pilot application role, the organisation context SHALL come from its active grant for that organisation instead of a membership, and SHALL carry the grant as the actor. Organisation creation and the person's own details SHALL be refused to applications.
+
+#### Scenario: An application creates an organisation
+- **WHEN** a pilot application sends an organisation creation
+- **THEN** it is refused
 

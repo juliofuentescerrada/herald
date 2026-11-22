@@ -47,6 +47,10 @@ namespace Herald.Registration.Persistence.Migrations
                     b.Property<Guid?>("AdmittedBy")
                         .HasColumnType("uuid");
 
+                    b.Property<string>("CancellationCause")
+                        .HasMaxLength(20)
+                        .HasColumnType("character varying(20)");
+
                     b.Property<DateTimeOffset?>("CancelledAt")
                         .HasColumnType("timestamp with time zone");
 
@@ -62,6 +66,9 @@ namespace Herald.Registration.Persistence.Migrations
                     b.Property<Guid>("EnteredBy")
                         .HasColumnType("uuid");
 
+                    b.Property<int?>("FrozenRosterRevision")
+                        .HasColumnType("integer");
+
                     b.Property<Guid>("GuestId")
                         .HasColumnType("uuid");
 
@@ -75,6 +82,9 @@ namespace Herald.Registration.Persistence.Migrations
 
                     b.Property<int>("Revision")
                         .HasColumnType("integer");
+
+                    b.Property<DateTimeOffset?>("RosterFrozenAt")
+                        .HasColumnType("timestamp with time zone");
 
                     b.Property<int>("RosterRevision")
                         .HasColumnType("integer");
@@ -106,6 +116,9 @@ namespace Herald.Registration.Persistence.Migrations
                     b.Property<Guid>("Id")
                         .HasColumnType("uuid");
 
+                    b.Property<int>("EligibleRevision")
+                        .HasColumnType("integer");
+
                     b.Property<long>("LastSequence")
                         .HasColumnType("bigint");
 
@@ -122,6 +135,9 @@ namespace Herald.Registration.Persistence.Migrations
                     b.Property<int>("TermsRevision")
                         .HasColumnType("integer");
 
+                    b.Property<DateTimeOffset?>("TournamentCancelledAt")
+                        .HasColumnType("timestamp with time zone");
+
                     b.ComplexProperty(typeof(Dictionary<string, object>), "Terms", "Herald.Registration.Domain.Field.Terms#EntryTerms", b1 =>
                         {
                             b1.IsRequired();
@@ -134,10 +150,21 @@ namespace Herald.Registration.Persistence.Migrations
                             b1.Property<int>("Capacity")
                                 .HasColumnType("integer");
 
+                            b1.Property<string>("CheckIn")
+                                .IsRequired()
+                                .HasMaxLength(20)
+                                .HasColumnType("character varying(20)");
+
+                            b1.Property<bool>("CompetitionStarted")
+                                .HasColumnType("boolean");
+
                             b1.Property<string>("EntryKind")
                                 .IsRequired()
                                 .HasMaxLength(20)
                                 .HasColumnType("character varying(20)");
+
+                            b1.Property<bool>("FieldLocked")
+                                .HasColumnType("boolean");
 
                             b1.Property<int?>("MaximumRosterSize")
                                 .HasColumnType("integer");

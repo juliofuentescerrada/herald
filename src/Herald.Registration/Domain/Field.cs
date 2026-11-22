@@ -26,15 +26,29 @@ public enum Admission
     Manual,
 }
 
+public enum CheckInPolicy
+{
+    Optional,
+    Mandatory,
+}
+
 // The facts of the tournament that decide its entries, as Tournaments last reported them (design D-3).
 // The roster sizes are set for a team tournament; terms sent before rosters existed lack them.
+// The field is locked while the tournament's schedule is published (h1-round-robin-pairings D-3), and
+// fixed with the rosters once the competition started (h1-competition-start D-3).
 public sealed record EntryTerms(
     RegistrationState Registration,
     int Capacity,
     EntryKind EntryKind,
     Admission Admission,
     int? MinimumRosterSize = null,
-    int? MaximumRosterSize = null);
+    int? MaximumRosterSize = null,
+    CheckInPolicy CheckIn = CheckInPolicy.Optional,
+    bool FieldLocked = false,
+    bool CompetitionStarted = false);
+
+// An admitted entry that may be paired: checked in under a mandatory policy. Order 1 was admitted first.
+public sealed record EligibleEntry(Entry Entry, int AdmissionOrder);
 
 // Derived from the members and the bounds when read, never stored (h1-team-rosters D-4).
 public enum RosterReadiness
@@ -50,7 +64,7 @@ public sealed record GuestEntered(TournamentId TournamentId, EntryId EntryId, Gu
 // AdmittedBy is null when nobody acted: a promotion caused by new terms.
 public sealed record EntryAdmitted(TournamentId TournamentId, EntryId EntryId, AdmissionMethod Method, Guid? AdmittedBy, DateTimeOffset AdmittedAt) : IDomainEvent;
 
-public sealed record EntryCancelled(TournamentId TournamentId, EntryId EntryId, Guid CancelledBy, DateTimeOffset CancelledAt) : IDomainEvent;
+public sealed record EntryCancelled(TournamentId TournamentId, EntryId EntryId, CancellationCause Cause, Guid CancelledBy, DateTimeOffset CancelledAt) : IDomainEvent;
 
 public sealed record RosterMemberAdded(TournamentId TournamentId, EntryId EntryId, GuestId GuestId, int RosterRevision, Guid AddedBy, DateTimeOffset AddedAt) : IDomainEvent;
 
@@ -81,6 +95,13 @@ public sealed class Field : AggregateRoot<TournamentId>
 
     public EntryTerms Terms { get; private set; }
 
+    // Set once Tournaments' cancellation arrives: every later write is rejected (h1-tournament-cancel-and-dates D-1).
+    public DateTimeOffset? TournamentCancelledAt { get; private set; }
+
+    public bool IsTournamentCancelled => TournamentCancelledAt is not null;
+
+    public static readonly WriteResult Cancelled = WriteResult.Reject("tournament", "cancelled");
+
     // The tournament revision the terms come from; older terms are ignored.
     public int TermsRevision { get; private set; }
 
@@ -100,6 +121,23 @@ public sealed class Field : AggregateRoot<TournamentId>
     public int Waiting => _entries.Count(entry => entry.State == EntryState.Waiting);
 
     public int CheckedIn => _entries.Count(entry => entry.State == EntryState.Admitted && entry.IsCheckedIn);
+
+    // Grows by one when the eligible entrants, the registration state or the pending count change, and only then:
+    // roster edits and waiting entries leave it alone, so they never stale a draft (h1-round-robin-pairings D-2).
+    public int EligibleRevision { get; private set; }
+
+    // Admitted entries still to check in under a mandatory policy; they block drafting (F-05).
+    public int Pending => PendingEntries.Count;
+
+    public IReadOnlyList<Entry> PendingEntries => Terms.CheckIn == CheckInPolicy.Mandatory
+        ? [.. _entries.Where(entry => entry.State == EntryState.Admitted && !entry.IsCheckedIn).OrderBy(entry => entry.AdmittedAt).ThenBy(entry => entry.Sequence)]
+        : [];
+
+    public IReadOnlyList<EligibleEntry> Eligible => [.. _entries
+        .Where(entry => entry.State == EntryState.Admitted && (Terms.CheckIn == CheckInPolicy.Optional || entry.IsCheckedIn))
+        .OrderBy(entry => entry.AdmittedAt)
+        .ThenBy(entry => entry.Sequence)
+        .Select((entry, index) => new EligibleEntry(entry, index + 1))];
 
     // Crossed changes are reported, never repaired (EN-12).
     public int OverCapacityBy => Math.Max(0, Admitted - Terms.Capacity);
@@ -127,11 +165,23 @@ public sealed class Field : AggregateRoot<TournamentId>
             return false;
         }
 
+        var before = EligibilityKey;
+        var starts = terms.CompetitionStarted && !Terms.CompetitionStarted;
         Terms = terms;
         TermsRevision = termsRevision;
         TermsReceivedAt = at;
+        if (starts)
+        {
+            // Each admitted team keeps the roster it has now; a write that crossed the start stays visible (D-4).
+            foreach (var entry in _entries.Where(entry => entry.State == EntryState.Admitted && entry.GuestKind == GuestKind.Team))
+            {
+                entry.FreezeRoster(at);
+            }
+        }
+
         Promote(actor: null, at);
         Revision++;
+        Changed(before);
         return true;
     }
 
@@ -157,11 +207,17 @@ public sealed class Field : AggregateRoot<TournamentId>
             return WriteResult.Reject("field", "mismatch");
         }
 
+        if (Terms.FieldLocked)
+        {
+            return Locked;
+        }
+
         if (_entries.Any(entry => entry.GuestId == guest && entry.IsActive))
         {
             return WriteResult.Reject("guest", "already-entered");
         }
 
+        var before = EligibilityKey;
         var entry = new Entry(id, guest, kind, ++LastSequence, actor, at);
         _entries.Add(entry);
         Raise(new GuestEntered(Id, id, guest, actor, at));
@@ -179,6 +235,7 @@ public sealed class Field : AggregateRoot<TournamentId>
         }
 
         Revision++;
+        Changed(before);
         return WriteOutcome.Applied;
     }
 
@@ -199,6 +256,11 @@ public sealed class Field : AggregateRoot<TournamentId>
         if (entry.State == EntryState.Cancelled)
         {
             return WriteResult.Reject("entry", "cancelled");
+        }
+
+        if (Terms.FieldLocked)
+        {
+            return Locked;
         }
 
         if (HasMismatch)
@@ -225,13 +287,56 @@ public sealed class Field : AggregateRoot<TournamentId>
             return WriteResult.Reject("reason", "required");
         }
 
+        var before = EligibilityKey;
         AdmitEntry(entry, AdmissionMethod.Owner, actor, reason, at);
         Revision++;
+        Changed(before);
         return WriteOutcome.Applied;
     }
 
+    // Every waiting or admitted entry is cancelled with its identity and history, and nobody is promoted; idempotent (D-1).
+    public bool ApplyCancellation(Guid actor, DateTimeOffset at)
+    {
+        if (IsTournamentCancelled)
+        {
+            return false;
+        }
+
+        var before = EligibilityKey;
+        TournamentCancelledAt = at;
+        foreach (var entry in _entries.Where(entry => entry.IsActive))
+        {
+            entry.Cancel(CancellationCause.TournamentCancelled, actor, at);
+            Raise(new EntryCancelled(Id, entry.Id, CancellationCause.TournamentCancelled, actor, at));
+        }
+
+        Revision++;
+        Changed(before);
+        return true;
+    }
+
     // Final for the entry; a freed slot follows the policy (EN-3, EN-8).
-    public WriteResult Cancel(EntryId id, int expectedRevision, Guid actor, DateTimeOffset at)
+    public WriteResult Cancel(EntryId id, int expectedRevision, Guid actor, DateTimeOffset at) =>
+        Cancel(id, expectedRevision, CancellationCause.Owner, actor, at);
+
+    // The absence review: a pending entry under a mandatory policy is cancelled as absent at start (F-05, D-29).
+    public WriteResult MarkAbsent(EntryId id, int expectedRevision, Guid actor, DateTimeOffset at)
+    {
+        var entry = Find(id) ?? throw new KeyNotFoundException($"No entry {id.Value} in field {Id.Value}.");
+        if (entry is { State: EntryState.Cancelled, CancellationCause: CancellationCause.AbsentAtStart })
+        {
+            return WriteOutcome.Repeated;
+        }
+
+        if (entry.State != EntryState.Admitted || Terms.CheckIn != CheckInPolicy.Mandatory || entry.IsCheckedIn)
+        {
+            return WriteResult.Reject("entry", "not-pending");
+        }
+
+        return Cancel(id, expectedRevision, CancellationCause.AbsentAtStart, actor, at);
+    }
+
+    private WriteResult Cancel(EntryId id, int expectedRevision, CancellationCause cause, Guid actor, DateTimeOffset at)
     {
         var entry = Find(id) ?? throw new KeyNotFoundException($"No entry {id.Value} in field {Id.Value}.");
         if (entry.State == EntryState.Cancelled)
@@ -244,10 +349,17 @@ public sealed class Field : AggregateRoot<TournamentId>
             return WriteOutcome.Stale;
         }
 
-        entry.Cancel(actor, at);
-        Raise(new EntryCancelled(Id, id, actor, at));
+        if (Terms.FieldLocked)
+        {
+            return Locked;
+        }
+
+        var before = EligibilityKey;
+        entry.Cancel(cause, actor, at);
+        Raise(new EntryCancelled(Id, id, cause, actor, at));
         Promote(actor, at);
         Revision++;
+        Changed(before);
         return WriteOutcome.Applied;
     }
 
@@ -282,6 +394,11 @@ public sealed class Field : AggregateRoot<TournamentId>
         if (expectedRosterRevision != entry.RosterRevision)
         {
             return WriteOutcome.Stale;
+        }
+
+        if (Terms.CompetitionStarted)
+        {
+            return Frozen;
         }
 
         if (entry.State == EntryState.Cancelled)
@@ -334,6 +451,11 @@ public sealed class Field : AggregateRoot<TournamentId>
             return WriteOutcome.Stale;
         }
 
+        if (Terms.CompetitionStarted)
+        {
+            return Frozen;
+        }
+
         if (entry.State == EntryState.Cancelled)
         {
             return WriteResult.Reject("entry", "cancelled");
@@ -376,15 +498,43 @@ public sealed class Field : AggregateRoot<TournamentId>
             return WriteOutcome.Stale;
         }
 
+        if (Terms.FieldLocked)
+        {
+            return Locked;
+        }
+
+        var before = EligibilityKey;
         entry.SetCheckIn(checkedIn, actor, at);
         Raise(checkedIn
             ? new EntryCheckedIn(Id, id, entry.CheckInRevision, actor, at)
             : new EntryCheckInUndone(Id, id, entry.CheckInRevision, actor, at));
         Revision++;
+        Changed(before);
         return WriteOutcome.Applied;
     }
 
     private bool HasFreeSlot => Admitted < Terms.Capacity;
+
+    private WriteResult Locked => WriteResult.Reject("field", Terms.CompetitionStarted ? "competition-started" : "schedule-published");
+
+    private static WriteResult Frozen => WriteResult.Reject("roster", "frozen");
+
+    // Admitted teams whose roster is outside the profile's bounds: they block start (D-17, D-18).
+    public IReadOnlyList<Entry> RostersOutsideBounds => [.. _entries
+        .Where(entry => entry.State == EntryState.Admitted && ReadinessOf(entry) is RosterReadiness.Incomplete or RosterReadiness.AboveMaximum)
+        .OrderBy(entry => entry.AdmittedAt).ThenBy(entry => entry.Sequence)];
+
+    // What the eligible revision follows; compared before and after a write, never stored.
+    private string EligibilityKey =>
+        $"{Terms.Registration == RegistrationState.Closed}|{string.Join(',', PendingEntries.Select(entry => entry.Id.Value))}|{string.Join(',', Eligible.Select(eligible => eligible.Entry.Id.Value))}";
+
+    private void Changed(string before)
+    {
+        if (EligibilityKey != before)
+        {
+            EligibleRevision++;
+        }
+    }
 
     // Only with automatic admission and open registration does a free slot admit anyone by itself (EN-8).
     private void Promote(Guid? actor, DateTimeOffset at)

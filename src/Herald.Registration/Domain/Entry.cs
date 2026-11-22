@@ -30,6 +30,14 @@ public enum RosterChangeKind
     Removed,
 }
 
+// Why an entry was cancelled: by the owner, or marked absent in the absence review (F-05).
+public enum CancellationCause
+{
+    Owner,
+    AbsentAtStart,
+    TournamentCancelled,
+}
+
 public enum CheckInChangeKind
 {
     Confirmed,
@@ -100,12 +108,19 @@ public sealed class Entry : Entity<EntryId>
 
     public DateTimeOffset? CancelledAt { get; private set; }
 
+    public CancellationCause? CancellationCause { get; private set; }
+
     // Starts at 0 and grows by one with each addition or removal; roster writes state it (design D-2).
     public int RosterRevision { get; private set; }
 
     public IReadOnlyList<RosterMember> Members => _members;
 
     public IReadOnlyList<RosterChange> RosterChanges => _rosterChanges;
+
+    // The roster revision current when Registration learned of the start, and when (h1-competition-start D-3).
+    public int? FrozenRosterRevision { get; private set; }
+
+    public DateTimeOffset? RosterFrozenAt { get; private set; }
 
     // Pending until confirmed; kept after cancellation as evidence (h1-check-in R-3).
     public bool IsCheckedIn { get; private set; }
@@ -132,6 +147,12 @@ public sealed class Entry : Entity<EntryId>
     {
         _members.RemoveAll(member => member.GuestId == guest);
         _rosterChanges.Add(new(++RosterRevision, guest, RosterChangeKind.Removed, actor, at));
+    }
+
+    internal void FreezeRoster(DateTimeOffset at)
+    {
+        FrozenRosterRevision = RosterRevision;
+        RosterFrozenAt = at;
     }
 
     internal void SetCheckIn(bool checkedIn, Guid actor, DateTimeOffset at)
@@ -163,9 +184,10 @@ public sealed class Entry : Entity<EntryId>
         AdmissionReason = reason;
     }
 
-    internal void Cancel(Guid actor, DateTimeOffset at)
+    internal void Cancel(CancellationCause cause, Guid actor, DateTimeOffset at)
     {
         State = EntryState.Cancelled;
+        CancellationCause = cause;
         WaitingReason = null;
         CancelledBy = actor;
         CancelledAt = at;

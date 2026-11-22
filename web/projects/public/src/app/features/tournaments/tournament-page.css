@@ -1,0 +1,45 @@
+/* One column at every width, capped at 1200 px inside the fluid gutter (visual direction §8.1, D-5). */
+.page { display: flex; flex-direction: column; gap: var(--herald-space-6); max-width: var(--herald-width-public); margin: 0 auto; padding: var(--herald-space-8) max(5vw, 24px); }
+.text { max-inline-size: calc(75ch + 2 * max(5vw, 24px)); margin: 0; }
+.text a { color: var(--herald-color-text-primary); }
+h1 { margin: 0; font-size: 40px; }
+h2 { margin: 0 0 var(--herald-space-3); font-size: 24px; }
+h3 { margin: var(--herald-space-4) 0 var(--herald-space-2); font-size: 18px; }
+p { margin: 0 0 var(--herald-space-2); }
+/* The title with its lifecycle labels beside it; they wrap below it when there is no room. */
+.title { display: flex; flex-wrap: wrap; align-items: center; gap: var(--herald-space-2) var(--herald-space-4); }
+.labels { display: flex; flex-wrap: wrap; gap: var(--herald-space-2); }
+.page herald-notice { display: flex; }
+.panel { padding: var(--herald-space-6); background: var(--herald-color-surface-default); border: 1px solid var(--herald-color-border-default); }
+.help { color: var(--herald-color-text-secondary); max-inline-size: 75ch; }
+.facts { display: grid; grid-template-columns: max-content 1fr; gap: var(--herald-space-2) var(--herald-space-4); margin: 0; }
+.facts dt { color: var(--herald-color-text-secondary); }
+.facts dd { margin: 0; }
+.matches, .changes { list-style: none; margin: 0; padding: 0; }
+.matches li { display: flex; flex-wrap: wrap; align-items: center; gap: var(--herald-space-2) var(--herald-space-4); padding: var(--herald-space-3) 0; border-top: 1px solid var(--herald-color-border-default); }
+.pair { font-weight: 700; overflow-wrap: anywhere; }
+.vs { color: var(--herald-color-text-secondary); font-weight: 400; }
+.outcome { flex-basis: 100%; margin: 0; color: var(--herald-color-text-secondary); }
+.changes li { display: grid; grid-template-columns: auto 1fr; gap: var(--herald-space-3); padding: var(--herald-space-3) 0; border-top: 1px solid var(--herald-color-border-default); }
+.changes p { margin: 0; }
+
+/* A real table; numbers right-aligned in tabular figures, points strongest. */
+table { width: 100%; border-collapse: collapse; }
+th, td { padding: var(--herald-space-3) var(--herald-space-4); border-bottom: 1px solid var(--herald-color-border-default); text-align: left; }
+th { color: var(--herald-color-text-secondary); font-weight: 700; }
+.num { text-align: right; font-variant-numeric: tabular-nums; color: var(--herald-color-text-secondary); }
+.pts { text-align: right; font-variant-numeric: tabular-nums; font-weight: 700; }
+td herald-status-label { margin-left: var(--herald-space-2); }
+button.link { background: none; border: 0; padding: 0; min-height: var(--herald-target-min); font: inherit; color: var(--herald-color-text-primary); text-decoration: underline; text-align: left; cursor: pointer; overflow-wrap: anywhere; }
+.explain td { background: var(--herald-color-neutral-surface); }
+.explain ul { margin: 0 0 var(--herald-space-2); padding-left: var(--herald-space-6); }
+.visually-hidden { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); white-space: nowrap; }
+
+/* The narrow table drops the secondary columns, never points (D-5). */
+@media (max-width: 699px) {
+  .page { padding: var(--herald-space-6) var(--herald-space-4); }
+  h1 { font-size: 32px; }
+  .panel { padding: var(--herald-space-4); }
+  .wide { display: none; }
+  th, td { padding: var(--herald-space-2) var(--herald-space-3); }
+}

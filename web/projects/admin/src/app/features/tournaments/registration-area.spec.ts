@@ -72,6 +72,21 @@ describe('The registration area', () => {
     expect(document.activeElement).toBe(page().querySelector('#t-registrationOpensAt'));
   });
 
+  it('offers no registration action once the competition is running', async () => {
+    const { action } = await render([() => of(published({ registration: 'closed', registrationChangedAt: '2026-11-13T17:00:00Z', schedulePublished: true, competition: 'running' }))]);
+    expect(action()).toBeNull();
+  });
+
+  it('keeps reopening disabled with its reason while a schedule is published',
+    { meta: { type: 'covers', description: "registration-window: Reopening a published schedule's tournament" } }, async () => {
+      const { page, area, action } = await render([() => of(published({ registration: 'closed', registrationChangedAt: '2026-11-13T17:00:00Z', schedulePublished: true }))]);
+      expect(action().textContent?.trim()).toBe('Reopen registration');
+      expect(action().disabled).toBe(true);
+      expect(area()!.querySelector('#registration-reason')?.textContent?.trim()).toBe('The schedule is published. Withdraw it before reopening registration.');
+      expect(action().getAttribute('aria-describedby')).toBe('registration-reason');
+      expect((await axe.run(page(), { rules: { 'color-contrast': { enabled: false } } })).violations.map((v) => v.id)).toEqual([]);
+    });
+
   it('asks to save unsaved changes first', async () => {
     const { area, action, type } = await render([() => of(published())]);
     await type('capacity', '32');
@@ -97,7 +112,7 @@ describe('The registration area', () => {
 
     action().click();
     await vi.waitFor(() => expect(action().textContent?.trim()).toBe('Close registration'));
-    expect(texts('herald-status-label')).toEqual(['Published', 'Registration open', 'Preparing']);
+    expect(texts('.labels herald-status-label')).toEqual(['Published', 'Registration open', 'Preparing']);
     // W-1: the time in the reference zone, without the person's name.
     expect(area()!.querySelector('.last')?.textContent).toBe('Opened 11 November 2026, 09:30 · Europe/Madrid');
 

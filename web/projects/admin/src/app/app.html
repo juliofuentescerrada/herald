@@ -34,6 +34,7 @@
         <nav class="nav" aria-label="Workspace">
           <a herald-nav-link [routerLink]="context.home()" routerLinkActive ariaCurrentWhenActive="page" [routerLinkActiveOptions]="{ exact: true }" icon="layout-dashboard">Overview</a>
           <a herald-nav-link [routerLink]="[context.home(), 'tournaments']" routerLinkActive ariaCurrentWhenActive="page" icon="trophy">Tournaments</a>
+          <a herald-nav-link [routerLink]="[context.home(), 'applications']" routerLinkActive ariaCurrentWhenActive="page" icon="plug-connected">Applications</a>
         </nav>
       }
     </aside>

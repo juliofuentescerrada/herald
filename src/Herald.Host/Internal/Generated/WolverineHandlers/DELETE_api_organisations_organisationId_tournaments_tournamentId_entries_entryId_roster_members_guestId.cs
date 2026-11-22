@@ -34,6 +34,7 @@ namespace Internal.Generated.WolverineHandlers
             await using var registrationDbContext = new Herald.Registration.Persistence.RegistrationDbContext(_dbContextOptionsOfRegistrationDbContext, organisationContext);
             var messageContext = new Wolverine.Runtime.MessageContext(_wolverineRuntime);
             Wolverine.Http.HttpHandler.RequestActivity(httpContext)?.SetTag("handler.type", "Herald.Registration.Features.RemoveRosterMember.RemoveRosterMemberEndpoint").SetTag("http.route", "/api/organisations/{organisationId}/tournaments/{tournamentId}/entries/{entryId}/roster/members/{guestId}").SetTag("http.request.method", "DELETE");
+            Wolverine.Http.Runtime.RequestIdMiddleware.Apply(httpContext, messageContext);
             
             // Enroll the DbContext & IMessagingContext in the outgoing Wolverine outbox transaction
             var efCoreEnvelopeTransaction = new Wolverine.EntityFrameworkCore.Internals.EfCoreEnvelopeTransaction(registrationDbContext, messageContext, _domainEventScraperIEnumerable);
@@ -103,7 +104,7 @@ namespace Internal.Generated.WolverineHandlers
 
                 
                 // The actual HTTP request handler execution
-                var result = await Herald.Registration.Features.RemoveRosterMember.RemoveRosterMemberEndpoint.Delete(organisationId, tournamentId, entryId, guestId, expectedRevision, organisationContext, registrationDbContext, httpContext.RequestAborted).ConfigureAwait(false);
+                var result = await Herald.Registration.Features.RemoveRosterMember.RemoveRosterMemberEndpoint.Delete(organisationId, tournamentId, entryId, guestId, expectedRevision, organisationContext, registrationDbContext, messageContext, httpContext.RequestAborted).ConfigureAwait(false);
 
                 
                 // Added by EF Core Transaction Middleware

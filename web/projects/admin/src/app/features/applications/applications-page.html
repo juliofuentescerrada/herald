@@ -1,0 +1,145 @@
+<header class="heading">
+  <h1>Applications</h1>
+</header>
+
+<section class="summary" aria-labelledby="summary-heading">
+  <div>
+    <h2 id="summary-heading">Pilot applications</h2>
+    <p class="help">
+      An application acts only within its grant: the tournaments and operations you choose. Revoking stops it from the next request; what it did stays, attributed to it.
+    </p>
+  </div>
+  <button herald-button variant="primary" type="button" (click)="askGrant($any($event.currentTarget))">Grant access</button>
+</section>
+
+@if (revokeFailure(); as failed) {
+  <herald-notice tone="danger" heading="Access was not revoked">{{ failed }}</herald-notice>
+}
+
+@if (grants.isPending()) {
+  <p class="panel" role="status">Loading applications…</p>
+} @else if (grants.isError()) {
+  <section class="panel">
+    <herald-notice tone="danger" heading="Applications did not load">Nothing is shown because the list could not be read. Try again.</herald-notice>
+    <div class="actions">
+      <button herald-button variant="primary" type="button" [loading]="grants.isFetching()" (click)="grants.refetch()">Try again</button>
+    </div>
+  </section>
+} @else if (grants.data()!.length === 0) {
+  <herald-notice heading="No application has access">
+    Grant access to let a pilot application act for this organisation. The platform operator provides its application identifier.
+  </herald-notice>
+} @else {
+  <ul class="grants">
+    @for (grant of grants.data(); track grant.id) {
+      <li>
+        <div>
+          <div class="identity">
+            <h3>{{ grant.name }}</h3>
+            <herald-status-label [tone]="grant.revokedAt ? 'danger' : 'success'">{{ grant.revokedAt ? 'Revoked' : 'Active' }}</herald-status-label>
+          </div>
+          <p class="help"><span class="mono">{{ grant.applicationId }}</span> · {{ scope(grant) }}</p>
+          <p class="labels">
+            @for (group of grant.groups; track group) {
+              <herald-status-label>{{ groupLabel(group) }}</herald-status-label>
+            }
+          </p>
+          <p class="help">
+            Granted by {{ grant.grantedBy }} · {{ when(grant.grantedAt) }}
+            @if (grant.revokedAt) {
+              <br />Revoked by {{ grant.revokedBy }} · {{ when(grant.revokedAt) }}
+            }
+          </p>
+        </div>
+        @if (!grant.revokedAt) {
+          <div class="row-actions">
+            <button herald-button variant="destructive" type="button" [attr.aria-label]="'Revoke: ' + grant.name" (click)="revoke(grant)">Revoke</button>
+          </div>
+        }
+      </li>
+    }
+  </ul>
+}
+
+<ng-template #grantDialog>
+  <herald-dialog heading="Grant access" [busy]="busy()">
+    <form novalidate (submit)="$event.preventDefault(); grant()">
+      <div class="field">
+        <label for="grant-name">Name</label>
+        <input
+          id="grant-name"
+          #nameInput
+          maxlength="80"
+          [value]="name()"
+          (input)="name.set(nameInput.value); errors.set({ ...errors(), name: undefined })"
+          [readOnly]="busy()"
+          [attr.aria-invalid]="errors().name ? 'true' : null"
+          [attr.aria-describedby]="errors().name ? 'grant-name-error' : null"
+        />
+        @if (errors().name; as message) {
+          <p class="field-error" id="grant-name-error"><herald-icon name="alert-circle" size="metadata" />Error: {{ message }}</p>
+        }
+      </div>
+      <div class="field">
+        <label for="grant-id">Application identifier</label>
+        <input
+          id="grant-id"
+          #idInput
+          class="mono"
+          autocomplete="off"
+          spellcheck="false"
+          [value]="applicationId()"
+          (input)="applicationId.set(idInput.value); errors.set({ ...errors(), applicationId: undefined })"
+          [readOnly]="busy()"
+          [attr.aria-invalid]="errors().applicationId ? 'true' : null"
+          [attr.aria-describedby]="errors().applicationId ? 'grant-id-help grant-id-error' : 'grant-id-help'"
+        />
+        <p class="help" id="grant-id-help">From the platform operator's provisioning record.</p>
+        @if (errors().applicationId; as message) {
+          <p class="field-error" id="grant-id-error"><herald-icon name="alert-circle" size="metadata" />Error: {{ message }}</p>
+        }
+      </div>
+      <fieldset class="choice" [disabled]="busy()" [attr.aria-describedby]="errors().tournaments ? 'grant-tournaments-error' : null">
+        <legend>Tournaments</legend>
+        <label><input type="radio" name="scope" [checked]="allTournaments()" (change)="allTournaments.set(true)" /> All of the organisation's tournaments</label>
+        <label><input type="radio" name="scope" [checked]="!allTournaments()" (change)="allTournaments.set(false)" /> Selected tournaments</label>
+        @if (!allTournaments()) {
+          <div class="options nested">
+            @for (tournament of tournaments.data() ?? []; track tournament.id) {
+              <label>
+                <input type="checkbox" [checked]="selected().includes(tournament.id)" (change)="toggleTournament(tournament.id, $any($event.target).checked)" />
+                {{ tournament.title }}
+              </label>
+            } @empty {
+              <p class="help">The organisation has no tournaments yet.</p>
+            }
+          </div>
+        }
+        @if (errors().tournaments; as message) {
+          <p class="field-error" id="grant-tournaments-error"><herald-icon name="alert-circle" size="metadata" />Error: {{ message }}</p>
+        }
+      </fieldset>
+      <fieldset class="choice" [disabled]="busy()" [attr.aria-describedby]="errors().groups ? 'grant-groups-error' : null">
+        <legend>Operations</legend>
+        <div class="options">
+          @for (option of groups; track option.group) {
+            <label>
+              <input type="checkbox" [checked]="chosen().includes(option.group)" (change)="toggleGroup(option.group, $any($event.target).checked)" />
+              <span><strong>{{ option.label }}</strong> · {{ option.covers }}</span>
+            </label>
+          }
+        </div>
+        @if (errors().groups; as message) {
+          <p class="field-error" id="grant-groups-error"><herald-icon name="alert-circle" size="metadata" />Error: {{ message }}</p>
+        }
+      </fieldset>
+      @if (failure(); as failed) {
+        <herald-notice tone="danger" heading="Access was not granted">{{ failed }}</herald-notice>
+      }
+      <div class="actions">
+        <button herald-button variant="primary" type="submit" [loading]="busy()">{{ busy() ? 'Granting…' : failure() ? 'Try again' : 'Grant access' }}</button>
+        <button herald-button type="button" [disabled]="busy()" (click)="close()">Cancel</button>
+      </div>
+    </form>
+  </herald-dialog>
+</ng-template>

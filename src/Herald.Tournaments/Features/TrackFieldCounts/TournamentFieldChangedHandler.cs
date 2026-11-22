@@ -29,5 +29,10 @@ public static class TournamentFieldChangedHandler
         counts.Admitted = message.Admitted;
         counts.Waiting = message.Waiting;
         counts.CheckedIn = message.CheckedIn;
+        counts.EligibleRevision = message.EligibleRevision;
+        counts.Eligible = message.Eligible;
+        counts.Pending = message.Pending;
+        counts.RostersOutsideBounds = message.RostersOutsideBounds?.Select(roster => new Domain.RosterOutsideBounds(roster.EntryId, roster.TeamName, roster.Members)).ToList();
+        counts.SharedMemberNames = message.SharedMemberNames?.Select(shared => new Domain.SharedMemberName(shared.Name, [.. shared.TeamNames])).ToList();
     }
 }

@@ -19,6 +19,8 @@ public sealed class OrganisationsDbContext(DbContextOptions<OrganisationsDbConte
 
     public DbSet<IdentityRelink> IdentityRelinks => Set<IdentityRelink>();
 
+    public DbSet<ApplicationGrant> ApplicationGrants => Set<ApplicationGrant>();
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.MapModule(Schema);
@@ -58,6 +60,29 @@ public sealed class OrganisationsDbContext(DbContextOptions<OrganisationsDbConte
             membership.HasIndex(m => m.PersonId);
             membership.HasOne<Person>().WithMany().HasForeignKey(m => m.PersonId).OnDelete(DeleteBehavior.Restrict);
             membership.Property(m => m.Role).HasConversion<string>().HasMaxLength(20);
+        });
+
+        OrganisationOwned<ApplicationGrant>(modelBuilder);
+        modelBuilder.Entity<ApplicationGrant>(grant =>
+        {
+            grant.Ignore(g => g.DomainEvents);
+            grant.Ignore(g => g.Application);
+            grant.Ignore(g => g.Active);
+            grant.Property(g => g.Id).HasConversion(id => id.Value, value => new GrantId(value));
+            grant.Property(g => g.Name)
+                .HasConversion(name => name.Value, value => GrantName.Create(value))
+                .HasMaxLength(GrantName.MaxLength);
+            grant.Property<Guid>(nameof(IdentityKey.DirectoryId));
+            grant.Property<Guid>(nameof(IdentityKey.ObjectId));
+            // At most one active grant per application and organisation; also refuses a simultaneous second grant.
+            grant.HasIndex(OrganisationProperty, nameof(IdentityKey.DirectoryId), nameof(IdentityKey.ObjectId))
+                .IsUnique()
+                .HasFilter($"\"{nameof(ApplicationGrant.RevokedAt)}\" IS NULL");
+            grant.PrimitiveCollection(g => g.Tournaments).HasField("_tournaments");
+            grant.PrimitiveCollection(g => g.Groups).HasField("_groups").ElementType().HasConversion<string>();
+            grant.Property(g => g.GrantedBy).HasConversion(id => id.Value, value => new PersonId(value));
+            grant.Property(g => g.RevokedBy).HasConversion(id => id!.Value.Value, value => new PersonId(value));
+            grant.HasOne<Person>().WithMany().HasForeignKey(g => g.GrantedBy).OnDelete(DeleteBehavior.Restrict);
         });
 
         modelBuilder.Entity<IdentityRelink>(relink =>

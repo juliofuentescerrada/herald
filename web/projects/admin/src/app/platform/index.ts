@@ -1,6 +1,7 @@
 export { AppContext, CONTEXT_LOCATION, INITIAL_CONTEXT, organisationInPath, organisationKey, organisationPath, provideAppContext } from './app-context';
 export type { ContextSnapshot } from './app-context';
 export { QUERY_CLIENT } from './query-client';
+export { changeLogKey, fieldKey, scheduleKey, standingsKey, tournamentKey, tournamentsKey } from './query-keys';
 export { inOrganisation, resolveHome } from './routing';
 export { AUTH_CONFIG, MSAL_CLIENT, Session } from './session';
 export type { AuthConfig } from './session';

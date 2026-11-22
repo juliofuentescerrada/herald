@@ -21,4 +21,18 @@ public class TournamentEntryTermsChangedTests
         message.MinimumRosterSize.ShouldBeNull();
         message.MaximumRosterSize.ShouldBeNull();
     }
+
+    [Fact]
+    public void A_version_1_message_sent_before_check_in_the_lock_and_start_existed_reads_as_optional_unlocked_and_not_started()
+    {
+        var json = $$"""
+            {"OrganisationId":"{{Guid.NewGuid()}}","TournamentId":"{{Guid.NewGuid()}}","Revision":4,"Registration":2,"Capacity":8,"EntryKind":0,"Admission":0}
+            """;
+
+        var message = JsonSerializer.Deserialize<TournamentEntryTermsChanged>(json)!;
+
+        message.CheckIn.ShouldBe(CheckInPolicy.Optional);
+        message.FieldLocked.ShouldBeFalse();
+        message.CompetitionStarted.ShouldBeFalse();
+    }
 }

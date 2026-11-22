@@ -24,9 +24,17 @@ ADR 0007 already requires owning modules to persist actor, time and reason with 
 
 | Fact | Owner | Recorded by | Published |
 |---|---|---|---|
-| Entry admitted on entering, by hand or by promotion from the queue (`WaitingSince` set) | Registration | `h1-entries`: `Entry` state, method, actor, time, revision | Not yet |
-| Entry cancelled | Registration | `h1-entries`: `Entry` actor, time, revision | Not yet |
+| Entry admitted on entering, by hand or by promotion from the queue (`WaitingSince` set) | Registration | `h1-entries`: `Entry` state, method, actor, time, revision | `EntryAdmitted` v1 (alias, cause code, actor and name; no reason text), consumed by Tournaments' change log |
+| Entry cancelled, by the owner or marked absent at start | Registration | `h1-entries`: `Entry` actor, time, revision; `h1-round-robin-pairings`: its cause | `EntryCancelled` v1 (alias, cause code, actor and name), consumed by Tournaments' change log |
 | Roster member added or removed | Registration | `h1-team-rosters`: `RosterChange` player, added or removed, actor, time, roster revision | Not yet |
+| Schedule published, or withdrawn with its reason | Competition | `h1-round-robin-pairings`: `Publication` number, pairings, actor, time; withdrawal actor, time and private reason | `SchedulePublished` v1 and `ScheduleWithdrawn` v1 (no reason text), consumed by Tournaments' change log |
+| Entrant withdrawn or disqualified after start, with its reason | Competition | `h1-round-operations`: `Departure` entrant, status, actor, time, private reason, operation, schedule revision | Not yet |
+| Player withdrawn, sanctioned or the sanction lifted | Competition | `h1-round-operations`: `PlayerWithdrawal` and `PlayerSanction` actor, time, reason, schedule revision; lift actor, time and revision | Not yet |
+| Result corrected, with its reason | Competition | `h1-safe-corrections`: `ReplacedResolution` replaced resolution, actor, time, private reason, operation and the match revision it was effective at | Not yet |
+| Competition finalised, or reopened with its reason | Competition | `h1-finalisation`: `FinalRevision` number, results revision, actor, time; reopening actor, time and private reason | `CompetitionFinalised` v1 and `CompetitionReopened` v1 (no reason text), consumed by Standings and Tournaments (its state and change log) |
+| Tournament cancelled, before or after start, with its reason | Tournaments | `h1-tournament-cancel-and-dates`: `Tournament` cancelled state, actor, name, time, private reason and the revision it took effect at; Competition's `Schedule` keeps the actor and time it applied, and Registration's entries the cause | `TournamentCancelled` v1 (no reason text), consumed by Registration and Competition; Tournaments keeps it in its own change log (`h1-change-log`) |
+| Tournament dates changed | Tournaments | `h1-tournament-cancel-and-dates`: `DatesChanged` old and new registration opening, closure and planned start, the revisions before and after, actor, time | Not as an event: Tournaments keeps it in its own change log (`h1-change-log`) |
+| Tournament published, or a material change of a published tournament (game or variant, participation structure, location, venue, visibility) | Tournaments | `h1-change-log`: `ChangeLogEntry` kind, old and new values, actor, name, time and the tournament revision | Not as an event: Tournaments keeps it in its own change log |
 
 Each change that adds a fact adds a row, including H1's tournament publication, material changes and registration opening or closing when their owning change confirms what is recorded.
 

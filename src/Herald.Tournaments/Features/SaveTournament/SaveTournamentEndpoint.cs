@@ -1,3 +1,4 @@
+using Herald.BuildingBlocks;
 using Herald.ModuleHosting;
 using Herald.Tournaments.Domain;
 using Herald.Tournaments.Persistence;
@@ -18,6 +19,7 @@ public static class SaveTournamentEndpoint
     [WolverinePut("/api/organisations/{organisationId}/tournaments/{tournamentId}")]
     [EndpointGroupName(HeraldApi.Admin)]
     [EndpointName("saveTournament")]
+    [OperationGroup(OperationGroup.Setup)]
     [ProducesResponseType<TournamentDetails>(StatusCodes.Status200OK)]
     [ProducesResponseType<HttpValidationProblemDetails>(StatusCodes.Status400BadRequest, "application/problem+json")]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound, "application/problem+json")]
@@ -33,7 +35,7 @@ public static class SaveTournamentEndpoint
 
         var actor = context.ActorId ?? throw new InvalidOperationException($"No acting person in organisation {organisationId}.");
         var entries = await db.EntryCountsAsync(id, cancellationToken);
-        var result = tournament.Change(command.Configuration ?? new TournamentConfiguration(""), command.ExpectedRevision, actor, DateTimeOffset.UtcNow, entries);
+        var result = tournament.Change(command.Configuration ?? new TournamentConfiguration(""), command.ExpectedRevision, actor, DateTimeOffset.UtcNow, entries, context.ActorName);
         return await db.SavedAsync(bus, organisationId, tournament, result, cancellationToken);
     }
 }

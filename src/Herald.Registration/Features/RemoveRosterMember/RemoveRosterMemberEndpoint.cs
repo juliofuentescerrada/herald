@@ -1,9 +1,11 @@
+using Herald.BuildingBlocks;
 using Herald.ModuleHosting;
 using Herald.Registration.Domain;
 using Herald.Registration.Persistence;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Routing;
+using Wolverine;
 using Wolverine.Http;
 
 namespace Herald.Registration.Features.RemoveRosterMember;
@@ -14,6 +16,7 @@ public static class RemoveRosterMemberEndpoint
     [WolverineDelete("/api/organisations/{organisationId}/tournaments/{tournamentId}/entries/{entryId}/roster/members/{guestId}")]
     [EndpointGroupName(HeraldApi.Admin)]
     [EndpointName("removeRosterMember")]
+    [OperationGroup(OperationGroup.Entries)]
     [ProducesResponseType<RosterDetails>(StatusCodes.Status200OK)]
     [ProducesResponseType<HttpValidationProblemDetails>(StatusCodes.Status400BadRequest, "application/problem+json")]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound, "application/problem+json")]
@@ -26,12 +29,13 @@ public static class RemoveRosterMemberEndpoint
         [FromQuery] int expectedRevision,
         OrganisationContext context,
         RegistrationDbContext db,
+        IMessageBus bus,
         CancellationToken cancellationToken)
     {
         var actor = context.ActorId ?? throw new InvalidOperationException($"No acting person in organisation {organisationId}.");
         var id = new EntryId(entryId);
         var player = new GuestId(guestId);
-        return await db.WriteAsync(tournamentId, id, player,
+        return await db.WriteAsync(bus, organisationId, tournamentId, id, player,
             field => field.RemoveRosterMember(id, player, expectedRevision, actor, DateTimeOffset.UtcNow), cancellationToken);
     }
 }

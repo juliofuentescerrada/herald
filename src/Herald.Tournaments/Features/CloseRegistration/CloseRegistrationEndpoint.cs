@@ -1,3 +1,4 @@
+using Herald.BuildingBlocks;
 using Herald.ModuleHosting;
 using Herald.Tournaments.Domain;
 using Herald.Tournaments.Persistence;
@@ -19,6 +20,7 @@ public static class CloseRegistrationEndpoint
     [WolverinePost("/api/organisations/{organisationId}/tournaments/{tournamentId}/registration/closure")]
     [EndpointGroupName(HeraldApi.Admin)]
     [EndpointName("closeRegistration")]
+    [OperationGroup(OperationGroup.Setup)]
     [ProducesResponseType<TournamentDetails>(StatusCodes.Status200OK)]
     [ProducesResponseType<HttpValidationProblemDetails>(StatusCodes.Status400BadRequest, "application/problem+json")]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound, "application/problem+json")]

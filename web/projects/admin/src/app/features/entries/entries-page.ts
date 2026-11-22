@@ -1,3 +1,4 @@
+import { TournamentNav } from '../../shared';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, computed, ElementRef, inject, signal, TemplateRef, viewChild, ViewContainerRef } from '@angular/core';
 import { ActivatedRoute, RouterLink } from '@angular/router';
@@ -31,7 +32,7 @@ import {
   waitingReasonText,
 } from './entries';
 
-type Panel = { readonly kind: 'add' } | { readonly kind: 'cancel' | 'admit' | 'roster'; readonly entry: EntryDetails } | null;
+type Panel = { readonly kind: 'add' } | { readonly kind: 'cancel' | 'admit' | 'roster' | 'absent'; readonly entry: EntryDetails } | null;
 
 interface Failure {
   readonly heading: string;
@@ -47,7 +48,7 @@ interface RowFailure {
 /** A published tournament's entries: added as guests, admitted and cancelled by the owner (EN-1 to EN-12). */
 @Component({
   selector: 'app-entries-page',
-  imports: [Button, Dialog, Drawer, Icon, Notice, RosterDrawer, RouterLink, StatusLabel],
+  imports: [TournamentNav, Button, Dialog, Drawer, Icon, Notice, RosterDrawer, RouterLink, StatusLabel],
   templateUrl: './entries-page.html',
   styleUrl: './entries-page.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -65,6 +66,7 @@ export class EntriesPage {
   private readonly cancelDialog = viewChild.required<TemplateRef<DialogContext>>('cancelDialog');
   private readonly admitDialog = viewChild.required<TemplateRef<DialogContext>>('admitDialog');
   private readonly rosterDrawer = viewChild.required<TemplateRef<DialogContext>>('rosterDrawer');
+  private readonly absentDialog = viewChild.required<TemplateRef<DialogContext>>('absentDialog');
   /** The open dialog or drawer, which shows `panel`. */
   private open: DialogRef | null = null;
   private readonly summaryHeading = viewChild<ElementRef<HTMLElement>>('summaryHeading');
@@ -148,6 +150,18 @@ export class EntriesPage {
     const admitted = this.admitted().length;
     return admitted ? `${policy} · ${this.field.data()!.checkedIn} of ${admitted} checked in` : policy;
   });
+  /** A published schedule locks the field: admitting, cancelling and check-in wait for its withdrawal (D-3). */
+  protected readonly locked = computed(() => !!this.field.data()?.terms.fieldLocked);
+  protected readonly running = computed(() => !!this.field.data()?.terms.competitionStarted);
+  /** Cancellation is final: entries were cancelled with it and nothing can change (h1-tournament-cancel-and-dates D-1). */
+  protected readonly tournamentCancelled = computed(() => this.tournament.data()?.competition === 'cancelled');
+  /** Why the field cannot change: the start fixes it, a published schedule locks it. */
+  protected readonly lockedText = computed(() => (this.running() ? 'The competition has started.' : 'The schedule is published. Withdraw it to change the field.'));
+  /** The absence review: pending entries under a mandatory policy, once registration has closed (F-05). */
+  protected readonly reviewing = computed(() => {
+    const field = this.field.data();
+    return !!field && field.terms.checkIn === 'mandatory' && field.terms.registration === 'closed' && field.pending > 0 && !this.locked();
+  });
   protected readonly termsUpdated = computed(() => `Entry terms updated ${instantText(this.field.data()!.termsReceivedAt, this.zone())} · ${this.zone()}`);
 
   /** Why adding is unavailable, or null when it is (EN-2, EN-12). */
@@ -156,6 +170,8 @@ export class EntriesPage {
     if (this.state() === 'busy') return 'Request in progress. Please wait; do not submit again.';
     if (this.state() === 'conflict') return 'Reload the latest version first.';
     if (!field) return null;
+    if (this.tournamentCancelled()) return 'The tournament is cancelled. Nothing can change.';
+    if (field.terms.fieldLocked) return this.lockedText();
     if (field.overCapacityBy > 0) return 'Field is over capacity. Cancel an admitted entry before adding or admitting.';
     if (field.kindMismatch) return 'The field has entries of the other kind. Resolve that before adding or admitting.';
     if (field.terms.registration === 'closed') return 'Registration is closed. Reopen registration in configuration to add entries.';
@@ -165,6 +181,7 @@ export class EntriesPage {
   /** Why a waiting entry cannot be admitted, said under its row; null when it can. */
   protected readonly admitBlocked = computed(() => {
     const field = this.field.data();
+    if (field?.terms.fieldLocked) return this.lockedText();
     if (!field || hasFreeSlot(field)) return null;
     if (field.overCapacityBy > 0) return 'Field is over capacity. Cancel an admitted entry first.';
     if (field.kindMismatch) return 'The field has entries of the other kind. Resolve that first.';
@@ -237,6 +254,16 @@ export class EntriesPage {
     this.show({ kind: 'cancel', entry }, trigger);
   }
 
+  protected askAbsent(entry: EntryDetails, trigger: HTMLElement): void {
+    this.show({ kind: 'absent', entry }, trigger);
+  }
+
+  protected confirmAbsent(): void {
+    const panel = this.panel();
+    if (panel?.kind !== 'absent') return;
+    void this.run('Entry was not marked absent', () => this.send('absent', panel.entry), `${panel.entry.guestName} marked absent.`);
+  }
+
   /** In queue order, or a pending entry, admits at once; skipping the capacity queue asks for the reason first (EN-7). */
   protected admit(entry: EntryDetails, trigger: HTMLElement): void {
     if (entry.waitingReason === 'capacityFull' && this.first()?.id !== entry.id) {
@@ -304,7 +331,7 @@ export class EntriesPage {
   private show(panel: Exclude<Panel, null>, trigger: HTMLElement): void {
     this.panel.set(panel);
     this.failure.set(null);
-    const open = this.dialogs.open({ add: this.addDrawer, cancel: this.cancelDialog, admit: this.admitDialog, roster: this.rosterDrawer }[panel.kind](), { trigger, viewContainerRef: this.viewContainerRef });
+    const open = this.dialogs.open({ add: this.addDrawer, cancel: this.cancelDialog, admit: this.admitDialog, roster: this.rosterDrawer, absent: this.absentDialog }[panel.kind](), { trigger, viewContainerRef: this.viewContainerRef });
     this.open = open;
     // Escape, the leaving action and a completed write all end here.
     void open.closed.then(() => {
@@ -326,12 +353,14 @@ export class EntriesPage {
     return firstValueFrom(this.api.enterGuest<FieldDetails>(this.organisation, this.tournamentId, this.entryAttempt.id, { guestId: guest.id }));
   }
 
-  private send(action: 'admit' | 'cancel', entry: EntryDetails, reason?: string): Promise<FieldDetails> {
+  private send(action: 'admit' | 'cancel' | 'absent', entry: EntryDetails, reason?: string): Promise<FieldDetails> {
     const body = { expectedRevision: entry.revision };
     return firstValueFrom(
       action === 'admit'
         ? this.api.admitEntry<FieldDetails>(this.organisation, this.tournamentId, entry.id, { ...body, reason: reason ?? null })
-        : this.api.cancelEntry<FieldDetails>(this.organisation, this.tournamentId, entry.id, body),
+        : action === 'absent'
+          ? this.api.markAbsent<FieldDetails>(this.organisation, this.tournamentId, entry.id, body)
+          : this.api.cancelEntry<FieldDetails>(this.organisation, this.tournamentId, entry.id, body),
     );
   }
 

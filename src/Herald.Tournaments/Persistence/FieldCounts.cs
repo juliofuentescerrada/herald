@@ -17,5 +17,16 @@ public sealed class FieldCounts
 
     public int CheckedIn { get; set; }
 
+    // The start readiness members (h1-competition-start D-2); null until a report carries them.
+    public int? EligibleRevision { get; set; }
+
+    public int? Eligible { get; set; }
+
+    public int? Pending { get; set; }
+
+    public List<RosterOutsideBounds>? RostersOutsideBounds { get; set; }
+
+    public List<SharedMemberName>? SharedMemberNames { get; set; }
+
     public EntryCounts Counts => new(Admitted, Waiting, CheckedIn);
 }

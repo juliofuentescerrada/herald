@@ -18,6 +18,11 @@ public static class TestTokens
     public static string For(Guid objectId, string name = "Alex Morgan", bool organiser = true, Guid? directoryId = null) =>
         WithIdentifiers((directoryId ?? DirectoryId).ToString(), objectId.ToString(), name, organiser);
 
+    // A pilot server application's client-credentials token: the application role and no delegated `scp`.
+    public static string ForApplication(Guid objectId, Guid? directoryId = null) =>
+        Signed([new("tid", (directoryId ?? DirectoryId).ToString()), new("oid", objectId.ToString()),
+            new("roles", HeraldAuthentication.PilotApplicationRole)]);
+
     // Any `tid` and `oid` text, for tokens the directory would never issue.
     public static string WithIdentifiers(string directoryId, string objectId, string name = "Alex Morgan", bool organiser = true)
     {
@@ -32,6 +37,11 @@ public static class TestTokens
             claims.Add(new Claim("roles", HeraldAuthentication.OrganiserRole));
         }
 
+        return Signed(claims);
+    }
+
+    private static string Signed(IEnumerable<Claim> claims)
+    {
         var token = new JwtSecurityToken(Issuer, Audience, claims, DateTime.UtcNow.AddMinutes(-1), DateTime.UtcNow.AddMinutes(10),
             new SigningCredentials(SigningKey, SecurityAlgorithms.RsaSha256));
         return new JwtSecurityTokenHandler().WriteToken(token);

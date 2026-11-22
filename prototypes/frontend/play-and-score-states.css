@@ -1,0 +1,15 @@
+/* Batch 2 additions over the start-and-pair composition. */
+.ps-match{display:grid;grid-template-columns:1fr auto 1fr auto;gap:var(--space-3);align-items:center}.ps-match .home{text-align:right}.ps-match .vs{color:var(--secondary)}.ps-match .ps-outcome{grid-column:1/-1;margin:0;color:var(--secondary)}
+.ps-match a{color:inherit}
+.ps-stats{display:flex;flex-wrap:wrap;gap:var(--space-2);margin:var(--space-3) 0}
+.ps-rounds{list-style:none;margin:var(--space-3) 0;padding:0;display:grid;gap:var(--space-2)}.ps-rounds li{display:flex;justify-content:space-between;gap:var(--space-3);border-bottom:1px solid var(--line);padding-bottom:var(--space-2)}
+.ps-choice{border:0;padding:0;margin:var(--space-4) 0;display:grid;gap:var(--space-2)}.ps-choice legend{font-weight:600;margin-bottom:var(--space-2)}
+.ps-players{list-style:none;margin:var(--space-3) 0;padding:0;display:grid;grid-template-columns:repeat(auto-fill,minmax(14rem,1fr));gap:var(--space-2)}.ps-players label{display:flex;gap:var(--space-2);align-items:center}.ps-players .help{margin:0 0 0 var(--space-2)}
+.ps-table{width:100%;border-collapse:collapse;margin:var(--space-4) 0}.ps-table th,.ps-table td{padding:var(--space-2) var(--space-3);border-bottom:1px solid var(--line);text-align:left}.ps-table .num{text-align:right;font-variant-numeric:tabular-nums;color:var(--secondary)}.ps-table .pts{text-align:right;font-variant-numeric:tabular-nums;font-weight:700}
+.ps-table button.link{background:none;border:0;padding:0;font:inherit;color:var(--ink);text-decoration:underline;cursor:pointer}
+.ps-explain td{background:var(--herald-color-neutral-surface)}.ps-explain ul{margin:0;padding-left:var(--space-4)}
+.ps-locked{color:var(--secondary)}
+@media(max-width:699px){.ps-table .wide{display:none}.ps-match{grid-template-columns:1fr auto 1fr}.ps-match .sp-badge{grid-column:1/-1;justify-self:start}}
+.ps-choice label,.ps-players label{display:flex;gap:var(--space-2);align-items:center;font-weight:400}.ps-choice input,.ps-players input{width:auto;height:auto;min-height:0;margin:0;flex:none;accent-color:var(--ink)}
+.sp-round li.ps-match{grid-template-columns:1fr auto 1fr auto}.sp-round li.ps-match .sp-badge{justify-self:end}
+@media(max-width:699px){.sp-round li.ps-match{grid-template-columns:1fr auto 1fr}.sp-round li.ps-match .sp-badge{grid-column:1/-1;justify-self:start}}

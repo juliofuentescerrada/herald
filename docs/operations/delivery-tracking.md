@@ -15,15 +15,15 @@ From H1's remaining slices, progress lives in GitHub Issues ([ADR 0018](../adr/0
 | Label | Meaning | Who sets it |
 |---|---|---|
 | `batch` | An issue for a batch of three to five slices that share decisions and screens | The batch template |
-| `slice` | An issue for one OpenSpec change of a batch, or its pull request | The slice template, the agent on the pull request |
+| `slice` | An issue for one OpenSpec change of a batch, or its pull request | The slice template; the `delivery-labels` workflow on a pull request that closes a slice |
 | `batch-proposals` | The pull request with a batch's proposals and prototypes; merging it approves the batch | The agent |
 | `needs-decision` | Waits for the maintainer to settle a rule the decision register does not | The batch template, the agent |
 | `in-progress` | A slice an agent session is implementing | The agent |
-| `ready-to-test` | A slice or a batch waiting for the maintainer's test round | The agent |
+| `ready-to-test` | A slice or a batch waiting for the maintainer's test round | The agent on a slice; the `delivery-labels` workflow on a batch whose last slice closes |
 | `feedback` | The maintainer's feedback is waiting for the agent | The maintainer |
 | `agent:start` | Starts or resumes the slice in an agent session | The maintainer |
 
-Status labels trigger nothing. `agent:start` starts or resumes a slice once the `issues.labeled` scheduled task exists, which is after H1's first batch (ADR 0018); until then it only marks the slice the maintainer asks a session to start. ADR 0018 defines when a slice counts as in progress and how many may be.
+Status labels trigger nothing. The `delivery-labels` workflow (`.github/workflows/delivery-labels.yml`) removes `in-progress`, `ready-to-test` and `feedback` from an issue when it closes, and labels a batch `ready-to-test`, without `needs-decision`, when its last slice sub-issue closes. The session implementing a slice labels its issue `in-progress` when it starts and `ready-to-test` when it marks the pull request ready (`CLAUDE.md`). `agent:start` starts or resumes a slice once the `issues.labeled` scheduled task exists, which is after H1's first batch (ADR 0018); until then it only marks the slice the maintainer asks a session to start. ADR 0018 defines when a slice counts as in progress and how many may be.
 
 ## Board columns
 

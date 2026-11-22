@@ -19,7 +19,24 @@
       <p [class.readiness-warning]="current.readiness !== 'complete'">{{ readiness() }}</p>
     </div>
 
-    @if (readOnly()) {
+    @if (frozen()) {
+      <div class="drawer-notice">
+        <herald-notice heading="Frozen at start">
+          The competition has started. This roster froze on revision {{ current.frozenRevision }}, {{ zoned(current.frozenAt!) }}; members cannot be added or removed.
+        </herald-notice>
+      </div>
+      @if (current.readiness !== 'complete') {
+        <div class="drawer-notice">
+          <herald-notice tone="danger" heading="The frozen roster is outside its bounds">
+            A roster change crossed the start. Nothing was repaired; resolve it from the round operations.
+          </herald-notice>
+        </div>
+      }
+    } @else if (started() && current.entryState !== 'cancelled') {
+      <div class="drawer-notice">
+        <herald-notice heading="Read only">The competition has started; this team’s roster cannot change.</herald-notice>
+      </div>
+    } @else if (readOnly()) {
       <div class="drawer-notice">
         <herald-notice heading="Read only">This team’s entry was cancelled. Its roster is kept as a record and cannot change.</herald-notice>
       </div>
@@ -81,6 +98,7 @@
         </div>
       }
 
+      @if (current.history.length) {
       <details class="cancelled history">
         <summary>History · {{ current.history.length }}</summary>
         @if (current.history.length) {
@@ -96,6 +114,7 @@
           <p class="help">No changes yet.</p>
         }
       </details>
+      }
     } @else {
       <h3>Add player</h3>
       <p class="help">Choose a guest player of {{ organisationName() }} or create a new player.</p>
@@ -139,7 +158,7 @@
           @if (guests.isPending()) {
             <p class="help" role="status">Searching…</p>
           } @else if (guests.isError()) {
-            <p class="help" role="status">The search failed. Change the name to try again.</p>
+            <p class="help" role="status">The search failed. Your query has been kept. <button herald-button type="button" [loading]="guests.isFetching()" (click)="guests.refetch()">Try again</button></p>
           } @else if (!results.length) {
             <p class="help" role="status">No player guest starts with “{{ name().trim() }}”. Choose “Create new” to add one.</p>
           }
@@ -157,7 +176,7 @@
                 } @else if (onTeam(guest); as team) {
                   <p class="help">On {{ team.name }}</p>
                 } @else {
-                  <button herald-button variant="primary" type="button" [disabled]="state() === 'busy'" [attr.aria-label]="'Add player: ' + guest.name"
+                  <button herald-button type="button" [disabled]="state() === 'busy'" [attr.aria-label]="'Add player: ' + guest.name"
                     (click)="addExisting(guest)">Add player</button>
                 }
               </li>

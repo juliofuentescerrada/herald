@@ -16,7 +16,7 @@
       <h1>{{ published() ? stored()!.configuration.title : stored() ? 'Configure ' + stored()!.configuration.title : 'Create tournament' }}</h1>
       <p class="labels">
         @for (label of labels(); track label.text) {
-          <herald-status-label [icon]="label.icon">{{ label.text }}</herald-status-label>
+          <herald-status-label [icon]="label.icon" [tone]="label.tone ?? 'neutral'">{{ label.text }}</herald-status-label>
         }
       </p>
     </div>
@@ -27,14 +27,28 @@
       <p class="lead">Draft configuration · {{ organisationName() }}not yet published</p>
     }
   </header>
+  @if (published()) { <app-tournament-nav current="Configuration" /> }
 
   <!-- A published tournament shows its state, registration and entries before the form, stacked at every width. -->
   <div class="column">
+    @if (stored(); as current) {
+      <app-lifecycle-area [organisation]="organisation" [tournament]="current" [unsaved]="dirty()" (changed)="registrationChanged($event)" (deleted)="draftDeleted(current.id)" />
+    }
     @if (published()) {
-      <herald-notice heading="Published · configuration remains editable">
-        Competition is preparing. Saving configuration does not change registration.
-      </herald-notice>
+      @if (!cancelled()) {
+        <herald-notice heading="Published · configuration remains editable">
+          Competition is {{ stored()!.competition === 'preparation' ? 'preparing' : stored()!.competition }}. Saving configuration does not change registration.
+        </herald-notice>
+      }
+      <app-visibility-area [organisation]="organisation" [tournament]="stored()!" [unsaved]="dirty()" (changed)="registrationChanged($event)" />
       <app-registration-area
+        [organisation]="organisation"
+        [tournament]="stored()!"
+        [unsaved]="dirty()"
+        (changed)="registrationChanged($event)"
+        (reload)="reloadLatest()"
+      />
+      <app-competition-area
         [organisation]="organisation"
         [tournament]="stored()!"
         [unsaved]="dirty()"
@@ -47,6 +61,13 @@
           <p>{{ entriesText() }}</p>
         </div>
         <a herald-button routerLink="entries"><herald-icon name="users" />View entries</a>
+      </section>
+      <section class="summary entries" aria-labelledby="schedule-heading">
+        <div>
+          <h2 id="schedule-heading">Schedule</h2>
+          <p>{{ stored()!.competition !== 'preparation' ? 'Published · fixed by the start' : stored()!.schedulePublished ? 'Published · the field is locked until it is withdrawn' : 'Not published' }}</p>
+        </div>
+        <a herald-button routerLink="schedule">View schedule</a>
       </section>
     }
     @if (state() === 'failed') {
@@ -115,7 +136,7 @@
                     autocomplete="off"
                     [value]="value(field.name)"
                     (input)="set(field.name, input.value)"
-                    [readOnly]="field.kind === 'readonly' || state() === 'saving'"
+                    [readOnly]="field.kind === 'readonly' || !!field.locked || state() === 'saving'"
                     [attr.aria-invalid]="errorOf(field.name) ? 'true' : null"
                     [attr.aria-describedby]="describedBy(field)"
                   />
@@ -137,9 +158,11 @@
         <p class="help" role="status">Saving. Please wait; do not submit again.</p>
       }
       <div class="actions">
-        <button herald-button variant="primary" type="submit" [loading]="state() === 'saving'">
-          {{ state() === 'saving' ? 'Saving…' : state() === 'failed' ? 'Try again' : published() ? 'Save changes' : 'Save draft' }}
-        </button>
+        @if (!cancelled()) {
+          <button herald-button variant="primary" type="submit" [loading]="state() === 'saving'">
+            {{ state() === 'saving' ? 'Saving…' : state() === 'failed' ? 'Try again' : published() ? 'Save changes' : 'Save draft' }}
+          </button>
+        }
         @if (!published()) {
           @if (reviewBlocked(); as why) {
             <button herald-button type="button" disabled aria-describedby="review-why">Review and publish</button>

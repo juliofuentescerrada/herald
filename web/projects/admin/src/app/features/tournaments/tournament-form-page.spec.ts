@@ -219,14 +219,14 @@ describe('The tournament configuration form', () => {
   it.each([
     ['individual', {}, 'Card game · Constructed · Individual · Northside Hall'],
     ['team', team, 'Card game · Constructed · Team · Northside Hall'],
-  ])('shows a published %s tournament with its facts, editable, and nothing to start it', async (_kind, config, facts) => {
+  ])('shows a published %s tournament with its facts, editable, and start not yet available', async (_kind, config, facts) => {
     const { page, type, submit, saved, text, texts } = await render(`/${tournamentId}`, {
       reads: [() => of(details({ publication: 'published' }, config))],
       writes: [() => of(details({ publication: 'published', revision: 2 }, { ...config, capacity: 32 }))],
     });
     expect(text('h1')).toBe('Autumn Open');
     expect(texts('p.lead')).toEqual([facts, '14 November 2026, 10:00 · Europe/Madrid']);
-    expect(texts('herald-status-label')).toEqual(['Published', 'Registration not open', 'Preparing']);
+    expect(texts('.labels herald-status-label')).toEqual(['Published', 'Registration not open', 'Preparing']);
     expect(texts('.actions a, .actions button')).toEqual(['Save changes', 'Back to tournaments']);
     // V-1: the draft sentence does not belong on a published tournament.
     expect(page().textContent).not.toContain('A draft can be saved');

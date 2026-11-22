@@ -1,0 +1,57 @@
+name: Delivery labels
+
+# Keeps the delivery tracking's labels in step with merges (docs/operations/delivery-tracking.md): a closed issue loses its
+# status label, a pull request that closes a slice is labelled `slice`, and a batch whose last slice closes waits for its
+# acceptance journey.
+on:
+  issues:
+    types: [closed]
+  pull_request:
+    types: [opened, edited, reopened, ready_for_review]
+
+permissions:
+  issues: write
+  pull-requests: write
+
+jobs:
+  closed-issue:
+    if: github.event_name == 'issues'
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      NUMBER: ${{ github.event.issue.number }}
+    steps:
+      - name: Remove the status labels
+        run: gh issue edit "$NUMBER" --remove-label in-progress,ready-to-test,feedback
+      - name: Mark the batch ready to test when its last slice closes
+        run: |
+          read -r parent open < <(gh api graphql -F owner="${GH_REPO%/*}" -F name="${GH_REPO#*/}" -F number="$NUMBER" -f query='
+            query($owner: String!, $name: String!, $number: Int!) {
+              repository(owner: $owner, name: $name) { issue(number: $number) {
+                parent { number state labels(first: 20) { nodes { name } } subIssuesSummary { total completed } }
+              } }
+            }' --jq '.data.repository.issue.parent
+              | select(. != null and .state == "OPEN" and any(.labels.nodes[]; .name == "batch"))
+              | "\(.number) \(.subIssuesSummary.total - .subIssuesSummary.completed)"') || true
+          if [ -n "${parent:-}" ] && [ "$open" = "0" ]; then
+            gh issue edit "$parent" --add-label ready-to-test --remove-label needs-decision,in-progress,feedback
+          fi
+
+  slice-pull-request:
+    if: github.event_name == 'pull_request'
+    runs-on: ubuntu-latest
+    env:
+      GH_TOKEN: ${{ github.token }}
+      GH_REPO: ${{ github.repository }}
+      NUMBER: ${{ github.event.pull_request.number }}
+      BODY: ${{ github.event.pull_request.body }}
+    steps:
+      - name: Label the pull request that closes a slice
+        run: |
+          for issue in $(printf '%s' "$BODY" | grep -oiE '(close[sd]?|fix(e[sd])?|resolve[sd]?) #[0-9]+' | grep -oE '[0-9]+'); do
+            if gh issue view "$issue" --json labels --jq '.labels[].name' | grep -qx slice; then
+              gh pr edit "$NUMBER" --add-label slice
+              break
+            fi
+          done

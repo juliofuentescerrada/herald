@@ -1,3 +1,4 @@
+using Herald.BuildingBlocks;
 using Herald.ModuleHosting;
 using Herald.Tournaments.Domain;
 using Herald.Tournaments.Persistence;
@@ -18,6 +19,7 @@ public static class PublishTournamentEndpoint
     [WolverinePost("/api/organisations/{organisationId}/tournaments/{tournamentId}/publication")]
     [EndpointGroupName(HeraldApi.Admin)]
     [EndpointName("publishTournament")]
+    [OperationGroup(OperationGroup.Setup)]
     [ProducesResponseType<TournamentDetails>(StatusCodes.Status200OK)]
     [ProducesResponseType<HttpValidationProblemDetails>(StatusCodes.Status400BadRequest, "application/problem+json")]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound, "application/problem+json")]
@@ -32,7 +34,7 @@ public static class PublishTournamentEndpoint
         }
 
         var actor = context.ActorId ?? throw new InvalidOperationException($"No acting person in organisation {organisationId}.");
-        var result = tournament.Publish(command.ExpectedRevision, actor, DateTimeOffset.UtcNow);
+        var result = tournament.Publish(command.ExpectedRevision, actor, DateTimeOffset.UtcNow, context.ActorName);
         return await db.SavedAsync(bus, organisationId, tournament, result, cancellationToken);
     }
 }

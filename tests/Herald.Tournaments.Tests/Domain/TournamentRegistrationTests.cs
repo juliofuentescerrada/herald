@@ -176,15 +176,14 @@ public class TournamentRegistrationTests
     }
 
     [Fact]
-    public void A_closed_registration_that_lost_a_date_cannot_reopen()
+    [Trait("covers", "registration-window: Reopening a published schedule's tournament")]
+    public void A_closed_registration_cannot_reopen_while_the_schedule_is_published()
     {
         var tournament = Closed();
-        tournament.Change(CompleteIndividual with { RegistrationOpensAt = null }, 4, _owner, _later).Outcome.ShouldBe(WriteOutcome.Applied);
 
-        var result = tournament.OpenRegistration(5, _owner, _later);
+        var result = tournament.OpenRegistration(4, _owner, _later, schedulePublished: true);
 
-        result.Outcome.ShouldBe(WriteOutcome.Rejected);
-        result.Broken.ShouldBe([new BrokenRule("registrationOpensAt", "required")]);
+        result.Broken.ShouldBe([new BrokenRule("registration", "schedule-published")]);
         tournament.Registration.ShouldBe(RegistrationWindow.Closed);
     }
 
@@ -201,10 +200,10 @@ public class TournamentRegistrationTests
     }
 
     [Fact]
-    public void A_save_can_change_the_dates_and_the_capacity_while_registration_is_open()
+    public void A_save_can_change_the_capacity_while_registration_is_open()
     {
         var tournament = Open();
-        var changed = CompleteTeam with { RegistrationClosesAt = new DateTime(2026, 11, 14, 9, 0, 0) };
+        var changed = CompleteTeam;
 
         tournament.Change(changed, 3, _owner, _later).Outcome.ShouldBe(WriteOutcome.Applied);
 
@@ -213,6 +212,6 @@ public class TournamentRegistrationTests
     }
 
     [Fact]
-    public void A_save_can_remove_the_registration_dates_while_registration_is_not_open() =>
-        Published().Change(_withoutDates, 2, _owner, _later).Outcome.ShouldBe(WriteOutcome.Applied);
+    public void A_published_tournament_keeps_its_dates_out_of_the_configuration_form() =>
+        Published().Change(_withoutDates, 2, _owner, _later).Broken.ShouldBe([new BrokenRule("registrationOpensAt", "change-dates"), new BrokenRule("registrationClosesAt", "change-dates")]);
 }

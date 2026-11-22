@@ -24,6 +24,130 @@ namespace Herald.Competition.Persistence.Migrations
 
             NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
 
+            modelBuilder.Entity("Herald.Competition.Domain.Match", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<int?>("ActivePlayers")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("First")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("FirstLineups")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<Guid>("OrganisationId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("ReplacedResolutions")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("Resolution")
+                        .HasColumnType("jsonb");
+
+                    b.Property<int>("Revision")
+                        .IsConcurrencyToken()
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Round")
+                        .HasColumnType("integer");
+
+                    b.Property<Guid>("Second")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("SecondLineups")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("Start")
+                        .HasColumnType("jsonb");
+
+                    b.Property<Guid>("TournamentId")
+                        .HasColumnType("uuid");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrganisationId");
+
+                    b.HasIndex("TournamentId");
+
+                    b.ToTable("Matches", "competition");
+                });
+
+            modelBuilder.Entity("Herald.Competition.Domain.Schedule", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("uuid");
+
+                    b.Property<int?>("ActivePlayersPerSide")
+                        .HasColumnType("integer");
+
+                    b.Property<int>("ArchiveRevision")
+                        .HasColumnType("integer");
+
+                    b.Property<bool>("Archived")
+                        .HasColumnType("boolean");
+
+                    b.Property<DateTimeOffset?>("CancelledAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<Guid?>("CancelledBy")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Departures")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("Draft")
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("Field")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("Finals")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<Guid>("OrganisationId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Players")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<string>("Publications")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<int>("ResultsRevision")
+                        .IsConcurrencyToken()
+                        .HasColumnType("integer");
+
+                    b.Property<int>("Revision")
+                        .IsConcurrencyToken()
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Rosters")
+                        .HasColumnType("jsonb");
+
+                    b.Property<DateTimeOffset?>("StartedAt")
+                        .HasColumnType("timestamp with time zone");
+
+                    b.Property<int?>("StartedOnRevision")
+                        .HasColumnType("integer");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OrganisationId");
+
+                    b.ToTable("Schedules", "competition");
+                });
+
             modelBuilder.Entity("Wolverine.EntityFrameworkCore.Internals.IncomingMessage", b =>
                 {
                     b.Property<Guid>("Id")

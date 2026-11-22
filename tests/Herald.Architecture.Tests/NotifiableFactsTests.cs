@@ -13,9 +13,15 @@ public partial class NotifiableFactsTests
     private static readonly Dictionary<string, string> _exemptions = new()
     {
         ["RosterMember"] = "Its addition is the roster change the inventory names as RosterChange.",
+        ["ApplicationGrant"] = "Granting and revoking pilot application access are not notifiable facts (h1-pilot-access proposal).",
         ["Organisation"] = "Creating an organisation is not a notifiable fact in F-10.",
         ["Guest"] = "Creating a guest is not a notifiable fact in F-10.",
         ["CheckInChange"] = "Check-in is not a notifiable fact in F-10 (h1-check-in R-8).",
+        ["Draft"] = "A draft is not a notifiable fact: generating and regenerating send nothing (F-06, h1-round-robin-pairings).",
+        ["FieldChange"] = "Computed when read from the field and the pairings, never stored (h1-round-robin-pairings D-5).",
+        ["Lineup"] = "Recording a match lineup is not a notifiable fact in F-10 (h1-match-lineups proposal).",
+        ["MatchStart"] = "Starting a match is not a notifiable fact in F-10 (h1-match-lineups proposal).",
+        ["Resolution"] = "A first result is not a notifiable fact in F-10; revised final results join with the change log (h1-operator-results proposal, D-26).",
         ["Tournament"] = "Publication and registration opening or closing join the inventory when their owning change confirms what is recorded (ADR 0017).",
     };
 

@@ -1,4 +1,4 @@
-import { ChangeDetectionStrategy, Component, inject } from '@angular/core';
+import { ChangeDetectionStrategy, Component, inject, signal } from '@angular/core';
 import { RouterLink } from '@angular/router';
 import { HeraldHostAdminService, TournamentSummary } from '@herald/api-client/admin';
 import { Button, Icon, Notice, StatusLabel } from '@herald/ui';
@@ -17,9 +17,13 @@ import { admittedText, capacityText, dateTimeText, injectOrganisation, lifecycle
         <h1>Tournaments</h1>
         <p class="lead">{{ organisation.data()?.name }} · your organising workspace</p>
       </div>
-      @if (tournaments.data()?.length) {
-        <a herald-button variant="primary" routerLink="new">Create tournament</a>
-      }
+      <div class="heading-actions">
+        <!-- Archived tournaments are hidden unless asked for (h1-tournament-cancel-and-dates D-3). -->
+        <label class="toggle"><input type="checkbox" [checked]="showArchived()" (change)="showArchived.set(!showArchived())" /> Show archived</label>
+        @if (tournaments.data()?.length) {
+          <a herald-button variant="primary" routerLink="new">Create tournament</a>
+        }
+      </div>
     </header>
 
     @if (tournaments.isPending()) {
@@ -29,6 +33,13 @@ import { admittedText, capacityText, dateTimeText, injectOrganisation, lifecycle
         <herald-notice tone="danger" heading="Tournaments did not load">Nothing is shown because the list could not be read. Try again.</herald-notice>
         <div class="actions">
           <button herald-button variant="primary" type="button" [loading]="tournaments.isFetching()" (click)="tournaments.refetch()">Try again</button>
+        </div>
+      </section>
+    } @else if (tournaments.data()!.length === 0 && showArchived()) {
+      <section class="panel" aria-labelledby="empty-heading">
+        <h2 id="empty-heading">No tournaments, archived or not</h2>
+        <div class="actions">
+          <a herald-button variant="primary" routerLink="new">Create tournament</a>
         </div>
       </section>
     } @else if (tournaments.data()!.length === 0) {
@@ -53,7 +64,7 @@ import { admittedText, capacityText, dateTimeText, injectOrganisation, lifecycle
               <p class="capacity">{{ capacityLine(tournament) }}</p>
               <p class="labels">
                 @for (label of labels(tournament); track label.text) {
-                  <herald-status-label [icon]="label.icon">{{ label.text }}</herald-status-label>
+                  <herald-status-label [icon]="label.icon" [tone]="label.tone ?? 'neutral'">{{ label.text }}</herald-status-label>
                 }
               </p>
             </div>
@@ -61,6 +72,7 @@ import { admittedText, capacityText, dateTimeText, injectOrganisation, lifecycle
             <div class="row-actions">
               <a herald-button [routerLink]="tournament.id" [attr.aria-label]="action(tournament) + ': ' + tournament.title">{{ action(tournament) }}</a>
               @if (tournament.publication === 'published') {
+                <a herald-button [routerLink]="[tournament.id, 'schedule']" [attr.aria-label]="'View schedule: ' + tournament.title">View schedule</a>
                 <a herald-button [routerLink]="[tournament.id, 'entries']" [attr.aria-label]="'Entries: ' + tournament.title"><herald-icon name="users" />Entries</a>
               }
             </div>
@@ -70,21 +82,25 @@ import { admittedText, capacityText, dateTimeText, injectOrganisation, lifecycle
     }
   `,
   styles: `
+    .heading-actions { display: flex; flex-wrap: wrap; align-items: center; gap: var(--herald-space-4); }
+    .toggle { display: inline-flex; align-items: center; gap: var(--herald-space-2); }
     .heading { display: flex; align-items: flex-start; justify-content: space-between; gap: var(--herald-space-4); margin-bottom: var(--herald-space-6); }
     h1 { font-size: 32px; margin-bottom: var(--herald-space-2); }
     .panel h2 { margin-top: 0; }
     .empty-icon { color: var(--herald-color-text-secondary); margin-bottom: var(--herald-space-2); }
     .tournaments { list-style: none; margin: 0; padding: 0; background: var(--herald-color-surface-default); border: 1px solid var(--herald-color-border-default); }
-    li { display: flex; align-items: center; justify-content: space-between; gap: var(--herald-space-4); padding: var(--herald-space-6); }
+    li { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: var(--herald-space-4); padding: var(--herald-space-6); }
+    li > div:first-child { flex: 1 1 240px; min-width: 0; overflow-wrap: anywhere; }
+    .facts, .capacity { font-variant-numeric: tabular-nums; }
     li + li { border-top: 1px solid var(--herald-color-border-default); }
     li h2 { font-size: 20px; margin: 0 0 var(--herald-space-2); }
     .facts { color: var(--herald-color-text-secondary); margin: 0 0 var(--herald-space-2); }
     .capacity { font-weight: 700; font-size: var(--herald-text-lg); margin: 0 0 var(--herald-space-3); }
     .labels { display: flex; flex-wrap: wrap; gap: var(--herald-space-2); margin: 0; }
-    .row-actions { display: flex; flex: none; gap: var(--herald-space-3); }
+    .row-actions { display: flex; flex: 0 1 auto; flex-wrap: wrap; gap: var(--herald-space-3); }
     @media (max-width: 699px) {
       h1 { font-size: 28px; }
-      .heading, li, .row-actions { flex-direction: column; align-items: stretch; }
+      .heading, .heading-actions, li, .row-actions { flex-direction: column; align-items: stretch; }
     }
   `,
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -93,9 +109,10 @@ export class TournamentListPage {
   private readonly api = inject(HeraldHostAdminService);
   private readonly organisationId = injectOrganisation();
   protected readonly organisation = injectWorkingOrganisation();
+  protected readonly showArchived = signal(false);
   protected readonly tournaments = injectQuery(() => ({
-    queryKey: tournamentsKey(this.organisationId),
-    queryFn: () => firstValueFrom(this.api.listTournaments(this.organisationId)),
+    queryKey: [...tournamentsKey(this.organisationId), this.showArchived() ? 'with-archived' : 'default'],
+    queryFn: () => firstValueFrom(this.api.listTournaments(this.organisationId, this.showArchived() ? { archived: true } : undefined)),
     retry: false,
   }));
 

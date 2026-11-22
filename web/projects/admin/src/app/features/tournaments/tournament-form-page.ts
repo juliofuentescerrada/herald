@@ -1,3 +1,4 @@
+import { TournamentNav } from '../../shared';
 import { HttpErrorResponse } from '@angular/common/http';
 import { ChangeDetectionStrategy, Component, computed, DOCUMENT, effect, ElementRef, inject, signal, untracked, viewChild } from '@angular/core';
 import { ActivatedRoute, Router, RouterLink } from '@angular/router';
@@ -18,6 +19,9 @@ import {
   tournamentsKey,
   tournamentsPath,
 } from './tournaments';
+import { CompetitionArea } from './competition-area';
+import { LifecycleArea } from './lifecycle-area';
+import { VisibilityArea } from './visibility-area';
 import { RegistrationArea } from './registration-area';
 
 const names = [
@@ -94,6 +98,7 @@ const ruleText = (field: string, rule: string): string => {
     case 'below-admitted': return 'Capacity cannot be lower than the admitted entries.';
     case 'locked-by-entries': return 'This cannot change while the tournament has entries.';
     case 'locked-by-check-ins': return 'This cannot change while entries have checked in.';
+    case 'competition-started': return 'This cannot change once the competition has started.';
     case 'skipped-hour': return 'This time does not exist in the reference time zone: the clocks go forward.';
     default: return 'Check this value.';
   }
@@ -110,7 +115,7 @@ const zones = (): string[] => {
 /** Creates a draft, edits it, and edits a published tournament: one form, three moments. */
 @Component({
   selector: 'app-tournament-form-page',
-  imports: [Button, Icon, Notice, RegistrationArea, RouterLink, StatusLabel],
+  imports: [TournamentNav, Button, CompetitionArea, Icon, LifecycleArea, Notice, RegistrationArea, RouterLink, StatusLabel, VisibilityArea],
   templateUrl: './tournament-form-page.html',
   styleUrl: './tournament-form-page.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -142,6 +147,8 @@ export class TournamentFormPage {
   private readonly workingOrganisation = injectWorkingOrganisation();
   protected readonly organisationName = computed(() => (this.workingOrganisation.data() ? `${this.workingOrganisation.data()!.name} · ` : ''));
   protected readonly published = computed(() => this.stored()?.publication === 'published');
+  /** Cancellation is final: the page reads, nothing is offered (h1-tournament-cancel-and-dates D-6). */
+  protected readonly cancelled = computed(() => this.stored()?.competition === 'cancelled');
   protected readonly dirty = computed(() => JSON.stringify(this.draft()) !== this.baseline());
   protected readonly labels = computed(() => lifecycleLabels(this.stored() ?? { publication: 'draft', registration: 'notOpen', competition: 'preparation' }));
   protected readonly errorList = computed(() =>
@@ -187,7 +194,19 @@ export class TournamentFormPage {
     const lockedHelp = 'Locked while the tournament has entries. Cancel every entry to change it.';
     const atLeast = admitted ? ` At least ${admitted}: the admitted entries.` : '';
     const zoneOptions = [...new Set([...zones(), ...(d.timeZone ? [d.timeZone] : [])])].sort().map((zone) => [zone, zone] as const);
-    const field = (name: Name, kind: Field['kind'], help: string, extra: Partial<Field> = {}): Field => ({ name, kind, label: fieldLabels[name], help, ...extra });
+    const fixed = new Set<Name>(['capacity', 'entryKind', 'admission', 'checkIn', 'minimumRosterSize', 'maximumRosterSize', 'activePlayersPerSide']);
+    // Started is a time, not a state: a tournament cancelled before start never fixed anything (h1-tournament-cancel-and-dates I-1).
+    const running = this.stored()?.start.startedAt != null;
+    const dates = new Set<Name>(['registrationOpensAt', 'registrationClosesAt', 'plannedStartAt']);
+    const cancelled = this.cancelled();
+    const published = this.published();
+    const field = (name: Name, kind: Field['kind'], help: string, extra: Partial<Field> = {}): Field => ({
+      name, kind, label: fieldLabels[name], help, ...extra,
+      ...(running && fixed.has(name) ? { locked: true, help: 'Fixed when the competition started.' } : {}),
+      // A published tournament's dates change only through "Change dates" (D-5, Q3).
+      ...(published && dates.has(name) ? { locked: true, help: running ? 'Fixed when the competition started.' : 'Change it through “Change dates” above.' } : {}),
+      ...(cancelled ? { locked: true } : {}),
+    });
     return [
       {
         heading: 'Tournament details',
@@ -244,9 +263,11 @@ export class TournamentFormPage {
             options: [['optional', 'Optional'], ['mandatory', 'Mandatory']],
             locked: checkedIn > 0,
           }),
-          field('visibility', 'select', 'Public: listed. Unlisted: readable by link. Private: owner-only access.', {
+          field('visibility', 'select', published ? 'Change it through “Change visibility” above, which previews what becomes public.' : 'Public: listed. Unlisted: readable by link. Private: owner-only access.', {
             options: [['public', 'Public'], ['unlisted', 'Unlisted'], ['private', 'Private']],
             wide: true,
+            // A published tournament's visibility changes only through its own confirmation or preview (h1-public-read D-3).
+            ...(published ? { locked: true } : {}),
           }),
         ],
       },
@@ -364,6 +385,15 @@ export class TournamentFormPage {
   protected registrationChanged(details: TournamentDetails): void {
     this.accept(details);
     this.state.set('editing');
+  }
+
+  /** Nothing of a deleted draft remains, so the list is where the person goes (D-4). */
+  protected async draftDeleted(id: string): Promise<void> {
+    this.queries.removeQueries({ queryKey: tournamentKey(this.organisation, id) });
+    void this.queries.invalidateQueries({ queryKey: tournamentsKey(this.organisation) });
+    // The draft is gone: leaving needs no question about the form.
+    this.baseline.set(JSON.stringify(this.draft()));
+    await this.router.navigateByUrl(this.listPath);
   }
 
 

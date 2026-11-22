@@ -108,10 +108,15 @@ test('An owner opens the registration of a published tournament, closes it and r
   await expect(registration.getByText('Set both registration dates before opening registration.')).toBeVisible();
   await registration.getByRole('link', { name: 'Set registration opening' }).click();
   await expect(page.getByLabel('Registration opening', { exact: true })).toBeFocused();
-  await page.getByLabel('Registration opening', { exact: true }).fill('2026-11-10T09:00');
-  await page.getByLabel('Registration closure', { exact: true }).fill('2026-11-13T18:00');
-  await expect(registration.getByText('Save your changes first.')).toBeVisible();
-  await page.getByRole('button', { name: 'Save changes' }).click();
+  // A published tournament's dates change only through "Change dates" (h1-tournament-cancel-and-dates Q3).
+  await expect(page.getByLabel('Registration opening', { exact: true })).not.toBeEditable();
+  await page.getByRole('button', { name: 'Change dates' }).click();
+  const dates = page.getByRole('dialog', { name: 'Change dates' });
+  await dates.getByRole('checkbox', { name: 'Registration opens' }).check();
+  await dates.getByLabel('New registration opens').fill('2026-11-10T09:00');
+  await dates.getByRole('checkbox', { name: 'Registration closes' }).check();
+  await dates.getByLabel('New registration closes').fill('2026-11-13T18:00');
+  await dates.getByRole('button', { name: 'Save dates' }).click();
   await expect(registration.getByText('13 November 2026, 18:00')).toBeVisible();
 
   await registration.getByRole('button', { name: 'Open registration' }).click();
