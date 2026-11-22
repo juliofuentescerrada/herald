@@ -177,7 +177,8 @@ public static class Receipts
     [OperationGroup(OperationGroup.Read)]
     [ProducesResponseType<ReceiptView>(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound, "application/problem+json")]
-    public static async Task<IResult> ReadAsync(Guid operationId, HttpContext http)
+    [ProblemTypes(StatusCodes.Status404NotFound, NotFound)]
+    public static async Task<IResult> ReadAsync(Guid organisationId, Guid operationId, HttpContext http)
     {
         var context = http.RequestServices.GetRequiredService<OrganisationContext>();
         return await FindAsync(http, operationId) is { } receipt && (context.Grant is null || receipt.ActorId == context.ActorId)

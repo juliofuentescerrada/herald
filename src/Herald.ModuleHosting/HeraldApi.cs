@@ -38,7 +38,11 @@ public static class HeraldApi
         foreach (var document in Documents)
         {
             // By default .NET adds ungrouped endpoints to every document; here each holds only its group.
-            services.AddOpenApi(document, options => options.ShouldInclude = description => description.GroupName == document);
+            services.AddOpenApi(document, options =>
+            {
+                options.ShouldInclude = description => description.GroupName == document;
+                options.AddOperationTransformer<ProblemTypesTransformer>();
+            });
         }
 
         return services;
@@ -61,11 +65,18 @@ public static class HeraldApi
                     chain.Metadata.RequireAuthorization(HeraldAuthentication.OrganiserPolicy);
                 }
 
-                // For the access step, which reads them from the endpoint to check an application's grant.
+                // For the access step, which reads them from the endpoint to check an application's grant, and for the OpenAPI documents.
                 foreach (var attribute in chain.Method.Method.GetCustomAttributes()
-                    .Where(attribute => attribute is OperationGroupAttribute or PeopleOnlyAttribute))
+                    .Where(attribute => attribute is OperationGroupAttribute or PeopleOnlyAttribute or ProblemTypesAttribute))
                 {
                     chain.Metadata.WithMetadata(attribute);
+                }
+
+                // Every receipt-carrying mutation can answer `operation-reused` (operation-receipts), so each describes a conflict.
+                if (chain.Postprocessors.OfType<JasperFx.CodeGeneration.Frames.MethodCall>().Any(call => call.HandlerType == typeof(Receipts))
+                    && !chain.Method.Method.GetCustomAttributes<ProducesResponseTypeAttribute>().Any(produces => produces.StatusCode == StatusCodes.Status409Conflict))
+                {
+                    chain.Metadata.Produces<ProblemDetails>(StatusCodes.Status409Conflict, "application/problem+json");
                 }
 
                 // An application outside its grant is refused (design D-4): part of each grouped endpoint's contract.
@@ -76,7 +87,8 @@ public static class HeraldApi
             });
         });
         app.MapGet("/api/organisations/{organisationId}/receipts/{operationId}", Receipts.ReadAsync)
-            .RequireAuthorization(HeraldAuthentication.OrganiserPolicy);
+            .RequireAuthorization(HeraldAuthentication.OrganiserPolicy)
+            .Produces<ProblemDetails>(StatusCodes.Status403Forbidden, "application/problem+json");
         // Development only for now, like /health: what Azure exposes is decided in M4.
         if (app.Environment.IsDevelopment())
         {

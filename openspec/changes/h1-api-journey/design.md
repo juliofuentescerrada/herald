@@ -47,6 +47,9 @@ Not applicable.
 - **N-5** Two simultaneous requests with one identity: the second loses to the receipt's primary key, its transaction rolls back, and it answers with the first one's receipt.
 - **N-6** Deleting a draft removes the receipts of that tournament; the deletion's own receipt is recorded after, so a repeated deletion still answers 204. A creation's receipt takes its tournament from the body.
 
+- **N-7** Business errors are problem types, listed per response as `x-problem-types` in the OpenAPI documents: each endpoint declares its own with `[ProblemTypes]`, and the documents add those every organisation-scoped endpoint shares (`organisation-not-available`, `operation-not-granted`, `operation-reused`). Validation rules stay in the 400 response's `errors`.
+- **N-8** The identifier review (D-3) found two gaps, both fixed compatibly: creating a tournament or an organisation with a reused identifier and other content answered a 409 without a type; they now answer `tournament-identifier-reused` and `organisation-identifier-reused`. The entry kind travels in a tournament's `configuration` and a field's `terms`; no identifier needed renaming.
+
 ## Risks / Trade-offs
 
 - [One more row per mutation] → small, organisation-owned and indexed by operation identity; retention follows the tournament.

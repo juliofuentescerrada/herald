@@ -23,6 +23,7 @@ public static class AdmitEntryEndpoint
     [ProducesResponseType<HttpValidationProblemDetails>(StatusCodes.Status400BadRequest, "application/problem+json")]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound, "application/problem+json")]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status409Conflict, "application/problem+json")]
+    [ProblemTypes(StatusCodes.Status409Conflict, FieldResults.EntryRevisionConflict)]
     public static async Task<IResult> Post(
         Guid organisationId,
         Guid tournamentId,

@@ -24,6 +24,7 @@ public static class CreateGuestEndpoint
     [ProducesResponseType<HttpValidationProblemDetails>(StatusCodes.Status400BadRequest, "application/problem+json")]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound, "application/problem+json")]
     [ProducesResponseType<GuestConflict>(StatusCodes.Status409Conflict, "application/problem+json")]
+    [ProblemTypes(StatusCodes.Status409Conflict, GuestResults.PossibleDuplicate, GuestResults.IdentifierReused)]
     public static async Task<IResult> Put(
         Guid organisationId, Guid guestId, CreateGuest command, OrganisationContext context, RegistrationDbContext db, CancellationToken cancellationToken)
     {

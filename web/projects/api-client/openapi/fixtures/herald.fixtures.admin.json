@@ -63,7 +63,10 @@
                   "$ref": "#/components/schemas/ProblemDetails"
                 }
               }
-            }
+            },
+            "x-problem-types": [
+              "operation-not-granted"
+            ]
           },
           "409": {
             "description": "Conflict",
@@ -87,6 +90,73 @@
           },
           "404": {
             "description": "Not Found"
+          }
+        }
+      }
+    },
+    "/api/organisations/{organisationId}/receipts/{operationId}": {
+      "get": {
+        "tags": [
+          "Receipts"
+        ],
+        "operationId": "readReceipt",
+        "parameters": [
+          {
+            "name": "organisationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          },
+          {
+            "name": "operationId",
+            "in": "path",
+            "required": true,
+            "schema": {
+              "type": "string",
+              "format": "uuid"
+            }
+          }
+        ],
+        "responses": {
+          "403": {
+            "description": "Forbidden",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "x-problem-types": [
+              "operation-not-granted"
+            ]
+          },
+          "200": {
+            "description": "OK",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ReceiptView"
+                }
+              }
+            }
+          },
+          "404": {
+            "description": "Not Found",
+            "content": {
+              "application/problem+json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "x-problem-types": [
+              "not-found",
+              "organisation-not-available"
+            ]
           }
         }
       }
@@ -156,6 +226,57 @@
               "null",
               "string"
             ]
+          }
+        }
+      },
+      "ReceiptOutcome": {
+        "enum": [
+          "applied",
+          "rejected",
+          "received"
+        ]
+      },
+      "ReceiptView": {
+        "required": [
+          "operationId",
+          "operation",
+          "outcome",
+          "revision",
+          "resource",
+          "problemType",
+          "at"
+        ],
+        "type": "object",
+        "properties": {
+          "operationId": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "operation": {
+            "type": "string"
+          },
+          "outcome": {
+            "$ref": "#/components/schemas/ReceiptOutcome"
+          },
+          "revision": {
+            "type": [
+              "null",
+              "integer"
+            ],
+            "format": "int32"
+          },
+          "resource": {
+            "type": "string"
+          },
+          "problemType": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "at": {
+            "type": "string",
+            "format": "date-time"
           }
         }
       },
@@ -232,6 +353,9 @@
   "tags": [
     {
       "name": "Herald.ApiFixtures.ReviseFixtureItemEndpoint"
+    },
+    {
+      "name": "Receipts"
     }
   ]
 }

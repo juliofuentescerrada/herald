@@ -9,7 +9,7 @@
 
 ## 3. Contract
 
-- [ ] 3.1 Identifier review test and fixes (D-3); problem types per operation in the OpenAPI documents; tests for the `api-description` scenarios
+- [x] 3.1 Identifier review test and fixes (D-3); problem types per operation in the OpenAPI documents; tests for the `api-description` scenarios
 - [ ] 3.2 The admin `api-client` sends `Operation-Id` on mutations
 - [ ] 3.3 Regenerate Wolverine code (`codegen write`) and the OpenAPI documents and client (`pnpm api:generate`); CI drift checks pass
 
