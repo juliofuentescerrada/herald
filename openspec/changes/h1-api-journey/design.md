@@ -50,6 +50,8 @@ Not applicable.
 - **N-7** Business errors are problem types, listed per response as `x-problem-types` in the OpenAPI documents: each endpoint declares its own with `[ProblemTypes]`, and the documents add those every organisation-scoped endpoint shares (`organisation-not-available`, `operation-not-granted`, `operation-reused`). Validation rules stay in the 400 response's `errors`.
 - **N-8** The identifier review (D-3) found two gaps, both fixed compatibly: creating a tournament or an organisation with a reused identifier and other content answered a 409 without a type; they now answer `tournament-identifier-reused` and `organisation-identifier-reused`. The entry kind travels in a tournament's `configuration` and a field's `terms`; no identifier needed renaming.
 
+- **N-9** Journey 30 has the owner create the organisation, grant the client every group and read the final Standings page in the browser, because those are a person's (organisation creation and grants are people-only); the league itself runs through the `request` fixture with the pilot application's client-credentials token, following `docs/api/individual-league.md`. Writing it found that the admin client's identity header must reuse an `operationId` the body carries (`operation.ts`).
+
 ## Risks / Trade-offs
 
 - [One more row per mutation] → small, organisation-owned and indexed by operation identity; retention follows the tournament.

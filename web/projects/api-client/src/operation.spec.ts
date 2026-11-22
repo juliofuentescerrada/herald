@@ -31,6 +31,11 @@ describe('Operation identity', () => {
     expect(header).toBe('chosen');
   });
 
+  it('sends the identity a command carries in its body', async () => {
+    const url = '/api/organisations/1/tournaments/2/schedule/draft';
+    expect(await sent((http) => firstValueFrom(http.post(url, { operationId: 'from-body', expectedRevision: 1 })), url)).toBe('from-body');
+  });
+
   it('sends reads and organisation creation as they are', async () => {
     expect(await sent((http) => firstValueFrom(http.get('/api/organisations/1/tournaments')), '/api/organisations/1/tournaments')).toBeNull();
     expect(await sent((http) => firstValueFrom(http.post('/api/organisations', {})), '/api/organisations')).toBeNull();
