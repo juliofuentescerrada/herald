@@ -3,6 +3,7 @@
 AADSTS
 ASPNETCORE
 Blazor
+Dockerfiles
 CONTENTROOT
 ciamlogin
 codegen

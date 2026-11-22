@@ -22,7 +22,7 @@ A slice pull request SHALL take `preview` by its `preview` label; while it holds
 - **WHEN** a pull request that has the `preview` label receives a push
 - **THEN** the guard answers deploy
 
-#### Scenario: Closing or unlabelling releases the slot
+#### Scenario: Closing or removing the label releases the slot
 - **WHEN** the holder is closed or loses its `preview` label
 - **THEN** the guard answers release, and a pull request labelled afterwards is answered deploy
 
