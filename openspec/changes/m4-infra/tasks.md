@@ -6,7 +6,7 @@
 
 - [x] 2.1 `versions.tf`, `backend.tf`, the shared resources by name (D-1)
 - [x] 2.2 Slot identities and their AcrPull (D-2); Application Insights per slot
-- [ ] 2.3 The container apps and the job per slot, ingress, probes and configuration (D-3, D-4), placeholder images
+- [x] 2.3 The container apps and the job per slot, ingress, probes and configuration (D-3, D-4), placeholder images
 - [ ] 2.4 The databases' import behind `databases_onboarded` (D-5); `budget-herald` with its three alerts
 - [ ] 2.5 `infra/infra.test.mjs` for the `cloud-infrastructure` scenarios; `tofu fmt -check` and `tofu validate` locally
 
