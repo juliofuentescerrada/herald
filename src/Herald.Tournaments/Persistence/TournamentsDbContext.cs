@@ -23,6 +23,10 @@ public sealed class TournamentsDbContext(DbContextOptions<TournamentsDbContext> 
 
     public DbSet<ChangeLogEntry> ChangeLog => Set<ChangeLogEntry>();
 
+    public DbSet<ResultsState> Results => Set<ResultsState>();
+
+    public DbSet<StandingsState> Standings => Set<StandingsState>();
+
     // Adds a fact once: a second delivery of the same kind, subject and subject revision is skipped (change-log D-1).
     public async Task<bool> LogOnceAsync(ChangeLogEntry entry, CancellationToken cancellationToken)
     {
@@ -134,6 +138,24 @@ public sealed class TournamentsDbContext(DbContextOptions<TournamentsDbContext> 
         {
             schedule.HasKey(s => s.TournamentId);
             schedule.Property(s => s.TournamentId).HasConversion(id => id.Value, value => new TournamentId(value));
+            Json(schedule.Property(s => s.Published));
+        });
+
+        modelBuilder.Entity<ResultsState>(results =>
+        {
+            results.HasKey(r => r.TournamentId);
+            results.Property(r => r.TournamentId).HasConversion(id => id.Value, value => new TournamentId(value));
+            // Two snapshots applied at once cannot both win.
+            results.Property(r => r.Revision).IsConcurrencyToken();
+            Json(results.Property(r => r.Results));
+        });
+
+        modelBuilder.Entity<StandingsState>(standings =>
+        {
+            standings.HasKey(s => s.TournamentId);
+            standings.Property(s => s.TournamentId).HasConversion(id => id.Value, value => new TournamentId(value));
+            standings.Property(s => s.Revision).IsConcurrencyToken();
+            Json(standings.Property(s => s.Standings));
         });
     }
 

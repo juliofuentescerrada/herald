@@ -290,6 +290,24 @@ namespace Herald.Tournaments.Persistence.Migrations
                     b.ToTable("FieldCounts", "tournaments");
                 });
 
+            modelBuilder.Entity("Herald.Tournaments.Persistence.ResultsState", b =>
+                {
+                    b.Property<Guid>("TournamentId")
+                        .HasColumnType("uuid");
+
+                    b.Property<string>("Results")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.Property<int>("Revision")
+                        .IsConcurrencyToken()
+                        .HasColumnType("integer");
+
+                    b.HasKey("TournamentId");
+
+                    b.ToTable("Results", "tournaments");
+                });
+
             modelBuilder.Entity("Herald.Tournaments.Persistence.ScheduleState", b =>
                 {
                     b.Property<Guid>("TournamentId")
@@ -297,6 +315,9 @@ namespace Herald.Tournaments.Persistence.Migrations
 
                     b.Property<int?>("EligibleRevision")
                         .HasColumnType("integer");
+
+                    b.Property<string>("Published")
+                        .HasColumnType("jsonb");
 
                     b.Property<int?>("PublishedRevision")
                         .HasColumnType("integer");
@@ -307,6 +328,24 @@ namespace Herald.Tournaments.Persistence.Migrations
                     b.HasKey("TournamentId");
 
                     b.ToTable("Schedules", "tournaments");
+                });
+
+            modelBuilder.Entity("Herald.Tournaments.Persistence.StandingsState", b =>
+                {
+                    b.Property<Guid>("TournamentId")
+                        .HasColumnType("uuid");
+
+                    b.Property<int>("Revision")
+                        .IsConcurrencyToken()
+                        .HasColumnType("integer");
+
+                    b.Property<string>("Standings")
+                        .IsRequired()
+                        .HasColumnType("jsonb");
+
+                    b.HasKey("TournamentId");
+
+                    b.ToTable("Standings", "tournaments");
                 });
 
             modelBuilder.Entity("Wolverine.EntityFrameworkCore.Internals.IncomingMessage", b =>

@@ -1,3 +1,4 @@
+using Herald.Contracts.Competition.V1;
 using Herald.Tournaments.Domain;
 
 namespace Herald.Tournaments.Persistence;
@@ -15,4 +16,7 @@ public sealed class ScheduleState
     public int? PublishedRevision { get; set; }
 
     public int? EligibleRevision { get; set; }
+
+    // The published pairings with aliases, for the public page (h1-public-read D-1); null while none is published.
+    public PublishedSchedule? Published { get; set; }
 }

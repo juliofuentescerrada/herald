@@ -2,6 +2,7 @@ using System.Net;
 using System.Net.Http.Json;
 using System.Text.Json;
 using Herald.Contracts.Competition.V1;
+using Herald.Contracts.Standings.V1;
 using Shouldly;
 
 namespace Herald.Host.Tests;
@@ -79,5 +80,53 @@ public partial class MatchTests
         before.StatusCode.ShouldBe(HttpStatusCode.NotFound);
         started.StatusCode.ShouldBe(HttpStatusCode.OK);
         other.StatusCode.ShouldBe(HttpStatusCode.NotFound);
+    }
+
+    [Fact]
+    [Trait("covers", "standings: After a result")]
+    public async Task Standings_publish_their_table_at_each_results_revision_and_again_when_it_becomes_final()
+    {
+        var league = await PlayedLeagueAsync();
+        var tournament = Guid.Parse(league.Path.Split('/')[^1]);
+
+        var tables = api.Sent<TournamentStandingsChanged>().Where(message => message.TournamentId == tournament).Distinct().ToList();
+        var latest = tables.MaxBy(message => message.Revision).ShouldNotBeNull();
+        latest.ResultsRevision.ShouldBe(7);
+        (latest.ResolvedMatches, latest.Matches, latest.Final).ShouldBe((6, 6, null));
+        latest.Rows.Select(row => (row.Position, row.Shared, row.Name, row.Points))
+            .ShouldBe([(1, false, "Robin Vale", 9), (2, true, "Jamie Brook", 4), (2, true, "Sam Reed", 4), (4, false, "Taylor Finch", 0)]);
+
+        (await SettledAsync(async () => await FinaliseAsync(league, ResultsRevision(await ScheduleAsync(league))))).StatusCode.ShouldBe(HttpStatusCode.OK);
+
+        var final = api.Sent<TournamentStandingsChanged>().Where(message => message.TournamentId == tournament).MaxBy(message => message.Revision).ShouldNotBeNull();
+        final.Revision.ShouldBeGreaterThan(latest.Revision);
+        (final.ResultsRevision, final.Final?.Number).ShouldBe((7, 1));
+    }
+
+    [Fact]
+    public async Task Tournaments_keeps_the_published_schedule_the_results_and_the_standings_for_the_public_page()
+    {
+        var league = await PlayedLeagueAsync();
+        var tournament = Guid.Parse(league.Path.Split('/')[^1]);
+
+        (await api.TextAsync("""select "Published"->'entrants'->0->>'name' from tournaments."Schedules" where "TournamentId" = $1""", tournament)).ShouldNotBeNull();
+        (await api.TextAsync("""select ("Revision")::text from tournaments."Results" where "TournamentId" = $1""", tournament)).ShouldBe("7");
+        (await api.TextAsync("""select "Standings"->'rows'->0->>'name' from tournaments."Standings" where "TournamentId" = $1""", tournament)).ShouldBe("Robin Vale");
+    }
+
+    [Fact]
+    public async Task An_owner_changes_a_running_tournament_s_visibility_and_the_change_log_records_it()
+    {
+        var league = await PlayedLeagueAsync();
+        var revision = Revision(await JsonAsync(await league.Client.GetAsync(league.Path, Cancellation)));
+
+        var changed = await SettledAsync(() => league.Client.PostAsJsonAsync($"{league.Path}/visibility", new { visibility = "unlisted", expectedRevision = revision }, Cancellation));
+        var stale = await league.Client.PostAsJsonAsync($"{league.Path}/visibility", new { visibility = "private", expectedRevision = revision }, Cancellation);
+
+        changed.StatusCode.ShouldBe(HttpStatusCode.OK);
+        (await JsonAsync(changed)).GetProperty("configuration").GetProperty("visibility").GetString().ShouldBe("unlisted");
+        stale.StatusCode.ShouldBe(HttpStatusCode.Conflict);
+        var log = await JsonAsync(await league.Client.GetAsync($"{league.Path}/change-log", Cancellation));
+        log.ToString().ShouldContain("visibilityChanged", Case.Insensitive);
     }
 }

@@ -21,6 +21,7 @@ import {
 } from './tournaments';
 import { CompetitionArea } from './competition-area';
 import { LifecycleArea } from './lifecycle-area';
+import { VisibilityArea } from './visibility-area';
 import { RegistrationArea } from './registration-area';
 
 const names = [
@@ -114,7 +115,7 @@ const zones = (): string[] => {
 /** Creates a draft, edits it, and edits a published tournament: one form, three moments. */
 @Component({
   selector: 'app-tournament-form-page',
-  imports: [TournamentNav, Button, CompetitionArea, Icon, LifecycleArea, Notice, RegistrationArea, RouterLink, StatusLabel],
+  imports: [TournamentNav, Button, CompetitionArea, Icon, LifecycleArea, Notice, RegistrationArea, RouterLink, StatusLabel, VisibilityArea],
   templateUrl: './tournament-form-page.html',
   styleUrl: './tournament-form-page.css',
   changeDetection: ChangeDetectionStrategy.OnPush,
@@ -262,9 +263,11 @@ export class TournamentFormPage {
             options: [['optional', 'Optional'], ['mandatory', 'Mandatory']],
             locked: checkedIn > 0,
           }),
-          field('visibility', 'select', 'Public: listed. Unlisted: readable by link. Private: owner-only access.', {
+          field('visibility', 'select', published ? 'Change it through “Change visibility” above, which previews what becomes public.' : 'Public: listed. Unlisted: readable by link. Private: owner-only access.', {
             options: [['public', 'Public'], ['unlisted', 'Unlisted'], ['private', 'Private']],
             wide: true,
+            // A published tournament's visibility changes only through its own confirmation or preview (h1-public-read D-3).
+            ...(published ? { locked: true } : {}),
           }),
         ],
       },

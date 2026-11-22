@@ -56,6 +56,9 @@ public sealed class TournamentResults : AggregateRoot<TournamentId>
 
     public int Revision { get; private set; }
 
+    // Counts every change of the table: a new results snapshot, a finalisation or a reopening, so its published snapshot orders.
+    public int TableRevision { get; private set; }
+
     public IReadOnlyList<FinalRevision> Finals
     {
         get => _finals;
@@ -68,7 +71,7 @@ public sealed class TournamentResults : AggregateRoot<TournamentId>
     // Final standings where every entrant departed declare no champion (h1-finalisation D-5).
     public bool NoChampion => Final is not null && Snapshot.Entrants.All(entrant => entrant.Status != EntrantStatus.Active);
 
-    public static TournamentResults Track(TournamentId id, ResultsSnapshot snapshot) => new(id, snapshot) { Revision = snapshot.Revision };
+    public static TournamentResults Track(TournamentId id, ResultsSnapshot snapshot) => new(id, snapshot) { Revision = snapshot.Revision, TableRevision = 1 };
 
     // A newer snapshot replaces the results; an older or repeated one changes nothing (ADR 0016).
     public bool Apply(ResultsSnapshot snapshot)
@@ -80,6 +83,7 @@ public sealed class TournamentResults : AggregateRoot<TournamentId>
 
         Snapshot = snapshot;
         Revision = snapshot.Revision;
+        TableRevision++;
         return true;
     }
 
@@ -93,6 +97,7 @@ public sealed class TournamentResults : AggregateRoot<TournamentId>
 
         _finals.Add(new(number, resultsRevision, at));
         _finals.Sort((left, right) => left.Number.CompareTo(right.Number));
+        TableRevision++;
         return true;
     }
 
@@ -111,6 +116,7 @@ public sealed class TournamentResults : AggregateRoot<TournamentId>
         }
 
         _finals[index] = _finals[index] with { Reopened = true };
+        TableRevision++;
         return true;
     }
 

@@ -282,6 +282,38 @@ public static class Scenarios
             }
         }
 
+        // Three individual leagues of four for the public page (h1-public-read): Lantern Gate public and running with three of six
+        // matches resolved, Lantern Arch unlisted and finalised, and Lantern Vault private and running.
+        foreach (var (key, title, visibility, resolved) in new[] { ("public-running", "Lantern Gate", "public", 3), ("unlisted-finalised", "Lantern Arch", "unlisted", 6), ("private", "Lantern Vault", "private", 2) })
+        {
+            var tournament = Ids.For("tournament", key);
+            await admin.CreateTournamentAsync(organisation, tournament, Configuration(clock, title, opens: -6, closes: -1, starts: 1, capacity: 4));
+            await admin.PublishAsync(organisation, tournament);
+            await admin.OpenRegistrationAsync(organisation, tournament);
+            foreach (var name in Names.Players[12..16])
+            {
+                await admin.EnterAsync(organisation, tournament, await admin.CreateGuestAsync(organisation, "player", name));
+            }
+
+            await admin.CloseRegistrationAsync(organisation, tournament);
+            await admin.PublishScheduleAsync(organisation, tournament);
+            await admin.StartCompetitionAsync(organisation, tournament);
+            foreach (var (index, outcome) in new[] { (0, "first"), (1, "draw"), (2, "second"), (3, "first"), (4, "first"), (5, "draw") }[..resolved])
+            {
+                await admin.RecordResultAsync(organisation, tournament, index, outcome: outcome);
+            }
+
+            if (resolved == 6)
+            {
+                await admin.FinaliseAsync(organisation, tournament);
+            }
+
+            if (visibility != "public")
+            {
+                await admin.ChangeVisibilityAsync(organisation, tournament, visibility);
+            }
+        }
+
         // A populated change log (h1-change-log): four admissions, a postponed start, a schedule published, withdrawn and published
         // again. The change log script cancels it.
         var logged = Ids.For("tournament", "change-log");

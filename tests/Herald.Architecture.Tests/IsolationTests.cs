@@ -9,6 +9,8 @@ public class IsolationTests
     [
         "Herald.Organisations/Features/GetMe/GetMeEndpoint.cs",
         "Herald.Organisations/Persistence/OrganisationAccess.cs",
+        // The anonymous public page finds its tournament's organisation (PublicTournamentTests).
+        "Herald.Tournaments/Features/GetPublicTournament/GetPublicTournamentEndpoint.cs",
     ];
 
     [Fact]

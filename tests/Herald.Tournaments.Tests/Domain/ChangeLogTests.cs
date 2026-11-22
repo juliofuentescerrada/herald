@@ -60,16 +60,13 @@ public class ChangeLogTests
     }
 
     [Fact]
-    public void A_material_change_and_a_visibility_change_are_recorded_apart_with_their_values()
+    public void A_material_change_is_recorded_with_its_values()
     {
         var tournament = Published();
 
-        tournament.Change(CompleteIndividual with { Venue = "Valencia", Visibility = Visibility.Public }, 2, _owner, _at).Outcome.ShouldBe(WriteOutcome.Applied);
+        tournament.Change(CompleteIndividual with { Venue = "Valencia" }, 2, _owner, _at).Outcome.ShouldBe(WriteOutcome.Applied);
 
-        tournament.Logged.Skip(1).Select(entry => (entry.Kind, entry.Changes.Single())).ShouldBe([
-            (ChangeKind.MaterialChange, new ChangedValue("venue", "Madrid", "Valencia")),
-            (ChangeKind.VisibilityChanged, new ChangedValue("visibility", "Private", "Public")),
-        ]);
+        tournament.Logged.Skip(1).Select(entry => (entry.Kind, entry.Changes.Single())).ShouldBe([(ChangeKind.MaterialChange, new ChangedValue("venue", "Madrid", "Valencia"))]);
     }
 
     [Fact]

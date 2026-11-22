@@ -303,4 +303,20 @@ public class SyntheticDataTests(SeededDatabases databases)
         (await SeedCommand.RunAsync(configuration, output, error)).ShouldBe(SeedCommand.Refused);
         error.ToString().ShouldContain("Production");
     }
+
+    [Fact]
+    public async Task The_seeded_public_page_leagues_are_public_and_running_unlisted_and_finalised_and_private()
+    {
+        var database = await databases.NewDatabaseAsync();
+        await SeededDatabases.SeedAsync(database);
+
+        await using var reader = new Reader(database);
+        var running = await reader.GetAsync(Main, $"/api/public/tournaments/{Ids.For("tournament", "public-running")}");
+        var finalised = await reader.GetAsync(Main, $"/api/public/tournaments/{Ids.For("tournament", "unlisted-finalised")}");
+        var hidden = await reader.GetAsync(Main, $"/api/public/tournaments/{Ids.For("tournament", "private")}");
+
+        (running.GetProperty("visibility").GetString(), running.GetProperty("standings").GetProperty("resolvedMatches").GetInt32()).ShouldBe(("public", 3));
+        (finalised.GetProperty("visibility").GetString(), finalised.GetProperty("standings").GetProperty("final").GetBoolean()).ShouldBe(("unlisted", true));
+        hidden.GetProperty("status").GetInt32().ShouldBe(404);
+    }
 }

@@ -4,4 +4,323 @@
  * Herald.Host | public
  * OpenAPI spec version: 1.0.0
  */
+import {
+  HttpClient
+} from '@angular/common/http';
+import type {
+  HttpContext,
+  HttpEvent,
+  HttpParams
+} from '@angular/common/http';
 
+import type {
+  HttpHeaders,
+  HttpResponse as AngularHttpResponse
+} from '@angular/common/http';
+
+import {
+  Injectable,
+  inject
+} from '@angular/core';
+
+import type {
+  Observable
+} from 'rxjs';
+
+export interface ChangedValue {
+  field: string;
+  /** @nullable */
+  old: string | null;
+  /** @nullable */
+  new: string | null;
+}
+
+export type ChangeKind = typeof ChangeKind[keyof typeof ChangeKind];
+
+
+export const ChangeKind = {
+  entryAdmitted: 'entryAdmitted',
+  entryCancelled: 'entryCancelled',
+  schedulePublished: 'schedulePublished',
+  scheduleWithdrawn: 'scheduleWithdrawn',
+  tournamentPublished: 'tournamentPublished',
+  materialChange: 'materialChange',
+  datesChanged: 'datesChanged',
+  visibilityChanged: 'visibilityChanged',
+  tournamentCancelled: 'tournamentCancelled',
+  competitionFinalised: 'competitionFinalised',
+  competitionReopened: 'competitionReopened',
+} as const;
+
+export type EntryKind = typeof EntryKind[keyof typeof EntryKind] | null;
+
+
+export const EntryKind = {
+  individual: 'individual',
+  team: 'team',
+} as const;
+
+export type LocationMode = typeof LocationMode[keyof typeof LocationMode] | null;
+
+
+export const LocationMode = {
+  onSite: 'onSite',
+  online: 'online',
+} as const;
+
+export interface ProblemDetails {
+  /** @nullable */
+  type?: string | null;
+  /** @nullable */
+  title?: string | null;
+  /** @nullable */
+  status?: number | null;
+  /** @nullable */
+  detail?: string | null;
+  /** @nullable */
+  instance?: string | null;
+}
+
+export interface PublicChange {
+  kind: ChangeKind;
+  subjectRevision: number;
+  at: string;
+  changes: ChangedValue[];
+  /** @nullable */
+  timeZone: string | null;
+  /** @nullable */
+  cause: string | null;
+}
+
+export type StandingsLineResult = typeof StandingsLineResult[keyof typeof StandingsLineResult] | null;
+
+
+export const StandingsLineResult = {
+  won: 'won',
+  drawn: 'drawn',
+  lost: 'lost',
+  noWinner: 'noWinner',
+} as const;
+
+export interface PublicLine {
+  round: number;
+  /** @nullable */
+  opponent: string | null;
+  result: null | StandingsLineResult;
+  /** @nullable */
+  cause: string | null;
+  points: number;
+}
+
+export type ResultsMatchState = typeof ResultsMatchState[keyof typeof ResultsMatchState];
+
+
+export const ResultsMatchState = {
+  scheduled: 'scheduled',
+  inPlay: 'inPlay',
+  resolved: 'resolved',
+} as const;
+
+export type ResultOutcome = typeof ResultOutcome[keyof typeof ResultOutcome] | null;
+
+
+export const ResultOutcome = {
+  first: 'first',
+  second: 'second',
+  draw: 'draw',
+  none: 'none',
+} as const;
+
+export interface PublicMatch {
+  first: string;
+  second: string;
+  state: ResultsMatchState;
+  outcome: null | ResultOutcome;
+  /** @nullable */
+  cause: string | null;
+}
+
+export interface PublicRemainingMatch {
+  round: number;
+  opponent: string;
+}
+
+export interface PublicRound {
+  number: number;
+  matches: PublicMatch[];
+  /** @nullable */
+  rest: string | null;
+}
+
+export type StandingsEntrantStatus = typeof StandingsEntrantStatus[keyof typeof StandingsEntrantStatus];
+
+
+export const StandingsEntrantStatus = {
+  active: 'active',
+  withdrawn: 'withdrawn',
+  disqualified: 'disqualified',
+} as const;
+
+export interface PublicStandingsRow {
+  position: number;
+  shared: boolean;
+  name: string;
+  status: StandingsEntrantStatus;
+  resolved: number;
+  won: number;
+  drawn: number;
+  lost: number;
+  points: number;
+  lines: PublicLine[];
+  remaining: PublicRemainingMatch[];
+}
+
+export interface PublicStandings {
+  final: boolean;
+  /** @nullable */
+  finalRevision: number | null;
+  revised: boolean;
+  resultsRevision: number;
+  updatedAt: string;
+  resolvedMatches: number;
+  matches: number;
+  noChampion: boolean;
+  rows: PublicStandingsRow[];
+}
+
+export type Visibility = typeof Visibility[keyof typeof Visibility] | null;
+
+
+export const Visibility = {
+  public: 'public',
+  unlisted: 'unlisted',
+  private: 'private',
+} as const;
+
+export type RegistrationWindow = typeof RegistrationWindow[keyof typeof RegistrationWindow];
+
+
+export const RegistrationWindow = {
+  notOpen: 'notOpen',
+  open: 'open',
+  closed: 'closed',
+} as const;
+
+export interface PublicTournamentView {
+  id: string;
+  title: string;
+  organiser: string;
+  /** @nullable */
+  gameVariant: string | null;
+  entryKind: null | EntryKind;
+  /** @nullable */
+  minimumRosterSize: number | null;
+  /** @nullable */
+  maximumRosterSize: number | null;
+  /** @nullable */
+  activePlayersPerSide: number | null;
+  location: null | LocationMode;
+  /** @nullable */
+  venue: string | null;
+  /** @nullable */
+  registrationOpensAt: string | null;
+  /** @nullable */
+  registrationClosesAt: string | null;
+  /** @nullable */
+  plannedStartAt: string | null;
+  /** @nullable */
+  timeZone: string | null;
+  visibility: null | Visibility;
+  registration: RegistrationWindow;
+  competition: string;
+  /** @nullable */
+  cancelledAt: string | null;
+  rounds: PublicRound[];
+  standings: null | PublicStandings;
+  changes: PublicChange[];
+}
+
+interface HttpClientOptions {
+  readonly headers?: HttpHeaders | Record<string, string | string[]>;
+  readonly context?: HttpContext;
+  readonly params?:
+        | HttpParams
+      | Record<string, string | number | boolean | Array<string | number | boolean>>;
+  readonly reportProgress?: boolean;
+  readonly withCredentials?: boolean;
+  readonly credentials?: RequestCredentials;
+  readonly keepalive?: boolean;
+  readonly priority?: RequestPriority;
+  readonly cache?: RequestCache;
+  readonly mode?: RequestMode;
+  readonly redirect?: RequestRedirect;
+  readonly referrer?: string;
+  readonly integrity?: string;
+  readonly referrerPolicy?: ReferrerPolicy;
+  readonly transferCache?: {includeHeaders?: string[]} | boolean;
+  readonly timeout?: number;
+}
+
+type HttpClientBodyOptions = HttpClientOptions & {
+  readonly observe?: 'body';
+};
+
+type HttpClientEventOptions = HttpClientOptions & {
+  readonly observe: 'events';
+};
+
+type HttpClientResponseOptions = HttpClientOptions & {
+  readonly observe: 'response';
+};
+
+type HttpClientObserveOptions = HttpClientOptions & {
+  readonly observe?: 'body' | 'events' | 'response';
+};
+
+
+
+
+
+
+
+@Injectable({ providedIn: 'root' })
+export class HeraldHostPublicService {
+  private readonly http = inject(HttpClient);
+/**
+ * GET_api_public_tournaments_tournamentId
+ * @summary GET_api_public_tournaments_tournamentId
+ */
+ getPublicTournament<TData = PublicTournamentView>(tournamentId: string, options?: HttpClientBodyOptions): Observable<TData>;
+ getPublicTournament<TData = PublicTournamentView>(tournamentId: string, options?: HttpClientEventOptions): Observable<HttpEvent<TData>>;
+ getPublicTournament<TData = PublicTournamentView>(tournamentId: string, options?: HttpClientResponseOptions): Observable<AngularHttpResponse<TData>>;
+  getPublicTournament<TData = PublicTournamentView>(
+    tournamentId: string, options?: HttpClientObserveOptions): Observable<TData | HttpEvent<TData> | AngularHttpResponse<TData>> {
+    if (options?.observe === 'events') {
+      return this.http.get<TData>(
+      `/api/public/tournaments/${tournamentId}`,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'events',
+      }
+    );
+    }
+
+    if (options?.observe === 'response') {
+      return this.http.get<TData>(
+      `/api/public/tournaments/${tournamentId}`,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'response',
+      }
+    );
+    }
+
+    return this.http.get<TData>(
+      `/api/public/tournaments/${tournamentId}`,{
+        ...(options as Omit<NonNullable<typeof options>, 'observe'>),
+        observe: 'body',
+      }
+    );
+  }
+
+};
+
+export type GetPublicTournamentClientResult = NonNullable<PublicTournamentView>

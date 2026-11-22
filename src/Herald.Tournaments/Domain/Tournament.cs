@@ -291,8 +291,11 @@ public sealed class Tournament : AggregateRoot<TournamentId>
 
         if (broken.Count == 0 && Publication == Publication.Published)
         {
-            // A published tournament's dates change only through "Change dates" (D-5, Q3).
-            broken = DatesChangedIn(configuration);
+            // A published tournament's dates change only through "Change dates" (D-5, Q3), and its visibility only through
+            // "Change visibility", after its confirmation or preview (h1-public-read D-3).
+            broken = configuration.Visibility == Configuration.Visibility
+                ? DatesChangedIn(configuration)
+                : [.. DatesChangedIn(configuration), new BrokenRule("visibility", "change-visibility")];
         }
 
         if (broken.Count == 0)
@@ -498,6 +501,32 @@ public sealed class Tournament : AggregateRoot<TournamentId>
         return WriteOutcome.Applied;
     }
 
+    // In any state after publication, cancelled and archived included; before it, visibility is part of the configuration
+    // (§5.2, h1-public-read D-3). Logged as its own change.
+    public WriteResult ChangeVisibility(Visibility visibility, int expectedRevision, Guid actor, DateTimeOffset at, string? actorName = null)
+    {
+        if (Configuration.Visibility == visibility)
+        {
+            return WriteOutcome.Repeated;
+        }
+
+        if (expectedRevision != Revision)
+        {
+            return WriteOutcome.Stale;
+        }
+
+        if (Publication != Publication.Published)
+        {
+            return new(WriteOutcome.Rejected, [new("visibility", "not-published")]);
+        }
+
+        var before = Configuration.Visibility;
+        Configuration = Configuration with { Visibility = visibility };
+        Touch(actor, at);
+        Log(ChangeKind.VisibilityChanged, actor, actorName, at, Values([("visibility", before, visibility)]));
+        return WriteOutcome.Applied;
+    }
+
     // A draft has no entries and no other module holds anything of it, so it is removed whole (design D-4).
     public WriteResult CanDelete(int expectedRevision)
     {
@@ -562,7 +591,7 @@ public sealed class Tournament : AggregateRoot<TournamentId>
     }
 
     // Game or variant, participation structure and venue are material (F-02); capacity, title, admission and check-in are not
-    // (change-log A-2). Visibility has its own entry.
+    // (change-log A-2). Visibility has its own entry, through ChangeVisibility.
     private void LogMaterialChanges(TournamentConfiguration before, Guid actor, string? actorName, DateTimeOffset at)
     {
         var after = Configuration;
@@ -579,11 +608,6 @@ public sealed class Tournament : AggregateRoot<TournamentId>
         if (Values(fields) is { Count: > 0 } material)
         {
             Log(ChangeKind.MaterialChange, actor, actorName, at, material);
-        }
-
-        if (Values([("visibility", before.Visibility, after.Visibility)]) is { Count: > 0 } visibility)
-        {
-            Log(ChangeKind.VisibilityChanged, actor, actorName, at, visibility);
         }
     }
 
