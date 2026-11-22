@@ -1,0 +1,13 @@
+import { HttpInterceptorFn } from '@angular/common/http';
+
+/** The header that carries a mutation's operation identity (operation-receipts). */
+export const operationIdHeader = 'Operation-Id';
+
+/**
+ * Gives every admin mutation an operation identity, so the host keeps its receipt and a repeat of the same request returns the
+ * first outcome instead of a second effect. A request that already names one keeps it; reads go as they are.
+ */
+export const operationIdentity: HttpInterceptorFn = (request, next) =>
+  request.method === 'GET' || request.method === 'HEAD' || !request.url.includes('/api/organisations/') || request.headers.has(operationIdHeader)
+    ? next(request)
+    : next(request.clone({ setHeaders: { [operationIdHeader]: crypto.randomUUID() } }));
