@@ -1,11 +1,11 @@
 ## ADDED Requirements
 
 ### Requirement: Each slot has the same resources under its own names
-The infrastructure SHALL define, for each of the `main` and `preview` slots, an API container app, a public and an admin container app, a seeding job, Application Insights and the slot's identities, named `<type>-herald-<function>` for `main` and `<type>-herald-<function>-preview` for `preview`.
+The infrastructure SHALL define, for each of the `main` and `preview` slots, an API container app, a public and an admin container app, a seeding job, Application Insights and the slot's identities, named `<type>-herald-<function>` for `main` and `<type>-herald-preview-<function>` for `preview`.
 
 #### Scenario: Both slots are defined with their names
 - **WHEN** the infrastructure code is read
-- **THEN** it defines `ca-herald-api`, `ca-herald-public`, `ca-herald-admin`, `caj-herald-seed` and `appi-herald`, and the same names with `-preview`
+- **THEN** it defines `ca-herald-api`, `ca-herald-public`, `ca-herald-admin`, `caj-herald-seed` and `appi-herald`, and `ca-herald-preview-api`, `ca-herald-preview-public`, `ca-herald-preview-admin`, `caj-herald-preview-seed` and `appi-herald-preview`
 
 ### Requirement: Slots scale to zero and only the web apps are public
 Every container app SHALL have a minimum of zero replicas; the API's ingress SHALL be internal to the shared environment and the web apps' external.

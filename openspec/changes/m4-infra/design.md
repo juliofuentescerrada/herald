@@ -17,6 +17,10 @@ Archivist's `infra/` is the reference: `data` sources for the shared environment
 - **D-5 Images and databases.** Placeholder image with `ignore_changes` on the image, as Archivist. The databases are `azurerm_postgresql_flexible_server_database` resources imported (`import` blocks) when `databases_onboarded` is true, with `prevent_destroy` and their charset and collation ignored.
 - **D-6 Plans.** `infra.yml` on pull requests touching `infra/` or the workflow, on GitHub's hosted runners (Steward's ADR 0004), with the plan's summary in the run and the full plan folded; the plan file is not uploaded. A Node test (`infra/infra.test.mjs`) checks statically what the specification requires of the code: names per slot, minimum replicas, ingress, no secrets in variables, `prevent_destroy` on the databases.
 
+## Implementation notes
+
+- **Names (22 November 2026):** the proposal and specification first put `-preview` after the function (`ca-herald-api-preview`); the decision session, ADR 0012 and Steward's `onboard-herald` design put it before (`ca-herald-preview-api`, `id-herald-preview-api`). Both artefacts were corrected to the decision before any resource existed.
+
 ## Questions for the review
 
 - **Q1** D-2: a second, pull-only identity per slot for the web apps, or the slot identity for all four (fewer resources, but the public server could reach the database)?
