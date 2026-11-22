@@ -174,6 +174,30 @@ Next: M0's three changes are implemented and archived, and H1's slices up to tea
 
 H0 remains the product decision gate described in the functional baseline. It does not require solving H2–H7 or every M0 implementation detail. No H1 screen proposal is ready solely because a concept image or wireframe now exists: confirm the rule/interaction decisions and relevant states for that slice.
 
+## M4 batch — proposed 22 November 2026
+
+M4 is one batch under [ADR 0018](adr/0018-deliver-in-batches-tested-on-a-deployed-preview.md), on Steward's shared platform ([ADR 0012](adr/0012-azure-hosting.md)) with the slots of [ADR 0019](adr/0019-preview-environments-and-synthetic-data.md). Steward's `onboard-herald` has onboarded Herald (its groups 1–4, #86); its group 5 creates the slot databases once `m4-infra` has created the slot identities. M4 has no screens, so its proposals carry no prototypes.
+
+### Batch: main and preview on Azure
+
+Goal: `main` deploys on merge and a slice pull request deploys to `preview`, both seeded and signed in through the shared directory, with their cost measured.
+
+| Slice | Delivers | Depends on |
+|---|---|---|
+| `m4-cloud-runtime` | The host runs without a broker by configuration and reaches PostgreSQL with an Entra token as its slot's identity | none |
+| `m4-images` | Images of the host, the public SSR runtime, the admin application and the reset-and-seed job, one repository per slot | none |
+| `m4-infra` | The rest of `infra/` (OpenTofu): slot identities, Application Insights on `log-shared`, the container apps and job of each slot with a minimum of zero replicas, `budget-herald`; `infra.yml` plans on pull requests | none |
+| `m4-deploy` | `deploy.yml`: `main` on merge and `preview` per slice pull request, the job's schema reset, migrations and seeding, the pull request comment, redirect URIs and personas, and the measured cost | `m4-cloud-runtime`, `m4-images`, `m4-infra`, Steward's group 5 |
+
+Technical decisions, recorded in each change's `design.md` or in ADRs 0012 and 0019 (none is a product rule of §15). The decision session of 22 November 2026 closed them:
+
+- **Web runtime:** two container apps per slot, the public SSR runtime in a Node container that serves its own static files and the admin application in an unprivileged nginx container, both with a minimum of zero replicas, as ADR 0019 says.
+- **Migrations:** only in the job, already settled: outside Development, `db-apply` and the modules' migrations are deployment steps (`m0-messaging`).
+- **Cost:** `budget-herald` at 10 EUR a month, alerting at 80 % and 100 % actual and 100 % forecast; traces sampled at 25 %, logs and metrics unsampled; both reviewed against the cost `m4-deploy` measures.
+- **Taking `preview`:** a `preview` label on a slice pull request deploys it and each push redeploys it; the workflow refuses while another open pull request has the label; removing the label or closing the pull request releases the slot.
+- **Addresses:** Container Apps' default addresses on `cae-shared`, with managed TLS; a custom domain waits for production.
+Acceptance journey: a merge to `main` deploys and keeps its data; a slice pull request deploys to `preview` with seeded scenarios and the owner persona signs in; a second deployment of each needs no operator; a `preview` reset needs no server privileges and cannot reach `herald_main`; the measured monthly cost of both slots is recorded beside the base cost (M4's exit criteria in the milestone table above).
+
 ## Ideas outside the plan
 
 Feature ideas not yet planned are kept as GitHub issues labelled `idea` (template `.github/ISSUE_TEMPLATE/idea.yml`). They are not commitments: review them when the target delivery above is complete, or earlier if one fits a horizon being refined, and turn one into an OpenSpec change or close it with its reason.
