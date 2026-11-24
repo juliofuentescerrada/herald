@@ -22,6 +22,6 @@
 ## 5. Validation and completion
 
 - [x] 5.1 `covers` markers for every scenario this change adds; `node scripts/spec-coverage.mjs` passes
-- [ ] 5.2 Full run (`scripts/check all`); record the plan's summary in design.md
+- [x] 5.2 Full run (`scripts/check all`); record the plan's summary in design.md
 - [x] 5.3 Test script in `infra.yml` (design note): the plan's summary and `az resource list -g rg-herald` (names only) as text captures, the `infra-plan-screens` artefact
 - [ ] 5.4 herald-reviewer review of the diff; sync the specs and archive the change in the slice's pull request
