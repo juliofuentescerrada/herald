@@ -24,4 +24,5 @@
 - [x] 5.1 `covers` markers for every scenario this change adds; `node scripts/spec-coverage.mjs` passes
 - [x] 5.2 Full run (`scripts/check all`); record the plan's summary in design.md
 - [x] 5.3 Test script in `infra.yml` (design note): the plan's summary and `az resource list -g rg-herald` (names only) as text captures, the `infra-plan-screens` artefact
-- [ ] 5.4 herald-reviewer review of the diff; sync the specs and archive the change in the slice's pull request
+- [x] 5.4 herald-reviewer review of the diff, its findings resolved; sync the specs
+- [ ] 5.5 After 4.2: archive the change in a follow-up pull request (maintainer, 24 November 2026: 4.1 and 4.2 can only run after the merge)
