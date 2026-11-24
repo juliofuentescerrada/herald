@@ -12,7 +12,7 @@
 
 ## 3. Plan on pull requests
 
-- [ ] 3.1 `.github/workflows/infra.yml` (D-6) and its classification in `scripts/ci-changes.mjs`, with a `covers`-marked test; the plan on this slice's pull request creates only `rg-herald`'s resources
+- [x] 3.1 `.github/workflows/infra.yml` (D-6) and its classification in `scripts/ci-changes.mjs`, with a `covers`-marked test; the plan on this slice's pull request creates only `rg-herald`'s resources
 
 ## 4. First apply and Steward
 
