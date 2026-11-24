@@ -1,7 +1,7 @@
 name: Infra
 
 # A plan of infra/ on pull requests that change it (m4-infra D-6), on GitHub's hosted runners, signed in as
-# id-herald-delivery through its pull-request federated credential. The plan file is never uploaded.
+# id-herald-delivery through its pull-request federated credential. The plan file and its text are never published.
 on:
   pull_request:
     types: [opened, synchronize, reopened, ready_for_review]
@@ -56,21 +56,19 @@ jobs:
       - run: tofu fmt -check -recursive
       - run: tofu init -input=false
       - run: tofu validate
-      - run: tofu plan -input=false -no-color -out=tfplan
+      # The plan's text carries resource ids with the subscription in them and the run log is public, so only the
+      # summary line and the resource addresses are shown; errors still reach the log through stderr.
+      - run: tofu plan -input=false -no-color -lock-timeout=5m -out=tfplan > /dev/null
       - name: Plan summary
         run: |
           {
             echo "### tofu plan"
-            tofu show -no-color tfplan | grep -E '^(Plan:|No changes)' || true
-            echo '<details><summary>Full plan</summary>'
-            echo
             echo '```'
-            tofu show -no-color tfplan
+            tofu show -no-color tfplan | grep -E '^(Plan:|No changes)|^  # .* (will|must) be' || true
             echo '```'
-            echo '</details>'
           } >> "$GITHUB_STEP_SUMMARY"
       # The slice's test script (m4-infra 5.3): the plan's summary and rg-herald's resource names as text captures,
-      # uploaded as the pull request's infra-plan-screens artefact. Names only: the plan itself stays in the run.
+      # uploaded as the pull request's infra-plan-screens artefact. Names only: the plan itself is never published.
       - name: Plan capture
         run: |
           mkdir -p test-results/screens/infra-plan

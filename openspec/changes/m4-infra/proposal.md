@@ -18,7 +18,7 @@ Steward has onboarded Herald: `rg-herald` (created by `infra/bootstrap.sh`), `id
   - `ca-herald[-preview]-public` and `ca-herald[-preview]-admin`: external ingress on Container Apps' default addresses, minimum zero replicas.
   - `caj-herald[-preview]-seed`: a manually triggered job running the `seed` image as the slot's identity.
   - `appi-herald[-preview]`: Application Insights on `log-shared`.
-  - Configuration as environment variables: broker `None`, Entra database authentication, trace ratio 0.25, the directory's identifiers taken from GitHub environment variables (never from Git); `preview`'s job with the reset on, `main`'s without.
+  - Configuration as environment variables: broker `None`, Entra database authentication, trace ratio 0.25, the directory's identifiers taken from GitHub variables (never from Git); `preview`'s job with the reset on, `main`'s without.
 - **Images:** created with a placeholder image and ignored afterwards (`ignore_changes`); `m4-deploy` sets them.
 - **Databases:** once Steward's operator has created `herald_main` and `herald_preview` (group 5), a `databases_onboarded` variable imports them into this state, protected from destruction.
 - **`budget-herald`:** 10 EUR a month on `rg-herald`, alerting at 80 % and 100 % actual and 100 % forecast (decision session).
@@ -44,6 +44,6 @@ None.
 
 ## Impact
 
-- New: `infra/{versions,backend,main,variables,outputs}.tf`, `.github/workflows/infra.yml`, `infra/infra.test.mjs`.
+- New: `infra/{versions,backend,main,variables,outputs}.tf`, `.github/workflows/infra.yml`, `scripts/infra.test.mjs`.
 - `scripts/ci-changes.mjs`: `infra/` classified so that `infra.yml` runs and the code jobs do not.
 - Cost: identities, Application Insights and the container apps at zero replicas cost nothing idle; usage is measured by `m4-deploy`.

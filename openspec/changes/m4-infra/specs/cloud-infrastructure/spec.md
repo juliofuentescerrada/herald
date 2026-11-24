@@ -22,7 +22,7 @@ The infrastructure SHALL find Steward's resources by their documented names and 
 - **THEN** it has no `terraform_remote_state` and refers to `cae-shared`, `crjfcshared`, `log-shared` and `psql-jfc-shared` by name
 
 ### Requirement: No secret in the infrastructure's configuration
-The infrastructure SHALL configure the apps with non-secret values only, take the directory's identifiers from the slot's environment instead of the repository, and define no Key Vault or container app secret.
+The infrastructure SHALL configure the apps with non-secret values only, take the directory's identifiers from GitHub variables, never from the repository's files, and define no Key Vault or container app secret.
 
 #### Scenario: No secrets defined
 - **WHEN** the infrastructure code is read
