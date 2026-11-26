@@ -28,6 +28,14 @@ test('every image runs its entry point as a non-root user', () => {
   }
 });
 
+test('each image starts its own process', () => {
+  const entrypoint = (name) => JSON.parse(docker('image', 'inspect', '-f', '{{json .Config.Entrypoint}}', image(name)));
+  assert.deepEqual(entrypoint('api'), ['dotnet', 'Herald.Host.dll']);
+  assert.deepEqual(entrypoint('seed'), ['dotnet', 'Herald.Seed.dll']);
+  assert.deepEqual(entrypoint('public'), ['node', 'server/server.mjs']);
+  assert.deepEqual(entrypoint('admin'), ['/docker-entrypoint.sh']);
+});
+
 // covers: container-images: The seeding tool is absent from the host's image
 test("the host's image has no seeding or test assembly, the seed image has both", () => {
   const api = files('api', '/app');
@@ -68,4 +76,10 @@ test('the admin container stops, naming the variable, without its client id', ()
   const run = spawnSync('docker', ['run', '--rm', ...envArgs(rest), image('admin')], { encoding: 'utf8' });
   assert.notEqual(run.status, 0);
   assert.match(run.stderr, /HERALD_AUTH_CLIENT_ID is not set/);
+});
+
+test("the admin container stops when the API's address has a path, which would break the forwarding", () => {
+  const run = spawnSync('docker', ['run', '--rm', ...envArgs({ ...adminEnv, HERALD_API_URL: 'https://api.internal.example/' }), image('admin')], { encoding: 'utf8' });
+  assert.notEqual(run.status, 0);
+  assert.match(run.stderr, /HERALD_API_URL must have no path/);
 });

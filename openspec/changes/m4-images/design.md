@@ -20,8 +20,9 @@ The host targets .NET 10 and loads Wolverine's generated code statically outside
 
 - The image and CI depend on the same build step → intended: one build, one result.
 - Base images pinned by digest go stale → updated by hand in a pull request deployed to `preview`; automating it (Dependabot) is a separate decision.
-- The public SSR server answers 400 to a host that is not in Angular's allowlist (`allowedHosts` is empty in `angular.json`): its container needs `NG_ALLOWED_HOSTS` set to its own address, which `m4-infra`'s `ca-herald[-preview]-public` does not set yet → `m4-deploy` adds it beside `PORT` and `HERALD_API_URL` (the test script sets it to `localhost`).
-- `HERALD_API_URL` must have no path, not even a trailing slash: nginx would otherwise replace `/api/` in the forwarded path. `m4-infra`'s addresses have none.
+- The public SSR server answers 400 to a host that is not in Angular's allowlist (`allowedHosts` is empty in `angular.json`): its container needs `NG_ALLOWED_HOSTS` set to its own address, which `m4-infra`'s `ca-herald[-preview]-public` does not set yet → `m4-deploy`'s task 3.2 adds it to `infra/apps.tf` beside `PORT` and `HERALD_API_URL` (the test script sets it to `localhost`).
+- `HERALD_API_URL` must have no path, not even a trailing slash: nginx would otherwise replace `/api/` in the forwarded path. `m4-infra`'s addresses have none, and the admin's start script refuses one that has.
+- The `test-scripts` job now also publishes and builds the images for this slice's script: its timeout goes from 20 to 30 minutes.
 
 ## Results (26 November 2026)
 
