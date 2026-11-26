@@ -2,6 +2,7 @@
 # Product and library names
 AADSTS
 ASPNETCORE
+appsettings
 Blazor
 Dockerfiles
 CONTENTROOT
