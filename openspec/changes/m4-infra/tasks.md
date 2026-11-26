@@ -16,7 +16,7 @@
 
 ## 4. First apply and Steward
 
-- [ ] 4.1 After merge, with the maintainer's authorisation: the first `apply` from `main`; the slot identities' object ids handed to Steward's operator outside Git, for `onboard-herald` group 5
+- [x] 4.1 After merge, with the maintainer's authorisation: the first `apply` from `main`; the slot identities' object ids handed to Steward's operator outside Git, for `onboard-herald` group 5
 - [ ] 4.2 After group 5: `databases_onboarded` set and a plan that only imports the two databases
 
 ## 5. Validation and completion
