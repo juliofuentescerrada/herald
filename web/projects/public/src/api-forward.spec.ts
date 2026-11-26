@@ -34,7 +34,7 @@ describe('the public server forwarding /api', () => {
   });
 
   it('passes the path, query and Authorization header, and returns the API status and body',
-    { meta: { type: 'covers', description: 'cloud-runtime: A browser request to the public origin\'s API path' } }, async () => {
+    { meta: { type: 'covers', description: "cloud-runtime: A browser request to the public origin's API path" } }, async () => {
       const response = await fetch(`${siteUrl}/api/tournaments/t-1?view=public`, { headers: { Authorization: 'Bearer browser-token' } });
 
       expect(seen).toMatchObject({ method: 'GET', url: '/api/tournaments/t-1?view=public', authorization: 'Bearer browser-token' });

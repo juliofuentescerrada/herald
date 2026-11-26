@@ -15,7 +15,7 @@
 
 ## 4. Validation and completion
 
-- [ ] 4.1 `covers` markers for every scenario this change adds; `node scripts/spec-coverage.mjs` passes
+- [x] 4.1 `covers` markers for every scenario this change adds; `node scripts/spec-coverage.mjs` passes
 - [ ] 4.2 Full run (`scripts/check all` and the e2e suite, which now runs without a broker through the option); record in design.md
 - [ ] 4.3 Test script in `e2e/scripts/`: the host without a broker, its `/alive` and `/health` answers as text captures, and a public tournament page served through the `/api` forwarding, with a screenshot
 - [ ] 4.4 herald-reviewer review of the diff; sync the specs and archive the change in the slice's pull request
