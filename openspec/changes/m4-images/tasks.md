@@ -11,7 +11,7 @@
 
 ## 3. CI
 
-- [ ] 3.1 `images` job and its classification in `scripts/ci-changes.mjs` (D-5), with a `covers`-marked test of the classification
+- [x] 3.1 `images` job and its classification in `scripts/ci-changes.mjs` (D-5), with a `covers`-marked test of the classification
 
 ## 4. Validation and completion
 
