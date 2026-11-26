@@ -11,7 +11,7 @@
 ## 3. Public server and seeding
 
 - [x] 3.1 `/api` forwarding in `server.ts` (D-5); a Vitest test with a stub API
-- [ ] 3.2 The seeding tool's reset (D-6); tests against real PostgreSQL for both `synthetic-data` scenarios
+- [x] 3.2 The seeding tool's reset (D-6); tests against real PostgreSQL for both `synthetic-data` scenarios
 
 ## 4. Validation and completion
 

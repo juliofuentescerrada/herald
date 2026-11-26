@@ -32,6 +32,13 @@ public static class SeedCommand
 
         try
         {
+            // Only when asked: the preview slot's job resets, nothing else does (m4-cloud-runtime D-6).
+            if (configuration.GetValue<bool>("Herald:Seed:Reset"))
+            {
+                await Reset.DropSchemasAsync(connectionString, configuration);
+                await output.WriteLineAsync($"reset             {string.Join(", ", Reset.Schemas)}");
+            }
+
             foreach (var result in await Seeder.RunAsync(connectionString, personas, DateTimeOffset.UtcNow))
             {
                 await output.WriteLineAsync(result.Outcome == ScenarioOutcome.Seeded ? $"seeded            {result.Name}" : $"already present   {result.Name}");
