@@ -4,7 +4,7 @@
 
 ## 2. Images
 
-- [ ] 2.1 `api` and `seed` Dockerfiles (D-1, D-2, D-3) and `.dockerignore`
+- [x] 2.1 `api` and `seed` Dockerfiles (D-1, D-2, D-3) and `.dockerignore`
 - [ ] 2.2 `public` Dockerfile
 - [ ] 2.3 `admin` Dockerfile, nginx configuration with the `/api/` forwarding, and the start script that writes `runtime-config.json` (D-4)
 - [ ] 2.4 `deploy/images/images.test.mjs` for the `container-images` scenarios, run against locally built images
