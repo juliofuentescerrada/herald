@@ -15,7 +15,7 @@
 
 ## 4. Validation and completion
 
-- [ ] 4.1 `covers` markers for every scenario this change adds; `node scripts/spec-coverage.mjs` passes
+- [x] 4.1 `covers` markers for every scenario this change adds; `node scripts/spec-coverage.mjs` passes
 - [ ] 4.2 Full run (`scripts/check all`) and the `images` job green; record image sizes in design.md
 - [ ] 4.3 Test script in `e2e/scripts/`: the four images started locally (admin with stub configuration), with the admin's `runtime-config.json` and the public home page as captures and a screenshot
 - [ ] 4.4 herald-reviewer review of the diff; sync the specs and archive the change in the slice's pull request
