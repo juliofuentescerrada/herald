@@ -2,6 +2,8 @@
 
 **Proposed in the M4 batch's proposals pull request, 22 November 2026.** The technical decisions come from the batch's decision session of the same day ([M4 batch](../../../docs/roadmap.md#batch-main-and-preview-on-azure), ADRs 0012 and 0019). Merging the proposals pull request approves this change (ADR 0018); task 1.1 records that approval.
 
+**Approved for implementation on 22 November 2026**, when the maintainer merged the M4 batch proposals pull request (#95). The review asked for no change to this one. Since then `m4-infra` (archived 26 November 2026) set the admin app's environment with the AppHost's names, so D-4's start script reads `HERALD_AUTH_AUTHORITY`, `HERALD_AUTH_CLIENT_ID`, `HERALD_AUTH_API_SCOPE` and `HERALD_PUBLIC_URL`.
+
 ## Why
 
 Each slot runs four things (ADR 0019 and the decision session): the host, the public SSR server, the admin application and the job that resets, migrates and seeds. None has an image. The seeding tool must never be part of the host's image (ADR 0019), and the admin's directory identifiers stay out of the repository and of the image (`docs/operations/identity.md`).

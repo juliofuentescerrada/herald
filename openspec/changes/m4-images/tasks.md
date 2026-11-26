@@ -1,6 +1,6 @@
 ## 1. Review gates
 
-- [ ] 1.1 Record in proposal.md that merging the M4 batch proposals pull request approved this change, with any change the review asked for (ADR 0018); verify with `openspec validate m4-images`
+- [x] 1.1 Record in proposal.md that merging the M4 batch proposals pull request approved this change, with any change the review asked for (ADR 0018); verify with `openspec validate m4-images`
 
 ## 2. Images
 
