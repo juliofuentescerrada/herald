@@ -115,6 +115,8 @@ jobs:
         working-directory: e2e
       # Built here so the servers start within their readiness timeout.
       - run: dotnet build src/Herald.Host && dotnet build tools/Herald.Seed
+      # The m4-images test script starts the images against this run's servers.
+      - run: deploy/images/build
       - run: pnpm test:scripts
         working-directory: e2e
       - if: always()
@@ -145,12 +147,9 @@ jobs:
       - uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
         with:
           global-json-file: global.json
-      - run: dotnet publish src/Herald.Host -c Release -o out/api
-      - run: dotnet publish tools/Herald.Seed -c Release -o out/seed
-      - run: pnpm install --frozen-lockfile && pnpm build public && pnpm build admin
+      - run: pnpm install --frozen-lockfile
         working-directory: web
-      - name: Build the images
-        run: for name in api seed public admin; do docker build -f "deploy/images/$name/Dockerfile" -t "herald-$name:local" .; done
+      - run: deploy/images/build
       - run: node --test deploy/images/images.test.mjs
       - name: Image sizes
         run: docker images --format '{{.Repository}} {{.Size}}' --filter 'reference=herald-*' >> "$GITHUB_STEP_SUMMARY"

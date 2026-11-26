@@ -10,6 +10,7 @@ server {
     }
 
     # The API's ingress is internal to the environment (m4-cloud-runtime D-5): the browser reaches it through this origin.
+    # HERALD_API_URL has no path, not even a trailing slash, so the request's /api/... path reaches the API unchanged.
     location /api/ {
         proxy_pass ${HERALD_API_URL};
         proxy_ssl_server_name on;

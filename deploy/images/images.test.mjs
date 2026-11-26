@@ -16,7 +16,7 @@ const adminEnv = {
   HERALD_AUTH_CLIENT_ID: 'stub-client',
   HERALD_AUTH_API_SCOPE: 'api://stub/access_as_user',
   HERALD_PUBLIC_URL: 'https://public.example',
-  HERALD_API_URL: 'http://127.0.0.1:9/',
+  HERALD_API_URL: 'http://127.0.0.1:9',
 };
 const envArgs = (env) => Object.entries(env).flatMap(([name, value]) => ['-e', `${name}=${value}`]);
 
