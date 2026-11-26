@@ -1,0 +1,9 @@
+# The images package the runner's build output only (m4-images D-1): everything else stays out of the context.
+*
+!out/api
+!out/seed
+!web/dist/public
+!web/dist/admin/browser
+!deploy/images
+# Written at start from the environment, never baked in (D-4): a local development file must not enter an image.
+**/runtime-config.json
