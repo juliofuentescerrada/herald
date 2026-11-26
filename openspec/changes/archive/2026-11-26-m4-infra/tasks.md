@@ -17,7 +17,7 @@
 ## 4. First apply and Steward
 
 - [x] 4.1 After merge, with the maintainer's authorisation: the first `apply` from `main`; the slot identities' object ids handed to Steward's operator outside Git, for `onboard-herald` group 5
-- [ ] 4.2 After group 5: `databases_onboarded` set and a plan that only imports the two databases
+- [x] 4.2 After group 5: `databases_onboarded` set and a plan that only imports the two databases
 
 ## 5. Validation and completion
 
@@ -25,4 +25,4 @@
 - [x] 5.2 Full run (`scripts/check all`); record the plan's summary in design.md
 - [x] 5.3 Test script in `infra.yml` (design note): the plan's summary and `az resource list -g rg-herald` (names only) as text captures, the `infra-plan-screens` artefact
 - [x] 5.4 herald-reviewer review of the diff, its findings resolved; sync the specs
-- [ ] 5.5 After 4.2: archive the change in a follow-up pull request (maintainer, 24 November 2026: 4.1 and 4.2 can only run after the merge)
+- [x] 5.5 After 4.2: archive the change in a follow-up pull request (maintainer, 24 November 2026: 4.1 and 4.2 can only run after the merge)

@@ -29,6 +29,7 @@ Archivist's `infra/` is the reference: `data` sources for the shared environment
 - **No principal id in the outputs:** apply logs are public; Steward's operator reads the slot identities with `az identity show`.
 - **First apply (task 4.1, maintainer, 26 November 2026):** run by hand from `main` (`2ef593f`) with OpenTofu 1.13.9 and the maintainer's own sign-in, the directory variables still unset: `19 added, 0 changed, 0 destroyed`, and a plan afterwards shows no changes. `rg-herald` now holds `appi-herald`, `appi-herald-preview`, `ca-herald-{api,public,admin}`, `ca-herald-preview-{api,public,admin}`, `caj-herald-seed`, `caj-herald-preview-seed`, `id-herald-{api,web}` and `id-herald-preview-{api,web}`; the budget is not a resource of the group's listing.
 - **Steward's group 5 (maintainer, 26 November 2026):** the maintainer, as Steward's operator, ran `onboard-database.sql` once per database with one migrator role each, named after the slot identity (`id-herald-api` on `herald_main`, `id-herald-preview-api` on `herald_preview`), and no extensions. The object ids never entered Git. The script requires `extensions` even when empty (`-v extensions=`), which is Steward's to fix.
+- **Databases imported (task 4.2, maintainer, 26 November 2026):** with `HERALD_DATABASES_ONBOARDED` set, the plan imported only `herald_main` and `herald_preview` (`2 to import, 0 to add, 0 to change, 0 to destroy`); after the import a plan shows no changes.
 
 ## Questions for the review
 
