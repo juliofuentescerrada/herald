@@ -1,3 +1,4 @@
+using Azure.Monitor.OpenTelemetry.Exporter;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Diagnostics.HealthChecks;
 using Microsoft.Extensions.Configuration;
@@ -14,6 +15,13 @@ namespace Herald.ServiceDefaults;
 public static class ServiceDefaults
 {
     private const string LiveTag = "live";
+
+    // Set by Azure hosting; their presence means a deployment.
+    private static readonly string[] _hostingMarkers = ["CONTAINER_APP_NAME", "WEBSITE_SITE_NAME"];
+
+    /// <summary>The Azure hosting marker this configuration carries, or null outside a deployment.</summary>
+    public static string? HostingMarker(IConfiguration configuration) =>
+        _hostingMarkers.FirstOrDefault(name => !string.IsNullOrEmpty(configuration[name]));
 
     public static TBuilder AddServiceDefaults<TBuilder>(this TBuilder builder)
         where TBuilder : IHostApplicationBuilder
@@ -40,6 +48,24 @@ public static class ServiceDefaults
             telemetry.UseOtlpExporter();
         }
 
+        // A deployed slot exports to Application Insights, traces sampled (m4-cloud-runtime D-4); logs and metrics are not.
+        if (builder.Configuration["APPLICATIONINSIGHTS_CONNECTION_STRING"] is { Length: > 0 } connectionString)
+        {
+            var ratio = builder.Configuration.GetValue("Herald:Telemetry:TraceSampleRatio", 1.0);
+            telemetry
+                .WithTracing(tracing => tracing
+                    .AddAzureMonitorTraceExporter(options => options.ConnectionString = connectionString)
+                    // After the exporter, which sets its own rate-limited sampler: the last sampler set wins.
+                    .SetSampler(new ParentBasedSampler(new TraceIdRatioBasedSampler(ratio))))
+                .WithMetrics(metrics => metrics.AddAzureMonitorMetricExporter(options => options.ConnectionString = connectionString));
+            builder.Logging.AddOpenTelemetry(logging => logging.AddAzureMonitorLogExporter(options =>
+            {
+                options.ConnectionString = connectionString;
+                // Otherwise logs of unsampled traces are dropped with them.
+                options.EnableTraceBasedLogsSampler = false;
+            }));
+        }
+
         builder.Services.AddHealthChecks()
             .AddCheck("self", () => HealthCheckResult.Healthy(), [LiveTag]);
 
@@ -55,9 +81,9 @@ public static class ServiceDefaults
 
     public static WebApplication MapDefaultEndpoints(this WebApplication app)
     {
-        // Exposing health in Azure (Container Apps probes) is decided in M4. The end-to-end suite (E2E)
-        // waits on /health before its journeys.
-        if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("E2E"))
+        // The end-to-end suite (E2E) waits on /health before its journeys; Container Apps probes a deployed slot
+        // (m4-cloud-runtime D-3). The OpenAPI documents stay Development-only.
+        if (app.Environment.IsDevelopment() || app.Environment.IsEnvironment("E2E") || HostingMarker(app.Configuration) is not null)
         {
             app.MapHealthChecks("/health");
             app.MapHealthChecks("/alive", new HealthCheckOptions

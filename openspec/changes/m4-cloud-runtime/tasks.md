@@ -6,7 +6,7 @@
 
 - [x] 2.1 `Herald:Messaging:Broker` (D-1), E2E through the same option; host tests for the `cloud-runtime` broker scenario
 - [x] 2.2 Entra authentication for the data source (D-2); the packages and their transitive licences pass `scripts/rules.mjs`; a test of the token-provider configuration
-- [ ] 2.3 Health in a deployment (D-3) and telemetry export with sampling (D-4); host tests for both scenarios
+- [x] 2.3 Health in a deployment (D-3) and telemetry export with sampling (D-4); host tests for both scenarios
 
 ## 3. Public server and seeding
 
