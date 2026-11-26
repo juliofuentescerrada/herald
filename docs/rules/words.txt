@@ -28,6 +28,9 @@ nologo
 Postprocessors
 xunit
 vendored
+# Azure resource names and prefixes (Steward's naming convention)
+appi
+crjfcshared
 # Identity and web terms
 accesstoken
 refreshtoken

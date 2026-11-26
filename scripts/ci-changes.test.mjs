@@ -118,6 +118,17 @@ test('No CI job runs on a draft, and marking it ready starts them', () => {
   assert.ok(jobs.changes.includes(notDraft) && jobs.rules.includes(notDraft), 'the jobs without needs skip drafts');
 });
 
+// covers: cloud-infrastructure: An infrastructure change triggers its plan
+test('An infrastructure change runs the infra workflow, and not the code jobs by itself', () => {
+  assert.equal(touchesCode(['infra/apps.tf', '.github/workflows/infra.yml', 'docs/roadmap.md']), false);
+  assert.equal(touchesCode(['infra/apps.tf', 'src/Herald.Host/Program.cs']), true);
+  const { text, jobs } = jobsOf('infra.yml');
+  assert.match(text, /pull_request:\n {4}types: \[opened, synchronize, reopened, ready_for_review\]\n {4}paths:\n {6}- infra\/\*\*\n/);
+  assert.deepEqual(Object.keys(jobs), ['plan']);
+  assert.match(jobs.plan, /!github\.event\.pull_request\.draft/);
+  assert.match(jobs.plan, /tofu plan /);
+});
+
 // covers: continuous-integration: A documentation-only merge
 test('The journeys after a merge wait for the classification and run only for code', () => {
   const { jobs } = jobsOf('e2e.yml');
