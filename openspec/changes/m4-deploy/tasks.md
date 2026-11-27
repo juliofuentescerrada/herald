@@ -1,7 +1,7 @@
 ## 1. Review gates
 
 - [x] 1.1 Record in proposal.md that merging the M4 batch proposals pull request approved this change, with any change the review asked for (ADR 0018); verify with `openspec validate m4-deploy`
-- [ ] 1.2 Check that `m4-cloud-runtime`, `m4-images` and `m4-infra` are merged and Steward's `onboard-herald` group 5 is done
+- [x] 1.2 Check that `m4-cloud-runtime`, `m4-images` and `m4-infra` are merged and Steward's `onboard-herald` group 5 is done
 
 ## 2. Personas and environments (operator, with the maintainer)
 
