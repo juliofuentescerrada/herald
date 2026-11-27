@@ -16,6 +16,8 @@
 
 ## 4. First deployments
 
+The slice's pull request covers 4.2 and 5.3 and is merged; 4.1, 4.3 and 5.4 follow in a second pull request, as `m4-infra`'s did (maintainer, 27 November 2026): `main` deploys only once `deploy.yml` is on it.
+
 - [ ] 4.1 Merge deploys `main`; the owner persona signs in and finds its seeded organisation; a second merge deploys with no operator
 - [ ] 4.2 This slice's own pull request labelled `preview`: deployed with a reset, and a role of `herald_preview` cannot connect to `herald_main` (Steward's task 5.1 records it); record both in design.md and in Steward's evidence
 - [ ] 4.3 After a week of use: the measured monthly cost of both slots, the cold-start times and log volume in design.md, ADR 0019 and the roadmap; review `budget-herald` and the trace ratio
