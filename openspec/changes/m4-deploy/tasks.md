@@ -11,7 +11,7 @@
 ## 3. Pipeline
 
 - [x] 3.1 `scripts/preview-slot.mjs` (D-2) and its Node tests for the four guard scenarios; the `preview` label in `scripts/github-setup`
-- [ ] 3.2 `.github/workflows/deploy.yml` (D-1, D-3, D-4, D-5) and a Node test reading it for the `main` and `preview` step scenarios; the public app's `NG_ALLOWED_HOSTS` (its own host name) in `infra/apps.tf`, without which the SSR server answers 400 (`m4-images` design)
+- [x] 3.2 `.github/workflows/deploy.yml` (D-1, D-3, D-4, D-5) and a Node test reading it for the `main` and `preview` step scenarios; the public app's `NG_ALLOWED_HOSTS` (its own host name) in `infra/apps.tf`, without which the SSR server answers 400 (`m4-images` design)
 - [ ] 3.3 Smoke check, timings and the pull request comment (D-7), with a test that the composed comment carries no identifiers
 
 ## 4. First deployments

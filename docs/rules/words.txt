@@ -30,6 +30,7 @@ Postprocessors
 xunit
 vendored
 unlabeled
+containerapp
 # Azure resource names and prefixes (Steward's naming convention)
 appi
 crjfcshared

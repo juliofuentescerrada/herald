@@ -79,6 +79,11 @@
       "reason": "azure/login's `tenant-id` input, the Azure directory's id."
     },
     {
+      "path": ".github/workflows/deploy.yml",
+      "term": "tenant",
+      "reason": "azure/login's `tenant-id` input, the Azure directory's id."
+    },
+    {
       "path": "e2e/environment.ts",
       "term": "tenant",
       "reason": "The test identity provider's issuer stands for the directory's tenant."
