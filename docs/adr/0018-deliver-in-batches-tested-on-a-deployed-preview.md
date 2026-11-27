@@ -59,3 +59,5 @@ The maintainer keeps the decisions, ADR acceptance and the merge. Nothing here l
   - H1's first batch, started by hand, is the trial; the next-slice scheduled task is created after it, because scheduled tasks are a research preview and may change.
 
 Direction proposed by the maintainer on 12 November 2026 and accepted on 13 November 2026, with `batch-delivery`'s revisions: the flow starts with H1's remaining slices, the test round is local until M4, and two slices may be in progress.
+
+Revised by the maintainer on 27 November 2026: no GitHub Project board was created and none is needed. The labels and milestones of the issues track status on their own; the board in the decision and its follow-ups is dropped ([delivery tracking](../operations/delivery-tracking.md)).

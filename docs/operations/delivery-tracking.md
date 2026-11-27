@@ -1,14 +1,10 @@
-# Delivery tracking: milestones, labels and the board
+# Delivery tracking: milestones and labels
 
 From H1's remaining slices, progress lives in GitHub Issues ([ADR 0018](../adr/0018-deliver-in-batches-tested-on-a-deployed-preview.md)). Issues hold state and feedback, never content: specifications, decisions and ADRs stay in the repository and the issues link to them. `docs/roadmap.md` keeps the milestones' exit criteria.
 
 ## Set up once
 
-1. **Labels and milestones:** run `scripts/github-setup` from the repository root with a `gh` signed in to an account that can administer the repository. It creates or updates the labels and milestones below, and can be run again at any time. `scripts/github-setup --dry-run` shows what it would do.
-2. **The project board** (a manual step, because it needs the `project` scope on `gh`, or the web):
-   - create a Projects board for the repository named "Herald delivery";
-   - set its Status field to the columns below, in that order;
-   - add the milestones' issues to it.
+**Labels and milestones:** run `scripts/github-setup` from the repository root with a `gh` signed in to an account that can administer the repository. It creates or updates the labels and milestones below, and can be run again at any time. `scripts/github-setup --dry-run` shows what it would do. There is no project board: the labels and milestones are the whole view.
 
 ## Labels
 
@@ -25,11 +21,11 @@ From H1's remaining slices, progress lives in GitHub Issues ([ADR 0018](../adr/0
 
 Status labels trigger nothing. The `delivery-labels` workflow (`.github/workflows/delivery-labels.yml`) removes `in-progress`, `ready-to-test` and `feedback` from an issue when it closes, and labels a batch `ready-to-test`, without `needs-decision`, when its last slice sub-issue closes. The session implementing a slice labels its issue `in-progress` when it starts and `ready-to-test` when it marks the pull request ready (`CLAUDE.md`). `agent:start` starts or resumes a slice once the `issues.labeled` scheduled task exists, which is after H1's first batch (ADR 0018); until then it only marks the slice the maintainer asks a session to start. ADR 0018 defines when a slice counts as in progress and how many may be.
 
-## Board columns
+## Status by label
 
-Projects does not map labels to its Status field by itself: the agent moves a slice's card when it changes the slice's label, and the board's built-in workflows move closed issues to Done and newly added issues to Ready.
+A filtered issue list gives each status, with `gh issue list --label <label>` or the web.
 
-| Column | Issues in it |
+| Status | Issues in it |
 |---|---|
 | Needs decision | Batches labelled `needs-decision` |
 | Ready | Slices whose "Depends on" are merged, not yet started |

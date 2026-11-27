@@ -7,6 +7,8 @@ For UI proposals, mockups, implementation and reviews, load these repository-own
 - `.agents/skills/herald-screens/SKILL.md`: visual-input and screenshot process.
 - `.agents/skills/refactoring-ui/SKILL.md`: Refactoring UI practices with Herald's constraints.
 - `.agents/skills/herald-docs/SKILL.md`: documentation ownership and decision status.
+- `.agents/skills/herald-status/SKILL.md`: roadmap status, the latest work and the recommended next task.
+- `.agents/skills/herald-cleanup/SKILL.md`: cleaning up merged branches, worktrees and stale issues after one confirmation.
 
 Their `SKILL.md` entry points are links to the canonical `.claude/skills/` sources; edit the source once. Claude Code discovers those sources directly. OpenSpec routes to them through `openspec/config.yaml`. No external design plugin is required.
 
