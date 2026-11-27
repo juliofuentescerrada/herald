@@ -20,9 +20,8 @@ Read each source by section, never whole (`docs/roadmap.md` is long), and run th
   - The milestones' issues: `gh issue list --state open --milestone "<milestone>" --json number,title,labels` for the milestone in progress and the next (`gh api repos/{owner}/{repo}/milestones --jq '.[]|"\(.title) \(.open_issues)/\(.open_issues+.closed_issues)"'` lists them), so batches, slices and other issues all appear; `gh issue view <batch> --comments` for the batch's last note.
   - `gh issue list --label needs-decision --state open --json number,title` and `gh issue list --label feedback --state open --json number,title`.
   - CI on `main`: `gh run list --branch main --limit 3 --json workflowName,conclusion,headSha`.
-  - The "Herald delivery" board: `gh project item-list <number> --owner @me --format json` (`gh project list --owner @me` gives the number). It needs the `read:project` scope; without it, say that `gh auth refresh -h github.com -s read:project`, in a terminal outside the session, enables it, and go on. No board of that name is itself a finding: setting it up is the maintainer's manual step 2 of `docs/operations/delivery-tracking.md`.
 
-  Check the tracking against `docs/operations/delivery-tracking.md`: a slice's label matches its pull request (`in-progress` while a draft, `ready-to-test` once ready, `feedback` with open comments), a closed slice's checkboxes in its batch, a card's column matches its label, and a merged slice's issue is closed.
+  Check the tracking against `docs/operations/delivery-tracking.md`: a slice's label matches its pull request (`in-progress` while a draft, `ready-to-test` once ready, `feedback` with open comments), a closed slice's checkboxes in its batch, and a merged slice's issue is closed.
 
 Issues and pull requests hold progress (ADR 0018, `docs/operations/delivery-tracking.md`); the roadmap holds milestones and exit criteria. Where they disagree, report the disagreement instead of picking one.
 
