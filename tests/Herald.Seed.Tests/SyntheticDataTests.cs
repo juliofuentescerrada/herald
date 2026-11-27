@@ -309,6 +309,7 @@ public class SyntheticDataTests(SeededDatabases databases)
 
         output.ToString().ShouldNotContain("reset");
         output.ToString().ShouldNotContain("seeded ");
+        Scenarios.All.ShouldAllBe(scenario => output.ToString().Contains($"already present   {scenario.Name}"));
         (await SeededDatabases.CountAsync(database, """select count(*) from registration."Entries" """)).ShouldBe(entries);
     }
 

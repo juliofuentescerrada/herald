@@ -2,12 +2,15 @@ using System.Net;
 using System.Reflection;
 using Herald.Contracts.Tournaments.V1;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.Hosting;
+using Microsoft.Extensions.Logging;
+using OpenTelemetry.Metrics;
 using OpenTelemetry.Trace;
 using Shouldly;
 using Wolverine.AzureServiceBus;
 using Wolverine.Configuration;
 using Wolverine.Runtime;
-using Wolverine.Runtime.Routing;
+using Wolverine.Tracking;
 
 namespace Herald.Host.Tests;
 
@@ -16,7 +19,7 @@ public class CloudRuntimeTests(PostgresFixture postgres)
 {
     [Fact]
     [Trait("covers", "cloud-runtime: A host configured without a broker delivers an integration event")]
-    public async Task A_host_configured_without_a_broker_routes_integration_events_through_durable_local_queues()
+    public async Task A_host_configured_without_a_broker_delivers_an_integration_event_through_its_durable_local_queue()
     {
         // No messaging connection string: configuring Service Bus would fail to start the host.
         await using var host = new HostFactory(postgres.ConnectionString, "Production");
@@ -25,11 +28,12 @@ public class CloudRuntimeTests(PostgresFixture postgres)
             .UseSetting("ConnectionStrings:messaging", ""));
         _ = withoutBroker.CreateClient();
         var runtime = withoutBroker.Services.GetRequiredService<IWolverineRuntime>();
+        var terms = new TournamentEntryTermsChanged(Guid.NewGuid(), Guid.NewGuid(), 1, RegistrationState.Open, 8, EntryKind.Individual, Admission.Automatic);
 
-        var route = runtime.RoutingFor(typeof(TournamentEntryTermsChanged)).Routes.OfType<MessageRoute>().ShouldHaveSingleItem();
+        var session = await withoutBroker.Services.GetRequiredService<IHost>().TrackActivity().PublishMessageAndWaitAsync(terms);
 
-        route.Uri.ShouldBe(new Uri("local://registration/"));
-        runtime.Endpoints.EndpointFor(route.Uri)!.Mode.ShouldBe(EndpointMode.Durable);
+        session.Executed.SingleEnvelope<TournamentEntryTermsChanged>().Destination.ShouldBe(new Uri("local://registration/"));
+        runtime.Endpoints.EndpointFor(new Uri("local://registration/"))!.Mode.ShouldBe(EndpointMode.Durable);
         runtime.Options.Transports.OfType<AzureServiceBusTransport>().ShouldBeEmpty();
     }
 
@@ -63,6 +67,11 @@ public class CloudRuntimeTests(PostgresFixture postgres)
 
         sampler.ShouldBeOfType<ParentBasedSampler>();
         sampler.Description.ShouldContain("TraceIdRatioBasedSampler{0.250000}");
+
+        // Metrics and logs are exported too, with no sampler of their own. The log exporter's trace-based sampling,
+        // switched off in ServiceDefaults, lives in options the SDK builds internally, so it is not observable here.
+        exporting.Services.GetService<MeterProvider>().ShouldNotBeNull();
+        exporting.Services.GetServices<ILoggerProvider>().ShouldContain(provider => provider.GetType().Name == "OpenTelemetryLoggerProvider");
     }
 
     [Fact]

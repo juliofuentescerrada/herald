@@ -5,7 +5,7 @@ import { scriptPersona, urls } from '../environment.ts';
 import { capture, screen } from './screens.ts';
 
 // The development server sends /api through proxy.conf.mjs, so the forwarding is checked on the built server,
-// the one a slot runs, beside the suite's servers (m4-cloud-runtime 4.3).
+// the server a slot runs (a development build of it: the forwarding code is the same), beside the suite's servers (m4-cloud-runtime 4.3).
 const builtPort = 5485;
 const built = `http://localhost:${builtPort}`;
 let server: ChildProcess | undefined;

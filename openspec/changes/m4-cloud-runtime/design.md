@@ -26,6 +26,7 @@ ADR 0019 runs two slots, `main` and `preview`, each with one managed identity th
 - Forwarding adds a hop and cold starts in series (web app, then API) → measured in `m4-deploy`; ADR 0012 already asks for the SSR/API cold-start measurement.
 - The seed tool's in-process host migrates `main` → acceptable while every slot is a preview (ADR 0019); production needs its own migration step.
 - A token outlives a connection pool's idle time → the periodic provider refreshes it; tested by a unit test of the provider's refresh interval, verified in a slot by `m4-deploy`.
+- The log exporter's trace-based sampling is off (`EnableTraceBasedLogsSampler = false`) in options the Azure Monitor SDK builds internally, so no host test can observe it; the test checks that logs and metrics are exported, and `m4-deploy` confirms in a slot that logs outside sampled traces arrive.
 
 ## Validation (task 4.2)
 

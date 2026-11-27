@@ -1,5 +1,5 @@
 import type { RequestHandler } from 'express';
-import { Readable } from 'node:stream';
+import { Readable, pipeline } from 'node:stream';
 
 // The connection's headers, not the request's (RFC 9110 §7.6.1); fetch sets its own host and length.
 const hopByHop = new Set(['connection', 'keep-alive', 'proxy-connection', 'te', 'trailer', 'transfer-encoding', 'upgrade', 'host', 'content-length']);
@@ -36,7 +36,8 @@ export function forwardApi(apiUrl: string | undefined): RequestHandler {
       });
       const cookies = response.headers.getSetCookie();
       if (cookies.length) res.setHeader('set-cookie', cookies);
-      if (response.body) Readable.fromWeb(response.body as never).pipe(res);
+      // pipeline destroys the response if the API's stream fails part-way, so the browser is not left waiting.
+      if (response.body) pipeline(Readable.fromWeb(response.body as never), res, () => undefined);
       else res.end();
     } catch (error) {
       next(error);
