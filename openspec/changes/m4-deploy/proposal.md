@@ -2,6 +2,8 @@
 
 **Proposed in the M4 batch's proposals pull request, 22 November 2026.** The technical decisions come from the batch's decision session of the same day ([M4 batch](../../../docs/roadmap.md#batch-main-and-preview-on-azure), ADRs 0012, 0018 and 0019). It depends on `m4-cloud-runtime`, `m4-images`, `m4-infra` and Steward's `onboard-herald` group 5. Merging the proposals pull request approves this change (ADR 0018); task 1.1 records that approval.
 
+**Approved for implementation on 22 November 2026**, when the maintainer merged the M4 batch proposals pull request (#95) (ADR 0018). The review's answers concerned `m4-cloud-runtime` and `m4-infra`; it asked for no change to this proposal.
+
 ## Why
 
 M4's exit criteria (roadmap): deploy on merge, protected credentials, the `main` environment and a `preview` slot for the slice pull request with seeded data and a test account per persona, and the measured cost of both. From H2, ADR 0018 tests every slice on `preview`.
