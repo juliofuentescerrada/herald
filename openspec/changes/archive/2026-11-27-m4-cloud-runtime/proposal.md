@@ -2,6 +2,10 @@
 
 **Proposed in the M4 batch's proposals pull request, 22 November 2026.** The technical decisions come from the batch's decision session of the same day, recorded in the roadmap's [M4 batch](../../../docs/roadmap.md#batch-main-and-preview-on-azure) and in ADRs 0012 and 0019. Merging the proposals pull request approves this change (ADR 0018); task 1.1 records that approval.
 
+**Approved for implementation on 22 November 2026**, when the maintainer merged the M4 batch proposals pull request (#95), with the review answers below (ADR 0018). The review asked for no other change to this proposal.
+
+**Review answers, 22 November 2026 (#95):** the maintainer accepted Q1: `/api` is forwarded through each web server, and the API's ingress stays internal.
+
 ## Why
 
 The host and the web servers only run locally today. Outside the `E2E` environment the host requires Service Bus, it reaches PostgreSQL with a password, it maps `/health` and `/alive` only in Development and E2E, and it exports telemetry only where Aspire sets an OTLP endpoint. The web servers reach the API through the Angular dev-server's proxy. ADR 0019 needs every slot to run without a broker, as its slot's managed identity, with no password and no secret, and `preview` must be reset without server privileges (Steward's ADR 0010).

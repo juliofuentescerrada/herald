@@ -275,6 +275,55 @@ public class SyntheticDataTests(SeededDatabases databases)
     }
 
     [Fact]
+    [Trait("covers", "synthetic-data: Resetting a seeded database")]
+    public async Task A_reset_drops_what_was_added_and_leaves_exactly_the_seeded_scenarios()
+    {
+        var database = await databases.NewDatabaseAsync();
+        await SeededDatabases.SeedAsync(database);
+        var extra = Guid.Parse("0198f5ee-0000-7000-8000-0000000e0001");
+        await using (var seeding = new Seeding(database))
+        {
+            await new Admin(seeding, Main).CreateOrganisationAsync(extra, "Added after seeding");
+        }
+
+        using var output = new StringWriter();
+        using var error = new StringWriter();
+        (await SeedCommand.RunAsync(Configuration(database, reset: true), output, error)).ShouldBe(0, error.ToString());
+
+        var organisations = await SeededDatabases.ColumnAsync(database, """select "Id" from organisations."Organisations" """);
+        organisations.Select(Guid.Parse).ShouldBe(Scenarios.All.Select(scenario => scenario.OrganisationId), ignoreOrder: true);
+        output.ToString().ShouldNotContain("already present");
+    }
+
+    [Fact]
+    [Trait("covers", "synthetic-data: No reset unless asked")]
+    public async Task Without_a_reset_the_command_drops_nothing_and_skips_every_scenario()
+    {
+        var database = await databases.NewDatabaseAsync();
+        await SeededDatabases.SeedAsync(database);
+        var entries = await SeededDatabases.CountAsync(database, """select count(*) from registration."Entries" """);
+
+        using var output = new StringWriter();
+        using var error = new StringWriter();
+        (await SeedCommand.RunAsync(Configuration(database, reset: false), output, error)).ShouldBe(0, error.ToString());
+
+        output.ToString().ShouldNotContain("reset");
+        output.ToString().ShouldNotContain("seeded ");
+        Scenarios.All.ShouldAllBe(scenario => output.ToString().Contains($"already present   {scenario.Name}"));
+        (await SeededDatabases.CountAsync(database, """select count(*) from registration."Entries" """)).ShouldBe(entries);
+    }
+
+    private static IConfiguration Configuration(string database, bool reset) => new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
+    {
+        ["ConnectionStrings:herald"] = database,
+        ["Herald:Seed:Reset"] = reset ? "true" : null,
+        ["Herald:Seed:Personas:Main:DirectoryId"] = Main.DirectoryId.ToString(),
+        ["Herald:Seed:Personas:Main:ObjectId"] = Main.ObjectId.ToString(),
+        ["Herald:Seed:Personas:Rival:DirectoryId"] = Rival.DirectoryId.ToString(),
+        ["Herald:Seed:Personas:Rival:ObjectId"] = Rival.ObjectId.ToString(),
+    }).Build();
+
+    [Fact]
     [Trait("covers", "local-environment: Starting the AppHost without personas")]
     public async Task Without_a_main_persona_the_seeding_reports_that_it_was_skipped_and_succeeds()
     {

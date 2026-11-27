@@ -26,3 +26,10 @@ ADR 0019 runs two slots, `main` and `preview`, each with one managed identity th
 - Forwarding adds a hop and cold starts in series (web app, then API) → measured in `m4-deploy`; ADR 0012 already asks for the SSR/API cold-start measurement.
 - The seed tool's in-process host migrates `main` → acceptable while every slot is a preview (ADR 0019); production needs its own migration step.
 - A token outlives a connection pool's idle time → the periodic provider refreshes it; tested by a unit test of the provider's refresh interval, verified in a slot by `m4-deploy`.
+- The log exporter's trace-based sampling is off (`EnableTraceBasedLogsSampler = false`) in options the Azure Monitor SDK builds internally, so no host test can observe it; the test checks that logs and metrics are exported, and `m4-deploy` confirms in a slot that logs outside sampled traces arrive.
+
+## Validation (task 4.2)
+
+- `scripts/check all`: 742 of 743 tests pass. `LocalSeedingTests.Without_an_object_id_the_seeding_resource_has_no_persona_and_reports_itself_skipped` fails only on a machine whose AppHost user secrets set `seed-object-id`, which the test assumes absent; a local-environment limitation, not a defect of this change (CI has no such secret).
+- E2E suite (broker `None` through `appsettings.E2E.json`): 30 of 30 journeys pass with `--workers=2`. With the default workers on a 16-thread local machine, 3 to 10 different journeys ran out of the 30 s test timeout each run (load average about 18; every trace shows steady progress and no failed assertion), so the local evidence is the two-worker run; CI's run is the reference.
+- Test scripts: 22 of 22 pass with `--workers=2`, including `seeded-cloud-runtime` (task 4.3).

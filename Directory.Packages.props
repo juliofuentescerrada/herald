@@ -7,6 +7,8 @@
     <PackageVersion Include="Aspire.Npgsql" Version="13.6.5" />
   </ItemGroup>
   <ItemGroup Label="Messaging and persistence">
+    <!-- PostgreSQL's Entra tokens (m4-cloud-runtime D-2); 1.21 forwards its credentials to the Azure.Core the Azure Monitor exporter needs. -->
+    <PackageVersion Include="Azure.Identity" Version="1.21.0" />
     <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.14" />
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.14" />
     <PackageVersion Include="Microsoft.EntityFrameworkCore.Design" Version="10.0.14" />
@@ -20,6 +22,7 @@
     <PackageVersion Include="WolverineFx.RuntimeCompilation" Version="6.62.0" />
   </ItemGroup>
   <ItemGroup Label="Service defaults">
+    <PackageVersion Include="Azure.Monitor.OpenTelemetry.Exporter" Version="1.8.3" />
     <PackageVersion Include="Microsoft.Extensions.Http.Resilience" Version="10.11.0" />
     <PackageVersion Include="Microsoft.Extensions.ServiceDiscovery" Version="10.11.0" />
     <PackageVersion Include="OpenTelemetry.Exporter.OpenTelemetryProtocol" Version="1.20.1" />
