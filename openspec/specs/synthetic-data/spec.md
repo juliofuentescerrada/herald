@@ -2,7 +2,9 @@
 
 ## Purpose
 TBD - created by archiving change dev-synthetic-data. Update Purpose after archive.
+
 ## Requirements
+
 ### Requirement: Synthetic data is made through the application's endpoints
 The seeding tool SHALL write every piece of synthetic data through Herald's admin endpoints, running the host in its own process against the target database, so that the aggregates' invariants, durable history and integration events apply as they do for a person. The tool's authentication SHALL exist only inside its process.
 
@@ -54,3 +56,13 @@ CI SHALL seed a throwaway database with every scenario, so that a change that br
 - **WHEN** a change makes an endpoint reject a step of a scenario
 - **THEN** the CI run fails and names the scenario and the rejected step
 
+### Requirement: The tool can reset Herald's schemas before seeding
+When its configuration asks for a reset, the tool SHALL drop Herald's own schemas in its target database, its modules' and Wolverine's, before migrating and seeding, without dropping the database and without server privileges. It SHALL never reset unless asked, and SHALL refuse in production as it refuses to seed.
+
+#### Scenario: Resetting a seeded database
+- **WHEN** the tool runs with a reset on a database it has already seeded and that holds an extra organisation
+- **THEN** afterwards the database holds exactly the seeded scenarios, and the extra organisation is gone
+
+#### Scenario: No reset unless asked
+- **WHEN** the tool runs without a reset on a database it has already seeded
+- **THEN** no schema is dropped and every scenario is skipped as already present
