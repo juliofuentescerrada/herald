@@ -6,7 +6,7 @@ OpenSpec change: `openspec/changes/<name>/`
 
 ## Test script
 
-<!-- A slice: the steps the maintainer follows (persona, seeded data, what to do and expect) and a link to the run's `test-script-screens` artefact. Until M4 the round is local (`aspire run`); with M4, on the preview. Otherwise: not applicable. -->
+<!-- A slice: the steps the maintainer follows (persona, seeded data, what to do and expect) and a link to the run's `test-script-screens` artefact. The round is on `preview`: label the pull request `preview` and test on the addresses its deployment comment gives (`docs/operations/deployment.md`). Otherwise: not applicable. -->
 
 ## Review
 

@@ -18,8 +18,9 @@ From H1's remaining slices, progress lives in GitHub Issues ([ADR 0018](../adr/0
 | `ready-to-test` | A slice or a batch waiting for the maintainer's test round | The agent on a slice; the `delivery-labels` workflow on a batch whose last slice closes |
 | `feedback` | The maintainer's feedback is waiting for the agent | The maintainer |
 | `agent:start` | Starts or resumes the slice in an agent session | The maintainer |
+| `preview` | Deploys the slice pull request to the `preview` slot, one pull request at a time ([deployment](deployment.md)) | The maintainer or the agent, for a test round |
 
-Status labels trigger nothing. The `delivery-labels` workflow (`.github/workflows/delivery-labels.yml`) removes `in-progress`, `ready-to-test` and `feedback` from an issue when it closes, and labels a batch `ready-to-test`, without `needs-decision`, when its last slice sub-issue closes. The session implementing a slice labels its issue `in-progress` when it starts and `ready-to-test` when it marks the pull request ready (`CLAUDE.md`). `agent:start` starts or resumes a slice once the `issues.labeled` scheduled task exists, which is after H1's first batch (ADR 0018); until then it only marks the slice the maintainer asks a session to start. ADR 0018 defines when a slice counts as in progress and how many may be.
+Status labels trigger nothing; `preview` triggers the `Deploy` workflow. The `delivery-labels` workflow (`.github/workflows/delivery-labels.yml`) removes `in-progress`, `ready-to-test` and `feedback` from an issue when it closes, and labels a batch `ready-to-test`, without `needs-decision`, when its last slice sub-issue closes. The session implementing a slice labels its issue `in-progress` when it starts and `ready-to-test` when it marks the pull request ready (`CLAUDE.md`). `agent:start` starts or resumes a slice once the `issues.labeled` scheduled task exists, which is after H1's first batch (ADR 0018); until then it only marks the slice the maintainer asks a session to start. ADR 0018 defines when a slice counts as in progress and how many may be.
 
 ## Status by label
 
