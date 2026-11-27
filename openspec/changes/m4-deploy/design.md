@@ -16,7 +16,7 @@ After `m4-infra` and Steward's group 5, each slot has its apps and job at zero r
 - **D-4 Tags.** `<commit sha>`; Steward's purge keeps the last two per repository, so the running image and the previous one survive.
 - **D-5 Seeding `main`.** The job runs the scenarios not yet present (the tool skips seeded ones), so `main` keeps its data; a manual `workflow_dispatch` input runs it with the reset, the "manual reset" of ADR 0019.
 - **D-6 Personas.** Two owners of different organisations now (D-21's isolation); the player, captain and referee personas are added with H2. Their object ids are the seed tool's `Herald__Seed__Personas__Main__ObjectId` and `…__Rival__ObjectId`, from the environment's variables; display names are the tool's invented ones.
-- **D-7 Smoke check and cold starts.** `curl` with timing on the public home page, `/api/…` through it and the admin's `runtime-config.json`, each retried until 200 or a timeout; the first response's time is written to the run's summary and, after a week, the measured values to `design.md` and ADR 0012.
+- **D-7 Smoke check and cold starts.** `curl` with timing on the public home page, `/api/…` through it and the admin's `runtime-config.json`, each retried until it answers or a timeout (implemented in `deploy/smoke-check`: the API request is `/api/public/tournaments/<empty id>`, whose 404 problem document only the API produces, so it proves the forwarding without depending on a seeded identifier); the first response's time is written to the run's summary and, after a week, the measured values to `design.md` and ADR 0012.
 
 ## Risks / Trade-offs
 

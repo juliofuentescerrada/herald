@@ -113,6 +113,10 @@ jobs:
         env:
           reset: ${{ inputs.reset && '--reset' || '' }}
         run: deploy/deploy-slot main "$GITHUB_SHA" $reset
+      - name: Smoke check
+        run: |
+          tofu -chdir=infra output -json > "$RUNNER_TEMP/outputs.json"
+          deploy/smoke-check "$(jq -r '.slots.value.main.urls.public' "$RUNNER_TEMP/outputs.json")" "$(jq -r '.slots.value.main.urls.admin' "$RUNNER_TEMP/outputs.json")"
 
   preview:
     needs: guard
@@ -155,3 +159,16 @@ jobs:
         env:
           sha: ${{ github.event.pull_request.head.sha }}
         run: deploy/deploy-slot preview "$sha"
+      - name: Smoke check
+        run: |
+          tofu -chdir=infra output -json > "$RUNNER_TEMP/outputs.json"
+          deploy/smoke-check "$(jq -r '.slots.value.preview.urls.public' "$RUNNER_TEMP/outputs.json")" "$(jq -r '.slots.value.preview.urls.admin' "$RUNNER_TEMP/outputs.json")"
+      # One comment per pull request, updated by each deployment.
+      - name: Comment
+        env:
+          GH_TOKEN: ${{ github.token }}
+          number: ${{ github.event.pull_request.number }}
+          sha: ${{ github.event.pull_request.head.sha }}
+        run: |
+          node scripts/deploy-comment.mjs "$RUNNER_TEMP/outputs.json" "$sha" > "$RUNNER_TEMP/comment.md"
+          gh pr comment "$number" --repo "$GITHUB_REPOSITORY" --body-file "$RUNNER_TEMP/comment.md" --edit-last --create-if-none

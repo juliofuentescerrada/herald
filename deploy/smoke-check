@@ -1,0 +1,37 @@
+#!/usr/bin/env bash
+# The deployment's smoke check (m4-deploy D-7): the public home page, an API request through the public server and the
+# admin's runtime configuration, each retried until it answers; the time until each first answered goes to the run's
+# summary, the cold-start measurement of ADR 0012.
+#   deploy/smoke-check <public url> <admin url>
+set -euo pipefail
+public="${1:?public url}"
+admin="${2:?admin url}"
+summary="${GITHUB_STEP_SUMMARY:-/dev/stdout}"
+
+# url, expected status, expected content type. The API answers an unknown tournament with a problem document, which
+# the SSR server never produces: it shows the request reached the API through the forwarding (m4-cloud-runtime D-5).
+checks=(
+  "$public/|200|text/html"
+  "$public/api/public/tournaments/00000000-0000-0000-0000-000000000000|404|application/problem+json"
+  "$admin/runtime-config.json|200|application/json"
+)
+
+echo "### Smoke check" >> "$summary"
+echo "| Request | Answer | Seconds until it answered |" >> "$summary"
+echo "|---|---|---|" >> "$summary"
+for check in "${checks[@]}"; do
+  IFS='|' read -r url status type <<< "$check"
+  start=$(date +%s)
+  answer=""
+  # Up to five minutes: both apps may start from zero replicas, one after the other.
+  for _ in $(seq 1 30); do
+    answer=$(curl -s -o /dev/null --max-time 60 -w '%{http_code} %{content_type}' "$url" || true)
+    [[ "$answer" == "$status $type"* ]] && break
+    sleep 10
+  done
+  echo "| \`${url#"$public"}\` | $answer | $(( $(date +%s) - start )) |" >> "$summary"
+  if [[ "$answer" != "$status $type"* ]]; then
+    echo "::error::$url answered '$answer', not $status $type."
+    exit 1
+  fi
+done
