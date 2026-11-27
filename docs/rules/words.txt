@@ -83,3 +83,4 @@ gpgsign
 valueonly
 AKIA
 usersecrets
+worktrees
