@@ -91,7 +91,7 @@ jobs:
     # Runs unless the classification ran and said documentation only: a failed classification runs the code jobs.
     if: ${{ !cancelled() && needs.changes.result != 'skipped' && needs.changes.outputs.code != 'false' }}
     runs-on: ubuntu-latest
-    timeout-minutes: 20
+    timeout-minutes: 30
     steps:
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
       - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
@@ -115,6 +115,8 @@ jobs:
         working-directory: e2e
       # Built here so the servers start within their readiness timeout.
       - run: dotnet build src/Herald.Host && dotnet build tools/Herald.Seed
+      # The m4-images test script starts the images against this run's servers.
+      - run: deploy/images/build
       - run: pnpm test:scripts
         working-directory: e2e
       - if: always()
@@ -124,6 +126,33 @@ jobs:
           path: e2e/test-results/screens
           if-no-files-found: ignore
           retention-days: 14
+
+  # The four images (m4-images D-1, D-5): the runner builds, Docker only packages; nothing is pushed (m4-deploy pushes).
+  images:
+    needs: changes
+    # Runs unless the classification ran and said documentation only: a failed classification runs the code jobs.
+    if: ${{ !cancelled() && needs.changes.result != 'skipped' && needs.changes.outputs.code != 'false' }}
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+        with:
+          package_json_file: web/package.json
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: web/.nvmrc
+          cache: pnpm
+          cache-dependency-path: web/pnpm-lock.yaml
+      - uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
+        with:
+          global-json-file: global.json
+      - run: pnpm install --frozen-lockfile
+        working-directory: web
+      - run: deploy/images/build
+      - run: node --test deploy/images/images.test.mjs
+      - name: Image sizes
+        run: docker images --format '{{.Repository}} {{.Size}}' --filter 'reference=herald-*' >> "$GITHUB_STEP_SUMMARY"
 
   dotnet:
     needs: changes

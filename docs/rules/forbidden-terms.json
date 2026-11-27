@@ -74,6 +74,11 @@
       "reason": "The directory's tenant id (`tid`), an External ID name."
     },
     {
+      "path": ".github/workflows/infra.yml",
+      "term": "tenant",
+      "reason": "azure/login's `tenant-id` input, the Azure directory's id."
+    },
+    {
       "path": "e2e/environment.ts",
       "term": "tenant",
       "reason": "The test identity provider's issuer stands for the directory's tenant."

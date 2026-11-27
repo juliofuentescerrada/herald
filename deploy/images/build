@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+# Builds Herald's four images as herald-<name>:local (m4-images D-1): the runner publishes and builds, Docker only packages.
+# Used by CI's images and test-scripts jobs and locally; `--no-app-build` packages an existing build.
+set -euo pipefail
+cd "$(dirname "$0")/../.."
+if [ "${1:-}" != "--no-app-build" ]; then
+  dotnet publish src/Herald.Host -c Release -o out/api
+  dotnet publish tools/Herald.Seed -c Release -o out/seed
+  pnpm --dir web build public
+  pnpm --dir web build admin
+fi
+for name in api seed public admin; do
+  docker build -f "deploy/images/$name/Dockerfile" -t "herald-$name:local" .
+done

@@ -45,6 +45,13 @@ test('Any file outside both groups is code', () => {
   }
 });
 
+// covers: continuous-integration: A change to an image definition builds the images
+test('The image definitions are code, so the images job runs (m4-images D-5)', () => {
+  for (const file of ['deploy/images/admin/Dockerfile', 'deploy/images/admin/default.conf.template', 'deploy/images/images.test.mjs', '.dockerignore']) {
+    assert.equal(touchesCode(['docs/roadmap.md', file]), true, file);
+  }
+});
+
 // covers: continuous-integration: ADR 0017 changes
 test('ADR 0017 is code, because an architecture test reads its inventory', () => {
   assert.equal(touchesCode(['docs/adr/0017-notifications-consume-fact-events.md']), true);
@@ -103,10 +110,10 @@ const notDraft = "if: github.event_name == 'push' || !github.event.pull_request.
 
 // covers: continuous-integration: A documentation-only pull request
 // covers: continuous-integration: The classification fails
-test('The build, test and test-script jobs wait for the classification and run only for code', () => {
+test('The build, test, test-script and image jobs wait for the classification and run only for code', () => {
   const { jobs } = jobsOf('ci.yml');
-  assert.deepEqual(Object.keys(jobs).sort(), ['changes', 'dotnet', 'rules', 'test-scripts', 'web']);
-  for (const job of ['dotnet', 'web', 'test-scripts']) assert.match(jobs[job], codeOnly, job);
+  assert.deepEqual(Object.keys(jobs).sort(), ['changes', 'dotnet', 'images', 'rules', 'test-scripts', 'web']);
+  for (const job of ['dotnet', 'web', 'test-scripts', 'images']) assert.match(jobs[job], codeOnly, job);
   assert.doesNotMatch(jobs.rules, /needs:/, 'the rules run for every ready change');
   assert.match(jobs.changes, /node scripts\/ci-changes\.mjs/);
 });
@@ -116,6 +123,17 @@ test('No CI job runs on a draft, and marking it ready starts them', () => {
   const { text, jobs } = jobsOf('ci.yml');
   assert.match(text, /types: \[opened, synchronize, reopened, ready_for_review\]/);
   assert.ok(jobs.changes.includes(notDraft) && jobs.rules.includes(notDraft), 'the jobs without needs skip drafts');
+});
+
+// covers: cloud-infrastructure: An infrastructure change triggers its plan
+test('An infrastructure change runs the infra workflow, and not the code jobs by itself', () => {
+  assert.equal(touchesCode(['infra/apps.tf', '.github/workflows/infra.yml', 'docs/roadmap.md']), false);
+  assert.equal(touchesCode(['infra/apps.tf', 'src/Herald.Host/Program.cs']), true);
+  const { text, jobs } = jobsOf('infra.yml');
+  assert.match(text, /pull_request:\n {4}types: \[opened, synchronize, reopened, ready_for_review\]\n {4}paths:\n {6}- infra\/\*\*\n/);
+  assert.deepEqual(Object.keys(jobs), ['plan']);
+  assert.match(jobs.plan, /!github\.event\.pull_request\.draft/);
+  assert.match(jobs.plan, /tofu plan /);
 });
 
 // covers: continuous-integration: A documentation-only merge

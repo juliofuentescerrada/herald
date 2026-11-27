@@ -80,7 +80,7 @@ export function collect() {
   const specified = scenariosOf(files.filter((file) => /^openspec\/specs\/[^/]+\/spec\.md$/.test(file)));
   const proposed = scenariosOf(files.filter((file) => /^openspec\/changes\/(?!archive\/)[^/]+\/specs\/[^/]+\/spec\.md$/.test(file)));
   const tests = files.filter(
-    (file) => /^tests\/.*\.cs$/.test(file) || /^e2e\/.*\.ts$/.test(file) || /^web\/projects\/.*\.spec\.ts$/.test(file) || /^scripts\/.*\.test\.mjs$/.test(file),
+    (file) => /^tests\/.*\.cs$/.test(file) || /^e2e\/.*\.ts$/.test(file) || /^web\/projects\/.*\.spec\.ts$/.test(file) || /^(scripts|deploy\/images)\/.*\.test\.mjs$/.test(file),
   );
   const markers = markersOf(tests.filter((file) => existsSync(join(root, file))));
   const baseline = new Set(

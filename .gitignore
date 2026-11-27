@@ -35,3 +35,6 @@ appsettings.*.local.json
 
 # Local agent prompts
 .prompts/
+
+# The runner's publish output that the images package (m4-images)
+/out/
