@@ -6,7 +6,7 @@ on:
   push:
     branches: [main]
   pull_request:
-    types: [labeled, synchronize, unlabeled, closed]
+    types: [labeled, synchronize, unlabeled, closed, reopened]
   workflow_dispatch:
     inputs:
       reset:
@@ -14,10 +14,9 @@ on:
         type: boolean
         default: false
 
+# Each job asks for what it needs: only the slot jobs get an OIDC token, so the guard can never sign in to Azure.
 permissions:
   contents: read
-  id-token: write # the OIDC token Entra exchanges for an Azure token
-  pull-requests: write # the guard's and the deployment's comments, and removing a refused label
 
 env:
   ARM_USE_OIDC: true
@@ -32,6 +31,9 @@ jobs:
     if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
     runs-on: ubuntu-latest
     timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: write # its comments, and removing a refused label
     outputs:
       decision: ${{ steps.decide.outputs.decision }}
     steps:
@@ -63,6 +65,9 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     environment: main
+    permissions:
+      contents: read
+      id-token: write # the OIDC token Entra exchanges for an Azure token
     # One deployment of main at a time; a merge waits for the running one instead of cancelling it.
     concurrency:
       group: deploy-main
@@ -99,8 +104,8 @@ jobs:
           auth_api_audience: ${{ vars.HERALD_AUTH_API_AUDIENCE }}
           auth_api_scope: ${{ vars.HERALD_AUTH_API_SCOPE }}
           auth_admin_client_id: ${{ vars.HERALD_AUTH_CLIENT_ID }}
-          persona_main_object_id: ${{ vars.HERALD_PERSONA_MAIN_OBJECT_ID }}
-          persona_rival_object_id: ${{ vars.HERALD_PERSONA_RIVAL_OBJECT_ID }}
+          persona_main_object_id: ${{ secrets.HERALD_PERSONA_MAIN_OBJECT_ID }}
+          persona_rival_object_id: ${{ secrets.HERALD_PERSONA_RIVAL_OBJECT_ID }}
         run: |
           for name in auth_authority auth_api_audience auth_api_scope auth_admin_client_id persona_main_object_id persona_rival_object_id; do
             if [ -n "${!name}" ]; then echo "TF_VAR_$name=${!name}" >> "$GITHUB_ENV"; fi
@@ -124,11 +129,18 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     environment: preview
+    permissions:
+      contents: read
+      id-token: write # the OIDC token Entra exchanges for an Azure token
+      pull-requests: write # the deployment's comment
     concurrency:
       group: deploy-preview
       cancel-in-progress: false
     steps:
+      # The pull request's head, not the merge commit pull_request checks out, so the image is the commit its tag names.
       - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
       - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
         with:
           package_json_file: web/package.json
@@ -163,7 +175,7 @@ jobs:
         run: |
           tofu -chdir=infra output -json > "$RUNNER_TEMP/outputs.json"
           deploy/smoke-check "$(jq -r '.slots.value.preview.urls.public' "$RUNNER_TEMP/outputs.json")" "$(jq -r '.slots.value.preview.urls.admin' "$RUNNER_TEMP/outputs.json")"
-      # One comment per pull request, updated by each deployment.
+      # A new comment per deployment: editing the last one could overwrite the guard's.
       - name: Comment
         env:
           GH_TOKEN: ${{ github.token }}
@@ -171,4 +183,4 @@ jobs:
           sha: ${{ github.event.pull_request.head.sha }}
         run: |
           node scripts/deploy-comment.mjs "$RUNNER_TEMP/outputs.json" "$sha" > "$RUNNER_TEMP/comment.md"
-          gh pr comment "$number" --repo "$GITHUB_REPOSITORY" --body-file "$RUNNER_TEMP/comment.md" --edit-last --create-if-none
+          gh pr comment "$number" --repo "$GITHUB_REPOSITORY" --body-file "$RUNNER_TEMP/comment.md"

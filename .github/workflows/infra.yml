@@ -47,8 +47,8 @@ jobs:
           auth_api_audience: ${{ vars.HERALD_AUTH_API_AUDIENCE }}
           auth_api_scope: ${{ vars.HERALD_AUTH_API_SCOPE }}
           auth_admin_client_id: ${{ vars.HERALD_AUTH_CLIENT_ID }}
-          persona_main_object_id: ${{ vars.HERALD_PERSONA_MAIN_OBJECT_ID }}
-          persona_rival_object_id: ${{ vars.HERALD_PERSONA_RIVAL_OBJECT_ID }}
+          persona_main_object_id: ${{ secrets.HERALD_PERSONA_MAIN_OBJECT_ID }}
+          persona_rival_object_id: ${{ secrets.HERALD_PERSONA_RIVAL_OBJECT_ID }}
         run: |
           for name in auth_authority auth_api_audience auth_api_scope auth_admin_client_id persona_main_object_id persona_rival_object_id; do
             if [ -n "${!name}" ]; then echo "TF_VAR_$name=${!name}" >> "$GITHUB_ENV"; fi

@@ -32,6 +32,13 @@ test('Closing the holder or removing its label releases the slot, and the next l
   assert.deepEqual(decide(labeled(8), [8]), { decision: 'deploy' });
 });
 
+test('A labelled pull request reopened takes the slot again, or is refused while another holds it', () => {
+  const reopened = { action: 'reopened', pull_request: pullRequest(7, 'preview') };
+  assert.deepEqual(decide(reopened, [7]), { decision: 'deploy' });
+  assert.deepEqual(decide(reopened, [7, 8]), { decision: 'refuse', holder: 8 });
+  assert.deepEqual(decide({ action: 'reopened', pull_request: pullRequest(7) }, []), { decision: 'ignore' });
+});
+
 test('Events that do not concern the slot are ignored', () => {
   assert.deepEqual(decide(labeled(7, 'slice'), []), { decision: 'ignore' });
   assert.deepEqual(decide({ action: 'synchronize', pull_request: pullRequest(7) }, []), { decision: 'ignore' });

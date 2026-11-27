@@ -15,9 +15,19 @@ const jobs = Object.fromEntries(
 test('The workflow deploys main on a merge and guards preview on pull requests', () => {
   assert.deepEqual(Object.keys(jobs), ['guard', 'main', 'preview']);
   assert.match(workflow, /push:\n {4}branches: \[main\]/);
-  assert.match(workflow, /pull_request:\n {4}types: \[labeled, synchronize, unlabeled, closed\]/);
+  assert.match(workflow, /pull_request:\n {4}types: \[labeled, synchronize, unlabeled, closed, reopened\]/);
   assert.match(jobs.guard, /node scripts\/preview-slot\.mjs/);
   assert.match(jobs.guard, /head\.repo\.full_name == github\.repository/, 'a fork never reaches the slot');
+  assert.doesNotMatch(workflow.slice(0, workflow.indexOf('\njobs:\n')), /id-token/, 'no OIDC token for every job');
+  assert.doesNotMatch(jobs.guard, /id-token/, 'the guard never signs in to Azure');
+});
+
+test('The personas object ids come from secrets, so the public run logs mask them', () => {
+  for (const name of ['deploy.yml', 'infra.yml']) {
+    const text = readFileSync(join(root, '.github', 'workflows', name), 'utf8');
+    assert.doesNotMatch(text, /vars\.HERALD_PERSONA_/, name);
+    assert.match(text, /secrets\.HERALD_PERSONA_MAIN_OBJECT_ID/, name);
+  }
 });
 
 // covers: deployment-pipeline: The main deployment's steps

@@ -120,13 +120,13 @@ The `main` and `preview` slots ([deployment](deployment.md)) sign in through the
 
 1. **Redirect URIs:** in `herald-admin` → *Authentication* → *Single-page application*, add each slot's admin address with its trailing slash, `https://ca-herald-admin.<environment domain>/` and `https://ca-herald-preview-admin.<environment domain>/`. `tofu -chdir=infra output slots` prints both addresses.
 2. **Personas:** two users in the shared directory, the owner (seeded as Avery Quinn) and an owner of another organisation (seeded as Rowan Ellis), who shows isolation (D-21). Assign each to `herald-admin` and to `herald-api` with `Organiser`, and to no other application. Keep their passwords in the password manager.
-3. **GitHub variables**, never in Git (*Settings → Secrets and variables → Actions → Variables*):
+3. **GitHub values**, never in Git (*Settings → Secrets and variables → Actions*). The object ids are secrets: run logs are public, and only secrets are masked in them.
 
-| Variable | Value |
-| --- | --- |
-| `HERALD_AUTH_AUTHORITY`, `HERALD_AUTH_API_AUDIENCE`, `HERALD_AUTH_API_SCOPE`, `HERALD_AUTH_CLIENT_ID` | As the AppHost parameters of the table above |
-| `HERALD_PERSONA_MAIN_OBJECT_ID` | The owner persona's object id |
-| `HERALD_PERSONA_RIVAL_OBJECT_ID` | The other owner's object id |
+| Name | Kind | Value |
+| --- | --- | --- |
+| `HERALD_AUTH_AUTHORITY`, `HERALD_AUTH_API_AUDIENCE`, `HERALD_AUTH_API_SCOPE`, `HERALD_AUTH_CLIENT_ID` | Variable | As the AppHost parameters of the table above |
+| `HERALD_PERSONA_MAIN_OBJECT_ID` | Secret | The owner persona's object id |
+| `HERALD_PERSONA_RIVAL_OBJECT_ID` | Secret | The other owner's object id |
 
 The next deployment of `main` applies them to both slots' seeding jobs, which seed each persona's organisation under their identity.
 

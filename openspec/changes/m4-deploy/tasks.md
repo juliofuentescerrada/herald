@@ -6,7 +6,7 @@
 ## 2. Personas and environments (operator, with the maintainer)
 
 - [ ] 2.1 Two owner personas in the shared directory, assigned to Herald's applications only; each slot's admin address as a redirect URI of `herald-admin`; `docs/operations/identity.md` updated
-- [ ] 2.2 Variables of the `main` and `preview` GitHub environments (directory identifiers, persona object ids), never in Git
+- [ ] 2.2 The repository's GitHub values, never in Git: the directory identifiers as variables, the persona object ids as secrets (run logs are public; the review of 27 November 2026), and the `main` environment limited to the `main` branch (`docs/operations/deployment.md`)
 
 ## 3. Pipeline
 
@@ -19,7 +19,7 @@
 The slice's pull request covers 4.2 and 5.3 and is merged; 4.1, 4.3 and 5.4 follow in a second pull request, as `m4-infra`'s did (maintainer, 27 November 2026): `main` deploys only once `deploy.yml` is on it.
 
 - [ ] 4.1 Merge deploys `main`; the owner persona signs in and finds its seeded organisation; a second merge deploys with no operator
-- [ ] 4.2 This slice's own pull request labelled `preview`: deployed with a reset, and a role of `herald_preview` cannot connect to `herald_main` (Steward's task 5.1 records it); record both in design.md and in Steward's evidence
+- [ ] 4.2 Before labelling, `infra/` applied by hand once from this branch (its `NG_ALLOWED_HOSTS` and the personas reach the apps and job only through an apply, which `preview` never runs), and `az acr login` checked against the shared registry. This slice's own pull request labelled `preview`: deployed with a reset, and a role of `herald_preview` cannot connect to `herald_main` (Steward's task 5.1 records it); record both in design.md and in Steward's evidence
 - [ ] 4.3 After a week of use: the measured monthly cost of both slots, the cold-start times and log volume in design.md, ADR 0019 and the roadmap; review `budget-herald` and the trace ratio
 
 ## 5. Documents, validation and completion

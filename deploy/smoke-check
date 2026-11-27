@@ -23,9 +23,10 @@ for check in "${checks[@]}"; do
   IFS='|' read -r url status type <<< "$check"
   start=$(date +%s)
   answer=""
-  # Up to five minutes: both apps may start from zero replicas, one after the other.
-  for _ in $(seq 1 30); do
-    answer=$(curl -s -o /dev/null --max-time 60 -w '%{http_code} %{content_type}' "$url" || true)
+  # Up to about six minutes per request (12 tries of at most 20 + 10 s): both apps may start from zero replicas, one
+  # after the other, and three requests stay well inside the job's timeout.
+  for _ in $(seq 1 12); do
+    answer=$(curl -s -o /dev/null --max-time 20 -w '%{http_code} %{content_type}' "$url" || true)
     [[ "$answer" == "$status $type"* ]] && break
     sleep 10
   done

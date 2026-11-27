@@ -24,6 +24,10 @@ export function decide(event, holders) {
     case 'labeled':
       if (event.label?.name !== label) return { decision: 'ignore' };
       return others.length ? { decision: 'refuse', holder: others[0] } : { decision: 'deploy' };
+    // A holder closed and reopened keeps its label: it takes the slot again, or is refused like a new label.
+    case 'reopened':
+      if (!hasLabel(pullRequest)) return { decision: 'ignore' };
+      return others.length ? { decision: 'refuse', holder: others[0] } : { decision: 'deploy' };
     case 'synchronize':
       return hasLabel(pullRequest) && !others.length ? { decision: 'deploy' } : { decision: 'ignore' };
     case 'unlabeled':
