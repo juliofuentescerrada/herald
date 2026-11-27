@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 # Creates or updates the labels and milestones of the delivery tracking (ADR 0018, batch-delivery D-4), with the
-# maintainer's gh. Idempotent: run it again at any time. The project board is a manual step
-# (docs/operations/delivery-tracking.md).
+# maintainer's gh. Idempotent: run it again at any time.
+# No project board (docs/operations/delivery-tracking.md).
 #   scripts/github-setup             create or update them in the current repository
 #   scripts/github-setup --dry-run   print what it would do, without calling GitHub
 set -euo pipefail

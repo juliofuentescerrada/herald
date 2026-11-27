@@ -11,7 +11,7 @@ description: Herald's rules for maintaining documentation and decisions. Use whe
 |---|---|
 | Orientation | `README.md` |
 | Delivery order, milestones and exit criteria | `docs/roadmap.md` |
-| Progress of batches and slices | GitHub Issues and the project board (ADR 0018, `docs/operations/delivery-tracking.md`) |
+| Progress of batches and slices | GitHub Issues, by label and milestone (ADR 0018, `docs/operations/delivery-tracking.md`) |
 | Shared product rules, journeys and the single decision register (§15) | `docs/herald-functional-discovery.md` |
 | Detailed H2 participant rules and target acceptance | `docs/herald-h2-functional-discovery.md`, linked from the baseline and its register |
 | Detailed H3 elimination, single-match and profile rules and target acceptance | `docs/herald-h3-functional-discovery.md`, linked from the baseline and its register |
