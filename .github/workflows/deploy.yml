@@ -58,7 +58,8 @@ jobs:
         env:
           GH_TOKEN: ${{ github.token }}
           number: ${{ github.event.pull_request.number }}
-        run: gh pr comment "$number" --repo "$GITHUB_REPOSITORY" --body "\`preview\` released: another slice pull request can take it with the \`preview\` label."
+        run: |
+          gh pr comment "$number" --repo "$GITHUB_REPOSITORY" --body "\`preview\` released: another slice pull request can take it with the \`preview\` label."
 
   main:
     if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
