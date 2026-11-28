@@ -23,3 +23,7 @@ After `m4-infra` and Steward's group 5, each slot has its apps and job at zero r
 - Cold starts in series (web app, then API) after zero replicas → measured (D-7); a minimum replica above zero would break ADR 0019's cost estimate and needs a decision.
 - A pull request that keeps `preview` and is forgotten blocks the slot → the guard's refusal comment names the holder; removing its label releases it.
 - The first `main` deployment seeds the persona organisations; later scenario additions seed on the next merge.
+
+## Evidence
+
+- **Infrastructure applied by hand (task 4.2, maintainer, 28 November 2026):** from `slice/m4-deploy` with OpenTofu 1.13.9 and the maintainer's own sign-in, the directory and persona values passed as `TF_VAR_`s as `infra.yml` passes them: `0 added, 4 changed, 0 destroyed`, every change in place. The shared registry answers the maintainer's Entra sign-in (`az acr login --expose-token`); a plain `az acr login` stops only at the local Docker credential store, which the workflow does not use.
