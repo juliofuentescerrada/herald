@@ -5,7 +5,7 @@
 
 ## 2. Personas and environments (operator, with the maintainer)
 
-- [ ] 2.1 Two owner personas in the shared directory, assigned to Herald's applications only; each slot's admin address as a redirect URI of `herald-admin`; `docs/operations/identity.md` updated
+- [x] 2.1 Two owner personas in the shared directory, assigned to Herald's applications only; each slot's admin address as a redirect URI of `herald-admin`; `docs/operations/identity.md` updated
 - [ ] 2.2 The repository's GitHub values, never in Git: the directory identifiers as variables, the persona object ids as secrets (run logs are public; the review of 27 November 2026), and the `main` environment limited to the `main` branch (`docs/operations/deployment.md`)
 
 ## 3. Pipeline

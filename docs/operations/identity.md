@@ -119,7 +119,7 @@ To revoke access:
 The `main` and `preview` slots ([deployment](deployment.md)) sign in through the same directory and registrations.
 
 1. **Redirect URIs:** in `herald-admin` → *Authentication* → *Single-page application*, add each slot's admin address with its trailing slash, `https://ca-herald-admin.<environment domain>/` and `https://ca-herald-preview-admin.<environment domain>/`. `tofu -chdir=infra output slots` prints both addresses.
-2. **Personas:** two users in the shared directory, the owner (seeded as Avery Quinn) and an owner of another organisation (seeded as Rowan Ellis), who shows isolation (D-21). Assign each to `herald-admin` and to `herald-api` with `Organiser`, and to no other application. Keep their passwords in the password manager.
+2. **Personas:** two users in the shared directory, the owner (seeded as Avery Quinn) and an owner of another organisation (seeded as Rowan Ellis), who shows isolation (D-21). Create each from *Users* → *All users* → **New user** → *Create new external user*, with an e-mail sign-in identity (the form an application's *Users and groups* opens creates an internal user, which the `signin` flow does not serve), then reset its password once so it signs in with a password rather than a code. Assign each to `herald-admin` and to `herald-api` with `Organiser`, and to no other application. Keep their passwords in the password manager.
 3. **GitHub values**, never in Git (*Settings → Secrets and variables → Actions*). The object ids are secrets: run logs are public, and only secrets are masked in them.
 
 | Name | Kind | Value |
