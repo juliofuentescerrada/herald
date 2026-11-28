@@ -7,6 +7,7 @@ import { webServer } from './servers.ts';
 // Not journeys: they are not part of the post-merge suite unless promoted to journeys/.
 export default defineConfig({
   testDir: './scripts',
+  testIgnore: 'deployed-slot.spec.ts', // deployed.config.ts runs it against a slot
   globalSetup: './scripts/seed.ts',
   workers: 1,
   reporter: [['list']],

@@ -26,5 +26,5 @@ The slice's pull request covers 4.2 and 5.3 and is merged; 4.1, 4.3 and 5.4 foll
 
 - [x] 5.1 `docs/operations/deployment.md`; `CLAUDE.md`, the pull request template and `docs/operations/delivery-tracking.md` for the preview test round
 - [x] 5.2 `covers` markers for every scenario this change adds; `node scripts/spec-coverage.mjs` passes; `scripts/check all`
-- [ ] 5.3 Test script in `e2e/scripts/`: on the deployed `preview`, the owner persona's seeded organisation, with screenshots of each step
+- [x] 5.3 Test script in `e2e/scripts/`: on the deployed `preview`, the owner persona's seeded organisation, with screenshots of each step
 - [ ] 5.4 ADRs 0012 and 0019 proposed for acceptance with what M4 measured; roadmap M4 exit criteria checked; herald-reviewer review of the diff; sync the specs and archive the change in the slice's pull request
