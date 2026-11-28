@@ -16,7 +16,7 @@ M4's exit criteria (roadmap): deploy on merge, protected credentials, the `main`
   - **A smoke check** after each deployment: the public home page and an `/api` request through it, and the admin's `runtime-config.json`, each answering 200; the first response's time is recorded in the run (ADR 0012's cold-start measurement).
 - **Taking and releasing `preview` (decision session):** adding the `preview` label to a slice pull request deploys it and every push redeploys it; the workflow refuses, with a comment, while another open pull request holds the label; removing the label or closing the pull request releases the slot. `scripts/github-setup` creates the label.
 - **The pull request comment:** the slot's addresses, the personas to sign in with (names only, never passwords or object ids), the seeded scenarios and the slice's test script.
-- **Personas and redirect URIs (operator, `docs/operations/identity.md`):** the owner and a second owner of another organisation (D-21), created in the shared directory and assigned to Herald's applications only; each slot's admin address registered once in `herald-admin`; the object ids and the directory's identifiers as variables of each GitHub environment, never in Git. Passwords stay in the maintainer's password manager.
+- **Personas and redirect URIs (operator, `docs/operations/identity.md`):** the owner and a second owner of another organisation (D-21), created in the shared directory and assigned to Herald's applications only; each slot's admin address registered once in `herald-admin`; the directory's identifiers as repository variables and the object ids as repository secrets (D-6), never in Git. Passwords stay in the maintainer's password manager.
 - **Cost:** after some days of use, the measured monthly cost of `main` and `preview` recorded beside the base cost (ADR 0019, roadmap), and `budget-herald` and the trace ratio reviewed against it.
 - **Documents:** `CLAUDE.md` (labelling `preview` before a test round), the pull request template (the test round on the preview), `docs/operations/delivery-tracking.md`, a deployment guide `docs/operations/deployment.md`; ADRs 0012 and 0019 proposed for acceptance once both slots have run.
 
@@ -42,4 +42,4 @@ None.
 
 - New: `.github/workflows/deploy.yml`, `scripts/preview-slot.mjs` and its tests, `docs/operations/deployment.md`.
 - `scripts/github-setup` (the `preview` label), `CLAUDE.md`, `.github/pull_request_template.md`, `docs/operations/delivery-tracking.md`, `docs/operations/identity.md`, `docs/roadmap.md`, ADRs 0012 and 0019.
-- GitHub: variables of the `main` and `preview` environments.
+- GitHub: repository variables and secrets, and the `main` and `preview` environments.

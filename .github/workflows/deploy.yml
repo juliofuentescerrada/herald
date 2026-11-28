@@ -14,16 +14,9 @@ on:
         type: boolean
         default: false
 
-# Each job asks for what it needs: only the slot jobs get an OIDC token, so the guard can never sign in to Azure.
+# Each job asks for what it needs: only the slot jobs get an OIDC token and the Azure ids, so the guard can never sign in to Azure.
 permissions:
   contents: read
-
-env:
-  ARM_USE_OIDC: true
-  ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
-  ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
-  ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
-  TF_VAR_databases_onboarded: ${{ vars.HERALD_DATABASES_ONBOARDED == 'true' }}
 
 jobs:
   guard:
@@ -66,6 +59,12 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     environment: main
+    env:
+      ARM_USE_OIDC: true
+      ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      TF_VAR_databases_onboarded: ${{ vars.HERALD_DATABASES_ONBOARDED == 'true' }}
     permissions:
       contents: read
       id-token: write # the OIDC token Entra exchanges for an Azure token
@@ -130,6 +129,12 @@ jobs:
     runs-on: ubuntu-latest
     timeout-minutes: 45
     environment: preview
+    env:
+      ARM_USE_OIDC: true
+      ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      TF_VAR_databases_onboarded: ${{ vars.HERALD_DATABASES_ONBOARDED == 'true' }}
     permissions:
       contents: read
       id-token: write # the OIDC token Entra exchanges for an Azure token

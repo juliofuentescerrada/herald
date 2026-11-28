@@ -20,6 +20,8 @@ const hasLabel = (pullRequest) => (pullRequest.labels ?? []).some((candidate) =>
 export function decide(event, holders) {
   const pullRequest = event.pull_request;
   const others = holders.filter((number) => number !== pullRequest.number);
+  // A label added to a closed pull request would take the slot with nothing left to release it.
+  if (pullRequest.state === 'closed' && event.action !== 'closed') return { decision: 'ignore' };
   switch (event.action) {
     case 'labeled':
       if (event.label?.name !== label) return { decision: 'ignore' };

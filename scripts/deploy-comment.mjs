@@ -26,7 +26,7 @@ export function comment({ public: publicUrl, admin }, commit, personas = persona
     `- Organiser workspace: ${admin}`,
     '',
     `Sign in as **${personas.main}** (the owner) or **${personas.rival}** (an owner of another organisation), with the passwords in the maintainer's password manager.`,
-    `The data was reset and seeded with the scenarios of \`tools/Herald.Seed/Scenarios.cs\`. The slice's test script is in \`e2e/scripts/\`, and its screens are this pull request's \`test-script-screens\` artefact.`,
+    `The data was reset and seeded with the scenarios of \`tools/Herald.Seed/Scenarios.cs\`. The slice's test script is in \`e2e/scripts/\`; this pull request's \`test-script-screens\` artefact holds the screens of its local run, against the same seeded scenarios.`,
     '',
     'Removing the `preview` label or closing this pull request releases the slot.',
   ].join('\n');

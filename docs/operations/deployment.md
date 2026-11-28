@@ -26,7 +26,7 @@ The workflow signs in as `id-herald-delivery` through the `main` and `preview` G
 - **Secrets:** `AZURE_CLIENT_ID`, `AZURE_TENANT_ID`, `AZURE_SUBSCRIPTION_ID`, and the personas' `HERALD_PERSONA_MAIN_OBJECT_ID` and `HERALD_PERSONA_RIVAL_OBJECT_ID`. The object ids are secrets because a step prints its variables in the run log, which is public, and only secrets are masked.
 - **Variables:** `HERALD_AUTH_*`, which the admin publishes anyway in its `runtime-config.json`, and `HERALD_DATABASES_ONBOARDED`.
 
-The `main` environment allows deployments from the `main` branch only (*Settings → Environments → main → Deployment branches and tags*). Without that, a branch could edit `deploy.yml` so that a job declares `environment: main` and deploys it from a pull request.
+The `main` environment allows deployments from the `main` branch only (*Settings → Environments → main → Deployment branches and tags*). Without that, a branch could edit `deploy.yml` so that a job declares `environment: main` and deploys it from a pull request. It is not the boundary, though: `id-herald-delivery` also trusts a plain `pull_request`, so a branch's job with no environment signs in with the same roles, and every secret is set at the repository's level. What keeps the slots safe is who can push to this repository: the maintainer only.
 
 ## When a deployment fails
 

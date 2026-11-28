@@ -32,6 +32,12 @@ test('Closing the holder or removing its label releases the slot, and the next l
   assert.deepEqual(decide(labeled(8), [8]), { decision: 'deploy' });
 });
 
+test('Labelling a closed pull request leaves the slot alone', () => {
+  const event = labeled(7);
+  event.pull_request.state = 'closed';
+  assert.deepEqual(decide(event, []), { decision: 'ignore' });
+});
+
 test('A labelled pull request reopened takes the slot again, or is refused while another holds it', () => {
   const reopened = { action: 'reopened', pull_request: pullRequest(7, 'preview') };
   assert.deepEqual(decide(reopened, [7]), { decision: 'deploy' });
