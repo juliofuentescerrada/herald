@@ -23,7 +23,7 @@ test('A dry run prints every label and milestone and calls no GitHub command', (
   const lines = result.stdout.trim().split('\n');
   for (const line of lines) assert.match(line, /: \S.{10,}$/, `each line carries a description: ${line}`);
   const labels = lines.filter((line) => line.startsWith('label:')).map((line) => line.match(/'([^']+)'/)[1]);
-  assert.deepEqual(labels, ['batch', 'slice', 'batch-proposals', 'needs-decision', 'in-progress', 'ready-to-test', 'feedback', 'agent:start']);
+  assert.deepEqual(labels, ['batch', 'slice', 'batch-proposals', 'needs-decision', 'in-progress', 'ready-to-test', 'feedback', 'agent:start', 'preview']);
   const milestones = lines.filter((line) => line.startsWith('milestone:')).map((line) => line.match(/'([^']+)'/)[1]);
   assert.deepEqual(milestones, ['H1 Operator league', 'M4 Cloud', 'H2 Participant portal']);
 });
@@ -51,7 +51,7 @@ test('A real run updates an existing milestone instead of creating a second one,
     const result = run();
     assert.equal(result.status, 0, result.stderr);
     const calls = readFileSync(log, 'utf8').trim().split('\n');
-    assert.equal(calls.filter((call) => call.startsWith('label create')).length, 8);
+    assert.equal(calls.filter((call) => call.startsWith('label create')).length, 9);
     assert.ok(calls.every((call) => !call.startsWith('label create') || call.includes('--force')), 'labels are created or updated');
     assert.deepEqual(calls.filter((call) => call.includes('-X PATCH')).map((call) => call.split(' ')[3]), ['repos/{owner}/{repo}/milestones/7']);
     const created = calls.filter((call) => call.includes('-X POST')).map((call) => call.match(/title=(.+?) -f/)[1]);

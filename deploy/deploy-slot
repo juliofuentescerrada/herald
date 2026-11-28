@@ -1,0 +1,50 @@
+#!/usr/bin/env bash
+# Deploys the images built by deploy/images/build to one slot (m4-deploy D-3, D-4), signed in with az as id-herald-delivery.
+# The order is the design's: push, the seeding job (and wait for it), then the apps. A failed job stops here, before the
+# apps change, so they never run against a half-migrated database. `tofu apply` is the workflow's, on main only.
+#   deploy/deploy-slot <main|preview> <tag> [--reset]   --reset: main only, the manual reset of ADR 0019 (D-5)
+set -euo pipefail
+slot="${1:?slot}"
+tag="${2:?tag}"
+reset="${3:-}"
+group=rg-herald
+cd "$(dirname "$0")/.."
+
+# Names and addresses from OpenTofu's outputs, which hold no identifier (infra/outputs.tf).
+outputs=$(tofu -chdir=infra output -json)
+registry=$(jq -r '.registry.value' <<< "$outputs")
+name() { jq -r --arg slot "$slot" --arg key "$1" '.slots.value[$slot][$key]' <<< "$outputs"; }
+
+az acr login --name "${registry%%.*}" --only-show-errors
+for image in api seed public admin; do
+  docker tag "herald-$image:local" "$registry/herald/$slot/$image:$tag"
+  docker push --quiet "$registry/herald/$slot/$image:$tag"
+done
+
+job=$(name job)
+az containerapp job update -n "$job" -g "$group" --image "$registry/herald/$slot/seed:$tag" -o none --only-show-errors
+if [ "$reset" = "--reset" ]; then
+  [ "$slot" = main ] || { echo "--reset is for main; preview resets on every deployment." >&2; exit 2; }
+  az containerapp job update -n "$job" -g "$group" --set-env-vars Herald__Seed__Reset=true -o none --only-show-errors
+  trap 'az containerapp job update -n "$job" -g "$group" --remove-env-vars Herald__Seed__Reset -o none --only-show-errors' EXIT
+fi
+
+execution=$(az containerapp job start -n "$job" -g "$group" --query name -o tsv --only-show-errors)
+echo "seeding job execution $execution"
+# replica_timeout_in_seconds is 900: wait a little longer.
+for _ in $(seq 1 100); do
+  status=$(az containerapp job execution show -n "$job" -g "$group" --job-execution-name "$execution" --query properties.status -o tsv --only-show-errors)
+  case "$status" in
+    Succeeded) break ;;
+    Failed | Stopped | Degraded)
+      echo "::error::The seeding job ended as $status; the apps were not changed. Its logs are in the slot's Application Insights."
+      exit 1 ;;
+  esac
+  sleep 10
+done
+[ "$status" = Succeeded ] || { echo "::error::The seeding job did not finish in time; the apps were not changed."; exit 1; }
+
+for app in api public admin; do
+  az containerapp update -n "$(name "$app")" -g "$group" --image "$registry/herald/$slot/$app:$tag" -o none --only-show-errors
+done
+echo "deployed $tag to $slot"

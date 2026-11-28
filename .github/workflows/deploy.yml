@@ -1,0 +1,192 @@
+name: Deploy
+
+# main on every merge; preview for the slice pull request that holds the `preview` label (m4-deploy D-1, D-2).
+# Signed in as id-herald-delivery through each slot's GitHub environment, which is the job's OIDC subject.
+on:
+  push:
+    branches: [main]
+  pull_request:
+    types: [labeled, synchronize, unlabeled, closed, reopened]
+  workflow_dispatch:
+    inputs:
+      reset:
+        description: Reset main's data before seeding (ADR 0019's manual reset)
+        type: boolean
+        default: false
+
+# Each job asks for what it needs: only the slot jobs get an OIDC token and the Azure ids, so the guard can never sign in to Azure.
+permissions:
+  contents: read
+
+jobs:
+  guard:
+    # Only this repository's pull requests: a fork's never reaches the slot.
+    if: github.event_name == 'pull_request' && github.event.pull_request.head.repo.full_name == github.repository
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    permissions:
+      contents: read
+      pull-requests: write # its comments, and removing a refused label
+    outputs:
+      decision: ${{ steps.decide.outputs.decision }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - id: decide
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          gh pr list --repo "$GITHUB_REPOSITORY" --label preview --state open --json number > "$RUNNER_TEMP/holders.json"
+          node scripts/preview-slot.mjs "$GITHUB_EVENT_PATH" "$RUNNER_TEMP/holders.json" >> "$GITHUB_OUTPUT"
+      - name: Refuse
+        if: steps.decide.outputs.decision == 'refuse'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          number: ${{ github.event.pull_request.number }}
+          holder: ${{ steps.decide.outputs.holder }}
+        run: |
+          gh pr edit "$number" --repo "$GITHUB_REPOSITORY" --remove-label preview
+          gh pr comment "$number" --repo "$GITHUB_REPOSITORY" --body "\`preview\` is held by #$holder. Remove its label or close it, then label this pull request again."
+      - name: Release
+        if: steps.decide.outputs.decision == 'release'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          number: ${{ github.event.pull_request.number }}
+        run: |
+          gh pr comment "$number" --repo "$GITHUB_REPOSITORY" --body "\`preview\` released: another slice pull request can take it with the \`preview\` label."
+
+  main:
+    if: github.event_name != 'pull_request' && github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    environment: main
+    env:
+      ARM_USE_OIDC: true
+      ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      TF_VAR_databases_onboarded: ${{ vars.HERALD_DATABASES_ONBOARDED == 'true' }}
+    permissions:
+      contents: read
+      id-token: write # the OIDC token Entra exchanges for an Azure token
+    # One deployment of main at a time; a merge waits for the running one instead of cancelling it.
+    concurrency:
+      group: deploy-main
+      cancel-in-progress: false
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+        with:
+          package_json_file: web/package.json
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: web/.nvmrc
+          cache: pnpm
+          cache-dependency-path: web/pnpm-lock.yaml
+      - uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
+        with:
+          global-json-file: global.json
+      - uses: opentofu/setup-opentofu@a1320f892987e89d278cc92dc5adc984fb93aca4 # v2.0.2
+        with:
+          tofu_version: 1.13.9
+          tofu_wrapper: false
+      - run: pnpm install --frozen-lockfile
+        working-directory: web
+      - run: deploy/images/build
+      - uses: azure/login@a641126d1b8aa4d1fa005f4f92df94a3a4c4c906 # v3.1.0
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      # As infra.yml: only the variables that are set become TF_VAR_s, so the others stay null.
+      - name: Directory variables
+        env:
+          auth_authority: ${{ vars.HERALD_AUTH_AUTHORITY }}
+          auth_api_audience: ${{ vars.HERALD_AUTH_API_AUDIENCE }}
+          auth_api_scope: ${{ vars.HERALD_AUTH_API_SCOPE }}
+          auth_admin_client_id: ${{ vars.HERALD_AUTH_CLIENT_ID }}
+          persona_main_object_id: ${{ secrets.HERALD_PERSONA_MAIN_OBJECT_ID }}
+          persona_rival_object_id: ${{ secrets.HERALD_PERSONA_RIVAL_OBJECT_ID }}
+        run: |
+          for name in auth_authority auth_api_audience auth_api_scope auth_admin_client_id persona_main_object_id persona_rival_object_id; do
+            if [ -n "${!name}" ]; then echo "TF_VAR_$name=${!name}" >> "$GITHUB_ENV"; fi
+          done
+      - run: tofu -chdir=infra init -input=false
+      # The apply's text carries resource ids with the subscription in them and the run log is public.
+      - name: tofu apply
+        run: tofu -chdir=infra apply -input=false -auto-approve -no-color -lock-timeout=5m > /dev/null
+      - name: Deploy
+        env:
+          reset: ${{ inputs.reset && '--reset' || '' }}
+        run: deploy/deploy-slot main "$GITHUB_SHA" $reset
+      - name: Smoke check
+        run: |
+          tofu -chdir=infra output -json > "$RUNNER_TEMP/outputs.json"
+          deploy/smoke-check "$(jq -r '.slots.value.main.urls.public' "$RUNNER_TEMP/outputs.json")" "$(jq -r '.slots.value.main.urls.admin' "$RUNNER_TEMP/outputs.json")"
+
+  preview:
+    needs: guard
+    if: needs.guard.outputs.decision == 'deploy'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    environment: preview
+    env:
+      ARM_USE_OIDC: true
+      ARM_CLIENT_ID: ${{ secrets.AZURE_CLIENT_ID }}
+      ARM_TENANT_ID: ${{ secrets.AZURE_TENANT_ID }}
+      ARM_SUBSCRIPTION_ID: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      TF_VAR_databases_onboarded: ${{ vars.HERALD_DATABASES_ONBOARDED == 'true' }}
+    permissions:
+      contents: read
+      id-token: write # the OIDC token Entra exchanges for an Azure token
+      pull-requests: write # the deployment's comment
+    concurrency:
+      group: deploy-preview
+      cancel-in-progress: false
+    steps:
+      # The pull request's head, not the merge commit pull_request checks out, so the image is the commit its tag names.
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          ref: ${{ github.event.pull_request.head.sha }}
+      - uses: pnpm/action-setup@73e46992e05b19abd31f2f3c20e0e7370d762115 # v6.1.1
+        with:
+          package_json_file: web/package.json
+      - uses: actions/setup-node@949feb2413d6458794dcd2491c4babbbce0c15c1 # v7.1.0
+        with:
+          node-version-file: web/.nvmrc
+          cache: pnpm
+          cache-dependency-path: web/pnpm-lock.yaml
+      - uses: actions/setup-dotnet@0f4a354dd5547a28c70b7853dbd95d5b67886e73 # v6.1.0
+        with:
+          global-json-file: global.json
+      - uses: opentofu/setup-opentofu@a1320f892987e89d278cc92dc5adc984fb93aca4 # v2.0.2
+        with:
+          tofu_version: 1.13.9
+          tofu_wrapper: false
+      - run: pnpm install --frozen-lockfile
+        working-directory: web
+      - run: deploy/images/build
+      - uses: azure/login@a641126d1b8aa4d1fa005f4f92df94a3a4c4c906 # v3.1.0
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+      # Only to read the outputs: infrastructure applies from main only, so no `apply` here.
+      - run: tofu -chdir=infra init -input=false
+      # The job resets preview on every run by its configuration (m4-infra).
+      - name: Deploy
+        env:
+          sha: ${{ github.event.pull_request.head.sha }}
+        run: deploy/deploy-slot preview "$sha"
+      - name: Smoke check
+        run: |
+          tofu -chdir=infra output -json > "$RUNNER_TEMP/outputs.json"
+          deploy/smoke-check "$(jq -r '.slots.value.preview.urls.public' "$RUNNER_TEMP/outputs.json")" "$(jq -r '.slots.value.preview.urls.admin' "$RUNNER_TEMP/outputs.json")"
+      # A new comment per deployment: editing the last one could overwrite the guard's.
+      - name: Comment
+        env:
+          GH_TOKEN: ${{ github.token }}
+          number: ${{ github.event.pull_request.number }}
+          sha: ${{ github.event.pull_request.head.sha }}
+        run: |
+          node scripts/deploy-comment.mjs "$RUNNER_TEMP/outputs.json" "$sha" > "$RUNNER_TEMP/comment.md"
+          gh pr comment "$number" --repo "$GITHUB_REPOSITORY" --body-file "$RUNNER_TEMP/comment.md"

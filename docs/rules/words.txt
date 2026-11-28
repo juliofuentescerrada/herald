@@ -29,6 +29,9 @@ nologo
 Postprocessors
 xunit
 vendored
+unlabeled
+containerapp
+vars
 # Azure resource names and prefixes (Steward's naming convention)
 appi
 crjfcshared

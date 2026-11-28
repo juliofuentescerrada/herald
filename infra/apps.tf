@@ -51,6 +51,8 @@ locals {
         PORT             = tostring(local.port)
         HERALD_API_URL   = local.urls[slot].api
         HERALD_ADMIN_URL = local.urls[slot].admin
+        # Angular's SSR server answers 400 to a host not on its allowlist (m4-images design).
+        NG_ALLOWED_HOSTS = trimprefix(local.urls[slot].public, "https://")
       }
     }
     "${slot}-admin" = {

@@ -21,6 +21,7 @@ labels=(
   "ready-to-test|0e8a16|A slice or batch waiting for the maintainer's test round"
   "feedback|c5def5|The maintainer's feedback is waiting for the agent"
   "agent:start|000000|Starts or resumes the slice in an agent session"
+  "preview|0052cc|Deploys this slice pull request to the preview slot; one pull request at a time (m4-deploy)"
 )
 
 # title|description
